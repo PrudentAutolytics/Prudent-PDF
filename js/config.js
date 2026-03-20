@@ -6,14 +6,16 @@ const APP_CONFIG = {
 
   /* ── Power Automate Flow Endpoints ─────────────────── */
   FLOWS: {
-    AUTH_REQUEST:  'https://YOUR_PA_FLOW/auth-request',   // POST { email }
-    AUTH_VERIFY:   'https://YOUR_PA_FLOW/auth-verify',    // POST { token }
-    QUOTA_GET:     'https://YOUR_PA_FLOW/quota-get',      // POST { email }
-    JOB_SUBMIT:    'https://YOUR_PA_FLOW/job-submit',     // POST { email, token, blobUrl, fileName, fileSize, pageCount }
-    JOB_STATUS:    'https://YOUR_PA_FLOW/job-status',     // POST { jobId, email }
-    JOB_LIST:      'https://YOUR_PA_FLOW/job-list',       // POST { email, days: 30 }
-    CONTACT_SEND:  'https://YOUR_PA_FLOW/contact-send',   // POST { name, email, company, message, planInterest }
-    BLOB_SAS:      'https://YOUR_PA_FLOW/blob-sas',       // POST { email, fileName } → { sasUrl, blobPath }
+    // ✅ Mapped from original single-file app
+    AUTH_REQUEST:  'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/23e2c998a84b4b73923ae583529f8e47/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QEyourHBk-W8NwSKhpj59GRmW85ij7UoVc0U_TX79rg',
+    AUTH_VERIFY:   'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/23e2c998a84b4b73923ae583529f8e47/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QEyourHBk-W8NwSKhpj59GRmW85ij7UoVc0U_TX79rg',
+    QUOTA_GET:     'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b3c15588b7594d4e834cc96ec1928dcb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=azighR_4vG-zfpQz4DNLFjaKciL19rLnePPtmYiQuKo',
+    JOB_SUBMIT:    'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3774048e2c6f42c996f356fa7a2d8318/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=oSVQ7qsCqYuDr7nbOpC_ssEsLdvBqezL4BYU-_0-BnI',
+    // ⚠️ These 4 need new PA flows to be built (see README):
+    JOB_STATUS:    '',   // POST { jobId, email } → { status, resultUrl }
+    JOB_LIST:      '',   // POST { email, days } → [ job array ]
+    CONTACT_SEND:  '',   // POST { name, email, company, message, planInterest }
+    BLOB_SAS:      '',   // POST { email, fileName } → { sasUrl, blobPath }
   },
 
   /* ── Azure Blob (upload direct from browser via SAS) ─ */
@@ -42,7 +44,7 @@ const APP_CONFIG = {
   APP: {
     NAME:           'Prudent PDF',
     TAGLINE:        'Intelligent PDF Redaction',
-    SUPPORT_EMAIL:  'kabileshvijaykumar@trulenthautologistics.com',
+    SUPPORT_EMAIL:  'kabileshvijaykumar@prudentautolytics.com',
     POLL_INTERVAL:  5000,   // ms — job status polling
     HISTORY_DAYS:   30,
   }
