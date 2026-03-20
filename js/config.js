@@ -44,7 +44,7 @@ const APP_CONFIG = {
   APP: {
     NAME:           'Prudent PDF',
     TAGLINE:        'Intelligent PDF Redaction',
-    SUPPORT_EMAIL:  'kabileshvijaykumar@trulenthautologistics.com',
+    SUPPORT_EMAIL:  'Kabileshvijayakumar@prudentautolytics.com',
     POLL_INTERVAL:  5000,   // ms — job status polling
     HISTORY_DAYS:   30,
   }

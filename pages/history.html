@@ -1,97 +1,98 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Job History — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-.sort-btn { background:none;border:none;color:var(--ink3);cursor:pointer;padding:0;font-size:10px;margin-left:4px;vertical-align:middle;transition:color var(--dur) var(--ease); }
-.sort-btn:hover,.sort-btn.active { color:var(--accent); }
-.bulk-bar {
-  background:var(--accent-s); border:1px solid rgba(59,130,246,.25);
-  border-radius:var(--r3); padding:8px 14px;
-  display:none; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;
+.bulk-bar{
+  display:none;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--c-blue-bg);border:1.5px solid var(--c-blue-bdr);
+  border-radius:var(--r8);padding:10px 16px;margin-bottom:12px;
 }
-.bulk-bar.show { display:flex; }
-.cost-summary-row {
-  display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px;
-}
-.cost-mini { background:var(--surface); border:1px solid var(--border); border-radius:var(--r3); padding:12px 14px; }
-.cost-mini-label { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); margin-bottom:4px; }
-.cost-mini-val { font-size:18px; font-weight:800; font-family:var(--font-mono); }
-.row-actions { display:flex; align-items:center; gap:5px; opacity:0; transition:opacity var(--dur) var(--ease); }
-tr:hover .row-actions { opacity:1; }
-.detail-row td { background:var(--bg2); padding:0 !important; }
-.detail-inner { padding:14px 16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; font-size:12px; }
-.detail-block { display:grid; gap:4px; }
-.detail-key { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); }
-.detail-val { color:var(--ink); font-family:var(--font-mono); font-size:12px; }
+.bulk-bar.show{display:flex}
+.detail-row td{background:var(--c-surface2);padding:0!important}
+.detail-inner{padding:16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.detail-block{}
+.detail-key{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--c-ink3);margin-bottom:4px}
+.detail-val{font-size:12.5px;color:var(--c-ink);font-family:var(--mono);word-break:break-all}
 </style>
 </head>
 <body>
-<div class="app-shell" id="appShell">
+<div class="shell" id="appShell">
   <main class="main">
 
-    <div class="page-hd animate-in">
-      <div>
+    <!-- ── Page header ── -->
+    <div class="page-hd anim">
+      <div class="page-hd-left">
+        <div class="page-hd-eyebrow">Workspace</div>
         <div class="page-title">Job History</div>
         <div class="page-subtitle">All redaction jobs from the last 30 days</div>
       </div>
-      <div class="page-actions">
+      <div class="page-hd-actions">
         <button class="btn btn-secondary" id="refreshBtn">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Refresh
         </button>
         <button class="btn btn-secondary" id="exportAllBtn">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Export All CSV
         </button>
         <a href="/dashboard" class="btn btn-primary">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
           New Redaction
         </a>
       </div>
     </div>
 
-    <!-- Cost summary mini cards -->
-    <div class="cost-summary-row animate-in stagger-1">
-      <div class="cost-mini stat-accent" style="border-top:2px solid var(--accent)">
-        <div class="cost-mini-label">Total Files</div>
-        <div class="cost-mini-val" id="cTotal">—</div>
+    <!-- ── Stats row ── -->
+    <div class="stats-grid">
+      <div class="stat-card blue anim d1">
+        <div class="stat-label">Total Files</div>
+        <div class="stat-val" id="sTotalFiles">0</div>
+        <div class="stat-note">Last 30 days</div>
+        <div class="stat-bg-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
       </div>
-      <div class="cost-mini stat-emerald" style="border-top:2px solid var(--emerald)">
-        <div class="cost-mini-label">Success Rate</div>
-        <div class="cost-mini-val text-emerald" id="cRate">—</div>
+      <div class="stat-card green anim d2">
+        <div class="stat-label">Success Rate</div>
+        <div class="stat-val" id="sSuccessRate">—</div>
+        <div class="stat-note" id="sSuccessNote">No data yet</div>
+        <div class="stat-bg-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       </div>
-      <div class="cost-mini stat-gold" style="border-top:2px solid var(--gold)">
-        <div class="cost-mini-label">Total Cost (30d)</div>
-        <div class="cost-mini-val text-gold" id="cCost">—</div>
+      <div class="stat-card amber anim d3">
+        <div class="stat-label">Total Cost (30d)</div>
+        <div class="stat-val" id="sTotalCost">$0.0000</div>
+        <div class="stat-note" id="sCostNote">Across all jobs</div>
+        <div class="stat-bg-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.5"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       </div>
-      <div class="cost-mini" style="border-top:2px solid var(--violet)">
-        <div class="cost-mini-label">Avg Cost / File</div>
-        <div class="cost-mini-val" style="color:var(--violet)" id="cAvg">—</div>
+      <div class="stat-card anim d4" style="border-top:2.5px solid var(--c-violet)">
+        <div class="stat-label">Avg Cost / File</div>
+        <div class="stat-val" id="sAvgCost" style="color:var(--c-violet)">—</div>
+        <div class="stat-note">Per processed file</div>
+        <div class="stat-bg-icon" style="color:var(--c-violet)"><svg width="40" height="40" fill="none" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
     </div>
 
-    <!-- Bulk action bar -->
+    <!-- ── Bulk bar ── -->
     <div class="bulk-bar" id="bulkBar">
-      <span class="text-sm text-accent bold" id="bulkCount">0 selected</span>
-      <button class="btn btn-secondary btn-sm" id="bulkExport">Export selected CSV</button>
-      <button class="btn btn-danger btn-sm" id="bulkDelete">Delete selected</button>
-      <button class="btn btn-ghost btn-sm" id="clearSelect">✕ Clear</button>
+      <span class="text-sm font-semibold text-blue" id="bulkCount">0 selected</span>
+      <button class="btn btn-sm btn-secondary" id="bulkExportBtn">Export selected CSV</button>
+      <button class="btn btn-sm btn-ghost" id="clearSelectBtn">✕ Clear selection</button>
     </div>
 
-    <!-- Filters -->
-    <div class="card animate-in stagger-2">
-      <div class="card-hd">
+    <!-- ── Jobs card ── -->
+    <div class="card anim d2">
+      <div class="card-header">
         <div class="card-title">
-          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="card-title-icon">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.75"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+          </div>
           All Jobs
-          <span class="nav-badge" id="jobCount">—</span>
+          <span class="nav-link-badge blue" id="jobCountBadge">0</span>
         </div>
-        <div class="filters-bar" style="margin:0">
-          <input class="filter-search" id="searchFilter" placeholder="Search filename…" type="search"/>
+        <div class="filter-bar">
+          <input class="filter-input" id="searchFilter" placeholder="Search filename…" type="search" style="width:200px"/>
           <select class="filter-select" id="statusFilter">
             <option value="">All Status</option>
             <option value="Complete">Complete</option>
@@ -108,7 +109,6 @@ tr:hover .row-actions { opacity:1; }
             <option value="date-desc">Newest first</option>
             <option value="date-asc">Oldest first</option>
             <option value="cost-desc">Highest cost</option>
-            <option value="cost-asc">Lowest cost</option>
             <option value="name-asc">Name A–Z</option>
           </select>
         </div>
@@ -116,27 +116,34 @@ tr:hover .row-actions { opacity:1; }
 
       <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr>
-            <th class="check-col"><input type="checkbox" id="selectAll"/></th>
-            <th>File</th>
-            <th>Submitted</th>
-            <th>Pages</th>
-            <th>Status</th>
-            <th>Processing Time</th>
-            <th>Cost</th>
-            <th>Actions</th>
-          </tr></thead>
+          <thead>
+            <tr>
+              <th class="col-chk"><input type="checkbox" id="selectAll"/></th>
+              <th>File</th>
+              <th>Submitted</th>
+              <th>Pages</th>
+              <th>Status</th>
+              <th>Processing Time</th>
+              <th>Cost</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="historyBody">
-            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--ink3)">Loading jobs…</td></tr>
+            <tr><td colspan="8">
+              <div class="empty-state">
+                <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+                <div class="empty-state-title">Loading jobs…</div>
+              </div>
+            </td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="card-footer">
-        <span class="text-xs text-muted" id="historyMeta">—</span>
+        <span class="text-sm text-subtle" id="historyMeta">—</span>
         <div style="flex:1"></div>
-        <button class="btn btn-secondary btn-sm" id="exportFilteredBtn">
-          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <button class="btn btn-sm btn-secondary" id="exportFilteredBtn">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
           Export filtered CSV
         </button>
       </div>
@@ -145,6 +152,9 @@ tr:hover .row-actions { opacity:1; }
   </main>
 </div>
 
+<!-- ── Toast area ── -->
+<div id="toast-area"></div>
+
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
@@ -152,74 +162,62 @@ Shell.init('history');
 
 (function(){
   const s = Session.get();
-  let allJobs      = [];
-  let filtered     = [];
-  let selected     = new Set();
-  let expandedRow  = null;
+  let allJobs = [], filtered = [], selected = new Set();
 
-  /* ── Load ─────────────────────────────────────────── */
   async function load() {
-    const days = parseInt(document.getElementById('dateFilter').value) || 30;
+    const days = parseInt(document.getElementById('dateFilter').value)||30;
     try {
-      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email: s.email, days });
-      allJobs = Array.isArray(res) ? res : (res?.jobs || []);
+      const r = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email:s.email, days });
+      allJobs = Array.isArray(r) ? r : (r?.jobs||[]);
     } catch {
-      allJobs = JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]');
+      allJobs = JSON.parse(localStorage.getItem('pp_jobs_'+s.email)||'[]');
     }
-
-    // Augment with cost if missing
     allJobs = allJobs.map(j => ({
       ...j,
-      costTotal: j.costTotal ?? calcJobCost(j.pageCount ?? 1, parseFloat(fmt.mb(j.fileSize ?? 0))).total,
-      processingMs: j.completedAt && j.submittedAt
-        ? new Date(j.completedAt) - new Date(j.submittedAt) : null,
+      costTotal: j.costTotal ?? calcJobCost(j.pageCount??1, parseFloat(fmt.mb(j.fileSize??0))).total,
+      processingMs: (j.completedAt && j.submittedAt)
+        ? new Date(j.completedAt)-new Date(j.submittedAt) : null,
     }));
-
     renderSummary();
     applyFilters();
-
-    // Poll if needed
-    if (allJobs.some(j => j.status === 'Processing' || j.status === 'Queued')) {
+    if (allJobs.some(j=>j.status==='Processing'||j.status==='Queued'))
       setTimeout(load, APP_CONFIG.APP.POLL_INTERVAL);
-    }
   }
 
   function renderSummary() {
     const total = allJobs.length;
-    const done  = allJobs.filter(j => j.status === 'Complete').length;
-    const totalCost = allJobs.reduce((a,j) => a + (j.costTotal || 0), 0);
-    document.getElementById('cTotal').textContent = total;
-    document.getElementById('cRate').textContent  = total ? Math.round(done/total*100) + '%' : '—';
-    document.getElementById('cCost').textContent  = '$' + totalCost.toFixed(4);
-    document.getElementById('cAvg').textContent   = total ? '$' + (totalCost/total).toFixed(4) : '—';
+    const done  = allJobs.filter(j=>j.status==='Complete').length;
+    const cost  = allJobs.reduce((a,j)=>a+(j.costTotal||0),0);
+    document.getElementById('sTotalFiles').textContent   = total;
+    document.getElementById('sSuccessRate').textContent  = total ? Math.round(done/total*100)+'%' : '—';
+    document.getElementById('sSuccessNote').textContent  = total ? `${done} of ${total} completed` : 'No jobs yet';
+    document.getElementById('sTotalCost').textContent    = '$'+cost.toFixed(4);
+    document.getElementById('sCostNote').textContent     = `${total} job${total!==1?'s':''}`;
+    document.getElementById('sAvgCost').textContent      = total ? '$'+(cost/total).toFixed(4) : '—';
   }
 
-  /* ── Filters ──────────────────────────────────────── */
   function applyFilters() {
     const q      = document.getElementById('searchFilter').value.toLowerCase();
     const status = document.getElementById('statusFilter').value;
     const sort   = document.getElementById('sortFilter').value;
-    const days   = parseInt(document.getElementById('dateFilter').value) || 30;
-    const cutoff = Date.now() - days * 86400000;
+    const days   = parseInt(document.getElementById('dateFilter').value)||30;
+    const cutoff = Date.now() - days*86400000;
 
     filtered = allJobs.filter(j => {
       if (new Date(j.submittedAt) < cutoff) return false;
-      if (q && !j.fileName.toLowerCase().includes(q)) return false;
+      if (q && !j.fileName?.toLowerCase().includes(q)) return false;
       if (status && j.status !== status) return false;
       return true;
     });
-
     filtered.sort((a,b) => {
-      if (sort === 'date-desc')  return new Date(b.submittedAt) - new Date(a.submittedAt);
-      if (sort === 'date-asc')   return new Date(a.submittedAt) - new Date(b.submittedAt);
-      if (sort === 'cost-desc')  return (b.costTotal||0) - (a.costTotal||0);
-      if (sort === 'cost-asc')   return (a.costTotal||0) - (b.costTotal||0);
-      if (sort === 'name-asc')   return a.fileName.localeCompare(b.fileName);
+      if (sort==='date-desc')  return new Date(b.submittedAt)-new Date(a.submittedAt);
+      if (sort==='date-asc')   return new Date(a.submittedAt)-new Date(b.submittedAt);
+      if (sort==='cost-desc')  return (b.costTotal||0)-(a.costTotal||0);
+      if (sort==='name-asc')   return (a.fileName||'').localeCompare(b.fileName||'');
       return 0;
     });
-
-    document.getElementById('jobCount').textContent = filtered.length;
-    document.getElementById('historyMeta').textContent = `${filtered.length} of ${allJobs.length} jobs`;
+    document.getElementById('jobCountBadge').textContent = filtered.length;
+    document.getElementById('historyMeta').textContent   = `${filtered.length} of ${allJobs.length} jobs`;
     renderTable();
   }
 
@@ -227,38 +225,42 @@ Shell.init('history');
     document.getElementById(id).addEventListener('input', applyFilters));
   document.getElementById('dateFilter').addEventListener('change', load);
 
-  /* ── Table ────────────────────────────────────────── */
   function renderTable() {
     const tbody = document.getElementById('historyBody');
     if (!filtered.length) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:48px 20px;color:var(--ink3)">
-        <svg width="36" height="36" fill="none" viewBox="0 0 24 24" style="margin:0 auto 10px;opacity:.3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
-        <div>No jobs match your filters.</div>
-      </td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
+        <svg class="empty-state" width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <div class="empty-state-title">No jobs match your filters</div>
+        <div class="empty-state-sub">Try adjusting the filters above or upload a new PDF</div>
+      </div></td></tr>`;
       return;
     }
+
     tbody.innerHTML = filtered.map((j,i) => `
-      <tr data-jobid="${j.jobId}" class="${j.status==='Processing'?'processing-row':''}">
-        <td class="check-col"><input type="checkbox" class="row-check" data-id="${j.jobId}" ${selected.has(j.jobId)?'checked':''}/></td>
+      <tr class="${j.status==='Processing'?'':''}">
+        <td class="col-chk"><input type="checkbox" class="row-chk" data-id="${j.jobId}" ${selected.has(j.jobId)?'checked':''}/></td>
         <td>
           <div class="file-cell">
             <div class="file-thumb">PDF</div>
             <div>
-              <div class="file-name" title="${j.fileName}">${j.fileName}</div>
+              <div class="file-name" title="${j.fileName||''}">${j.fileName||'—'}</div>
               <div class="file-meta">${fmt.bytes(j.fileSize||0)}</div>
             </div>
           </div>
         </td>
-        <td class="text-sm text-muted">${fmt.datetime(j.submittedAt)}</td>
-        <td class="text-sm">${j.pageCount ?? '—'}</td>
-        <td>${statusPill(j.status)}</td>
-        <td class="text-sm text-muted text-mono">${j.processingMs ? fmt.duration(j.processingMs) : '—'}</td>
-        <td><span class="cost-chip">${j.costTotal ? '$'+j.costTotal.toFixed(4) : '—'}</span></td>
         <td>
-          <div class="row-actions">
-            <button class="btn btn-secondary btn-xs expand-btn" data-idx="${i}" title="Details">⋯</button>
-            ${j.status === 'Complete' ? `<a href="/viewer?jobId=${j.jobId}" class="btn btn-secondary btn-xs">View</a>` : ''}
-            ${j.resultUrl ? `<a href="${j.resultUrl}" class="btn btn-ghost btn-xs" target="_blank" title="Download redacted PDF">↓</a>` : ''}
+          <div class="text-sm">${fmt.date(j.submittedAt)}</div>
+          <div class="text-xs text-subtle">${fmt.time(j.submittedAt)}</div>
+        </td>
+        <td class="text-sm">${j.pageCount??'—'}</td>
+        <td>${statusPill(j.status)}</td>
+        <td class="text-sm text-mono text-subtle">${j.processingMs?fmt.duration(j.processingMs):'—'}</td>
+        <td><span class="cost-chip">${j.costTotal?'$'+j.costTotal.toFixed(4):'—'}</span></td>
+        <td>
+          <div class="flex gap-6">
+            <button class="btn btn-xs btn-secondary expand-btn" data-idx="${i}">Details</button>
+            ${j.status==='Complete'?`<a href="/viewer?jobId=${j.jobId}" class="btn btn-xs btn-secondary">View</a>`:''}
+            ${j.resultUrl?`<a href="${j.resultUrl}" class="btn btn-xs btn-ghost" target="_blank" title="Download">↓</a>`:''}
           </div>
         </td>
       </tr>
@@ -266,108 +268,80 @@ Shell.init('history');
         <td colspan="8">
           <div class="detail-inner">
             <div class="detail-block">
-              <div class="detail-key">Job ID</div>
-              <div class="detail-val">${j.jobId || '—'}</div>
-              <div class="detail-key" style="margin-top:8px">Blob URL</div>
-              <div class="detail-val truncate" style="max-width:200px" title="${j.blobUrl||''}">${j.blobUrl ? '✓ Stored' : '—'}</div>
+              <div class="detail-key">Job ID</div><div class="detail-val">${j.jobId||'—'}</div>
+              <div class="detail-key mt-12">Blob URL</div><div class="detail-val truncate">${j.blobUrl?'✓ Stored in Azure Blob':'—'}</div>
             </div>
             <div class="detail-block">
               <div class="detail-key">Cost Breakdown</div>
-              ${costBreakdownMini(j)}
+              ${costBreakdown(j)}
             </div>
             <div class="detail-block">
               <div class="detail-key">Timeline</div>
               <div class="detail-val">Submitted: ${fmt.datetime(j.submittedAt)}</div>
-              ${j.completedAt ? `<div class="detail-val">Completed: ${fmt.datetime(j.completedAt)}</div>` : ''}
-              ${j.errorMessage ? `<div class="detail-key" style="margin-top:8px;color:var(--rose)">Error</div><div class="detail-val text-rose">${j.errorMessage}</div>` : ''}
+              ${j.completedAt?`<div class="detail-val mt-4">Completed: ${fmt.datetime(j.completedAt)}</div>`:''}
+              ${j.errorMessage?`<div class="detail-key mt-8" style="color:var(--c-red)">Error</div><div class="detail-val" style="color:var(--c-red)">${j.errorMessage}</div>`:''}
             </div>
           </div>
         </td>
       </tr>
     `).join('');
 
-    // Expand row toggle
     tbody.querySelectorAll('.expand-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const idx = btn.dataset.idx;
-        const detailRow = document.getElementById(`detail-${idx}`);
-        const isOpen = !detailRow.classList.contains('hidden');
-        tbody.querySelectorAll('.detail-row').forEach(r => r.classList.add('hidden'));
-        if (!isOpen) detailRow.classList.remove('hidden');
+        const row = document.getElementById('detail-'+btn.dataset.idx);
+        const open = !row.classList.contains('hidden');
+        tbody.querySelectorAll('.detail-row').forEach(r=>r.classList.add('hidden'));
+        if (!open) row.classList.remove('hidden');
+        btn.textContent = (!open) ? 'Close' : 'Details';
       });
     });
 
-    // Checkboxes
-    tbody.querySelectorAll('.row-check').forEach(chk => {
+    tbody.querySelectorAll('.row-chk').forEach(chk => {
       chk.addEventListener('change', () => {
-        const id = chk.dataset.id;
-        chk.checked ? selected.add(id) : selected.delete(id);
-        updateBulkBar();
+        chk.checked ? selected.add(chk.dataset.id) : selected.delete(chk.dataset.id);
+        updateBulk();
       });
     });
   }
 
-  function costBreakdownMini(j) {
-    if (!j.costTotal) return '<div class="detail-val">—</div>';
-    const c = calcJobCost(j.pageCount ?? 1, parseFloat(fmt.mb(j.fileSize ?? 0)));
-    return `
-      <div class="detail-val">Doc Intelligence: $${c.docIntel}</div>
-      <div class="detail-val">Blob Storage: $${c.blob}</div>
-      <div class="detail-val">Functions: $${c.functions}</div>
-      <div class="detail-val">PA Flow: $${c.paFlow}</div>
-      <div class="detail-val bold text-gold">Total: $${c.total.toFixed(4)}</div>`;
+  function costBreakdown(j) {
+    const c = calcJobCost(j.pageCount??1, parseFloat(fmt.mb(j.fileSize??0)));
+    return ['Doc Intelligence:$'+c.docIntel,'Blob Storage:$'+c.blob,'Functions:$'+c.functions,'PA Flow:$'+c.paFlow,'Total:<b>$'+c.total.toFixed(4)+'</b>']
+      .map(x=>{const[k,v]=x.split(':');return`<div class="flex-between text-xs mt-4"><span class="text-subtle">${k}</span><span class="text-mono">${v}</span></div>`;}).join('');
   }
 
-  function statusPill(status) {
-    const map = { 'Complete':'pill-complete','Processing':'pill-processing','Queued':'pill-queued','Failed':'pill-failed' };
-    const dot = status === 'Processing' ? '<span class="pill-dot pulse"></span>' : '<span class="pill-dot"></span>';
-    return `<span class="pill ${map[status]||'pill-queued'}">${dot}${status}</span>`;
+  function statusPill(s) {
+    const m = {Complete:'pill-complete',Processing:'pill-processing',Queued:'pill-queued',Failed:'pill-failed'};
+    const dot = s==='Processing' ? '<span class="pill-dot pulse"></span>' : '<span class="pill-dot"></span>';
+    return `<span class="pill ${m[s]||'pill-queued'}">${dot}${s}</span>`;
   }
 
-  /* ── Select all ───────────────────────────────────── */
-  document.getElementById('selectAll').addEventListener('change', (e) => {
+  document.getElementById('selectAll').addEventListener('change', e => {
     filtered.forEach(j => e.target.checked ? selected.add(j.jobId) : selected.delete(j.jobId));
-    renderTable();
-    updateBulkBar();
+    renderTable(); updateBulk();
   });
-
-  function updateBulkBar() {
+  function updateBulk() {
     const bar = document.getElementById('bulkBar');
-    const count = selected.size;
-    document.getElementById('bulkCount').textContent = `${count} selected`;
-    bar.classList.toggle('show', count > 0);
+    document.getElementById('bulkCount').textContent = selected.size+' selected';
+    bar.classList.toggle('show', selected.size > 0);
   }
 
-  document.getElementById('clearSelect').addEventListener('click', () => {
-    selected.clear(); renderTable(); updateBulkBar();
-  });
-
-  document.getElementById('bulkExport').addEventListener('click', () => {
-    const rows = filtered.filter(j => selected.has(j.jobId)).map(toCSVRow);
-    exportCSV(rows, 'selected-jobs.csv');
-  });
-
-  /* ── Exports ──────────────────────────────────────── */
-  function toCSVRow(j) {
-    return {
-      JobID: j.jobId, FileName: j.fileName,
-      FileSize: fmt.bytes(j.fileSize || 0), Pages: j.pageCount ?? '',
-      Status: j.status, SubmittedAt: j.submittedAt, CompletedAt: j.completedAt || '',
-      ProcessingTime: j.processingMs ? fmt.duration(j.processingMs) : '',
-      CostUSD: j.costTotal?.toFixed(4) || '',
-      ResultURL: j.resultUrl || '', ErrorMessage: j.errorMessage || '',
-    };
+  function toRow(j) {
+    return {JobID:j.jobId,FileName:j.fileName,FileSize:fmt.bytes(j.fileSize||0),
+      Pages:j.pageCount??'',Status:j.status,SubmittedAt:j.submittedAt,
+      CompletedAt:j.completedAt||'',ProcessingTime:j.processingMs?fmt.duration(j.processingMs):'',
+      CostUSD:j.costTotal?.toFixed(4)||'',ErrorMessage:j.errorMessage||''};
   }
 
-  document.getElementById('exportAllBtn').addEventListener('click', () => exportCSV(allJobs.map(toCSVRow), 'all-jobs-30d.csv'));
-  document.getElementById('exportFilteredBtn').addEventListener('click', () => exportCSV(filtered.map(toCSVRow), 'filtered-jobs.csv'));
   document.getElementById('refreshBtn').addEventListener('click', load);
+  document.getElementById('exportAllBtn').addEventListener('click', () => exportCSV(allJobs.map(toRow),'all-jobs.csv'));
+  document.getElementById('exportFilteredBtn').addEventListener('click', () => exportCSV(filtered.map(toRow),'filtered-jobs.csv'));
+  document.getElementById('bulkExportBtn').addEventListener('click', () => exportCSV(filtered.filter(j=>selected.has(j.jobId)).map(toRow),'selected-jobs.csv'));
+  document.getElementById('clearSelectBtn').addEventListener('click', () => { selected.clear(); renderTable(); updateBulk(); });
 
-  /* ── URL query search ─────────────────────────────── */
   const urlQ = new URLSearchParams(location.search).get('q');
-  if (urlQ) { document.getElementById('searchFilter').value = urlQ; }
+  if (urlQ) document.getElementById('searchFilter').value = urlQ;
 
-  /* ── Boot ─────────────────────────────────────────── */
   load();
 })();
 </script>
