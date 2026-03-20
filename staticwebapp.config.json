@@ -1,0 +1,25 @@
+{
+  "routes": [
+    { "route": "/dashboard", "rewrite": "/pages/dashboard.html" },
+    { "route": "/history",   "rewrite": "/pages/history.html" },
+    { "route": "/viewer",    "rewrite": "/pages/viewer.html" },
+    { "route": "/contact",   "rewrite": "/pages/contact.html" },
+    { "route": "/pricing",   "rewrite": "/pages/pricing.html" },
+    { "route": "/login",     "rewrite": "/pages/login.html" },
+    { "route": "/",          "rewrite": "/pages/login.html" }
+  ],
+  "navigationFallback": {
+    "rewrite": "/pages/login.html",
+    "exclude": ["/css/*", "/js/*", "/assets/*", "/*.json"]
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".css":  "text/css",
+    ".js":   "application/javascript"
+  }
+}

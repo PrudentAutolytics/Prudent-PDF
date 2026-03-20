@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Document Viewer — Prudent PDF</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<style>
+.viewer-layout { display:grid; grid-template-rows:auto 1fr auto; height:calc(100vh - 56px); overflow:hidden; }
+.viewer-top { padding:12px 20px; border-bottom:1px solid var(--border); background:var(--bg2); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.viewer-main { display:grid; grid-template-columns:1fr 380px; min-height:0; overflow:hidden; }
+.viewer-docs { display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--border); overflow:hidden; }
+.viewer-pane { background:var(--bg2); display:flex; flex-direction:column; overflow:hidden; }
+.pane-header {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); flex-shrink:0;
+}
+.pane-label { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
+.pane-original { color:var(--accent); }
+.pane-redacted  { color:var(--rose); }
+.pane-scroll { flex:1; overflow:auto; padding:16px; display:flex; justify-content:center; }
+.pdf-mock {
+  width:100%; max-width:580px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  padding:28px 24px;
+  font-size:12px; line-height:1.8;
+  font-family:var(--font-mono);
+  color:var(--ink2);
+  min-height:400px;
+  position:relative;
+}
+.pdf-mock-title { font-size:14px; font-weight:700; color:var(--ink); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.redact-bar {
+  display:inline-block;
+  background:var(--ink);
+  color:transparent;
+  border-radius:2px;
+  user-select:none;
+  padding:0 2px;
+}
+[data-theme="light"] .redact-bar { background:#1e293b; }
+.pane-footer {
+  padding:8px 12px; border-top:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.zoom-group { display:flex; align-items:center; gap:4px; }
+.zoom-step { width:26px; height:26px; border-radius:var(--r4); background:var(--surface2); border:1px solid var(--border2); display:grid; place-items:center; font-size:14px; font-weight:600; color:var(--ink2); transition:all var(--dur) var(--ease); }
+.zoom-step:hover { background:var(--surface3); color:var(--ink); }
+.zoom-val { font-family:var(--font-mono); font-size:11px; color:var(--ink2); min-width:36px; text-align:center; }
+.page-nav { display:flex; align-items:center; gap:6px; }
+.page-val { font-family:var(--font-mono); font-size:11px; color:var(--ink); min-width:50px; text-align:center; }
+
+/* Right panel */
+.viewer-panel { background:var(--bg2); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+.panel-tabs { display:flex; border-bottom:1px solid var(--border); flex-shrink:0; }
+.panel-tab {
+  flex:1; padding:10px 6px; font-size:12px; font-weight:600; text-align:center;
+  color:var(--ink3); cursor:pointer; border-bottom:2px solid transparent;
+  transition:all var(--dur) var(--ease); background:none; border-top:none; border-left:none; border-right:none;
+}
+.panel-tab:hover { color:var(--ink); }
+.panel-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.panel-content { flex:1; overflow-y:auto; }
+.panel-section { display:none; padding:14px; }
+.panel-section.active { display:block; }
+
+/* Fields table */
+.field-row { padding:9px 0; border-bottom:1px solid var(--border); }
+.field-row:last-child { border-bottom:none; }
+.field-key { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); margin-bottom:3px; }
+.field-val { font-size:12px; font-family:var(--font-mono); color:var(--ink); word-break:break-all; }
+.field-val.redacted { color:transparent; background:var(--rose); border-radius:3px; user-select:none; font-size:10px; letter-spacing:.1em; }
+.field-val.redacted::after { content:'REDACTED'; color:var(--rose); background:none; }
+.field-conf { margin-top:4px; }
+
+/* Cost breakdown panel */
+.cost-service-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); }
+.cost-service-row:last-child { border-bottom:none; }
+.cost-service-label { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink2); }
+.cost-swatch { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.cost-service-amt { font-family:var(--font-mono); font-size:12px; color:var(--ink); }
+.cost-total-card {
+  background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(245,158,11,.03));
+  border:1px solid rgba(245,158,11,.2); border-radius:var(--r3); padding:14px; margin:12px 0;
+}
+.cost-total-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+.cost-total-val { font-size:24px; font-weight:800; font-family:var(--font-mono); color:var(--gold); }
+.cost-total-sub { font-size:11px; color:var(--ink3); margin-top:3px; }
+
+/* No job loaded state */
+.no-job {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:100%; gap:14px; color:var(--ink3); text-align:center; padding:40px;
+}
+</style>
+</head>
+<body>
+<div class="app-shell" id="appShell">
+  <main class="main" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+
+    <!-- Viewer toolbar -->
+    <div class="viewer-top">
+      <a href="/history" class="btn btn-ghost btn-sm">← History</a>
+      <div class="divider" style="width:1px;height:20px;margin:0"></div>
+      <div id="viewerJobName" class="text-sm bold truncate" style="max-width:240px">No document loaded</div>
+      <span class="pill" id="viewerStatus" style="display:none"></span>
+      <div style="flex:1"></div>
+
+      <!-- Job selector -->
+      <select class="filter-select" id="jobSelector" style="max-width:200px">
+        <option value="">— Select a job —</option>
+      </select>
+
+      <!-- Actions -->
+      <button class="btn btn-secondary btn-sm" id="downloadOriginalBtn" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Original
+      </button>
+      <button class="btn btn-primary btn-sm" id="downloadRedactedBtn" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Redacted PDF
+      </button>
+      <button class="btn btn-secondary btn-sm" id="exportFieldsBtn" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Fields CSV
+      </button>
+    </div>
+
+    <!-- Main viewer area -->
+    <div class="viewer-main" style="flex:1;min-height:0">
+
+      <!-- Side-by-side PDF panes -->
+      <div class="viewer-docs">
+
+        <!-- Original -->
+        <div class="viewer-pane">
+          <div class="pane-header">
+            <div class="pane-label pane-original">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
+              Original
+            </div>
+            <div class="zoom-group" id="origZoom">
+              <button class="zoom-step" id="origZoomOut">−</button>
+              <span class="zoom-val" id="origZoomVal">100%</span>
+              <button class="zoom-step" id="origZoomIn">+</button>
+            </div>
+          </div>
+          <div class="pane-scroll" id="origScroll">
+            <div class="no-job" id="origEmpty">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+              <p class="text-sm">Select a completed job<br/>to view the original document</p>
+            </div>
+            <div id="origContent" class="hidden" style="width:100%;max-width:580px"></div>
+          </div>
+          <div class="pane-footer">
+            <div class="page-nav">
+              <button class="zoom-step" id="origPrevPage">‹</button>
+              <span class="page-val" id="origPageVal">1 / 1</span>
+              <button class="zoom-step" id="origNextPage">›</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Redacted -->
+        <div class="viewer-pane">
+          <div class="pane-header">
+            <div class="pane-label pane-redacted">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="2" rx="1" fill="currentColor"/><rect x="6" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="8" y="15" width="8" height="2" rx="1" fill="currentColor"/></svg>
+              Redacted
+            </div>
+            <div class="zoom-group">
+              <button class="zoom-step" id="redZoomOut">−</button>
+              <span class="zoom-val" id="redZoomVal">100%</span>
+              <button class="zoom-step" id="redZoomIn">+</button>
+            </div>
+          </div>
+          <div class="pane-scroll" id="redScroll">
+            <div class="no-job" id="redEmpty">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="2" rx="1" fill="currentColor" opacity=".3"/><rect x="6" y="7" width="12" height="2" rx="1" fill="currentColor" opacity=".3"/><rect x="8" y="15" width="8" height="2" rx="1" fill="currentColor" opacity=".3"/></svg>
+              <p class="text-sm">Redacted version<br/>will appear here</p>
+            </div>
+            <div id="redContent" class="hidden" style="width:100%;max-width:580px"></div>
+          </div>
+          <div class="pane-footer">
+            <div class="page-nav">
+              <button class="zoom-step" id="redPrevPage">‹</button>
+              <span class="page-val" id="redPageVal">1 / 1</span>
+              <button class="zoom-step" id="redNextPage">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="viewer-panel">
+        <div class="panel-tabs">
+          <button class="panel-tab active" data-tab="fields">Extracted Fields</button>
+          <button class="panel-tab" data-tab="cost">Cost</button>
+          <button class="panel-tab" data-tab="meta">Metadata</button>
+        </div>
+        <div class="panel-content">
+          <div class="panel-section active" id="tab-fields">
+            <div id="fieldsContent">
+              <div class="no-job" style="height:auto;padding:30px 0">
+                <p class="text-sm">Load a job to see extracted fields</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel-section" id="tab-cost">
+            <div id="costContent">
+              <div class="no-job" style="height:auto;padding:30px 0">
+                <p class="text-sm">Load a job to see cost breakdown</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel-section" id="tab-meta">
+            <div id="metaContent">
+              <div class="no-job" style="height:auto;padding:30px 0">
+                <p class="text-sm">Load a job to see metadata</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script>
+Shell.init('viewer');
+
+(function(){
+  const s = Session.get();
+  let jobs = [];
+  let currentJob = null;
+  let origZoom = 100, redZoom = 100;
+
+  /* ── Load job list ────────────────────────────────── */
+  async function loadJobs() {
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email: s.email, days: 30 });
+      jobs = (Array.isArray(res) ? res : (res?.jobs || []))
+        .filter(j => j.status === 'Complete');
+    } catch {
+      jobs = (JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]'))
+        .filter(j => j.status === 'Complete');
+    }
+
+    const sel = document.getElementById('jobSelector');
+    sel.innerHTML = '<option value="">— Select a completed job —</option>';
+    jobs.forEach(j => {
+      const opt = document.createElement('option');
+      opt.value = j.jobId;
+      opt.textContent = `${j.fileName} • ${fmt.date(j.submittedAt)}`;
+      sel.appendChild(opt);
+    });
+
+    // Auto-select from URL
+    const urlJobId = new URLSearchParams(location.search).get('jobId');
+    if (urlJobId) { sel.value = urlJobId; loadJob(urlJobId); }
+  }
+
+  document.getElementById('jobSelector').addEventListener('change', e => {
+    if (e.target.value) loadJob(e.target.value);
+  });
+
+  /* ── Load specific job ────────────────────────────── */
+  async function loadJob(jobId) {
+    const job = jobs.find(j => j.jobId === jobId);
+    if (!job) return;
+    currentJob = job;
+
+    document.getElementById('viewerJobName').textContent = job.fileName;
+    const statusEl = document.getElementById('viewerStatus');
+    statusEl.style.display = '';
+    statusEl.className = 'pill pill-complete';
+    statusEl.innerHTML = '<span class="pill-dot"></span>' + job.status;
+
+    // Enable buttons
+    document.getElementById('downloadRedactedBtn').disabled = !job.resultUrl;
+    document.getElementById('downloadOriginalBtn').disabled = !job.blobUrl;
+    document.getElementById('exportFieldsBtn').disabled = false;
+
+    if (job.resultUrl) {
+      document.getElementById('downloadRedactedBtn').onclick = () => window.open(job.resultUrl,'_blank');
+    }
+    if (job.blobUrl) {
+      document.getElementById('downloadOriginalBtn').onclick = () => window.open(job.blobUrl,'_blank');
+    }
+
+    // Render mock document views
+    renderMockOriginal(job);
+    renderMockRedacted(job);
+    renderFields(job);
+    renderCost(job);
+    renderMeta(job);
+  }
+
+  /* ── Mock document renderer ──────────────────────── */
+  function renderMockOriginal(job) {
+    document.getElementById('origEmpty').classList.add('hidden');
+    const el = document.getElementById('origContent');
+    el.classList.remove('hidden');
+    el.innerHTML = `
+      <div class="pdf-mock" style="transform:scale(${origZoom/100});transform-origin:top center">
+        <div class="pdf-mock-title">${job.fileName}</div>
+        <div style="color:var(--ink2);font-size:11px;margin-bottom:10px">Original document — submitted ${fmt.datetime(job.submittedAt)}</div>
+        ${generateMockPDFContent(job, false)}
+      </div>`;
+    document.getElementById('origPageVal').textContent = `1 / ${job.pageCount ?? 1}`;
+  }
+
+  function renderMockRedacted(job) {
+    document.getElementById('redEmpty').classList.add('hidden');
+    const el = document.getElementById('redContent');
+    el.classList.remove('hidden');
+    el.innerHTML = `
+      <div class="pdf-mock" style="transform:scale(${redZoom/100});transform-origin:top center">
+        <div class="pdf-mock-title">${job.fileName} <span style="color:var(--rose);font-size:10px">[REDACTED]</span></div>
+        <div style="color:var(--ink2);font-size:11px;margin-bottom:10px">Redacted version — processed ${job.completedAt ? fmt.datetime(job.completedAt) : '—'}</div>
+        ${generateMockPDFContent(job, true)}
+      </div>`;
+    document.getElementById('redPageVal').textContent = `1 / ${job.pageCount ?? 1}`;
+  }
+
+  function generateMockPDFContent(job, redacted) {
+    // If job has actual extracted fields, use them; otherwise show generic mock
+    const fields = job.extractedFields || [];
+    if (fields.length) {
+      return fields.map(f => `
+        <div class="field-row" style="margin-bottom:6px">
+          <div style="color:var(--ink3);font-size:10px;text-transform:uppercase;letter-spacing:.06em">${f.key}</div>
+          <div style="margin-top:2px">${redacted && f.sensitive
+            ? `<span class="redact-bar">${'█'.repeat(Math.max(4, String(f.value).length))}</span>`
+            : f.value}
+          </div>
+        </div>`).join('');
+    }
+    // Generic mock
+    const mockRows = [
+      ['Document Reference', 'DOC-2025-001234', true],
+      ['Client Name', 'John Michael Smith', true],
+      ['Date of Birth', '15/03/1985', true],
+      ['National ID', 'AB123456C', true],
+      ['Email Address', 'john.smith@company.com', true],
+      ['Phone Number', '+44 7700 900123', true],
+      ['Account Number', '12-34-56 / 78901234', true],
+      ['Document Type', 'Loan Application Form', false],
+      ['Branch Code', 'LON-001', false],
+      ['Submission Date', fmt.date(job.submittedAt), false],
+      ['Total Amount', '£45,000.00', false],
+      ['Purpose', 'Property Purchase', false],
+    ];
+    return mockRows.map(([k,v,sensitive]) => `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="color:var(--ink3)">${k}</span>
+        <span style="font-weight:600;color:var(--ink)">
+          ${redacted && sensitive
+            ? `<span class="redact-bar">${'█'.repeat(Math.max(4, v.length))}</span>`
+            : v}
+        </span>
+      </div>`).join('');
+  }
+
+  /* ── Fields panel ─────────────────────────────────── */
+  function renderFields(job) {
+    const fields = job.extractedFields || generateMockFields(job);
+    document.getElementById('fieldsContent').innerHTML = `
+      <div class="flex-between mb-8">
+        <div class="text-xs text-muted">${fields.length} fields extracted</div>
+        <span class="pill pill-complete" style="font-size:10px">Confidence ${Math.round(fields.reduce((a,f)=>a+(f.confidence||0.9),0)/fields.length*100)}%</span>
+      </div>
+      ${fields.map(f => `
+        <div class="field-row">
+          <div class="field-key">${f.key}</div>
+          <div class="flex-between gap-8 mt-4">
+            <div class="field-val ${f.sensitive ? 'redacted' : ''}">${f.sensitive ? f.value : f.value}</div>
+            ${f.sensitive ? '<span class="pill pill-failed" style="font-size:9px">PII</span>' : '<span class="pill pill-complete" style="font-size:9px">Safe</span>'}
+          </div>
+          <div class="field-conf mt-4">
+            <div class="conf-bar">
+              <div class="conf-track"><div class="conf-fill ${(f.confidence||.9)<.7?'low':(f.confidence||.9)<.85?'mid':''}" style="width:${Math.round((f.confidence||.9)*100)}%"></div></div>
+              <span class="conf-pct">${Math.round((f.confidence||.9)*100)}%</span>
+            </div>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  function generateMockFields(job) {
+    return [
+      { key:'Client Name',       value:'John Michael Smith',       sensitive:true,  confidence:.97 },
+      { key:'Date of Birth',     value:'15/03/1985',               sensitive:true,  confidence:.94 },
+      { key:'National ID',       value:'AB123456C',                sensitive:true,  confidence:.91 },
+      { key:'Email Address',     value:'john.smith@company.com',   sensitive:true,  confidence:.99 },
+      { key:'Phone Number',      value:'+44 7700 900123',          sensitive:true,  confidence:.88 },
+      { key:'Account Number',    value:'12-34-56 / 78901234',      sensitive:true,  confidence:.85 },
+      { key:'Document Type',     value:'Loan Application Form',    sensitive:false, confidence:.99 },
+      { key:'Submission Date',   value:fmt.date(job.submittedAt),  sensitive:false, confidence:.99 },
+      { key:'Branch Code',       value:'LON-001',                  sensitive:false, confidence:.93 },
+      { key:'Total Amount',      value:'£45,000.00',               sensitive:false, confidence:.96 },
+    ];
+  }
+
+  /* ── Cost panel ───────────────────────────────────── */
+  function renderCost(job) {
+    const pages = job.pageCount ?? 1;
+    const mb    = parseFloat(fmt.mb(job.fileSize ?? 0));
+    const c     = calcJobCost(pages, mb);
+    const services = [
+      { label:'Azure Doc Intelligence', color:'#3b82f6', amount: c.docIntel, note:`${pages} pages × $${APP_CONFIG.COSTS.DOC_INTELLIGENCE_PER_PAGE}` },
+      { label:'Azure Blob Storage',     color:'#06b6d4', amount: c.blob,     note:`${mb} MB` },
+      { label:'Azure Functions',        color:'#8b5cf6', amount: c.functions,note:'3 invocations' },
+      { label:'Power Automate',         color:'#f59e0b', amount: c.paFlow,   note:'2 flow runs' },
+      { label:'SendGrid Email',         color:'#10b981', amount: c.email,    note:'1 notification' },
+    ];
+    document.getElementById('costContent').innerHTML = `
+      <div class="cost-total-card mb-14">
+        <div class="cost-total-label">Total Job Cost</div>
+        <div class="cost-total-val">${c.totalFmt}</div>
+        <div class="cost-total-sub">${pages} page${pages>1?'s':''} • ${mb} MB • 20% overhead incl.</div>
+      </div>
+      ${services.map(sv => `
+        <div class="cost-service-row">
+          <div class="cost-service-label">
+            <div class="cost-swatch" style="background:${sv.color}"></div>
+            <div>
+              <div>${sv.label}</div>
+              <div class="text-xs text-muted">${sv.note}</div>
+            </div>
+          </div>
+          <div class="cost-service-amt">$${sv.amount.toFixed(5)}</div>
+        </div>`).join('')}
+      <div class="cost-service-row" style="border-top:2px solid var(--border2);margin-top:4px;font-weight:700">
+        <div class="cost-service-label"><div class="cost-swatch" style="background:var(--gold)"></div>Total (with overhead)</div>
+        <div class="cost-service-amt text-gold">$${c.total.toFixed(4)}</div>
+      </div>
+      <div class="alert alert-info mt-12 text-xs">
+        Costs are estimates based on published Azure/SendGrid pricing. Actual billing may vary slightly.
+      </div>`;
+  }
+
+  /* ── Meta panel ───────────────────────────────────── */
+  function renderMeta(job) {
+    const rows = [
+      ['Job ID',        job.jobId || '—'],
+      ['File Name',     job.fileName],
+      ['File Size',     fmt.bytes(job.fileSize || 0)],
+      ['Page Count',    job.pageCount ?? '—'],
+      ['Status',        job.status],
+      ['Submitted',     fmt.datetime(job.submittedAt)],
+      ['Completed',     job.completedAt ? fmt.datetime(job.completedAt) : '—'],
+      ['Processing Time', (job.completedAt && job.submittedAt)
+        ? fmt.duration(new Date(job.completedAt) - new Date(job.submittedAt)) : '—'],
+      ['User Email',    s.email],
+    ];
+    document.getElementById('metaContent').innerHTML = rows.map(([k,v]) => `
+      <div class="field-row">
+        <div class="field-key">${k}</div>
+        <div class="field-val">${v}</div>
+      </div>`).join('');
+  }
+
+  /* ── Tabs ─────────────────────────────────────────── */
+  document.querySelectorAll('.panel-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ── Zoom controls ────────────────────────────────── */
+  function setOrigZoom(z) {
+    origZoom = Math.min(200, Math.max(50, z));
+    document.getElementById('origZoomVal').textContent = origZoom + '%';
+    if (currentJob) renderMockOriginal(currentJob);
+  }
+  function setRedZoom(z) {
+    redZoom = Math.min(200, Math.max(50, z));
+    document.getElementById('redZoomVal').textContent = redZoom + '%';
+    if (currentJob) renderMockRedacted(currentJob);
+  }
+  document.getElementById('origZoomIn').addEventListener('click',  () => setOrigZoom(origZoom + 25));
+  document.getElementById('origZoomOut').addEventListener('click', () => setOrigZoom(origZoom - 25));
+  document.getElementById('redZoomIn').addEventListener('click',   () => setRedZoom(redZoom + 25));
+  document.getElementById('redZoomOut').addEventListener('click',  () => setRedZoom(redZoom - 25));
+
+  /* ── Export fields CSV ────────────────────────────── */
+  document.getElementById('exportFieldsBtn').addEventListener('click', () => {
+    if (!currentJob) return;
+    const fields = currentJob.extractedFields || generateMockFields(currentJob);
+    exportCSV(fields.map(f => ({
+      Field: f.key, Value: f.value, Sensitive: f.sensitive ? 'Yes':'No',
+      Confidence: Math.round((f.confidence||.9)*100) + '%', JobID: currentJob.jobId,
+    })), `fields-${currentJob.fileName}.csv`);
+  });
+
+  /* ── Boot ─────────────────────────────────────────── */
+  loadJobs();
+})();
+</script>
+</body>
+</html>

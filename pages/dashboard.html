@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dashboard — Prudent PDF</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<style>
+.upload-quota-warn {
+  background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(245,158,11,.03));
+  border:1px solid rgba(245,158,11,.2);
+  border-radius:var(--r2);
+  padding:12px 16px;
+  display:flex; align-items:center; gap:12px;
+  font-size:13px; flex-wrap:wrap;
+}
+.recent-table-wrap { margin-top:0; }
+.action-btns { display:flex; align-items:center; gap:6px; }
+.empty-state { text-align:center; padding:48px 20px; color:var(--ink3); }
+.empty-state svg { margin:0 auto 12px; opacity:.3; }
+.empty-state p { font-size:13px; }
+.processing-row { background:rgba(59,130,246,.04) !important; }
+</style>
+</head>
+<body>
+<div class="app-shell" id="appShell">
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-hd animate-in">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Overview of your redaction activity</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary" id="refreshBtn">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Refresh
+        </button>
+        <button class="btn btn-primary" id="scrollToUpload">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          New Redaction
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-grid">
+      <div class="stat-card stat-accent animate-in stagger-1">
+        <div class="stat-label">Total Jobs</div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-note">Last 30 days</div>
+        <div class="stat-bg-icon"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+      </div>
+      <div class="stat-card stat-emerald animate-in stagger-2">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="statDone">—</div>
+        <div class="stat-note" id="statDoneRate">—</div>
+        <div class="stat-bg-icon"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="stat-card stat-gold animate-in stagger-3">
+        <div class="stat-label">Total Cost</div>
+        <div class="stat-value" id="statCost">—</div>
+        <div class="stat-note" id="statCostNote">Across all jobs</div>
+        <div class="stat-bg-icon"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.5"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="stat-card stat-rose animate-in stagger-4">
+        <div class="stat-label">Credits Used</div>
+        <div class="stat-value" id="statCredits">—</div>
+        <div class="stat-note" id="statCreditsNote">—</div>
+        <div class="stat-bg-icon"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Quota warning (shown when >= 80% used) -->
+    <div class="upload-quota-warn hidden mb-16" id="quotaWarn">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="var(--gold)" stroke-width="1.8"/><line x1="12" y1="9" x2="12" y2="13" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="quotaWarnText" style="flex:1;color:var(--gold)">—</span>
+      <a href="/pricing" class="btn btn-gold btn-sm">Upgrade Plan</a>
+    </div>
+
+    <!-- Two column: Upload + Recent -->
+    <div class="two-col mb-24" id="uploadSection">
+
+      <!-- Upload card -->
+      <div class="card animate-in stagger-2">
+        <div class="card-hd">
+          <div class="card-title">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            New Redaction
+          </div>
+          <span class="pill pill-trial" id="planBadge">Trial</span>
+        </div>
+        <div class="card-body">
+
+          <!-- Stepper -->
+          <div class="stepper mb-16" id="stepper">
+            <div class="step-item active" id="st1"><div class="step-num">1</div><span class="text-sm">Select file</span></div>
+            <div class="step-item" id="st2"><div class="step-num">2</div><span class="text-sm">Upload</span></div>
+            <div class="step-item" id="st3"><div class="step-num">3</div><span class="text-sm">Processing</span></div>
+            <div class="step-item" id="st4"><div class="step-num">4</div><span class="text-sm">Done</span></div>
+          </div>
+
+          <!-- Upload zone -->
+          <div class="upload-zone mb-14" id="dropzone">
+            <input type="file" id="fileInput" accept="application/pdf"/>
+            <div class="upload-icon-wrap">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="2"/><path d="M14 2v6h6M12 11v6M9 14l3-3 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="upload-title">Drop your PDF here</div>
+            <div class="upload-sub">or click to browse from your device</div>
+            <div class="upload-tags">
+              <span class="upload-tag">PDF only</span>
+              <span class="upload-tag">Max 50 MB</span>
+              <span class="upload-tag">Encrypted PDFs must be unlocked first</span>
+            </div>
+          </div>
+
+          <!-- File selected -->
+          <div id="fileInfo" class="card hidden mb-14" style="background:var(--bg2)">
+            <div class="card-body" style="padding:12px 14px">
+              <div class="flex-between gap-8">
+                <div class="file-cell">
+                  <div class="file-thumb">PDF</div>
+                  <div>
+                    <div class="file-name" id="fileName">—</div>
+                    <div class="file-meta" id="fileMeta">—</div>
+                  </div>
+                </div>
+                <button class="btn btn-ghost btn-sm" id="clearFile">✕ Remove</button>
+              </div>
+              <!-- Cost preview -->
+              <div class="divider" style="margin:10px 0"></div>
+              <div class="flex-between text-xs text-muted">
+                <span>Estimated cost</span>
+                <span class="cost-chip" id="costPreview">calculating…</span>
+              </div>
+              <div style="margin-top:6px">
+                <div class="prog-track"><div class="prog-fill" id="progBar" style="width:0%"></div></div>
+                <div class="text-xs text-muted mt-4" id="progLabel" style="min-height:16px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checklist -->
+          <div class="checklist mb-14">
+            <div class="check-row" id="ckLogin"><div class="check-dot"></div><span>Signed in</span></div>
+            <div class="check-row" id="ckFile"><div class="check-dot"></div><span>PDF selected</span></div>
+            <div class="check-row" id="ckConsent"><div class="check-dot"></div><span>Terms accepted</span></div>
+            <div class="check-row" id="ckQuota"><div class="check-dot"></div><span>Credits available</span></div>
+          </div>
+
+          <!-- Consent + submit -->
+          <div class="flex gap-8 mb-14" style="align-items:flex-start">
+            <input type="checkbox" id="consentChk" style="margin-top:3px;accent-color:var(--accent);width:14px;height:14px;flex-shrink:0"/>
+            <label for="consentChk" class="text-sm text-muted" style="cursor:pointer;line-height:1.5">
+              I confirm I have the right to process this document and agree to the
+              <a href="/pricing">Terms of Service</a> and <a href="/contact">Privacy Policy</a>.
+            </label>
+          </div>
+
+          <div class="flex gap-8">
+            <button class="btn btn-primary" id="submitBtn" disabled style="flex:1;justify-content:center">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Start Redaction
+            </button>
+            <button class="btn btn-secondary btn-icon" id="resetBtn" title="Reset">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9M3 3v6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+
+          <div id="statusMsg" class="alert alert-info mt-12 hidden">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span id="statusText"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent jobs mini panel -->
+      <div class="card animate-in stagger-3">
+        <div class="card-hd">
+          <div class="card-title">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Recent Jobs
+          </div>
+          <a href="/history" class="btn btn-ghost btn-sm">View all →</a>
+        </div>
+        <div id="recentJobs" class="recent-table-wrap">
+          <div class="empty-state" id="noJobs">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+            <p>No jobs yet.<br/>Upload your first PDF above.</p>
+          </div>
+          <table class="tbl hidden" id="recentTbl">
+            <thead><tr>
+              <th>File</th>
+              <th>Status</th>
+              <th>Cost</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="recentBody"></tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <span class="text-xs text-muted" id="recentMeta">—</span>
+          <div class="flex-between" style="flex:1;justify-content:flex-end">
+            <button class="btn btn-secondary btn-sm" id="exportRecentBtn">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script>
+Shell.init('dashboard');
+
+(function(){
+  const s = Session.get();
+  let selectedFile = null;
+  let allJobs      = [];
+  let pollInterval = null;
+
+  /* ── DOM refs ─────────────────────────────────────── */
+  const dropzone    = document.getElementById('dropzone');
+  const fileInput   = document.getElementById('fileInput');
+  const fileInfo    = document.getElementById('fileInfo');
+  const fileName    = document.getElementById('fileName');
+  const fileMeta    = document.getElementById('fileMeta');
+  const clearFileBtn= document.getElementById('clearFile');
+  const costPreview = document.getElementById('costPreview');
+  const progBar     = document.getElementById('progBar');
+  const progLabel   = document.getElementById('progLabel');
+  const submitBtn   = document.getElementById('submitBtn');
+  const resetBtn    = document.getElementById('resetBtn');
+  const consentChk  = document.getElementById('consentChk');
+  const statusMsg   = document.getElementById('statusMsg');
+  const statusText  = document.getElementById('statusText');
+  const recentBody  = document.getElementById('recentBody');
+  const recentTbl   = document.getElementById('recentTbl');
+  const noJobs      = document.getElementById('noJobs');
+  const recentMeta  = document.getElementById('recentMeta');
+  const quotaWarn   = document.getElementById('quotaWarn');
+  const quotaWarnText= document.getElementById('quotaWarnText');
+  const planBadge   = document.getElementById('planBadge');
+
+  /* ── Init stats ───────────────────────────────────── */
+  function initStats() {
+    document.getElementById('statCredits').textContent = `${s.creditsUsed ?? 0}/${s.creditsLimit ?? 5}`;
+    document.getElementById('statCreditsNote').textContent = `${(s.creditsLimit ?? 5) - (s.creditsUsed ?? 0)} remaining`;
+    if (s.plan === 'paid') { planBadge.className = 'pill pill-paid'; planBadge.textContent = 'Pro'; }
+
+    const pct = Math.round(((s.creditsUsed ?? 0) / Math.max(1, s.creditsLimit ?? 5)) * 100);
+    if (pct >= 80) {
+      quotaWarn.classList.remove('hidden');
+      quotaWarnText.textContent = `You've used ${s.creditsUsed} of ${s.creditsLimit} free files. Upgrade for unlimited access.`;
+    }
+    updateChecklist();
+  }
+
+  /* ── Load jobs ────────────────────────────────────── */
+  async function loadJobs() {
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email: s.email, days: 30 });
+      allJobs = Array.isArray(res) ? res : (res?.jobs || []);
+      renderDashboardStats();
+      renderRecentJobs();
+    } catch {
+      allJobs = JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]');
+      renderDashboardStats();
+      renderRecentJobs();
+    }
+  }
+
+  function renderDashboardStats() {
+    const total    = allJobs.length;
+    const done     = allJobs.filter(j => j.status === 'Complete').length;
+    const failed   = allJobs.filter(j => j.status === 'Failed').length;
+    const totalCost= allJobs.reduce((acc, j) => acc + (j.costTotal ?? 0), 0);
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statDone').textContent  = done;
+    document.getElementById('statDoneRate').innerHTML = total
+      ? `<b>${Math.round(done/total*100)}%</b> success rate`
+      : 'No jobs yet';
+    document.getElementById('statCost').textContent = `$${totalCost.toFixed(4)}`;
+    document.getElementById('statCostNote').textContent = `Avg $${total ? (totalCost/total).toFixed(4) : '0.0000'} per file`;
+  }
+
+  function renderRecentJobs() {
+    const recent = allJobs.slice(0, 8);
+    if (!recent.length) { noJobs.classList.remove('hidden'); recentTbl.classList.add('hidden'); recentMeta.textContent = 'No jobs'; return; }
+    noJobs.classList.add('hidden');
+    recentTbl.classList.remove('hidden');
+    recentMeta.textContent = `Showing ${recent.length} most recent`;
+    recentBody.innerHTML = recent.map(j => `
+      <tr class="${j.status === 'Processing' ? 'processing-row' : ''}">
+        <td>
+          <div class="file-cell">
+            <div class="file-thumb">PDF</div>
+            <div>
+              <div class="file-name" title="${j.fileName}">${j.fileName}</div>
+              <div class="file-meta">${fmt.datetime(j.submittedAt)}</div>
+            </div>
+          </div>
+        </td>
+        <td>${statusPill(j.status)}</td>
+        <td><span class="cost-chip">${j.costTotal ? '$'+j.costTotal.toFixed(4) : '—'}</span></td>
+        <td>
+          <div class="action-btns">
+            ${j.status === 'Complete' ? `<a href="/viewer?jobId=${j.jobId}" class="btn btn-secondary btn-xs">View</a>` : ''}
+            ${j.resultUrl ? `<a href="${j.resultUrl}" class="btn btn-ghost btn-xs" target="_blank">↓</a>` : ''}
+          </div>
+        </td>
+      </tr>`).join('');
+
+    // Poll if any processing
+    if (allJobs.some(j => j.status === 'Processing' || j.status === 'Queued')) startPoll();
+    else stopPoll();
+  }
+
+  function statusPill(status) {
+    const map = {
+      'Complete':   'pill-complete',
+      'Processing': 'pill-processing',
+      'Queued':     'pill-queued',
+      'Failed':     'pill-failed',
+    };
+    const cls = map[status] || 'pill-queued';
+    const dot = (status === 'Processing') ? '<span class="pill-dot pulse"></span>' : '<span class="pill-dot"></span>';
+    return `<span class="pill ${cls}">${dot}${status}</span>`;
+  }
+
+  function startPoll() {
+    if (pollInterval) return;
+    pollInterval = setInterval(loadJobs, APP_CONFIG.APP.POLL_INTERVAL);
+  }
+  function stopPoll() {
+    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  }
+
+  /* ── File handling ────────────────────────────────── */
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+  function handleFile(file) {
+    if (!file) return;
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showStatus('Only PDF files are accepted.', 'error'); return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      showStatus('File exceeds 50 MB limit. Please compress it first.', 'error'); return;
+    }
+    selectedFile = file;
+    fileName.textContent = file.name;
+    fileMeta.textContent = `${fmt.bytes(file.size)} • Added ${fmt.time(new Date().toISOString())}`;
+    fileInfo.classList.remove('hidden');
+    dropzone.classList.add('hidden');
+
+    // Estimate pages (rough: ~50KB per page)
+    const estPages = Math.max(1, Math.ceil(file.size / 51200));
+    const cost = calcJobCost(estPages, parseFloat(fmt.mb(file.size)));
+    costPreview.textContent = `~${cost.totalFmt} (est. ${estPages}p)`;
+
+    setStep(2);
+    updateChecklist();
+    maybeEnableSubmit();
+    hideStatus();
+  }
+
+  clearFileBtn.addEventListener('click', resetUpload);
+
+  function resetUpload() {
+    selectedFile = null;
+    fileInput.value = '';
+    fileInfo.classList.add('hidden');
+    dropzone.classList.remove('hidden');
+    progBar.style.width = '0%';
+    progLabel.textContent = '';
+    setStep(1);
+    updateChecklist();
+    maybeEnableSubmit();
+    hideStatus();
+  }
+
+  resetBtn.addEventListener('click', resetUpload);
+  consentChk.addEventListener('change', () => { updateChecklist(); maybeEnableSubmit(); });
+
+  /* ── Checklist & step ─────────────────────────────── */
+  function setStep(n) {
+    [1,2,3,4].forEach(i => {
+      const el = document.getElementById(`st${i}`);
+      el.classList.remove('active','done');
+      if (i < n) el.classList.add('done');
+      else if (i === n) el.classList.add('active');
+    });
+  }
+
+  function updateChecklist() {
+    const used  = s.creditsUsed  ?? 0;
+    const limit = s.creditsLimit ?? 5;
+    setCheck('ckLogin',   true);
+    setCheck('ckFile',    !!selectedFile);
+    setCheck('ckConsent', consentChk.checked);
+    setCheck('ckQuota',   used < limit);
+  }
+
+  function setCheck(id, ok) {
+    const el = document.getElementById(id);
+    el.classList.toggle('ok', ok);
+    el.classList.toggle('fail', !ok);
+  }
+
+  function maybeEnableSubmit() {
+    const used  = s.creditsUsed  ?? 0;
+    const limit = s.creditsLimit ?? 5;
+    submitBtn.disabled = !(selectedFile && consentChk.checked && used < limit);
+  }
+
+  /* ── Submit ───────────────────────────────────────── */
+  submitBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    submitBtn.disabled = true;
+    setStep(2);
+    showStatus('Getting upload URL…', 'info');
+
+    try {
+      // Step 1: get SAS URL
+      progBar.style.width = '15%';
+      progLabel.textContent = 'Requesting upload URL…';
+      const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
+        email: s.email, fileName: selectedFile.name
+      });
+      const sasUrl  = sasRes?.sasUrl  || sasRes?.SasUrl;
+      const blobPath= sasRes?.blobPath|| sasRes?.BlobPath || selectedFile.name;
+
+      // Step 2: upload to blob
+      progBar.style.width = '30%';
+      progLabel.textContent = 'Uploading to Azure Blob Storage…';
+      if (sasUrl) {
+        await fetch(sasUrl, {
+          method: 'PUT',
+          headers: { 'x-ms-blob-type': 'BlockBlob', 'Content-Type': 'application/pdf' },
+          body: selectedFile,
+        });
+      }
+
+      // Step 3: submit job
+      progBar.style.width = '60%';
+      progLabel.textContent = 'Submitting redaction job…';
+      setStep(3);
+      const estPages = Math.max(1, Math.ceil(selectedFile.size / 51200));
+      const cost     = calcJobCost(estPages, parseFloat(fmt.mb(selectedFile.size)));
+
+      const jobRes = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, {
+        email:     s.email,
+        token:     s.token,
+        blobUrl:   sasUrl || blobPath,
+        fileName:  selectedFile.name,
+        fileSize:  selectedFile.size,
+        pageCount: estPages,
+        estCost:   cost.total,
+      });
+
+      progBar.classList.add('success');
+      progBar.style.width = '100%';
+      progLabel.textContent = 'Job submitted successfully!';
+      setStep(4);
+
+      const jobId = jobRes?.jobId || jobRes?.JobId || '';
+
+      // Update session credits optimistically
+      s.creditsUsed = (s.creditsUsed ?? 0) + 1;
+      Session.set(s);
+
+      // Save to local cache
+      const cached = JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]');
+      cached.unshift({
+        jobId, fileName: selectedFile.name, fileSize: selectedFile.size,
+        status: 'Queued', submittedAt: new Date().toISOString(),
+        costTotal: cost.total, resultUrl: '', blobUrl: sasUrl || blobPath,
+      });
+      localStorage.setItem('pp_jobs_' + s.email, JSON.stringify(cached.slice(0, 50)));
+
+      showStatus(`Job submitted! Job ID: ${jobId}. Results will be emailed to ${s.email}.`, 'success');
+      loadJobs();
+      startPoll();
+
+    } catch(e) {
+      progBar.classList.add('error');
+      progBar.style.width = '100%';
+      showStatus('Submission failed: ' + (e.message || e), 'error');
+      setStep(2);
+      submitBtn.disabled = false;
+    }
+  });
+
+  /* ── Status helpers ───────────────────────────────── */
+  function showStatus(msg, type = 'info') {
+    statusMsg.className = `alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'} mt-12`;
+    statusMsg.classList.remove('hidden');
+    statusText.textContent = msg;
+  }
+  function hideStatus() { statusMsg.classList.add('hidden'); }
+
+  /* ── Export ───────────────────────────────────────── */
+  document.getElementById('exportRecentBtn').addEventListener('click', () => {
+    exportCSV(allJobs.slice(0,8).map(j => ({
+      JobID: j.jobId, FileName: j.fileName, FileSize: fmt.bytes(j.fileSize),
+      Status: j.status, SubmittedAt: j.submittedAt, Cost: j.costTotal?.toFixed(4) || '',
+    })), 'recent-jobs.csv');
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', loadJobs);
+  document.getElementById('scrollToUpload').addEventListener('click', () => {
+    document.getElementById('uploadSection').scrollIntoView({ behavior:'smooth' });
+  });
+
+  /* ── Boot ─────────────────────────────────────────── */
+  initStats();
+  loadJobs();
+})();
+</script>
+</body>
+</html>

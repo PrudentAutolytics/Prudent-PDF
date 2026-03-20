@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Plans & Pricing — Prudent PDF</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<style>
+.pricing-wrap { max-width:900px; margin:0 auto; }
+.pricing-hero { text-align:center; margin-bottom:36px; }
+.pricing-hero h1 { font-size:32px; font-weight:800; letter-spacing:-.04em; margin-bottom:8px; }
+.pricing-hero p  { font-size:15px; color:var(--ink2); }
+.pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:36px; }
+.pricing-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:24px; display:flex; flex-direction:column; position:relative; overflow:hidden;
+  transition:all var(--dur) var(--ease);
+}
+.pricing-card:hover { border-color:var(--border2); transform:translateY(-3px); box-shadow:var(--shadow-md); }
+.pricing-card.featured {
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 20px 40px rgba(59,130,246,.15);
+}
+.pricing-card.featured::before {
+  content:'MOST POPULAR';
+  position:absolute; top:0; right:0;
+  background:var(--accent); color:#fff;
+  font-size:9px; font-weight:700; letter-spacing:.1em;
+  padding:5px 14px; border-bottom-left-radius:var(--r3);
+}
+.pricing-plan { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--ink2); margin-bottom:8px; }
+.pricing-price { font-size:38px; font-weight:800; letter-spacing:-.05em; line-height:1; margin-bottom:4px; }
+.pricing-price sup { font-size:20px; vertical-align:super; }
+.pricing-price span { font-size:14px; font-weight:500; color:var(--ink2); }
+.pricing-desc { font-size:12px; color:var(--ink2); margin-bottom:20px; line-height:1.5; }
+.pricing-divider { height:1px; background:var(--border); margin:16px 0; }
+.pricing-features { list-style:none; margin-bottom:24px; flex:1; display:flex; flex-direction:column; gap:7px; }
+.pricing-features li { font-size:12px; display:flex; align-items:flex-start; gap:8px; color:var(--ink2); line-height:1.4; }
+.pricing-features li::before { content:'✓'; color:var(--emerald); font-weight:700; font-size:11px; flex-shrink:0; margin-top:1px; }
+.pricing-features li.no::before { content:'✗'; color:var(--ink3); }
+.pricing-cta { margin-top:auto; }
+
+/* Trial banner */
+.trial-banner {
+  background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.06));
+  border:1px solid rgba(59,130,246,.2); border-radius:var(--r2);
+  padding:18px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  margin-bottom:32px;
+}
+.trial-banner-text h3 { font-size:15px; font-weight:700; margin-bottom:4px; }
+.trial-banner-text p  { font-size:12px; color:var(--ink2); }
+
+/* FAQ */
+.faq-item { border-bottom:1px solid var(--border); padding:14px 0; }
+.faq-q { font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+.faq-a { font-size:12px; color:var(--ink2); margin-top:8px; line-height:1.6; display:none; }
+.faq-item.open .faq-a { display:block; }
+.faq-arrow { transition:transform var(--dur) var(--ease); font-size:14px; }
+.faq-item.open .faq-arrow { transform:rotate(180deg); }
+</style>
+</head>
+<body>
+<div class="app-shell" id="appShell">
+  <main class="main">
+    <div class="pricing-wrap">
+
+      <!-- Current trial status -->
+      <div class="trial-banner animate-in" id="trialBanner">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;color:var(--accent)"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div class="trial-banner-text" style="flex:1">
+          <h3>You're on the Free Trial</h3>
+          <p id="trialMeta">Loading your account status…</p>
+        </div>
+        <a href="/contact" class="btn btn-primary btn-sm">Talk to us →</a>
+      </div>
+
+      <!-- Header -->
+      <div class="pricing-hero animate-in stagger-1">
+        <h1>Simple, transparent pricing</h1>
+        <p>Start free. Upgrade when you're ready. No surprises.</p>
+      </div>
+
+      <!-- Plans -->
+      <div class="pricing-grid animate-in stagger-2">
+
+        <!-- Free Trial -->
+        <div class="pricing-card">
+          <div class="pricing-plan">Free Trial</div>
+          <div class="pricing-price"><sup>$</sup>0 <span>/ 30 days</span></div>
+          <div class="pricing-desc">Perfect for evaluating Prudent PDF with your real documents.</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>5 PDF redactions</li>
+            <li>Azure Document Intelligence</li>
+            <li>Side-by-side document viewer</li>
+            <li>30-day job history</li>
+            <li>CSV export of extracted fields</li>
+            <li>Cost breakdown per document</li>
+            <li>Email delivery of redacted PDF</li>
+            <li class="no">Priority processing</li>
+            <li class="no">API access</li>
+            <li class="no">Custom redaction rules</li>
+          </ul>
+          <div class="pricing-cta">
+            <div class="btn btn-secondary w-full" style="justify-content:center;pointer-events:none">Current Plan</div>
+          </div>
+        </div>
+
+        <!-- Professional -->
+        <div class="pricing-card featured">
+          <div class="pricing-plan">Professional</div>
+          <div class="pricing-price"><sup>$</sup>49 <span>/ month</span></div>
+          <div class="pricing-desc">For teams and businesses processing documents regularly.</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li><strong>100 PDF redactions</strong> per month</li>
+            <li>Azure Document Intelligence</li>
+            <li>Side-by-side document viewer</li>
+            <li>90-day job history</li>
+            <li>Full CSV / JSON export</li>
+            <li>Detailed cost breakdown</li>
+            <li>Priority processing queue</li>
+            <li>Bulk upload (up to 10 files)</li>
+            <li>Custom redaction field rules</li>
+            <li class="no">API access</li>
+          </ul>
+          <div class="pricing-cta">
+            <a href="/contact?plan=professional" class="btn btn-primary w-full" style="justify-content:center">Get started →</a>
+          </div>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card">
+          <div class="pricing-plan">Enterprise</div>
+          <div class="pricing-price" style="font-size:28px;padding-top:8px">Custom</div>
+          <div class="pricing-desc">Full Power Platform integration, dedicated support, custom workflows.</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li><strong>Unlimited</strong> redactions</li>
+            <li>Custom Azure Document Intelligence models</li>
+            <li>Full document viewer + audit trail</li>
+            <li>Unlimited history retention</li>
+            <li>REST API + Power Automate connector</li>
+            <li>Dataverse / SharePoint integration</li>
+            <li>Custom redaction workflows</li>
+            <li>SLA guarantee (99.9% uptime)</li>
+            <li>Dedicated Slack/Teams support</li>
+            <li>White-label options available</li>
+          </ul>
+          <div class="pricing-cta">
+            <a href="/contact?plan=enterprise" class="btn btn-gold w-full" style="justify-content:center">Contact sales →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost transparency -->
+      <div class="card animate-in stagger-3 mb-24">
+        <div class="card-hd">
+          <div class="card-title">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.8"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Cost Transparency — What goes into each PDF?
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="three-col">
+            <div>
+              <div class="text-xs text-muted mb-8" style="font-weight:700;letter-spacing:.08em;text-transform:uppercase">Azure Document Intelligence</div>
+              <div class="text-sm mb-4">$0.001 per page (prebuilt models)</div>
+              <div class="text-xs text-muted">OCR, field extraction, layout analysis</div>
+            </div>
+            <div>
+              <div class="text-xs text-muted mb-8" style="font-weight:700;letter-spacing:.08em;text-transform:uppercase">Azure Blob Storage</div>
+              <div class="text-sm mb-4">~$0.00002 per MB</div>
+              <div class="text-xs text-muted">Temporary storage with 7-day auto-expiry</div>
+            </div>
+            <div>
+              <div class="text-xs text-muted mb-8" style="font-weight:700;letter-spacing:.08em;text-transform:uppercase">Processing + Email</div>
+              <div class="text-sm mb-4">~$0.001 total</div>
+              <div class="text-xs text-muted">Azure Functions + Power Automate + SendGrid</div>
+            </div>
+          </div>
+          <div class="alert alert-info mt-16 text-sm">
+            A typical 5-page PDF costs approximately <strong>$0.0075 to process</strong>. Our plans include margin to cover infrastructure, support, and reliability.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="card animate-in stagger-4">
+        <div class="card-hd"><div class="card-title">Frequently Asked Questions</div></div>
+        <div class="card-body">
+          <div id="faq"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script>
+Shell.init('pricing');
+
+(function(){
+  const s = Session.get();
+  if (s) {
+    const used  = s.creditsUsed  ?? 0;
+    const limit = s.creditsLimit ?? 5;
+    const rem   = limit - used;
+    const expiry = s.trialExpiryDate ? fmt.date(s.trialExpiryDate) : '—';
+    document.getElementById('trialMeta').textContent =
+      `${used} of ${limit} files used • ${rem} remaining • Trial expires ${expiry}`;
+    if (s.plan === 'paid') document.getElementById('trialBanner').classList.add('hidden');
+  }
+
+  const faqs = [
+    ['What file types are supported?', 'Currently PDF only. The file must be unlocked (not password-protected) and under 50 MB.'],
+    ['What PII does Prudent PDF redact?', 'Names, dates of birth, national ID numbers, email addresses, phone numbers, bank account numbers, signatures, and custom fields you define.'],
+    ['Is my data stored permanently?', 'No. Uploaded PDFs are stored in Azure Blob with a 7-day lifecycle policy. Redacted outputs are available for download for 30 days.'],
+    ['Can I use my own Azure subscription?', 'Yes — on the Enterprise plan we can deploy to your own Azure tenant with full data sovereignty.'],
+    ['How accurate is the extraction?', 'Azure Document Intelligence achieves 90–99% confidence on standard document types. Confidence scores are shown for every extracted field.'],
+    ['What happens when my trial ends?', 'Your account is preserved. You can upgrade at any time to continue processing. Existing job history remains accessible for 30 days.'],
+    ['Is there a Power Automate connector?', 'Enterprise plan includes a custom PA connector so you can trigger redaction from any PA flow or Teams workflow.'],
+  ];
+
+  document.getElementById('faq').innerHTML = faqs.map(([q,a]) => `
+    <div class="faq-item">
+      <div class="faq-q">${q}<span class="faq-arrow">▾</span></div>
+      <div class="faq-a">${a}</div>
+    </div>`).join('');
+
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => item.classList.toggle('open'));
+  });
+
+  // Pre-select plan from URL
+  const plan = new URLSearchParams(location.search).get('plan');
+})();
+</script>
+</body>
+</html>
