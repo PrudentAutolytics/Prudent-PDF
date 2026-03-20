@@ -85,7 +85,7 @@ const Shell = (() => {
         ${group.items.map(item => {
           const isActive = item.id === activeId;
           const badge = item.badge ? `<span class="nav-badge ${item.badgeCls}">${item.badge}</span>` : '';
-          return `<a class="nav-link ${isActive ? 'active' : ''}" href="${item.href}" data-navid="${item.id}">
+          return `<a class="nav-item ${isActive ? 'active' : ''}" href="${item.href}" data-navid="${item.id}">
             ${item.icon()} ${item.label} ${badge}
           </a>`;
         }).join('')}
@@ -96,13 +96,13 @@ const Shell = (() => {
     <div class="sidebar">
       ${navHTML}
       <div class="sidebar-footer">
-        <div class="plan-widget">
-          <div class="plan-tier">
+        <div class="plan-card">
+          <div class="plan-badge">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/></svg>
             ${s.plan === 'paid' ? 'Pro Plan' : 'Free Trial'}
           </div>
-          <div class="plan-usage">${used} <span>/ ${limit} files</span></div>
-          <div class="usage-bar"><div class="usage-fill ${fillCls}" style="width:${pct}%"></div></div>
+          <div class="plan-files">${used} <span>/ ${limit} files</span></div>
+          <div class="usage-track"><div class="usage-fill ${fillCls}" style="width:${pct}%"></div></div>
           <div class="plan-meta">
             <span>${limit - used} remaining</span>
             <span>${s.plan === 'paid' ? 'Unlimited' : `${daysLeft}d left`}</span>
