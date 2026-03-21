@@ -1,154 +1,279 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Sign In — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 700px 500px at 30% 20%,rgba(37,99,235,.06) 0%,transparent 60%),radial-gradient(ellipse 600px 400px at 80% 80%,rgba(124,58,237,.05) 0%,transparent 60%);pointer-events:none}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 800px 600px at 20% 15%, rgba(59,130,246,.12) 0%, transparent 60%),
+  radial-gradient(ellipse 600px 500px at 85% 85%, rgba(139,92,246,.1) 0%, transparent 60%),
+  radial-gradient(ellipse 400px 400px at 60% 40%, rgba(16,185,129,.05) 0%, transparent 50%);
+  pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+.login-wrap{position:relative;z-index:1}
 </style>
 </head>
 <body>
 <div class="login-wrap anim">
+  <!-- Logo -->
   <div class="login-logo">
+    <!-- LOGO SLOT: replace .login-logo-mark contents with <img src="data:image/...base64..."> -->
     <div class="login-logo-mark" id="loginLogoSlot">
-      <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="2"/><path d="M14 2v6h6M9 13h6M9 17h4" stroke="#fff" stroke-width="1.75" stroke-linecap="round"/></svg>
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="1.9"/><path d="M14 2v6h6M9 13h6M9 17h4" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg>
     </div>
     <div>
       <div class="login-logo-text">Prudent PDF</div>
-      <div style="font-size:11px;color:var(--ink3);letter-spacing:.03em;margin-top:1px">AI-Powered Document Redaction</div>
+      <div class="login-logo-sub">AI-Powered Document Redaction</div>
     </div>
   </div>
 
+  <!-- Card -->
   <div class="login-card">
-    <!-- Step 1: Email -->
+
+    <!-- STEP 1: Email entry -->
     <div id="stepEmail">
       <div class="login-title">Welcome back</div>
-      <div class="login-sub">Enter your email to receive a one-click sign-in link. No password needed — ever.</div>
+      <div class="login-sub">Enter your work email. We'll send a one-click magic link — no password ever.</div>
+
       <div class="form-group">
-        <label class="form-label">Email address</label>
-        <input class="form-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email" autofocus/>
-        <div id="emailErr" class="hidden" style="font-size:12px;color:var(--red);margin-top:5px"></div>
+        <label class="form-label" for="emailInput">Email address</label>
+        <input class="form-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email" autofocus aria-label="Email address"/>
+        <div id="emailErr" class="hidden" style="font-size:12px;color:var(--red);margin-top:6px;display:flex;align-items:center;gap:5px">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.9"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          <span id="emailErrText"></span>
+        </div>
       </div>
-      <button class="btn btn-primary w-full" id="sendBtn" style="justify-content:center;padding:12px">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Send sign-in link
+
+      <button class="btn btn-primary w-full" id="sendBtn" style="justify-content:center;padding:12px 18px;font-size:14px">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Send magic link
       </button>
-      <div class="login-divider"><span>What's included free</span></div>
+
+      <div class="login-divider"><span>What you get free</span></div>
+
       <div class="trial-features">
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>5 PDF redactions — no credit card required</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Azure Document Intelligence extraction</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>30-day job history &amp; document viewer</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>CSV export of extracted fields</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Detailed cost breakdown per document</div>
+        <div class="trial-feat"><span class="trial-feat-icon">✓</span>5 full PDF redactions — zero credit card required</div>
+        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Azure Document Intelligence field extraction</div>
+        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Side-by-side original vs redacted viewer</div>
+        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Full job history with 30-day retention</div>
+        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Per-document cost breakdown and CSV export</div>
+        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Email delivery of redacted PDFs</div>
+      </div>
+
+      <div class="flex-center gap-8 mt-16">
+        <div class="security-badge">${
+          '<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        } TLS Encrypted</div>
+        <div class="security-badge" style="background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg>
+          Azure Hosted
+        </div>
       </div>
     </div>
 
-    <!-- Step 2: Waiting -->
+    <!-- STEP 2: Waiting for approval -->
     <div id="stepWaiting" class="hidden">
       <div class="waiting-state">
-        <div style="margin-bottom:18px">
-          <svg width="48" height="48" fill="none" viewBox="0 0 24 24" style="margin:0 auto;color:var(--blue)"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;margin:0 auto 20px;color:var(--blue)">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="login-title" style="font-size:17px">Check your inbox</div>
-        <div style="font-size:13.5px;color:var(--ink2);margin:8px 0 4px">We sent a sign-in link to</div>
+        <div class="login-title" style="font-size:18px;margin-bottom:6px">Check your inbox</div>
+        <div style="font-size:13.5px;color:var(--ink2);margin-bottom:4px">Sign-in link sent to</div>
         <div class="waiting-email" id="waitingEmail">—</div>
-        <div class="login-sub" style="margin-top:9px">Click <strong>Sign In</strong> in that email. This page updates automatically.</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0">
+        <div style="font-size:13px;color:var(--ink3);margin:10px 0 0;line-height:1.65">Click the <strong style="color:var(--ink2)">Sign In</strong> button in the email. This page updates automatically once approved.</div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
           <div class="spinner"></div>
-          <div style="font-size:13px;color:var(--ink2)">Waiting for approval…</div>
+          <span style="font-size:13px;color:var(--ink2)">Waiting for approval…</span>
         </div>
+
         <div class="countdown" id="countdown">5:00</div>
         <div class="countdown-label">Link expires in</div>
-        <div id="statusMsg" class="mt-8 text-sm" style="min-height:18px;color:var(--green)"></div>
+
+        <div id="loginStatusMsg" style="min-height:20px;margin-top:10px;font-size:13px;text-align:center"></div>
+
         <div class="resend-row">
           <button class="btn btn-secondary btn-sm" id="resendBtn">Resend email</button>
           <button class="btn btn-ghost btn-sm" id="cancelBtn">Use different email</button>
         </div>
       </div>
     </div>
+
+    <!-- STEP 3: Approved -->
+    <div id="stepDone" class="hidden">
+      <div class="success-view">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Signed in!</div>
+        <p style="font-size:14px;color:var(--ink2);line-height:1.7">Redirecting to your dashboard…</p>
+        <div class="spinner" style="margin:16px auto 0"></div>
+      </div>
+    </div>
   </div>
 
   <div class="login-footer">
-    By signing in you agree to our <a href="/pricing">Terms</a> &amp; <a href="/contact">Privacy Policy</a>.<br/>
-    © 2025 Prudent Autolytics. Kabileshvijayakumar@prudentautolytics.com
+    By signing in you agree to our <a href="/pricing">Terms of Service</a> and <a href="/contact">Privacy Policy</a>.<br/>
+    © 2025 Prudent Autolytics · Kabileshvijayakumar@prudentautolytics.com
   </div>
 </div>
 
 <script src="/js/config.js"></script>
 <script>
 (function(){
-  const theme = localStorage.getItem('pp_theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  document.documentElement.setAttribute('data-theme',theme);
-  if(Session.valid()){window.location.href='/dashboard';return}
+  // Apply saved theme immediately
+  const t = localStorage.getItem('pp_theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', t);
 
-  // Check callback URL
-  const params=new URLSearchParams(location.search+'&'+location.hash.replace(/^#/,''));
-  const cbToken=params.get('token'),cbTxId=params.get('txId'),cbStatus=params.get('status');
-  if(cbToken||(cbTxId&&cbStatus)){handleCallback({token:cbToken,txId:cbTxId,status:cbStatus});return}
+  // Already logged in?
+  if (Session.valid()) { location.href = '/dashboard'; return; }
 
-  const stepEmail=document.getElementById('stepEmail');
-  const stepWaiting=document.getElementById('stepWaiting');
-  const emailInput=document.getElementById('emailInput');
-  const sendBtn=document.getElementById('sendBtn');
-  const emailErr=document.getElementById('emailErr');
-  const waitingEmail=document.getElementById('waitingEmail');
-  const countdownEl=document.getElementById('countdown');
-  const statusMsg=document.getElementById('statusMsg');
-  const resendBtn=document.getElementById('resendBtn');
-  const cancelBtn=document.getElementById('cancelBtn');
-  const AUTH_KEY='pp_auth_';
-  let currentEmail='',currentTxId='',deadline=0,timer=null,pollTimer=null;
+  // Check magic link callback params
+  const params = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/,''));
+  const cbToken = params.get('token'), cbTxId = params.get('txId'), cbStatus = params.get('status');
+  if (cbToken || (cbTxId && cbStatus)) { handleCallback({ token:cbToken, txId:cbTxId, status:cbStatus }); return; }
 
-  function showErr(msg){emailErr.textContent=msg;emailErr.classList.remove('hidden')}
-  function hideErr(){emailErr.classList.add('hidden')}
+  const AUTH_STORE = 'pp_auth_';
+  const $ = id => document.getElementById(id);
+  let currentEmail = '', currentTxId = '', deadline = 0, countTimer = null, pollTimer = null;
 
-  async function sendLink(){
-    const email=emailInput.value.trim();
-    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('Please enter a valid email address.');return}
+  function showStep(step) {
+    ['stepEmail','stepWaiting','stepDone'].forEach(s => $(s).classList.toggle('hidden', s !== step));
+  }
+  function showErr(msg) {
+    $('emailErr').classList.remove('hidden');
+    $('emailErrText').textContent = msg;
+    $('emailInput').classList.add('invalid');
+  }
+  function hideErr() {
+    $('emailErr').classList.add('hidden');
+    $('emailInput').classList.remove('invalid');
+  }
+
+  async function sendLink() {
+    const email = $('emailInput').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showErr('Please enter a valid email address.'); return;
+    }
     hideErr();
-    sendBtn.disabled=true;
-    sendBtn.innerHTML='<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Sending…';
-    try{
-      const txId=crypto.randomUUID?.()??('tx_'+Math.random().toString(36).slice(2)+Date.now().toString(36));
-      currentTxId=txId;currentEmail=email;
-      const res=await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email,txId,ttlSeconds:300});
-      if(res?.txId)currentTxId=res.txId;
-      stepEmail.classList.add('hidden');stepWaiting.classList.remove('hidden');
-      waitingEmail.textContent=email;
-      deadline=Date.now()+300000;startCountdown();startStorage();
-      if(APP_CONFIG.FLOWS.AUTH_VERIFY)startPoll();
-    }catch(e){showErr('Could not reach the server. Please try again.')}
-    finally{sendBtn.disabled=false;sendBtn.innerHTML='<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg> Send sign-in link'}
-  }
+    const btn = $('sendBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Sending…';
 
-  function startCountdown(){if(timer)clearInterval(timer);timer=setInterval(()=>{const r=Math.max(0,deadline-Date.now());const m=Math.floor(r/60000);const s=Math.floor((r%60000)/1000);countdownEl.textContent=`${m}:${String(s).padStart(2,'0')}`;if(r===0){clearInterval(timer);statusMsg.textContent='Link expired. Please resend.';statusMsg.style.color='var(--red)';stopPoll()}},1000)}
-  function startStorage(){window.addEventListener('storage',onStorage)}
-  function onStorage(e){if(e.key===AUTH_KEY+currentTxId&&e.newValue){try{applyAuth(JSON.parse(e.newValue))}catch{}}}
-  function startPoll(){if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(async()=>{if(Date.now()>deadline){stopPoll();return}try{const res=await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY,{txId:currentTxId,probe:true});if(res)applyAuth(res)}catch{}},4000)}
-  function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null}}
-  function applyAuth(data){
-    const st=String(data?.status||data?.Status||'').toLowerCase();
-    if(['approved','ok','success','yes','true'].includes(st)){
-      stopPoll();clearInterval(timer);window.removeEventListener('storage',onStorage);
-      Session.set({email:data.email||currentEmail,token:data.token||currentTxId,userId:data.userId||data.user||'',plan:data.plan||'trial',creditsUsed:data.creditsUsed??0,creditsLimit:data.creditsLimit??5,trialExpiryDate:data.trialExpiryDate||null,expiresAt:Date.now()+8*3600000});
-      statusMsg.textContent='✓ Signed in! Redirecting…';statusMsg.style.color='var(--green)';
-      setTimeout(()=>{window.location.href='/dashboard'},700);
-    }else if(['denied','rejected','no','false'].includes(st)){stopPoll();statusMsg.textContent='Access denied. Please try again.';statusMsg.style.color='var(--red)'}
-  }
-  function handleCallback(p){
-    if(p.token||p.status==='approved'){
-      const stored=localStorage.getItem(AUTH_KEY+p.txId);
-      if(stored){try{applyAuth(JSON.parse(stored))}catch{window.location.href='/login'}}
-      else{try{localStorage.setItem(AUTH_KEY+p.txId,JSON.stringify(p))}catch{}
-        document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;color:#0F1523"><div style="text-align:center"><div style="font-size:18px;font-weight:700;margin-bottom:8px">✓ Approved!</div><div style="color:#8A94AD">You can close this tab and return to the app.</div></div></div>'}
+    try {
+      const txId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'tx_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      currentEmail = email; currentTxId = txId;
+
+      const res = await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email, txId, ttlSeconds: 300 });
+      if (res?.txId) currentTxId = res.txId;
+
+      showStep('stepWaiting');
+      $('waitingEmail').textContent = email;
+      deadline = Date.now() + 300000;
+      startCountdown();
+      window.addEventListener('storage', onStorageEvent);
+      if (APP_CONFIG.FLOWS.AUTH_VERIFY) startPoll();
+    } catch(e) {
+      showErr('Could not reach the server. Please check your connection and try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Send magic link';
     }
   }
-  sendBtn.addEventListener('click',sendLink);
-  emailInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendLink()});
-  resendBtn.addEventListener('click',()=>{stopPoll();clearInterval(timer);stepWaiting.classList.add('hidden');stepEmail.classList.remove('hidden');emailInput.value=currentEmail;sendLink()});
-  cancelBtn.addEventListener('click',()=>{stopPoll();clearInterval(timer);stepWaiting.classList.add('hidden');stepEmail.classList.remove('hidden')});
+
+  function startCountdown() {
+    if (countTimer) clearInterval(countTimer);
+    countTimer = setInterval(() => {
+      const remaining = Math.max(0, deadline - Date.now());
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      $('countdown').textContent = `${m}:${String(s).padStart(2,'0')}`;
+      if (remaining === 0) {
+        clearInterval(countTimer); stopPoll();
+        const el = $('loginStatusMsg');
+        el.textContent = 'Link expired. Please resend.';
+        el.style.color = 'var(--red)';
+      }
+    }, 1000);
+  }
+
+  function onStorageEvent(e) {
+    if (e.key === AUTH_STORE + currentTxId && e.newValue) {
+      try { applyAuth(JSON.parse(e.newValue)); } catch {}
+    }
+  }
+
+  function startPoll() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      if (Date.now() > deadline) { stopPoll(); return; }
+      try {
+        const res = await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY, { txId: currentTxId, probe: true });
+        if (res) applyAuth(res);
+      } catch {}
+    }, 4000);
+  }
+
+  function stopPoll() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+
+  function applyAuth(data) {
+    const status = String(data?.status || data?.Status || '').toLowerCase();
+    const approved = ['approved','ok','success','yes','true','1'].includes(status);
+    const denied   = ['denied','rejected','no','false','0'].includes(status);
+
+    if (approved) {
+      stopPoll(); clearInterval(countTimer);
+      window.removeEventListener('storage', onStorageEvent);
+
+      Session.set({
+        email:          data.email || currentEmail,
+        token:          data.token || currentTxId,
+        userId:         data.userId || '',
+        plan:           data.plan  || 'trial',
+        creditsUsed:    data.creditsUsed  ?? 0,
+        creditsLimit:   data.creditsLimit ?? 5,
+        trialExpiryDate:data.trialExpiryDate || null,
+        expiresAt:      Date.now() + 8 * 3600000,
+      });
+
+      showStep('stepDone');
+      setTimeout(() => location.href = '/dashboard', 800);
+
+    } else if (denied) {
+      stopPoll();
+      const el = $('loginStatusMsg');
+      el.textContent = 'Access denied. Please try a different email.';
+      el.style.color = 'var(--red)';
+    }
+  }
+
+  function handleCallback(p) {
+    if (p.token || p.status === 'approved') {
+      const stored = localStorage.getItem(AUTH_STORE + p.txId);
+      if (stored) {
+        try { applyAuth(JSON.parse(stored)); return; } catch {}
+      }
+      try { localStorage.setItem(AUTH_STORE + p.txId, JSON.stringify(p)); } catch {}
+      document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Syne',sans-serif;color:var(--ink);background:var(--bg)"><div style="text-align:center;padding:40px"><div style="font-size:52px;margin-bottom:16px">✓</div><div style="font-size:20px;font-weight:800;margin-bottom:8px">Approved!</div><div style="font-size:14px;color:var(--ink2)">You can close this tab and return to the app.</div></div></div>`;
+    }
+  }
+
+  // Wire buttons
+  $('sendBtn').addEventListener('click', sendLink);
+  $('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendLink(); });
+  $('emailInput').addEventListener('input', hideErr);
+  $('resendBtn').addEventListener('click', () => {
+    stopPoll(); clearInterval(countTimer);
+    showStep('stepEmail');
+    $('emailInput').value = currentEmail;
+    setTimeout(sendLink, 100);
+  });
+  $('cancelBtn').addEventListener('click', () => {
+    stopPoll(); clearInterval(countTimer);
+    showStep('stepEmail');
+  });
 })();
 </script>
 </body>
