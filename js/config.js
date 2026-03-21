@@ -87,15 +87,29 @@ const Session = {
 };
 
 /* ── API wrapper ──────────────────────────────────────── */
-async function paFetch(url, body) {
-  const res = await fetch(url, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? res.json() : res.text();
+async function paFetch(url, body, timeoutMs = 55000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+      signal:  controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) {
+      if (res.status === 502) throw new Error('Power Automate flow returned 502 — the flow may be paused, throttled, or the request body is invalid. Check your PA flow is enabled and the trigger is configured correctly.');
+      if (res.status === 408 || res.status === 504) throw new Error('Flow timed out (HTTP ' + res.status + '). PA flows can take up to 30s — please try again.');
+      throw new Error('HTTP ' + res.status);
+    }
+    const ct = res.headers.get('content-type') || '';
+    return ct.includes('application/json') ? res.json() : res.text();
+  } catch(e) {
+    clearTimeout(timer);
+    if (e.name === 'AbortError') throw new Error('Request timed out after 55s. Power Automate flows occasionally take longer — please try again.');
+    throw e;
+  }
 }
 
 /* ── Guard: redirect to login if not authenticated ────── */

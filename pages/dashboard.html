@@ -446,42 +446,58 @@ Shell.init('dashboard');
     setStep(2); showStatus('Requesting secure upload URL from Azure…', 'info');
 
     try {
-      // Step 1: Get SAS URL
-      setProgress(10, 'Getting Azure Blob SAS URL…');
+      const estPages = Math.max(1, Math.ceil(selectedFile.size / 51200));
+      const cost = calcJobCost(estPages, parseFloat(fmt.mb(selectedFile.size)));
       let sasUrl = '', blobPath = selectedFile.name;
+
+      // Step 1: Get SAS URL (only if BLOB_SAS flow is configured)
       if (APP_CONFIG.FLOWS.BLOB_SAS) {
-        const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, { email: s.email, fileName: selectedFile.name, fileSize: selectedFile.size });
-        sasUrl   = sasRes?.sasUrl   || sasRes?.SasUrl   || '';
-        blobPath = sasRes?.blobPath || sasRes?.BlobPath || selectedFile.name;
+        setProgress(10, 'Getting secure upload URL…');
+        showStatus('Requesting Azure Blob Storage upload URL…', 'info');
+        const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
+          email: s.email, fileName: selectedFile.name, fileSize: selectedFile.size
+        });
+        sasUrl   = sasRes?.sasUrl   || sasRes?.SasUrl   || sasRes?.url   || '';
+        blobPath = sasRes?.blobPath || sasRes?.BlobPath || sasRes?.path  || selectedFile.name;
+      } else {
+        // BLOB_SAS not configured — skip blob upload, send file directly to PA
+        setProgress(20, 'Blob SAS not configured — submitting directly…');
+        showStatus('Submitting job to redaction pipeline…', 'info');
       }
 
-      // Step 2: Upload to Blob
-      setProgress(35, 'Uploading to Azure Blob Storage…');
-      setStep(2); showStatus('Uploading encrypted file to Azure Blob Storage…', 'info');
+      // Step 2: Upload to Blob (only if we got a SAS URL)
       if (sasUrl) {
+        setProgress(35, 'Uploading file to Azure Blob Storage…');
+        setStep(2); showStatus('Uploading encrypted file…', 'info');
         const uploadRes = await fetch(sasUrl, {
           method: 'PUT',
-          headers: { 'x-ms-blob-type': 'BlockBlob', 'Content-Type': 'application/pdf', 'x-ms-version': '2020-02-10' },
+          headers: {
+            'x-ms-blob-type': 'BlockBlob',
+            'Content-Type': 'application/pdf',
+            'x-ms-version': '2020-02-10'
+          },
           body: selectedFile,
         });
         if (!uploadRes.ok) throw new Error(`Blob upload failed: HTTP ${uploadRes.status}`);
       }
 
-      // Step 3: Submit job
+      // Step 3: Submit job to PA flow
       setStep(3); setProgress(65, 'Submitting to redaction pipeline…');
-      showStatus('Sending job to Azure Document Intelligence + Power Automate…', 'info');
-      const estPages = Math.max(1, Math.ceil(selectedFile.size / 51200));
-      const cost = calcJobCost(estPages, parseFloat(fmt.mb(selectedFile.size)));
-      const jobRes = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, {
-        email:     s.email,
-        token:     s.token,
-        blobUrl:   sasUrl || blobPath,
-        fileName:  selectedFile.name,
-        fileSize:  selectedFile.size,
-        pageCount: estPages,
-        estCost:   cost.total,
+      showStatus('Sending to Azure Document Intelligence…', 'info');
+      const jobPayload = {
+        email:       s.email,
+        token:       s.token,
+        fileName:    selectedFile.name,
+        fileSize:    selectedFile.size,
+        pageCount:   estPages,
+        estCost:     cost.total,
         submittedAt: new Date().toISOString(),
-      });
+      };
+      // Only include blobUrl if we actually have one (prevents PA 502 from empty string)
+      if (sasUrl || blobPath !== selectedFile.name) {
+        jobPayload.blobUrl = sasUrl || blobPath;
+      }
+      const jobRes = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, jobPayload);
 
       // Step 4: Done
       setProgress(100, '✓ Job submitted successfully!', 'ok');
@@ -509,9 +525,15 @@ Shell.init('dashboard');
 
       setTimeout(() => { close(); resetForm(); }, 2500);
     } catch(e) {
-      setProgress(100, 'Upload failed.', 'err');
-      showStatus('Submission failed: ' + (e.message || String(e)) + '. Please try again or contact support.', 'error');
-      setStep(2);
+      setProgress(0, '', 'err');
+      const msg = e.message || String(e);
+      let friendly = msg;
+      if (msg.includes('502')) friendly = 'Power Automate flow error (502). Check your JOB_SUBMIT flow is enabled and running, then try again.';
+      else if (msg.includes('timed out') || msg.includes('AbortError')) friendly = 'Request timed out. PA flows can be slow — please try again in a moment.';
+      else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) friendly = 'Network error. Check your internet connection and that the PA flow URL is correct.';
+      showStatus('❌ ' + friendly, 'error');
+      setStep(1);
+      console.error('[PrudentPDF] Submission error:', e);
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg> Start Redaction';
