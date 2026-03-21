@@ -43,7 +43,7 @@ const Shell = (() => {
     const displayName = shortName.length > 18 ? shortName.slice(0,16)+'…' : shortName;
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
 
-    return `
+    return `<nav class="topbar" role="banner">
       <a class="topbar-brand" href="/dashboard">
         <div class="brand-logo" id="brandLogoSlot">${I.pdf}</div>
         <div>
@@ -64,7 +64,8 @@ const Shell = (() => {
           <div class="user-avatar">${initials}</div>
           <span class="user-name">${displayName}</span>
         </div>
-      </div>`;
+      </div>
+    </nav>`;
   }
 
   function buildSidebar(activeId) {
@@ -95,7 +96,7 @@ const Shell = (() => {
       ? `<button class="btn-upgrade" onclick="location.href='/pricing'">${I.bolt} Upgrade to Pro</button>`
       : `<div class="flex-between mt-8"><span class="pill pill-paid" style="font-size:10px">● Pro Active</span><span class="text-xs text-subtle">Unlimited</span></div>`;
 
-    return `
+    return `<aside class="sidebar" role="navigation" aria-label="Main navigation">
       ${navHtml}
       <div class="nav-sep"></div>
       <div class="sidebar-bottom">
@@ -111,7 +112,8 @@ const Shell = (() => {
           </div>
           ${upgradeBtn}
         </div>
-      </div>`;
+      </div>
+    </aside>`;
   }
 
   function applyTheme() {
