@@ -195,10 +195,19 @@ const Shell = (() => {
       document.documentElement.setAttribute('data-theme', saved);
 
       // Fill pre-rendered placeholders (these must exist in the HTML)
-      const tb = document.getElementById('topbarPlaceholder');
-      const sb = document.getElementById('sidebarPlaceholder');
-      if (tb) tb.innerHTML = buildTopbar(activeId);
-      if (sb) sb.innerHTML = buildSidebar(activeId);
+      const wrap = document.getElementById('appShell');
+      if (!wrap) return;
+
+      /* inject topbar as first child */
+      const tb = document.createElement('div');
+      tb.innerHTML = buildTopbar(activeId);
+      wrap.insertBefore(tb.firstElementChild, wrap.firstChild);
+
+      /* inject sidebar before .main */
+      const sb = document.createElement('div');
+      sb.innerHTML = buildSidebar(activeId);
+      const mainEl = wrap.querySelector('.main');
+      wrap.insertBefore(sb.firstElementChild, mainEl);
 
       // Wire up
       applyTheme();

@@ -20,12 +20,12 @@
 /* Insight card */
 .insight-card{background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--r14);padding:18px 20px;position:relative;overflow:hidden}
 .insight-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.08),transparent 70%)}
+.right-col{display:flex;flex-direction:column;gap:20px}
+.btn-white{padding:12px 24px;font-size:13.5px;font-weight:700;letter-spacing:-.01em}
 </style>
 </head>
 <body>
 <div class="shell" id="appShell">
-  <nav class="topbar" id="topbarPlaceholder" role="banner" style="grid-column:1/-1"></nav>
-  <aside class="sidebar" id="sidebarPlaceholder" role="navigation" aria-label="Main navigation"></aside>
   <main class="main">
 
     <!-- ── Welcome banner ── -->
@@ -48,8 +48,8 @@
           </a>
         </div>
       </div>
-      <div class="welcome-actions" style="flex-shrink:0;position:relative;z-index:2">
-        <button class="btn btn-white" id="openUploadBtn" style="padding:12px 22px;font-size:14px">
+      <div class="welcome-actions">
+        <button class="btn btn-white" id="openUploadBtn">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Upload PDF
         </button>
@@ -57,7 +57,7 @@
     </div>
 
     <!-- ── Stats ── -->
-    <div class="stats-grid" style="margin-bottom:20px">
+    <div class="stats-grid">
       <div class="stat-card blue anim d1">
         <div class="stat-label">Total Jobs (30d)</div>
         <div class="stat-val" id="sTotal">—</div>
@@ -126,7 +126,7 @@
       </div>
 
       <!-- Right column: activity + insights -->
-      <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="right-col">
         <!-- Activity feed -->
         <div class="card">
           <div class="card-hd">
@@ -136,7 +136,7 @@
             </div>
             <span class="pill pill-complete" style="font-size:10px">Live</span>
           </div>
-          <div class="card-body" style="padding:8px 22px">
+          <div class="card-body" style="padding:10px 24px">
             <div class="activity-wrap" id="activityFeed">
               <div class="activity-row"><div class="activity-dot info"></div><div class="activity-text">Waiting for your first job…</div><div class="activity-time">now</div></div>
             </div>
@@ -144,7 +144,7 @@
         </div>
 
         <!-- Cost insight -->
-        <div class="card insight-card" style="border-radius:var(--r14)">
+        <div class="card insight-card">
           <div class="stat-label" style="margin-bottom:12px">Cost Efficiency</div>
           <div style="font-size:13px;color:var(--ink2);line-height:1.7">
             Average cost per document across all processed jobs. Azure Document Intelligence is charged per page.
