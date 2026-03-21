@@ -24,6 +24,8 @@
 </head>
 <body>
 <div class="shell" id="appShell">
+  <nav class="topbar" id="topbarPlaceholder" role="banner" style="grid-column:1/-1"></nav>
+  <aside class="sidebar" id="sidebarPlaceholder" role="navigation" aria-label="Main navigation"></aside>
   <main class="main">
 
     <!-- ── Welcome banner ── -->
@@ -281,7 +283,7 @@ Shell.init('dashboard');
   const h = new Date().getHours();
   const name = (s.email||'').split('@')[0];
   document.getElementById('welcomeTitle').textContent =
-    (h<12?'Good morning':'h<17?'Good afternoon':'Good evening') + ' 👋 ' + (name ? name.charAt(0).toUpperCase()+name.slice(1) : '');
+    (h<12?'Good morning':h<17?'Good afternoon':'Good evening') + ' 👋 ' + (name ? name.charAt(0).toUpperCase()+name.slice(1) : '');
 
   function init() {
     const used = s.creditsUsed ?? 0, limit = s.creditsLimit ?? 5;

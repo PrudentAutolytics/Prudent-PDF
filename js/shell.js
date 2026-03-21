@@ -1,26 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════
-   PRUDENT PDF — Premium Shell v5
-   Renders: glassmorphic topbar, animated sidebar, plan widget,
-            command palette, theme toggle, live clock, search
-   Call: Shell.init('dashboard') on every page
+   PRUDENT PDF — Premium Shell v5.1
+   Pre-rendered placeholders in HTML, JS fills innerHTML.
+   This prevents the CSS grid from collapsing before JS fires.
 ═══════════════════════════════════════════════════════════════ */
 const Shell = (() => {
 
-  /* ── NAVIGATION ────────────────────────────────────────────── */
   const NAV = [
     { group:'WORKSPACE', items:[
       { id:'dashboard', label:'Dashboard',       href:'/dashboard', icon:'grid',   desc:'Overview & stats'    },
-      { id:'upload',    label:'New Redaction',   href:'/dashboard', icon:'upload', desc:'Upload & process PDF', badge:'', badgeCls:'' },
-      { id:'history',   label:'Job History',     href:'/history',   icon:'clock',  desc:'All processed jobs',   badge:'30d', badgeCls:'' },
-      { id:'viewer',    label:'Document Viewer', href:'/viewer',    icon:'eye',    desc:'Side-by-side viewer'   },
+      { id:'upload',    label:'New Redaction',   href:'/dashboard', icon:'upload', desc:'Upload & process PDF' },
+      { id:'history',   label:'Job History',     href:'/history',   icon:'clock',  desc:'All processed jobs',  badge:'30d' },
+      { id:'viewer',    label:'Document Viewer', href:'/viewer',    icon:'eye',    desc:'Side-by-side viewer'  },
     ]},
     { group:'ACCOUNT', items:[
-      { id:'pricing', label:'Plans & Pricing', href:'/pricing', icon:'star', desc:'Compare plans'     },
-      { id:'contact', label:'Contact Us',      href:'/contact', icon:'mail', desc:'Talk to the team'  },
+      { id:'pricing', label:'Plans & Pricing', href:'/pricing', icon:'star', desc:'Compare plans'    },
+      { id:'contact', label:'Contact Us',      href:'/contact', icon:'mail', desc:'Talk to the team' },
     ]},
   ];
 
-  /* ── SVG ICONS ─────────────────────────────────────────────── */
   const I = {
     grid:   `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>`,
     upload: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -34,13 +31,10 @@ const Shell = (() => {
     bell:   `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     shield: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     bolt:   `<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    logout: `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     pdf:    `<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="1.8"/><path d="M14 2v6h6M9 13h6M9 17h4" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-    cmd:    `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 3a3 3 0 00-3 3v12a3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3H6a3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3V6a3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3h12a3 3 0 003-3 3 3 0 00-3-3z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    up:     `<svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    logout: `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   };
 
-  /* ── BUILD TOPBAR ──────────────────────────────────────────── */
   function buildTopbar(activeId) {
     const s = Session.get() || {};
     const email = s.email || APP_CONFIG.APP.SUPPORT_EMAIL;
@@ -50,56 +44,29 @@ const Shell = (() => {
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
 
     return `
-<div class="topbar">
-  <!-- BRAND — to add logo: replace contents of .brand-logo with <img src="data:image/...base64..." /> -->
-  <a class="topbar-brand" href="/dashboard">
-    <div class="brand-logo" id="brandLogoSlot">
-      ${I.pdf}
-    </div>
-    <div>
-      <div class="brand-name">Prudent PDF</div>
-      <div class="brand-tagline">AI Redaction Platform</div>
-    </div>
-  </a>
-
-  <!-- SEARCH -->
-  <div class="topbar-search">
-    <span class="topbar-search-icon">${I.search}</span>
-    <input type="search" id="globalSearch" placeholder="Search jobs, files, docs…" autocomplete="off" aria-label="Global search"/>
-    <span class="topbar-search-kbd" id="searchKbd">⌘K</span>
-  </div>
-
-  <!-- RIGHT -->
-  <div class="topbar-right">
-    <!-- Live clock -->
-    <div id="liveClock" style="font-family:var(--mono);font-size:11.5px;color:var(--ink3);padding:0 8px;white-space:nowrap;display:none"></div>
-
-    <!-- Security badge -->
-    <div class="security-badge" style="display:none" id="secBadge">
-      ${I.shield} Encrypted
-    </div>
-
-    <!-- Theme toggle -->
-    <button class="topbar-icon-btn" id="themeBtn" title="Toggle dark/light theme" aria-label="Toggle theme">
-      ${isDark ? I.sun : I.moon}
-    </button>
-
-    <!-- Notifications -->
-    <button class="topbar-icon-btn" id="notifBtn" title="Notifications" aria-label="Notifications">
-      ${I.bell}
-      <span class="notif-dot hidden" id="notifDot"></span>
-    </button>
-
-    <!-- User chip -->
-    <div class="user-chip" id="userChip" title="${email}" role="button" aria-label="User menu" tabindex="0">
-      <div class="user-avatar">${initials}</div>
-      <span class="user-name">${displayName}</span>
-    </div>
-  </div>
-</div>`;
+      <a class="topbar-brand" href="/dashboard">
+        <div class="brand-logo" id="brandLogoSlot">${I.pdf}</div>
+        <div>
+          <div class="brand-name">Prudent PDF</div>
+          <div class="brand-tagline">AI Redaction Platform</div>
+        </div>
+      </a>
+      <div class="topbar-search">
+        <span class="topbar-search-icon">${I.search}</span>
+        <input type="search" id="globalSearch" placeholder="Search jobs, files, docs…" autocomplete="off"/>
+        <span class="topbar-search-kbd">⌘K</span>
+      </div>
+      <div class="topbar-right">
+        <div id="liveClock" style="font-family:var(--mono);font-size:11.5px;color:var(--ink3);padding:0 8px;white-space:nowrap;display:none"></div>
+        <button class="topbar-icon-btn" id="themeBtn" title="Toggle theme">${isDark ? I.sun : I.moon}</button>
+        <button class="topbar-icon-btn" id="notifBtn" title="Notifications">${I.bell}<span class="notif-dot hidden" id="notifDot"></span></button>
+        <div class="user-chip" id="userChip" title="${email}" tabindex="0">
+          <div class="user-avatar">${initials}</div>
+          <span class="user-name">${displayName}</span>
+        </div>
+      </div>`;
   }
 
-  /* ── BUILD SIDEBAR ─────────────────────────────────────────── */
   function buildSidebar(activeId) {
     const s = Session.get() || {};
     const used   = s.creditsUsed  ?? 0;
@@ -109,134 +76,102 @@ const Shell = (() => {
     const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
     const planLabel = s.plan === 'paid' ? 'PRO PLAN' : 'FREE TRIAL';
     let daysLeft = 30;
-    if (s.trialExpiryDate) {
-      daysLeft = Math.max(0, Math.ceil((new Date(s.trialExpiryDate) - Date.now()) / 86400000));
-    }
+    if (s.trialExpiryDate) daysLeft = Math.max(0, Math.ceil((new Date(s.trialExpiryDate) - Date.now()) / 86400000));
 
     const navHtml = NAV.map(group => `
       <div class="nav-section">
         <span class="nav-group-label">${group.group}</span>
         ${group.items.map(item => {
           const isActive = item.id === activeId;
-          const badge = item.badge
-            ? `<span class="nav-link-badge ${isActive ? 'blue' : ''}">${item.badge}</span>` : '';
-          return `<a class="nav-link${isActive ? ' active' : ''}" href="${item.href}" title="${item.desc}" aria-current="${isActive ? 'page' : 'false'}">
-            <span class="nav-link-icon">${I[item.icon] || ''}</span>
-            ${item.label}
-            ${badge}
+          const badge = item.badge ? `<span class="nav-link-badge ${isActive?'blue':''}">${item.badge}</span>` : '';
+          return `<a class="nav-link${isActive?' active':''}" href="${item.href}" title="${item.desc}">
+            <span class="nav-link-icon">${I[item.icon]||''}</span>
+            ${item.label}${badge}
           </a>`;
         }).join('')}
       </div>`).join('<div class="nav-sep"></div>');
 
     const upgradeBtn = s.plan !== 'paid'
-      ? `<button class="btn-upgrade" onclick="location.href='/pricing'" aria-label="Upgrade to Pro">
-           ${I.bolt} Upgrade to Pro
-         </button>`
+      ? `<button class="btn-upgrade" onclick="location.href='/pricing'">${I.bolt} Upgrade to Pro</button>`
       : `<div class="flex-between mt-8"><span class="pill pill-paid" style="font-size:10px">● Pro Active</span><span class="text-xs text-subtle">Unlimited</span></div>`;
 
     return `
-<div class="sidebar" role="navigation" aria-label="Main navigation">
-  ${navHtml}
-  <div class="nav-sep"></div>
-  <div class="sidebar-bottom">
-    <div class="plan-box">
-      <div class="plan-tier">${I.bolt} ${planLabel}</div>
-      <div class="plan-count">${used}<span> / ${limit} files used</span></div>
-      <div class="plan-bar-track">
-        <div class="plan-bar-fill ${fillCls}" id="planBarFill" style="width:${pct}%" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-      <div class="plan-meta">
-        <span>${remain} remaining</span>
-        <span>${s.plan === 'paid' ? '∞ credits' : `${daysLeft}d left`}</span>
-      </div>
-      ${upgradeBtn}
-    </div>
-  </div>
-</div>`;
+      ${navHtml}
+      <div class="nav-sep"></div>
+      <div class="sidebar-bottom">
+        <div class="plan-box">
+          <div class="plan-tier">${I.bolt} ${planLabel}</div>
+          <div class="plan-count">${used}<span> / ${limit} files used</span></div>
+          <div class="plan-bar-track">
+            <div class="plan-bar-fill ${fillCls}" id="planBarFill" style="width:${pct}%"></div>
+          </div>
+          <div class="plan-meta">
+            <span>${remain} remaining</span>
+            <span>${s.plan==='paid'?'∞ credits':`${daysLeft}d left`}</span>
+          </div>
+          ${upgradeBtn}
+        </div>
+      </div>`;
   }
 
-  /* ── COMMAND PALETTE ───────────────────────────────────────── */
-  function buildPalette() {
-    const links = NAV.flatMap(g => g.items.map(i => ({...i, group: g.group})));
-    document.getElementById('globalSearch').addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        const q = e.target.value.trim().toLowerCase();
-        if (!q) return;
-        const match = links.find(l => l.label.toLowerCase().includes(q) || l.desc.toLowerCase().includes(q));
-        if (match) { location.href = match.href; }
-        else { location.href = `/history?q=${encodeURIComponent(q)}`; }
-      }
-    });
-    // ⌘K / Ctrl+K focus
-    document.addEventListener('keydown', e => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        document.getElementById('globalSearch')?.focus();
-      }
-    });
-  }
-
-  /* ── CLOCK ─────────────────────────────────────────────────── */
-  function startClock() {
-    const el = document.getElementById('liveClock');
-    if (!el) return;
-    const tick = () => {
-      const now = new Date();
-      el.textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-    };
-    tick();
-    setInterval(tick, 1000);
-    // show on larger screens
-    if (window.innerWidth > 1200) el.style.display = 'block';
-  }
-
-  /* ── THEME ─────────────────────────────────────────────────── */
   function applyTheme() {
-    const saved = localStorage.getItem('pp_theme') ||
-      (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+    const saved = localStorage.getItem('pp_theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', saved);
-
     document.getElementById('themeBtn')?.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('pp_theme', next);
-      const btn = document.getElementById('themeBtn');
-      btn.innerHTML = next === 'dark' ? I.sun : I.moon;
+      document.getElementById('themeBtn').innerHTML = next === 'dark' ? I.sun : I.moon;
     });
   }
 
-  /* ── USER MENU ─────────────────────────────────────────────── */
+  function startClock() {
+    const el = document.getElementById('liveClock');
+    if (!el || window.innerWidth < 1200) return;
+    el.style.display = 'block';
+    const tick = () => { el.textContent = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'}); };
+    tick(); setInterval(tick, 1000);
+  }
+
+  function initSearch() {
+    document.getElementById('globalSearch')?.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) return;
+      const match = NAV.flatMap(g => g.items).find(i => i.label.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q));
+      location.href = match ? match.href : `/history?q=${encodeURIComponent(q)}`;
+    });
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); document.getElementById('globalSearch')?.focus(); }
+    });
+  }
+
   function initUserMenu() {
     document.getElementById('userChip')?.addEventListener('click', () => {
-      const items = [
-        { label:'Account Settings', action: () => location.href='/contact' },
-        { label:'Upgrade Plan',     action: () => location.href='/pricing' },
-        { label:'divider' },
-        { label:'Sign Out',         action: () => { if (confirm('Sign out of Prudent PDF?')) { Session.clear(); location.href='/login'; } }, danger:true },
-      ];
       let menu = document.getElementById('userMenu');
       if (menu) { menu.remove(); return; }
       menu = document.createElement('div');
       menu.id = 'userMenu';
-      menu.style.cssText = `position:fixed;z-index:999;background:var(--surface);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--s4);padding:6px;min-width:180px;animation:modalIn .15s ease;right:20px;top:62px`;
-      menu.innerHTML = items.map(i => i.label === 'divider'
-        ? `<div style="height:1px;background:var(--border);margin:4px 0"></div>`
-        : `<button style="width:100%;text-align:left;padding:9px 13px;border-radius:8px;font-family:var(--display);font-size:13px;font-weight:500;color:${i.danger?'var(--red)':'var(--ink)'};cursor:pointer;border:none;background:none;transition:background .15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'" onclick="this.closest('#userMenu')?.remove()">${i.label}</button>`
+      menu.style.cssText = 'position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--s4);padding:6px;min-width:180px;animation:modalIn .15s ease;right:20px;top:66px';
+      const actions = [
+        { label:'View Pricing',  fn: () => location.href='/pricing' },
+        { label:'Contact Us',    fn: () => location.href='/contact' },
+        { sep: true },
+        { label:'Sign Out', danger:true, fn: () => { if(confirm('Sign out?')) { Session.clear(); location.href='/login'; } } },
+      ];
+      menu.innerHTML = actions.map(a => a.sep
+        ? '<div style="height:1px;background:var(--border);margin:4px 0"></div>'
+        : `<button style="width:100%;text-align:left;padding:9px 13px;border-radius:8px;font-family:var(--display);font-size:13px;font-weight:500;color:${a.danger?'var(--red)':'var(--ink)'};cursor:pointer;border:none;background:none;transition:background .12s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">${a.label}</button>`
       ).join('');
       document.body.appendChild(menu);
-      // click listeners
       const btns = menu.querySelectorAll('button');
-      items.filter(i => i.label !== 'divider').forEach((item, idx) => {
-        btns[idx]?.addEventListener('click', item.action);
-      });
-      setTimeout(() => document.addEventListener('click', function handler(e) {
-        if (!menu.contains(e.target) && e.target.id !== 'userChip') { menu.remove(); document.removeEventListener('click', handler); }
-      }), 10);
+      actions.filter(a => !a.sep).forEach((a,i) => btns[i]?.addEventListener('click', () => { menu.remove(); a.fn(); }));
+      setTimeout(() => document.addEventListener('click', function h(e) {
+        if (!menu.contains(e.target) && e.target.id !== 'userChip') { menu.remove(); document.removeEventListener('click', h); }
+      }, { capture: true }), 50);
     });
   }
 
-  /* ── QUOTA REFRESH ─────────────────────────────────────────── */
   function refreshQuota() {
     const s = Session.get();
     if (!s?.email || !APP_CONFIG.FLOWS.QUOTA_GET) return;
@@ -245,58 +180,36 @@ const Shell = (() => {
       const updated = { ...s, creditsUsed: d.creditsUsed ?? s.creditsUsed, creditsLimit: d.creditsLimit ?? s.creditsLimit, plan: d.plan ?? s.plan };
       Session.set(updated);
       const pct = Math.min(100, updated.creditsLimit > 0 ? Math.round(updated.creditsUsed / updated.creditsLimit * 100) : 0);
-      const el = document.getElementById('planBarFill');
-      if (el) {
-        el.style.width = pct + '%';
-        el.className = 'plan-bar-fill ' + (pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '');
-      }
-      if (pct >= 90) {
-        document.getElementById('notifDot')?.classList.remove('hidden');
-        showToast(`⚠️ Only ${updated.creditsLimit - updated.creditsUsed} credits left — consider upgrading.`, 'warn', 5000);
-      }
+      const bar = document.getElementById('planBarFill');
+      if (bar) { bar.style.width = pct + '%'; bar.className = 'plan-bar-fill ' + (pct>=90?'danger':pct>=70?'warn':''); }
+      if (pct >= 90) { document.getElementById('notifDot')?.classList.remove('hidden'); showToast(`Only ${updated.creditsLimit-updated.creditsUsed} credits left`, 'warn', 5000); }
     }).catch(() => {});
   }
 
-  /* ── INIT ──────────────────────────────────────────────────── */
   return {
     init(activeId) {
       if (!requireAuth()) return;
 
-      const wrap = document.getElementById('appShell');
-      if (!wrap) return;
-
-      // Apply theme immediately (before render) to avoid flash
+      // Apply theme first — prevents flash
       const saved = localStorage.getItem('pp_theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', saved);
 
-      // Inject topbar
-      const tbEl = document.createElement('div');
-      tbEl.innerHTML = buildTopbar(activeId);
-      wrap.insertBefore(tbEl.firstElementChild, wrap.firstChild);
+      // Fill pre-rendered placeholders (these must exist in the HTML)
+      const tb = document.getElementById('topbarPlaceholder');
+      const sb = document.getElementById('sidebarPlaceholder');
+      if (tb) tb.innerHTML = buildTopbar(activeId);
+      if (sb) sb.innerHTML = buildSidebar(activeId);
 
-      // Inject sidebar before .main
-      const sbEl = document.createElement('div');
-      sbEl.innerHTML = buildSidebar(activeId);
-      const main = wrap.querySelector('.main');
-      if (main) wrap.insertBefore(sbEl.firstElementChild, main);
-
-      // Wire everything
+      // Wire up
       applyTheme();
-      buildPalette();
       startClock();
+      initSearch();
       initUserMenu();
 
-      // Defer quota refresh
-      setTimeout(refreshQuota, 800);
+      // Quota after paint
+      setTimeout(refreshQuota, 1000);
 
-      // Show security badge on larger screens
-      if (window.innerWidth > 1100) {
-        document.getElementById('secBadge')?.removeAttribute('style');
-        const el = document.getElementById('secBadge');
-        if (el) el.style.display = 'inline-flex';
-      }
-
-      // Keyboard: Escape closes any open overlay
+      // Escape closes overlays
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
           document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
