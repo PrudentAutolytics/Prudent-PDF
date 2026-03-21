@@ -12,7 +12,7 @@
 <div class="shell" id="appShell">
   <nav class="topbar" id="topbarPlaceholder" role="banner" style="grid-column:1/-1"></nav>
   <aside class="sidebar" id="sidebarPlaceholder" role="navigation" aria-label="Main navigation"></aside>
-  <main class="main">
+  <main class="main viewer-main-wrap">
     <!-- Toolbar -->
     <div class="viewer-top">
       <a href="/history" class="btn btn-ghost btn-sm">← History</a>
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Viewer main area -->
-    <div style="display:grid;grid-template-columns:1fr 380px;flex:1;min-height:0;overflow:hidden">
+    <div class="viewer-body-grid" style="display:grid;grid-template-columns:1fr 380px;flex:1;min-height:0;overflow:hidden">
 
       <!-- Document panes -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);overflow:hidden">

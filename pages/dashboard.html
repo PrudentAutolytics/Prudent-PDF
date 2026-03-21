@@ -29,11 +29,11 @@
   <main class="main">
 
     <!-- ── Welcome banner ── -->
-    <div class="welcome-banner anim" id="welcomeBanner">
+    <div class="welcome-banner anim" id="welcomeBanner" style="overflow:visible">
       <div class="welcome-banner-left">
         <div class="welcome-title" id="welcomeTitle">Good morning 👋</div>
         <div class="welcome-sub">Your documents are processed with <strong>end-to-end encryption</strong> and automatically deleted after 7 days. No PII ever leaves Azure.</div>
-        <div class="flex gap-10 mt-16">
+        <div class="flex gap-10 mt-12" style="flex-wrap:nowrap">
           <a href="/history" class="quick-action">
             <div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
             <div><div class="quick-action-label">Job History</div><div class="quick-action-sub">View all processed files</div></div>
@@ -48,7 +48,7 @@
           </a>
         </div>
       </div>
-      <div class="welcome-actions">
+      <div class="welcome-actions" style="flex-shrink:0;position:relative;z-index:2">
         <button class="btn btn-white" id="openUploadBtn" style="padding:12px 22px;font-size:14px">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Upload PDF
@@ -57,7 +57,7 @@
     </div>
 
     <!-- ── Stats ── -->
-    <div class="stats-grid">
+    <div class="stats-grid" style="margin-bottom:20px">
       <div class="stat-card blue anim d1">
         <div class="stat-label">Total Jobs (30d)</div>
         <div class="stat-val" id="sTotal">—</div>
@@ -144,7 +144,7 @@
         </div>
 
         <!-- Cost insight -->
-        <div class="insight-card">
+        <div class="card insight-card" style="border-radius:var(--r14)">
           <div class="stat-label" style="margin-bottom:12px">Cost Efficiency</div>
           <div style="font-size:13px;color:var(--ink2);line-height:1.7">
             Average cost per document across all processed jobs. Azure Document Intelligence is charged per page.
