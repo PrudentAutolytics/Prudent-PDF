@@ -3,154 +3,272 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="Sign in to Prudent PDF — AI-powered document redaction platform by Prudent Autolytics"/>
+<meta name="description" content="Sign in or create your account — Prudent PDF by Prudent Autolytics"/>
 <title>Sign In — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-/* ── Login page layout ─────────────────────────────── */
 body {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   overflow: hidden;
+  padding: 20px;
 }
-
-/* Ambient gradient background */
 body::before {
   content: '';
   position: fixed; inset: 0;
   background:
-    radial-gradient(ellipse 900px 700px at 15% 10%,  rgba(59,130,246,.13)  0%, transparent 65%),
-    radial-gradient(ellipse 700px 600px at 88% 88%,  rgba(139,92,246,.11)  0%, transparent 60%),
-    radial-gradient(ellipse 500px 500px at 60%  45%, rgba(16,185,129,.05)  0%, transparent 55%);
-  pointer-events: none;
-  z-index: 0;
+    radial-gradient(ellipse 900px 700px at 12% 10%, rgba(59,130,246,.14) 0%, transparent 65%),
+    radial-gradient(ellipse 700px 600px at 90% 88%, rgba(139,92,246,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 500px at 55% 48%, rgba(16,185,129,.05) 0%, transparent 55%);
+  pointer-events: none; z-index: 0;
 }
-
-/* Subtle dot grid */
 body::after {
   content: '';
   position: fixed; inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255,255,255,.022) 1px, transparent 1px);
   background-size: 28px 28px;
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; z-index: 0;
+}
+.login-wrap { position: relative; z-index: 1; width: 100%; max-width: 510px; }
+
+/* ── Auth type toggle ──────────────────────────────── */
+.auth-toggle {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r12);
+  padding: 4px; gap: 4px;
+  margin-bottom: 26px;
+}
+.auth-tab {
+  padding: 11px 16px;
+  border-radius: var(--r8);
+  font-family: var(--display);
+  font-size: 13.5px; font-weight: 700;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all var(--dur2) var(--ease);
+  text-align: center;
+  border: 1px solid transparent;
+  user-select: none;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border2);
+  box-shadow: var(--s2);
+}
+.auth-tab.new-tab.active {
+  background: linear-gradient(135deg, rgba(59,130,246,.12), rgba(139,92,246,.10));
+  border-color: var(--blue-bd);
+  color: var(--blue);
+}
+.auth-tab:hover:not(.active) { color: var(--ink2); background: var(--surface3); }
+
+/* ── Compact feature grid ──────────────────────────── */
+.feat-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 7px; margin-bottom: 22px;
+}
+.feat-item {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 12.5px; color: var(--ink2); line-height: 1.35;
+}
+.feat-check {
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+  background: var(--green-bg); border: 1px solid var(--green-bd);
+  display: grid; place-items: center;
+  color: var(--green); font-size: 9px; font-weight: 900; margin-top: 1px;
 }
 
-.login-wrap { position: relative; z-index: 1; }
+/* ── Confirmation pending box ──────────────────────── */
+.confirm-box {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-bd);
+  border-radius: var(--r12);
+  padding: 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 18px;
+}
+.confirm-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(245,158,11,0.15);
+  display: grid; place-items: center;
+  color: var(--amber); flex-shrink: 0; font-size: 20px;
+}
 </style>
 </head>
 <body>
 
 <div class="login-wrap anim">
 
-  <!-- ── Logo ──────────────────────────────────────── -->
+  <!-- Logo -->
   <div class="login-logo">
-    <div class="login-logo-mark" id="loginLogoMark"></div>
+    <!-- SVG logo placeholder -->
+    <div class="login-logo-mark" style="
+      background: linear-gradient(135deg,#3B82F6,#8B5CF6);
+      border-radius:var(--r10);
+      display:grid;place-items:center;
+      box-shadow:0 4px 16px rgba(59,130,246,.35)">
+      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="1.8"/>
+        <path d="M14 2v6h6M8 13h8M8 17h5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
     <div>
       <div class="login-logo-text">Prudent PDF</div>
-      <div class="login-logo-sub">AI-Powered Document Redaction</div>
+      <div class="login-logo-sub">Redaction Platform · Prudent Autolytics</div>
     </div>
   </div>
 
-  <!-- ── Card ──────────────────────────────────────── -->
+  <!-- Card -->
   <div class="login-card">
 
-    <!-- ═══ STEP 1: Email entry ═══ -->
-    <div id="stepEmail">
-      <div class="login-title">Welcome back</div>
-      <div class="login-sub">Enter your work email. We'll send a one-click magic link — no password ever required.</div>
+    <!-- ════ USER TYPE SELECTION + FORMS ════ -->
+    <div id="stepUserType">
 
-      <div class="form-group">
-        <label class="form-label" for="emailInput">Work email address</label>
-        <input
-          class="form-input"
-          id="emailInput"
-          type="email"
-          placeholder="you@company.com"
-          autocomplete="email"
-          autofocus
-          spellcheck="false"
-          aria-label="Email address"
-          aria-describedby="emailErr"
-        />
-        <div id="emailErr" class="form-err hidden" role="alert" aria-live="polite">
-          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.9"/>
-            <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-          </svg>
-          <span id="emailErrText"></span>
+      <!-- Toggle -->
+      <div class="auth-toggle" role="tablist">
+        <div class="auth-tab active" id="tabExisting" role="tab" tabindex="0" aria-selected="true">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Sign in
+        </div>
+        <div class="auth-tab new-tab" id="tabNew" role="tab" tabindex="0" aria-selected="false">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Create account
         </div>
       </div>
 
-      <button class="btn btn-primary w-full" id="sendBtn" style="padding:12px;font-size:14px">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Send magic link
-      </button>
+      <!-- ─── Existing user form ─────────────────────── -->
+      <div id="existingForm">
+        <div class="login-title">Welcome back</div>
+        <div class="login-sub">Enter your email to receive a one-click magic link — no password required.</div>
 
-      <div class="login-divider"><span>What you get free</span></div>
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Work email</label>
+          <input class="form-input" id="emailInput" type="email"
+            placeholder="you@company.com" autocomplete="email"
+            autofocus spellcheck="false"/>
+          <div id="emailErr" class="form-err hidden" role="alert">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span id="emailErrText"></span>
+          </div>
+        </div>
 
-      <div class="trial-features">
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>5 full PDF redactions — zero credit card required</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Azure Document Intelligence field extraction</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Side-by-side original vs redacted document viewer</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>30-day job history with search and filters</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Per-document cost breakdown and CSV export</div>
-        <div class="trial-feat"><span class="trial-feat-icon">✓</span>Redacted PDF delivered by email automatically</div>
+        <button class="btn btn-primary w-full" id="sendBtn" style="padding:13px;font-size:14px">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Send magic link
+        </button>
+
+        <div class="login-divider mt-20"><span>Secure · No password · Azure hosted</span></div>
+
+        <div class="flex-center gap-8" style="flex-wrap:wrap">
+          <div class="security-badge">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            TLS Encrypted
+          </div>
+          <div class="security-badge" style="background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg>
+            Azure Hosted
+          </div>
+          <div class="security-badge" style="background:var(--green-bg);border-color:var(--green-bd);color:var(--green)">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            GDPR Compliant
+          </div>
+        </div>
       </div>
 
-      <div class="flex-center gap-8 mt-16" style="flex-wrap:wrap">
-        <div class="security-badge">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          TLS Encrypted
+      <!-- ─── New user form ──────────────────────────── -->
+      <div id="newUserForm" class="hidden">
+        <div class="login-title" style="font-size:20px">Create your free account</div>
+        <div class="login-sub" style="margin-bottom:16px">Start your 5-document free trial — no credit card needed.</div>
+
+        <!-- What you get -->
+        <div class="feat-grid">
+          <div class="feat-item"><span class="feat-check">✓</span>5 full PDF redactions</div>
+          <div class="feat-item"><span class="feat-check">✓</span>Azure Doc Intelligence</div>
+          <div class="feat-item"><span class="feat-check">✓</span>Side-by-side viewer</div>
+          <div class="feat-item"><span class="feat-check">✓</span>Job history &amp; CSV</div>
+          <div class="feat-item"><span class="feat-check">✓</span>Email delivery of PDFs</div>
+          <div class="feat-item"><span class="feat-check">✓</span>50 MB max file size</div>
         </div>
-        <div class="security-badge" style="background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/>
-          </svg>
-          Azure Hosted
+
+        <div class="form-row" style="gap:12px">
+          <div class="form-group">
+            <label class="form-label" for="regName">Full name <span style="color:var(--red)">*</span></label>
+            <input class="form-input" id="regName" type="text" placeholder="Jane Smith" autocomplete="name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regCompany">Company</label>
+            <input class="form-input" id="regCompany" type="text" placeholder="Acme Corp" autocomplete="organization"/>
+          </div>
         </div>
-        <div class="security-badge" style="background:var(--green-bg);border-color:var(--green-bd);color:var(--green)">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          GDPR Compliant
+
+        <div class="form-group">
+          <label class="form-label" for="regEmail">Work email <span style="color:var(--red)">*</span></label>
+          <input class="form-input" id="regEmail" type="email"
+            placeholder="you@company.com" autocomplete="email" spellcheck="false"/>
+          <div id="regEmailErr" class="form-err hidden" role="alert">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span id="regEmailErrText"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regUseCase">Primary use case</label>
+          <select class="form-select" id="regUseCase">
+            <option value="">Select one…</option>
+            <option value="legal">Legal document redaction</option>
+            <option value="hr">HR / employee records</option>
+            <option value="finance">Financial statements</option>
+            <option value="healthcare">Healthcare / medical records</option>
+            <option value="compliance">Compliance &amp; audit</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <button class="btn w-full" id="registerBtn" style="
+          padding:13px;font-size:14px;
+          background:linear-gradient(135deg,var(--blue),var(--violet));
+          color:#fff;font-family:var(--display);font-weight:700;
+          box-shadow:0 4px 18px rgba(59,130,246,.35)">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Create account &amp; verify email
+        </button>
+
+        <div class="text-xs text-subtle text-center mt-8" style="line-height:1.65">
+          By creating an account you agree to our
+          <a href="/pricing" style="color:var(--ink3);text-decoration:underline">Terms of Service</a>.
+          We send a verification link — no spam, ever.
         </div>
       </div>
-    </div>
+    </div><!-- /#stepUserType -->
 
-    <!-- ═══ STEP 2: Waiting for approval ═══ -->
+    <!-- ════ WAITING (existing user magic link) ════ -->
     <div id="stepWaiting" class="hidden">
       <div class="waiting-state">
-        <div style="width:66px;height:66px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;margin:0 auto 20px;color:var(--blue)" aria-hidden="true">
+        <div style="width:68px;height:68px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;margin:0 auto 20px;color:var(--blue)">
           <svg width="30" height="30" fill="none" viewBox="0 0 24 24">
             <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-
-        <div class="login-title" style="font-size:19px;margin-bottom:6px">Check your inbox</div>
+        <div class="login-title" style="font-size:20px;margin-bottom:6px">Check your inbox</div>
         <div style="font-size:13.5px;color:var(--ink2);margin-bottom:4px">Magic link sent to</div>
         <div class="waiting-email" id="waitingEmail">—</div>
         <div style="font-size:13px;color:var(--ink3);margin:12px 0 0;line-height:1.7">
-          Click the <strong style="color:var(--ink2)">Sign In</strong> button in the email.<br/>
+          Click <strong style="color:var(--ink2)">Sign In</strong> in the email.<br/>
           This page updates automatically once approved.
         </div>
-
         <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r10);padding:12px 16px">
-          <div class="spinner" role="status" aria-label="Waiting for email approval"></div>
+          <div class="spinner" role="status"></div>
           <span style="font-size:13px;color:var(--ink2)">Waiting for approval…</span>
         </div>
-
         <div class="countdown" id="countdown" aria-live="polite">5:00</div>
         <div class="countdown-label">Link expires in</div>
-
         <div id="loginStatusMsg" style="min-height:22px;margin-top:10px;font-size:13px;text-align:center" aria-live="polite"></div>
-
         <div class="resend-row">
           <button class="btn btn-secondary btn-sm" id="resendBtn">Resend email</button>
           <button class="btn btn-ghost btn-sm" id="cancelBtn">Use different email</button>
@@ -158,260 +276,340 @@ body::after {
       </div>
     </div>
 
-    <!-- ═══ STEP 3: Approved / redirecting ═══ -->
+    <!-- ════ NEW USER — Verification pending ════ -->
+    <div id="stepNewPending" class="hidden">
+      <div class="confirm-box">
+        <div class="confirm-icon">✉</div>
+        <div>
+          <div style="font-family:var(--display);font-weight:800;font-size:14.5px;color:var(--amber);margin-bottom:5px">Verification email sent</div>
+          <div style="font-size:13px;color:var(--ink2);line-height:1.65">
+            We sent a confirmation link to<br/>
+            <strong id="newPendingEmail" style="color:var(--ink)">—</strong>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.7;margin-bottom:20px">
+        Click the link to verify your address and activate your free trial.
+        The link expires in <strong style="color:var(--ink2)">5 minutes</strong> — check your spam folder too.
+      </p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r10);padding:12px 16px;margin-bottom:16px">
+        <div class="spinner" role="status"></div>
+        <span style="font-size:13px;color:var(--ink2)">Waiting for verification…</span>
+      </div>
+      <div style="min-height:22px;margin-bottom:12px;font-size:13px;text-align:center;color:var(--ink3)" id="newStatusMsg" aria-live="polite"></div>
+      <div class="resend-row">
+        <button class="btn btn-secondary btn-sm" id="resendNewBtn">Resend verification</button>
+        <button class="btn btn-ghost btn-sm" id="cancelNewBtn">Start over</button>
+      </div>
+    </div>
+
+    <!-- ════ SUCCESS / REDIRECT ════ -->
     <div id="stepDone" class="hidden">
       <div class="success-view">
-        <div class="success-icon" aria-label="Success">✓</div>
-        <div class="success-title">Signed in!</div>
-        <p style="font-size:14px;color:var(--ink2);line-height:1.7">Redirecting to your dashboard…</p>
-        <div class="spinner" style="margin:18px auto 0" role="status" aria-label="Redirecting"></div>
+        <div class="success-icon">✓</div>
+        <div class="success-title" id="successTitle">Signed in!</div>
+        <p id="successSub" style="font-size:14px;color:var(--ink2);line-height:1.7">Redirecting to your dashboard…</p>
+        <div class="spinner" style="margin:18px auto 0" role="status"></div>
       </div>
     </div>
 
   </div><!-- /.login-card -->
 
   <div class="login-footer">
-    By signing in you agree to our <a href="/pricing">Terms of Service</a> and <a href="/contact">Privacy Policy</a>.<br/>
-    © 2025 Prudent Autolytics &mdash; <a href="mailto:Kabileshvijayakumar@prudentautolytics.com">Kabileshvijayakumar@prudentautolytics.com</a>
+    <span id="switchFooterText"></span>
+    <span id="switchFooter" style="color:var(--blue);cursor:pointer;text-decoration:underline;margin-left:4px" role="button" tabindex="0"></span>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="/pricing">Terms</a>&nbsp;·&nbsp;<a href="/contact">Privacy</a><br/>
+    © 2025 Prudent Autolytics · <a href="mailto:Kabileshvijayakumar@prudentautolytics.com">Contact</a>
   </div>
 
-</div><!-- /.login-wrap -->
+</div>
 
 <script src="/js/config.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   Login page logic
+   LOGIN v8 — New + Existing user flows
    ─────────────────────────────────────────────────────────────────
-   Flow:
-   1. User enters email → POST AUTH_REQUEST → PA sends magic link email
-   2. App polls AUTH_VERIFY every 4 s (+ listens via localStorage storage event)
-   3. On approval → save session → redirect to /dashboard
+   PA receives: { email, txId, type:"new"|"existing", name?, company?, useCase?, ttlSeconds }
+   type:"new"      → PA sends CONFIRMATION email (account creation)
+   type:"existing" → PA sends MAGIC-LINK email (sign-in)
+   Both then polled via AUTH_VERIFY { txId, type }
    ═══════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  /* ── Apply saved theme immediately to prevent flash ──────────────── */
-  const savedTheme = localStorage.getItem('pp_theme')
-    || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  // Theme first
+  const t = localStorage.getItem('pp_theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', t);
 
-  /* ── Already authenticated? Redirect immediately ──────────────────── */
-  if (Session.valid()) {
-    location.replace('/dashboard');
-    return;
-  }
+  // Already signed in?
+  if (Session.valid()) { location.replace('/dashboard'); return; }
 
-  /* ── Magic-link callback handling (approval tab) ──────────────────── */
-  const urlParams = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
-  const cbToken  = urlParams.get('token');
-  const cbTxId   = urlParams.get('txId');
-  const cbStatus = urlParams.get('status');
+  // Magic-link callback tab?
+  const up = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
+  const cb = { token: up.get('token'), txId: up.get('txId'), status: up.get('status') };
+  if (cb.token || cb.txId) { handleCallback(cb); return; }
 
-  if (cbToken || (cbTxId && cbStatus)) {
-    handleCallback({ token: cbToken, txId: cbTxId, status: cbStatus });
-    return;
-  }
-
-  /* ── State ────────────────────────────────────────────────────────── */
-  const AUTH_STORE      = 'pp_auth_';
-  const POLL_INTERVAL   = 4000;
-  const LINK_TTL_MS     = 300_000; // 5 min
-
-  let currentEmail = '';
-  let currentTxId  = '';
-  let deadline     = 0;
-  let countTimer   = null;
-  let pollTimer    = null;
-
-  /* ── DOM shortcuts ────────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
+  const AUTH_STORE = 'pp_auth_';
+  const TTL = 300_000;
 
-  /* ── Step visibility ──────────────────────────────────────────────── */
-  function showStep(step) {
-    ['stepEmail', 'stepWaiting', 'stepDone'].forEach(s => {
-      const el = $(s);
-      if (el) el.classList.toggle('hidden', s !== step);
+  let state = { email:'', txId:'', isNew:false, name:'', company:'', useCase:'' };
+  let deadline = 0, countTimer = null, pollTimer = null;
+  let activeTab = 'existing';
+
+  /* ── Tabs ────────────────────────────────────────── */
+  function setTab(tab) {
+    activeTab = tab;
+    $('tabExisting').classList.toggle('active', tab === 'existing');
+    $('tabNew').classList.toggle('active', tab !== 'existing');
+    $('tabExisting').setAttribute('aria-selected', tab === 'existing');
+    $('tabNew').setAttribute('aria-selected', tab !== 'existing');
+    $('existingForm').classList.toggle('hidden', tab !== 'existing');
+    $('newUserForm').classList.toggle('hidden', tab === 'existing');
+
+    // Footer helper text
+    if (tab === 'existing') {
+      $('switchFooterText').textContent = "Don't have an account?";
+      $('switchFooter').textContent = 'Create one free';
+    } else {
+      $('switchFooterText').textContent = 'Already have an account?';
+      $('switchFooter').textContent = 'Sign in here';
+    }
+
+    setTimeout(() => {
+      if (tab === 'existing') $('emailInput')?.focus();
+      else $('regName')?.focus();
+    }, 60);
+  }
+
+  $('tabExisting').addEventListener('click', () => setTab('existing'));
+  $('tabNew').addEventListener('click', () => setTab('new'));
+  ['tabExisting','tabNew'].forEach(id => {
+    $(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') $(id).click();
     });
-    if (step === 'stepWaiting') $('sendBtn')?.setAttribute('aria-hidden', 'true');
+  });
+  $('switchFooter').addEventListener('click', () => setTab(activeTab === 'existing' ? 'new' : 'existing'));
+  $('switchFooter').addEventListener('keydown', e => { if (e.key === 'Enter') $('switchFooter').click(); });
+
+  setTab('existing'); // initial state
+
+  /* ── Step visibility ─────────────────────────────── */
+  function showStep(step) {
+    ['stepUserType','stepWaiting','stepNewPending','stepDone'].forEach(s => {
+      $(s)?.classList.toggle('hidden', s !== step);
+    });
   }
 
-  /* ── Error helpers ────────────────────────────────────────────────── */
-  function showErr(msg) {
-    const err     = $('emailErr');
-    const errText = $('emailErrText');
-    const input   = $('emailInput');
-    if (err)     err.classList.remove('hidden');
-    if (errText) errText.textContent = msg;
-    if (input)   input.classList.add('invalid');
-    input?.focus();
+  /* ── Errors ──────────────────────────────────────── */
+  function showErr(inpId, errId, textId, msg) {
+    $(errId)?.classList.remove('hidden');
+    const et = $(textId); if (et) et.textContent = msg;
+    $(inpId)?.classList.add('invalid'); $(inpId)?.focus();
   }
-  function hideErr() {
-    $('emailErr')?.classList.add('hidden');
-    $('emailInput')?.classList.remove('invalid');
+  function hideErr(inpId, errId) {
+    $(errId)?.classList.add('hidden'); $(inpId)?.classList.remove('invalid');
   }
 
-  /* ── Send magic link ──────────────────────────────────────────────── */
-  async function sendLink() {
-    const email = ($('emailInput')?.value || '').trim();
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showErr('Please enter a valid email address.');
-      return;
-    }
-    hideErr();
-
-    const btn = $('sendBtn');
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Sending…';
-    }
-
+  /* ── Send PA request ─────────────────────────────── */
+  async function sendRequest(payload, btnId, resetBtnHTML) {
+    const btn = $(btnId);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Sending…'; }
     try {
-      const txId  = genUUID();
-      currentEmail = email;
-      currentTxId  = txId;
-
-      const res = await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, {
-        email, txId, ttlSeconds: LINK_TTL_MS / 1000,
-      });
-      // PA may return a different txId — honour it
-      if (res?.txId) currentTxId = res.txId;
-
-      showStep('stepWaiting');
-      const waitEl = $('waitingEmail');
-      if (waitEl) waitEl.textContent = email;
-
-      deadline = Date.now() + LINK_TTL_MS;
-      startCountdown();
-      window.addEventListener('storage', onStorageEvent);
-      if (APP_CONFIG.FLOWS.AUTH_VERIFY) startPoll();
-
+      state.txId = genUUID();
+      payload.txId = state.txId;
+      payload.ttlSeconds = TTL / 1000;
+      const res = await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, payload);
+      if (res?.txId) state.txId = res.txId;
+      return true;
     } catch (err) {
-      showErr(err.message || 'Could not reach the server. Please check your connection and try again.');
+      return err.message || 'Could not reach server. Check your connection.';
     } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Send magic link`;
-      }
+      if (btn) { btn.disabled = false; btn.innerHTML = resetBtnHTML; }
     }
   }
 
-  /* ── Countdown timer ──────────────────────────────────────────────── */
+  /* ── Existing user ───────────────────────────────── */
+  async function sendExisting() {
+    const email = ($('emailInput')?.value || '').trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showErr('emailInput','emailErr','emailErrText','Please enter a valid email address.'); return;
+    }
+    hideErr('emailInput','emailErr');
+    state.email = email; state.isNew = false;
+
+    const BTN_HTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Send magic link';
+    const result = await sendRequest({ email, type:'existing' }, 'sendBtn', BTN_HTML);
+    if (result !== true) { showErr('emailInput','emailErr','emailErrText', result); return; }
+
+    $('waitingEmail').textContent = email;
+    showStep('stepWaiting');
+    startCountdown();
+    window.addEventListener('storage', onStorage);
+    if (APP_CONFIG.FLOWS.AUTH_VERIFY) startPoll();
+  }
+
+  /* ── New user ────────────────────────────────────── */
+  async function registerNew() {
+    const name    = ($('regName')?.value    || '').trim();
+    const email   = ($('regEmail')?.value   || '').trim();
+    const company = ($('regCompany')?.value || '').trim();
+    const useCase = $('regUseCase')?.value  || '';
+
+    if (!name) { showErr('regName','regEmailErr','regEmailErrText','Please enter your full name.'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showErr('regEmail','regEmailErr','regEmailErrText','Please enter a valid work email.'); return;
+    }
+    hideErr('regEmail','regEmailErr');
+    state.email = email; state.isNew = true;
+    state.name = name; state.company = company; state.useCase = useCase;
+
+    const BTN_HTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Create account &amp; verify email';
+    const result = await sendRequest(
+      { email, type:'new', name, company, useCase },
+      'registerBtn', BTN_HTML
+    );
+    if (result !== true) { showErr('regEmail','regEmailErr','regEmailErrText', result); return; }
+
+    $('newPendingEmail').textContent = email;
+    showStep('stepNewPending');
+    startCountdown();
+    window.addEventListener('storage', onStorage);
+    if (APP_CONFIG.FLOWS.AUTH_VERIFY) startPoll();
+  }
+
+  /* ── Countdown timer ─────────────────────────────── */
   function startCountdown() {
+    deadline = Date.now() + TTL;
     if (countTimer) clearInterval(countTimer);
     countTimer = setInterval(() => {
-      const remaining = Math.max(0, deadline - Date.now());
-      const m = Math.floor(remaining / 60_000);
-      const s = Math.floor((remaining % 60_000) / 1000);
-      const cdEl = $('countdown');
-      if (cdEl) cdEl.textContent = `${m}:${String(s).padStart(2, '0')}`;
-
-      if (remaining === 0) {
-        clearInterval(countTimer);
-        stopPoll();
-        setStatusMsg('Link expired. Please resend a new magic link.', 'var(--red)');
-      }
+      const rem = Math.max(0, deadline - Date.now());
+      const el = $('countdown');
+      if (el) el.textContent = `${Math.floor(rem/60000)}:${String(Math.floor((rem%60000)/1000)).padStart(2,'0')}`;
+      if (rem === 0) { clearInterval(countTimer); stopPoll(); setMsg('Link expired. Please resend.','var(--red)'); }
     }, 1000);
   }
 
-  function setStatusMsg(msg, color = 'var(--ink3)') {
-    const el = $('loginStatusMsg');
-    if (el) { el.textContent = msg; el.style.color = color; }
+  function setMsg(msg, color = 'var(--ink3)') {
+    [$('loginStatusMsg'), $('newStatusMsg')].forEach(el => {
+      if (el) { el.textContent = msg; el.style.color = color; }
+    });
   }
 
-  /* ── Cross-tab storage listener ───────────────────────────────────── */
-  function onStorageEvent(e) {
-    if (e.key === AUTH_STORE + currentTxId && e.newValue) {
-      try { applyAuth(JSON.parse(e.newValue)); } catch { /* ignore */ }
+  /* ── Cross-tab storage ───────────────────────────── */
+  function onStorage(e) {
+    if (e.key === AUTH_STORE + state.txId && e.newValue) {
+      try { applyAuth(JSON.parse(e.newValue)); } catch {}
     }
   }
 
-  /* ── Polling ──────────────────────────────────────────────────────── */
+  /* ── Poll AUTH_VERIFY ────────────────────────────── */
   function startPoll() {
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(async () => {
       if (Date.now() > deadline) { stopPoll(); return; }
       try {
-        const res = await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY, { txId: currentTxId, probe: true });
+        const res = await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY, {
+          txId: state.txId, type: state.isNew ? 'new' : 'existing', probe: true,
+        });
         if (res) applyAuth(res);
-      } catch { /* silent — keep polling */ }
-    }, POLL_INTERVAL);
+      } catch {}
+    }, 4000);
   }
+  function stopPoll() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
 
-  function stopPoll() {
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-  }
-
-  /* ── Apply auth response ──────────────────────────────────────────── */
+  /* ── Apply approved session ──────────────────────── */
   function applyAuth(data) {
-    const raw     = String(data?.status || data?.Status || '').toLowerCase();
-    const approved = ['approved', 'ok', 'success', 'yes', 'true', '1'].includes(raw);
-    const denied   = ['denied', 'rejected', 'no', 'false', '0'].includes(raw);
+    const raw = String(data?.status || data?.Status || '').toLowerCase();
+    const ok  = ['approved','ok','success','yes','true','1','verified','confirmed'].includes(raw);
+    const no  = ['denied','rejected','no','false','0'].includes(raw);
 
-    if (approved) {
-      stopPoll();
-      clearInterval(countTimer);
-      window.removeEventListener('storage', onStorageEvent);
+    if (ok) {
+      stopPoll(); clearInterval(countTimer);
+      window.removeEventListener('storage', onStorage);
 
       Session.set({
-        email           : data.email           || currentEmail,
-        token           : data.token           || currentTxId,
+        email           : data.email           || state.email,
+        token           : data.token           || state.txId,
         userId          : data.userId          || '',
         plan            : data.plan            || 'trial',
         creditsUsed     : data.creditsUsed     ?? 0,
         creditsLimit    : data.creditsLimit    ?? APP_CONFIG.TRIAL.MAX_FILES,
         trialExpiryDate : data.trialExpiryDate || null,
-        expiresAt       : Date.now() + 8 * 3_600_000, // 8 hours
+        isNewUser       : state.isNew,
+        expiresAt       : Date.now() + 8 * 3_600_000,
       });
 
-      showStep('stepDone');
-      setTimeout(() => location.replace('/dashboard'), 900);
+      const firstName = state.name ? state.name.split(' ')[0] : null;
+      $('successTitle').textContent = state.isNew && firstName
+        ? `Welcome, ${firstName}! 🎉`
+        : 'Signed in!';
+      $('successSub').textContent = state.isNew
+        ? 'Your free trial is active. Redirecting to your dashboard…'
+        : 'Redirecting to your dashboard…';
 
-    } else if (denied) {
+      showStep('stepDone');
+      setTimeout(() => location.replace('/dashboard'), 1000);
+
+    } else if (no) {
       stopPoll();
-      setStatusMsg('Access denied. Please try a different email or contact support.', 'var(--red)');
+      setMsg(
+        state.isNew
+          ? 'Verification failed. Please try again or contact support.'
+          : 'Access denied. Try a different email or contact support.',
+        'var(--red)'
+      );
     }
   }
 
-  /* ── Callback tab handler ─────────────────────────────────────────── */
+  /* ── Callback handler (confirmation tab) ─────────── */
   function handleCallback(p) {
-    const raw     = String(p.status || '').toLowerCase();
-    const approved = p.token || ['approved', 'ok', 'success'].includes(raw);
-    if (!approved) return;
-
-    // Notify original tab via storage
-    try { localStorage.setItem(AUTH_STORE + p.txId, JSON.stringify(p)); } catch { /* quota */ }
-
-    // Show confirmation in this (callback) tab
+    const raw = String(p.status || '').toLowerCase();
+    if (!p.token && !['approved','ok','success','verified','confirmed'].includes(raw)) return;
+    try { localStorage.setItem(AUTH_STORE + p.txId, JSON.stringify(p)); } catch {}
     document.body.innerHTML = `
-<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink)">
-  <div style="text-align:center;padding:48px;max-width:400px">
-    <div style="font-size:56px;margin-bottom:18px">✓</div>
-    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px">Approved!</div>
-    <div style="font-size:14px;color:var(--ink2);line-height:1.7">You can now close this tab and return to the app. You'll be signed in automatically.</div>
-  </div>
-</div>`;
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink)">
+        <div style="text-align:center;padding:48px;max-width:420px">
+          <div style="font-size:56px;margin-bottom:18px">✓</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px">Verified!</div>
+          <div style="font-size:14px;color:var(--ink2);line-height:1.7">You can close this tab and return to the app — you'll be signed in automatically.</div>
+        </div>
+      </div>`;
   }
 
-  /* ── Wire events ──────────────────────────────────────────────────── */
-  $('sendBtn')?.addEventListener('click', sendLink);
-  $('emailInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendLink(); });
-  $('emailInput')?.addEventListener('input', hideErr);
+  /* ── Wire events ─────────────────────────────────── */
+  $('sendBtn')?.addEventListener('click', sendExisting);
+  $('emailInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendExisting(); });
+  $('emailInput')?.addEventListener('input', () => hideErr('emailInput','emailErr'));
 
+  $('registerBtn')?.addEventListener('click', registerNew);
+  $('regEmail')?.addEventListener('keydown', e => { if (e.key === 'Enter') registerNew(); });
+  $('regEmail')?.addEventListener('input', () => hideErr('regEmail','regEmailErr'));
+
+  // Existing user waiting
   $('resendBtn')?.addEventListener('click', () => {
-    stopPoll();
-    clearInterval(countTimer);
-    showStep('stepEmail');
-    const input = $('emailInput');
-    if (input) input.value = currentEmail;
-    setTimeout(sendLink, 100);
+    stopPoll(); clearInterval(countTimer);
+    showStep('stepUserType'); setTab('existing');
+    $('emailInput').value = state.email;
+    setTimeout(sendExisting, 100);
+  });
+  $('cancelBtn')?.addEventListener('click', () => {
+    stopPoll(); clearInterval(countTimer);
+    showStep('stepUserType'); setTab('existing');
   });
 
-  $('cancelBtn')?.addEventListener('click', () => {
-    stopPoll();
-    clearInterval(countTimer);
-    showStep('stepEmail');
-    $('emailInput')?.focus();
+  // New user pending
+  $('resendNewBtn')?.addEventListener('click', () => {
+    stopPoll(); clearInterval(countTimer);
+    showStep('stepUserType'); setTab('new');
+    $('regEmail').value = state.email;
+    $('regName').value  = state.name;
+    setTimeout(registerNew, 100);
+  });
+  $('cancelNewBtn')?.addEventListener('click', () => {
+    stopPoll(); clearInterval(countTimer);
+    showStep('stepUserType'); setTab('new');
   });
 
 })();
