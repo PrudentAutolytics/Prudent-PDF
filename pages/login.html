@@ -339,7 +339,7 @@ body::after {
   'use strict';
 
   // Theme first
-  const t = localStorage.getItem('pp_theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  const t = localStorage.getItem('pp_theme') || 'light';
   document.documentElement.setAttribute('data-theme', t);
 
   // Already signed in?

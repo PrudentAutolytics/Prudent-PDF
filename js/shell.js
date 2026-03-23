@@ -107,7 +107,7 @@ const Shell = (() => {
   </div>
 
   <div class="topbar-right">
-    <div id="liveClock" class="hidden" style="font-family:var(--mono);font-size:11px;color:var(--ink3);padding:0 10px;white-space:nowrap" aria-live="off"></div>
+    <div id="liveClock" class="topbar-clock hidden" aria-live="off"></div>
 
     <button class="topbar-icon-btn" id="themeBtn" aria-label="Toggle colour theme" title="Toggle theme">
       ${isDark ? ICONS.sun : ICONS.moon}
@@ -206,8 +206,7 @@ const Shell = (() => {
 
   /* ── Theme management ──────────────────────────────────────────────────── */
   function applyTheme() {
-    const saved = localStorage.getItem('pp_theme')
-      || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+    const saved = localStorage.getItem('pp_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
   }
 

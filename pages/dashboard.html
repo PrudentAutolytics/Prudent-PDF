@@ -8,28 +8,11 @@
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
 /* ── Dashboard-specific extras ─────────────────────── */
-.welcome-banner-left { position: relative; z-index: 1; }
-.welcome-actions      { position: relative; z-index: 1; flex-shrink: 0; }
-
-.quick-actions-row {
-  display: flex; gap: 10px; margin-top: 14px;
-  flex-wrap: nowrap; overflow-x: auto;
-}
-
-.right-col  { display: flex; flex-direction: column; gap: 20px; }
-
-/* Activity */
-.activity-wrap { display: flex; flex-direction: column; }
-
-/* Insight card gradient strip */
-.insight-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--blue), var(--violet));
-}
-
-/* Recent jobs row — processing highlight */
-.tbl-row-processing td { background: var(--blue-bg) !important; }
+.welcome-banner-left { position: relative; z-index: 1; flex: 1; }
+.welcome-actions     { position: relative; z-index: 1; flex-shrink: 0; }
+.right-col           { display: flex; flex-direction: column; gap: 22px; }
+.activity-wrap       { display: flex; flex-direction: column; }
+.tbl-row-processing td { background: var(--blue-pale) !important; }
 </style>
 </head>
 <body>
