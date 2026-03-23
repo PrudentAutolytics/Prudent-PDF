@@ -1,552 +1,869 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Prudent PDF dashboard — upload, redact, and manage PDF documents"/>
 <title>Dashboard — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-.welcome-banner-left{position:relative;z-index:1}
-.quick-action{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r10);cursor:pointer;transition:all .15s ease;flex:1;text-decoration:none;color:#fff}
-.quick-action:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);text-decoration:none;transform:translateY(-1px)}
-.quick-action-icon{width:36px;height:36px;border-radius:var(--r8);background:rgba(255,255,255,.12);display:grid;place-items:center;flex-shrink:0}
-.quick-action-label{font-family:var(--display);font-size:12.5px;font-weight:600;line-height:1.2}
-.quick-action-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:1px}
-/* Upload modal polish */
-.security-strip{display:flex;align-items:center;gap:16px;padding:10px 14px;background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--r8);margin-bottom:16px;flex-wrap:wrap}
-.security-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--green);font-weight:500}
-/* Recent row */
-.processing-row{background:var(--blue-bg)!important}
-.activity-wrap{display:flex;flex-direction:column;gap:0}
-/* Insight card */
-.insight-card{background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--r14);padding:18px 20px;position:relative;overflow:hidden}
-.insight-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.08),transparent 70%)}
-.right-col{display:flex;flex-direction:column;gap:20px}
-.btn-white{padding:12px 24px;font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+/* ── Dashboard-specific extras ─────────────────────── */
+.welcome-banner-left { position: relative; z-index: 1; }
+.welcome-actions      { position: relative; z-index: 1; flex-shrink: 0; }
+
+.quick-actions-row {
+  display: flex; gap: 10px; margin-top: 14px;
+  flex-wrap: nowrap; overflow-x: auto;
+}
+
+.right-col  { display: flex; flex-direction: column; gap: 20px; }
+
+/* Activity */
+.activity-wrap { display: flex; flex-direction: column; }
+
+/* Insight card gradient strip */
+.insight-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--violet));
+}
+
+/* Recent jobs row — processing highlight */
+.tbl-row-processing td { background: var(--blue-bg) !important; }
 </style>
 </head>
 <body>
+
 <div class="shell" id="appShell">
   <main class="main">
 
-    <!-- ── Welcome banner ── -->
+    <!-- ── Welcome banner ────────────────────────────── -->
     <div class="welcome-banner anim" id="welcomeBanner">
       <div class="welcome-banner-left">
         <div class="welcome-title" id="welcomeTitle">Good morning 👋</div>
-        <div class="welcome-sub">Your documents are processed with <strong>end-to-end encryption</strong> and automatically deleted after 7 days. No PII ever leaves Azure.</div>
-        <div class="flex gap-10 mt-12" style="flex-wrap:nowrap">
+        <div class="welcome-sub">
+          Your documents are processed with <strong>end-to-end encryption</strong> and automatically
+          deleted after 7 days. No PII ever leaves Azure's European data centres.
+        </div>
+        <div class="quick-actions-row">
           <a href="/history" class="quick-action">
-            <div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-            <div><div class="quick-action-label">Job History</div><div class="quick-action-sub">View all processed files</div></div>
+            <div class="quick-action-icon" aria-hidden="true">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="quick-action-label">Job History</div>
+              <div class="quick-action-sub">View all processed files</div>
+            </div>
           </a>
           <a href="/viewer" class="quick-action">
-            <div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.8"/></svg></div>
-            <div><div class="quick-action-label">Document Viewer</div><div class="quick-action-sub">Side-by-side comparison</div></div>
+            <div class="quick-action-icon" aria-hidden="true">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.8"/></svg>
+            </div>
+            <div>
+              <div class="quick-action-label">Document Viewer</div>
+              <div class="quick-action-sub">Side-by-side comparison</div>
+            </div>
           </a>
           <a href="/pricing" class="quick-action">
-            <div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="#fff" stroke-width="1.8"/></svg></div>
-            <div><div class="quick-action-label">Upgrade Plan</div><div class="quick-action-sub">Unlock unlimited files</div></div>
+            <div class="quick-action-icon" aria-hidden="true">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="#fff" stroke-width="1.8"/></svg>
+            </div>
+            <div>
+              <div class="quick-action-label">Upgrade Plan</div>
+              <div class="quick-action-sub">Unlock unlimited files</div>
+            </div>
           </a>
         </div>
       </div>
       <div class="welcome-actions">
-        <button class="btn btn-white" id="openUploadBtn">
+        <button class="btn btn-white" id="openUploadBtn" style="padding:12px 24px;font-size:13.5px;font-weight:700">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Upload PDF
         </button>
       </div>
     </div>
 
-    <!-- ── Stats ── -->
+    <!-- ── Stat cards ─────────────────────────────────── -->
     <div class="stats-grid">
-      <div class="stat-card blue anim d1">
+      <div class="stat-card blue anim d1" role="region" aria-label="Total jobs">
         <div class="stat-label">Total Jobs (30d)</div>
         <div class="stat-val" id="sTotal">—</div>
         <div class="stat-note" id="sTotalNote">Loading…</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true">
+          <svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.4"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
       </div>
-      <div class="stat-card green anim d2">
+
+      <div class="stat-card green anim d2" role="region" aria-label="Completed jobs">
         <div class="stat-label">Completed</div>
         <div class="stat-val" id="sDone">—</div>
         <div class="stat-note" id="sDoneNote">—</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true">
+          <svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </div>
-      <div class="stat-card amber anim d3">
+
+      <div class="stat-card amber anim d3" role="region" aria-label="Total cost">
         <div class="stat-label">Total Cost (30d)</div>
         <div class="stat-val" id="sCost">$0.00</div>
         <div class="stat-note" id="sCostNote">Across all jobs</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.5"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true">
+          <svg width="44" height="44" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.4"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
       </div>
-      <div class="stat-card violet anim d4">
+
+      <div class="stat-card violet anim d4" role="region" aria-label="Credits remaining">
         <div class="stat-label">Credits Remaining</div>
         <div class="stat-val" id="sCredits">—</div>
         <div class="stat-note" id="sCreditsNote">—</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true">
+          <svg width="44" height="44" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
       </div>
     </div>
 
-    <!-- ── Two column layout ── -->
+    <!-- ── Two-column main content ────────────────────── -->
     <div class="two-col anim d2">
-      <!-- Recent jobs -->
+
+      <!-- Recent jobs table -->
       <div class="card">
         <div class="card-hd">
           <div class="card-title">
-            <div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="card-title-icon" aria-hidden="true">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
             Recent Jobs
           </div>
           <div class="flex gap-8">
-            <button class="btn btn-ghost btn-sm" id="refreshBtn">
+            <button class="btn btn-ghost btn-sm" id="refreshBtn" aria-label="Refresh job list">
               <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               Refresh
             </button>
             <a href="/history" class="btn btn-secondary btn-sm">All jobs →</a>
           </div>
         </div>
+
         <div class="tbl-wrap">
-          <table class="tbl">
-            <thead><tr>
-              <th>File</th>
-              <th>Status</th>
-              <th>Cost</th>
-              <th>Actions</th>
-            </tr></thead>
+          <table class="tbl" aria-label="Recent jobs">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Status</th>
+                <th>Cost</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
             <tbody id="recentBody">
-              <tr><td colspan="4"><div class="recent-empty">
-                <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
-                <div style="font-size:13.5px;font-weight:600;color:var(--ink2);margin-bottom:4px">No jobs yet</div>
-                <div style="font-size:13px">Click <strong>Upload PDF</strong> to get started</div>
-              </div></td></tr>
+              <tr>
+                <td colspan="4">
+                  <div class="tbl-empty">
+                    <div class="tbl-empty-icon" aria-hidden="true">
+                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </div>
+                    <div class="tbl-empty-title">No jobs yet</div>
+                    <div class="tbl-empty-sub">Click <strong>Upload PDF</strong> to get started</div>
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
+
         <div class="card-footer">
           <span class="text-sm text-subtle" id="recentMeta">—</span>
           <div style="flex:1"></div>
-          <button class="btn btn-ghost btn-sm" id="exportRecentBtn">↓ CSV</button>
+          <button class="btn btn-ghost btn-sm" id="exportRecentBtn" aria-label="Export recent jobs to CSV">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export CSV
+          </button>
         </div>
       </div>
 
-      <!-- Right column: activity + insights -->
+      <!-- Right column: activity + cost insight -->
       <div class="right-col">
+
         <!-- Activity feed -->
         <div class="card">
           <div class="card-hd">
             <div class="card-title">
-              <div class="card-title-icon" style="background:var(--green-bg);border-color:var(--green-bd);color:var(--green)"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              Activity
+              <div class="card-title-icon" style="background:var(--green-bg);border-color:var(--green-bd);color:var(--green)" aria-hidden="true">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              Activity Feed
             </div>
-            <span class="pill pill-complete" style="font-size:10px">Live</span>
+            <span class="pill pill-complete" style="font-size:10px">
+              <span class="pill-dot" aria-hidden="true"></span>
+              Live
+            </span>
           </div>
-          <div class="card-body" style="padding:10px 24px">
-            <div class="activity-wrap" id="activityFeed">
-              <div class="activity-row"><div class="activity-dot info"></div><div class="activity-text">Waiting for your first job…</div><div class="activity-time">now</div></div>
+          <div class="card-body" style="padding:8px 20px">
+            <div class="activity-wrap" id="activityFeed" aria-live="polite" aria-label="Activity feed">
+              <div class="activity-row">
+                <div class="activity-dot info" aria-hidden="true"></div>
+                <div class="activity-text">Waiting for your first job…</div>
+                <div class="activity-time">now</div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Cost insight -->
-        <div class="card insight-card">
+        <div class="card insight-card" role="region" aria-label="Cost efficiency">
           <div class="stat-label" style="margin-bottom:12px">Cost Efficiency</div>
           <div style="font-size:13px;color:var(--ink2);line-height:1.7">
-            Average cost per document across all processed jobs. Azure Document Intelligence is charged per page.
+            Average cost per processed document across all jobs.<br/>
+            Azure Document Intelligence is charged per page ($0.001/page).
           </div>
           <div class="flex-between mt-12">
             <div class="mini-stat">
               <div class="mini-stat-val" id="avgCost">—</div>
-              <div class="mini-stat-label" style="margin-left:6px">avg / file</div>
+              <div class="mini-stat-label">avg / file</div>
             </div>
             <a href="/pricing" class="btn btn-sm btn-secondary" style="font-size:11.5px">View breakdown →</a>
           </div>
+          <div class="flex-between mt-12" style="gap:12px">
+            <div>
+              <div class="text-xs text-subtle">Total pages</div>
+              <div class="font-display font-bold" id="totalPages" style="font-size:16px;color:var(--ink)">—</div>
+            </div>
+            <div>
+              <div class="text-xs text-subtle">Avg pages/doc</div>
+              <div class="font-display font-bold" id="avgPages" style="font-size:16px;color:var(--ink)">—</div>
+            </div>
+            <div>
+              <div class="text-xs text-subtle">Success rate</div>
+              <div class="font-display font-bold" id="successRate" style="font-size:16px;color:var(--green)">—</div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+
+      </div><!-- /.right-col -->
+    </div><!-- /.two-col -->
 
   </main>
-</div>
+</div><!-- /#appShell -->
 
-<!-- ═══════════ UPLOAD MODAL ═══════════ -->
-<div class="modal-bg" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<!-- ═══════════════════════════════════════════════════════════════════
+     UPLOAD MODAL
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="uploadModalTitle">
   <div class="modal">
+
     <div class="modal-header">
-      <div class="modal-title" id="modalTitle">
-        <div style="width:32px;height:32px;border-radius:var(--r8);background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;color:var(--blue)">
+      <div class="modal-title" id="uploadModalTitle">
+        <div style="width:32px;height:32px;border-radius:var(--r8);background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;color:var(--blue)" aria-hidden="true">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         New Redaction Job
       </div>
-      <button class="modal-close" id="closeModal" aria-label="Close modal">✕</button>
+      <button class="modal-close" id="closeModal" aria-label="Close upload dialog">✕</button>
     </div>
 
     <div class="modal-body">
-      <!-- Progress stepper -->
-      <div class="stepper mb-20" id="uploadStepper">
+
+      <!-- Stepper -->
+      <div class="stepper mb-20" id="uploadStepper" aria-label="Upload progress">
         <div class="step active" id="st1"><div class="step-num">1</div><span>Select file</span></div>
-        <div class="step" id="st2"><div class="step-num">2</div><span>Upload</span></div>
-        <div class="step" id="st3"><div class="step-num">3</div><span>Process</span></div>
-        <div class="step" id="st4"><div class="step-num">4</div><span>Done</span></div>
+        <div class="step"        id="st2"><div class="step-num">2</div><span>Upload</span></div>
+        <div class="step"        id="st3"><div class="step-num">3</div><span>Process</span></div>
+        <div class="step"        id="st4"><div class="step-num">4</div><span>Done</span></div>
       </div>
 
       <!-- Security strip -->
-      <div class="security-strip">
-        <div class="security-item"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg> TLS encrypted upload</div>
-        <div class="security-item"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg> Stored on Azure Blob</div>
-        <div class="security-item"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Auto-deleted in 7 days</div>
-        <div class="security-item"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg> GDPR compliant</div>
+      <div class="security-strip" role="note">
+        <div class="security-item">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg>
+          TLS encrypted upload
+        </div>
+        <div class="security-item">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg>
+          Azure Blob storage
+        </div>
+        <div class="security-item">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Auto-deleted in 7 days
+        </div>
+        <div class="security-item">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          GDPR compliant
+        </div>
       </div>
 
-      <!-- Drop zone -->
-      <div class="upload-modal-zone" id="dropzone">
-        <input type="file" id="fileInput" accept="application/pdf" aria-label="Select PDF file"/>
-        <div class="upload-modal-icon">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="1.9"/><path d="M14 2v6h6M12 11v6M9 14l3-3 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- Drop zone / file selection -->
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Click or drag to select a PDF file">
+        <input type="file" id="fileInput" accept="application/pdf" aria-label="Select PDF file" aria-describedby="dropzoneHint"/>
+        <div class="dropzone-icon" aria-hidden="true">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="1.9"/>
+            <path d="M14 2v6h6M12 11v6M9 14l3-3 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);margin-bottom:5px">Drop your PDF here</div>
-        <div style="font-size:13px;color:var(--ink2)">or click to browse from your computer</div>
-        <div class="upload-zone-tags mt-12">
-          <span class="upload-tag">
-            <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/></svg>
+        <div class="dropzone-title">Drop your PDF here</div>
+        <div class="dropzone-sub" id="dropzoneHint">or click to browse files</div>
+        <div class="dropzone-constraints">
+          <div class="dropzone-constraint">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.7"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.7"/></svg>
             PDF only
-          </span>
-          <span class="upload-tag">Max 50 MB</span>
-          <span class="upload-tag">Must be unlocked</span>
-          <span class="upload-tag">Multi-page supported</span>
-        </div>
-      </div>
-
-      <!-- File info (hidden until selected) -->
-      <div class="file-selected-box hidden" id="fileInfo">
-        <div class="flex-between gap-10">
-          <div class="file-cell">
-            <div class="file-thumb">PDF</div>
-            <div>
-              <div class="file-name" id="fileName">—</div>
-              <div class="file-meta" id="fileMeta">—</div>
-            </div>
           </div>
-          <button class="btn btn-xs btn-ghost" id="clearFile" aria-label="Remove file">✕ Remove</button>
-        </div>
-        <div class="divider"></div>
-        <div class="flex-between text-sm">
-          <span class="text-subtle">Estimated processing cost</span>
-          <span class="cost-chip" id="costEstimate">Calculating…</span>
-        </div>
-        <div class="mt-10">
-          <div class="progress-track"><div class="progress-fill" id="uploadProgress" style="width:0%"></div></div>
-          <div class="text-xs text-subtle mt-6" id="uploadProgressLabel" style="min-height:16px"></div>
+          <div class="dropzone-constraint">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            Max 50 MB
+          </div>
+          <div class="dropzone-constraint">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Any page count
+          </div>
         </div>
       </div>
 
-      <!-- Pre-flight checklist -->
-      <div class="checklist mb-16" id="preflight">
-        <div class="check-row ok" id="ckAccount"><div class="check-dot"></div>Signed in and authenticated</div>
-        <div class="check-row" id="ckFile"><div class="check-dot"></div>PDF file selected (max 50 MB)</div>
-        <div class="check-row" id="ckConsent"><div class="check-dot"></div>Processing consent given</div>
-        <div class="check-row" id="ckCredits"><div class="check-dot"></div>Trial credits available</div>
+      <!-- File preview (shown after selection) -->
+      <div class="file-preview hidden" id="filePreview">
+        <div class="file-preview-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/><path d="M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="file-preview-name" id="filePreviewName">—</div>
+          <div class="file-preview-meta" id="filePreviewMeta">—</div>
+        </div>
+        <button class="file-preview-remove" id="fileRemoveBtn" aria-label="Remove selected file">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
       </div>
 
-      <!-- Consent -->
-      <label class="flex gap-10 mb-16" style="align-items:flex-start;cursor:pointer">
-        <input type="checkbox" id="consentChk" style="margin-top:3px;accent-color:var(--blue);width:15px;height:15px;flex-shrink:0" aria-label="Consent to processing"/>
-        <span style="font-size:12.5px;color:var(--ink2);line-height:1.65">
-          I confirm I have the <strong>legal right</strong> to process this document and consent to its temporary storage on Azure. I agree to the <a href="/pricing" target="_blank">Terms of Service</a> and <a href="/contact" target="_blank">Privacy Policy</a>. Files are encrypted at rest and deleted after 7 days.
-        </span>
-      </label>
-
-      <!-- Status message -->
-      <div id="uploadStatus" class="alert alert-info hidden" style="font-size:13px;margin-bottom:12px">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span id="uploadStatusText"></span>
+      <!-- Upload progress (hidden until upload starts) -->
+      <div id="uploadProgressWrap" class="hidden mt-12">
+        <div class="flex-between mb-4">
+          <span class="text-sm text-ink2" id="uploadStatusText">Uploading…</span>
+          <span class="font-mono text-sm text-ink3" id="uploadPct">0%</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="uploadProgressBar">
+          <div class="progress-fill" id="uploadProgressFill" style="width:0%"></div>
+        </div>
+        <div class="text-xs text-subtle mt-4" id="uploadProgressSub">Preparing file…</div>
       </div>
-    </div>
 
-    <div class="modal-divider"></div>
+      <!-- Estimated cost preview -->
+      <div id="costPreviewWrap" class="hidden mt-14">
+        <div style="font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Estimated Cost</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;text-align:center">
+            <div class="font-mono text-xs text-subtle mb-4">Doc Intelligence</div>
+            <div class="font-display font-bold text-ink" id="costDocIntel">—</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;text-align:center">
+            <div class="font-mono text-xs text-subtle mb-4">Storage + Flow</div>
+            <div class="font-display font-bold text-ink" id="costInfra">—</div>
+          </div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:10px 12px;text-align:center">
+            <div class="font-mono text-xs text-blue mb-4">Total (est.)</div>
+            <div class="font-display font-bold text-blue" id="costTotal">—</div>
+          </div>
+        </div>
+        <div class="text-xs text-subtle mt-6 text-center">
+          Based on page count extracted from PDF metadata. Actual cost may vary slightly.
+        </div>
+      </div>
+
+    </div><!-- /.modal-body -->
+
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" id="resetUploadBtn">Reset</button>
+      <span class="text-sm text-subtle" id="quotaHint">—</span>
       <div style="flex:1"></div>
-      <button class="btn btn-secondary" id="cancelUploadBtn">Cancel</button>
-      <button class="btn btn-primary" id="submitBtn" disabled style="gap:8px">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Start Redaction
+      <button class="btn btn-ghost" id="cancelUploadBtn">Cancel</button>
+      <button class="btn btn-primary" id="submitBtn" disabled>
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Submit for redaction
       </button>
     </div>
-  </div>
-</div>
+
+  </div><!-- /.modal -->
+</div><!-- /#uploadModal -->
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
-Shell.init('dashboard');
-(function(){
-  const s = Session.get();
-  let allJobs = [], selectedFile = null, pollTimer = null;
+/* ═══════════════════════════════════════════════════════════════════
+   Dashboard page logic — v7.0
+   ─────────────────────────────────────────────────────────────────
+   · Welcome banner with greeting + time-of-day
+   · Stats from local job history (+ live quota from PA)
+   · Recent jobs table from local history
+   · Upload modal: drag-drop → file validate → cost preview → submit
+   · Job status polling for in-progress jobs
+   · Activity feed
+   ═══════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
 
-  // Greeting
-  const h = new Date().getHours();
-  const name = (s.email||'').split('@')[0];
-  document.getElementById('welcomeTitle').textContent =
-    (h<12?'Good morning':h<17?'Good afternoon':'Good evening') + ' 👋 ' + (name ? name.charAt(0).toUpperCase()+name.slice(1) : '');
+  Shell.init('dashboard');
 
-  function init() {
-    const used = s.creditsUsed ?? 0, limit = s.creditsLimit ?? 5;
-    document.getElementById('sCredits').textContent  = limit - used;
-    document.getElementById('sCreditsNote').textContent = `${used} of ${limit} used · ${s.plan==='paid'?'Unlimited':'Trial'}`;
-    loadJobs();
+  const session = Session.get();
+  const $ = id => document.getElementById(id);
+
+  /* ── Welcome greeting ─────────────────────────────── */
+  const greetEl = $('welcomeTitle');
+  if (greetEl && session?.email) {
+    const name = session.email.split('@')[0];
+    greetEl.textContent = `${greeting()}, ${name.charAt(0).toUpperCase() + name.slice(1)} 👋`;
   }
 
-  async function loadJobs() {
+  /* ── Job history helpers ──────────────────────────── */
+  const JOB_KEY = `pp_jobs_${session?.userId || session?.email || 'anon'}`;
+
+  function loadJobs() {
+    try { return JSON.parse(localStorage.getItem(JOB_KEY) || '[]'); } catch { return []; }
+  }
+
+  function saveJob(job) {
     try {
-      const r = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email: s.email, days: 30 });
-      allJobs = Array.isArray(r) ? r : (r?.jobs || []);
-    } catch {
-      allJobs = JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]');
-    }
-    renderStats(); renderRecent(); renderActivity();
-    if (allJobs.some(j => j.status === 'Processing' || j.status === 'Queued')) startPoll();
-    else stopPoll();
+      const jobs = [job, ...loadJobs().filter(j => j.jobId !== job.jobId)]
+        .slice(0, APP_CONFIG.APP.MAX_JOB_HISTORY);
+      localStorage.setItem(JOB_KEY, JSON.stringify(jobs));
+    } catch { /* quota */ }
   }
 
+  function updateJob(jobId, patch) {
+    try {
+      const jobs = loadJobs().map(j => j.jobId === jobId ? { ...j, ...patch } : j);
+      localStorage.setItem(JOB_KEY, JSON.stringify(jobs));
+    } catch { /* quota */ }
+  }
+
+  /* ── Stats population ─────────────────────────────── */
   function renderStats() {
-    const total = allJobs.length;
-    const done  = allJobs.filter(j => j.status === 'Complete').length;
-    const cost  = allJobs.reduce((a,j) => a + (j.costTotal||0), 0);
-    const avg   = total ? cost/total : 0;
-    document.getElementById('sTotal').textContent    = total;
-    document.getElementById('sTotalNote').textContent = `${done} completed · ${total-done} other`;
-    document.getElementById('sDone').textContent     = done;
-    document.getElementById('sDoneNote').innerHTML   = total ? `<b>${Math.round(done/total*100)}%</b> success rate` : 'No jobs yet';
-    document.getElementById('sCost').textContent     = '$' + cost.toFixed(4);
-    document.getElementById('sCostNote').textContent = `Avg $${avg.toFixed(4)} per file`;
-    document.getElementById('avgCost').textContent   = total ? '$' + avg.toFixed(4) : '—';
+    const jobs  = loadJobs();
+    const s     = Session.get() || {};
+    const used  = s.creditsUsed  ?? 0;
+    const limit = s.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
+    const done  = jobs.filter(j => (j.status || '').toLowerCase() === 'complete');
+    const total = jobs.length;
+    const cost  = done.reduce((sum, j) => sum + (j.costTotal || 0), 0);
+    const pages = done.reduce((sum, j) => sum + (j.pageCount || 0), 0);
+    const avgCst= done.length ? cost / done.length : 0;
+    const avgPgs= done.length ? pages / done.length : 0;
+    const rate  = total ? Math.round(done.length / total * 100) : 0;
+
+    setText('sTotal',     total || '0');
+    setText('sTotalNote', total === 1 ? '1 document' : `${total} documents`);
+    setText('sDone',      done.length || '0');
+    setText('sDoneNote',  total ? `${rate}% success rate` : 'No jobs yet');
+    setText('sCost',      '$' + cost.toFixed(4));
+    setText('sCostNote',  `${done.length} completed job${done.length !== 1 ? 's' : ''}`);
+    setText('sCredits',   Math.max(0, limit - used).toString());
+    setText('sCreditsNote', `${used} of ${limit} used`);
+    setText('avgCost',    done.length ? fmt.usd(avgCst) : '—');
+    setText('totalPages', pages || '—');
+    setText('avgPages',   done.length ? avgPgs.toFixed(1) : '—');
+    $('successRate').textContent  = total ? rate + '%' : '—';
+    $('successRate').style.color  = rate >= 90 ? 'var(--green)' : rate >= 70 ? 'var(--amber)' : 'var(--red)';
   }
 
-  function renderRecent() {
-    const tbody = document.getElementById('recentBody');
-    const recent = allJobs.slice(0, 8);
-    document.getElementById('recentMeta').textContent = `Showing ${recent.length} of ${allJobs.length} jobs`;
-    if (!recent.length) {
-      tbody.innerHTML = `<tr><td colspan="4"><div class="recent-empty"><svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg><div style="font-size:13.5px;font-weight:600;color:var(--ink2);margin-bottom:5px">No jobs yet</div><div style="font-size:13px">Click <strong>Upload PDF</strong> above to process your first document</div></div></td></tr>`;
+  function setText(id, val) {
+    const el = $(id); if (el) el.textContent = val;
+  }
+
+  /* ── Render recent jobs table ─────────────────────── */
+  function statusPill(status) {
+    const s = (status || '').toLowerCase();
+    if (s === 'complete')   return `<span class="pill pill-complete"><span class="pill-dot"></span>Complete</span>`;
+    if (s === 'processing') return `<span class="pill pill-processing"><span class="pill-dot"></span>Processing</span>`;
+    if (s === 'queued')     return `<span class="pill pill-queued">Queued</span>`;
+    if (s === 'failed')     return `<span class="pill pill-failed">Failed</span>`;
+    return `<span class="pill">${status || 'Unknown'}</span>`;
+  }
+
+  function renderRecentJobs() {
+    const jobs  = loadJobs().slice(0, 8);
+    const tbody = $('recentBody');
+    const meta  = $('recentMeta');
+    if (!tbody) return;
+
+    if (!jobs.length) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="tbl-empty">
+        <div class="tbl-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="tbl-empty-title">No jobs yet</div>
+        <div class="tbl-empty-sub">Click <strong>Upload PDF</strong> above to get started</div>
+      </div></td></tr>`;
+      if (meta) meta.textContent = 'No jobs in history';
       return;
     }
-    tbody.innerHTML = recent.map(j => {
-      const st = j.status || 'Queued';
-      const cls = {Complete:'pill-complete',Processing:'pill-processing',Queued:'pill-queued',Failed:'pill-failed'}[st] || 'pill-queued';
-      const dot = st==='Processing'?'<span class="pill-dot pulse"></span>':'<span class="pill-dot"></span>';
-      return `<tr class="${st==='Processing'?'processing-row':''}">
-        <td><div class="file-cell"><div class="file-thumb">PDF</div><div><div class="file-name" title="${j.fileName||''}">${j.fileName||'Unknown'}</div><div class="file-meta">${fmt.datetime(j.submittedAt)}</div></div></div></td>
-        <td><span class="pill ${cls}">${dot}${st}</span></td>
-        <td><span class="cost-chip">${j.costTotal?'$'+j.costTotal.toFixed(4):'—'}</span></td>
-        <td><div class="flex gap-6">${st==='Complete'?`<a href="/viewer?jobId=${j.jobId}" class="btn btn-xs btn-secondary">View</a>`:''}${j.resultUrl?`<a href="${j.resultUrl}" class="btn btn-xs btn-ghost" target="_blank" title="Download redacted PDF">↓</a>`:''}</div></td>
+
+    if (meta) meta.textContent = `${jobs.length} recent job${jobs.length !== 1 ? 's' : ''}`;
+
+    tbody.innerHTML = jobs.map(j => {
+      const s      = (j.status || '').toLowerCase();
+      const isProc = s === 'processing' || s === 'queued';
+      const rowCls = isProc ? ' class="tbl-row-processing"' : '';
+
+      const actions = s === 'complete'
+        ? `<div class="flex gap-6">
+            ${j.resultUrl ? `<a href="${j.resultUrl}" class="btn btn-sm btn-secondary" download>↓ PDF</a>` : ''}
+            <button class="btn btn-sm btn-ghost" onclick="viewJob('${j.jobId}')">View</button>
+          </div>`
+        : isProc
+          ? `<span class="text-xs text-subtle">Polling…</span>`
+          : `<span class="text-xs text-subtle">—</span>`;
+
+      return `<tr${rowCls}>
+        <td>
+          <div class="tbl-filename">${fmt.trunc(j.fileName, 36)}</div>
+          <div class="tbl-meta">${fmt.bytes(j.fileSize)} · ${fmt.pages(j.pageCount || 0)} · ${fmt.relative(j.submittedAt)}</div>
+        </td>
+        <td>${statusPill(j.status)}</td>
+        <td><span class="font-mono text-sm text-ink2">${j.costTotal != null ? fmt.usd(j.costTotal) : '—'}</span></td>
+        <td>${actions}</td>
       </tr>`;
     }).join('');
   }
 
-  function renderActivity() {
-    const feed = document.getElementById('activityFeed');
-    const items = allJobs.slice(0,5).map(j => ({
-      dot: j.status==='Complete'?'ok':j.status==='Failed'?'warn':'info',
-      text: `<strong>${j.fileName||'File'}</strong> — ${j.status}${j.costTotal?' · $'+j.costTotal.toFixed(4):''}`,
-      time: fmt.date(j.submittedAt),
-    }));
-    if (!items.length) items.push({ dot:'info', text:'No activity yet — upload your first PDF', time:'now' });
-    feed.innerHTML = items.map(i => `<div class="activity-row"><div class="activity-dot ${i.dot}"></div><div class="activity-text">${i.text}</div><div class="activity-time">${i.time}</div></div>`).join('');
+  window.viewJob = function (jobId) {
+    location.href = `/viewer?jobId=${encodeURIComponent(jobId)}`;
+  };
+
+  /* ── Activity feed ────────────────────────────────── */
+  function addActivity(text, type = 'info') {
+    const feed = $('activityFeed');
+    if (!feed) return;
+    const row = document.createElement('div');
+    row.className = 'activity-row';
+    row.innerHTML = `
+      <div class="activity-dot ${type}"></div>
+      <div class="activity-text">${text}</div>
+      <div class="activity-time">${fmt.time(new Date().toISOString())}</div>
+    `;
+    feed.prepend(row);
+    // Keep feed to 12 entries
+    while (feed.children.length > 12) feed.removeChild(feed.lastChild);
   }
 
-  function startPoll() { if (!pollTimer) pollTimer = setInterval(loadJobs, APP_CONFIG.APP.POLL_INTERVAL); }
-  function stopPoll()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+  /* ── Modal helpers ────────────────────────────────── */
+  function openModal()  { $('uploadModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeModal() { $('uploadModal').classList.remove('open'); document.body.style.overflow = ''; resetModal(); }
 
-  // ── MODAL LOGIC ──
-  const modal = document.getElementById('uploadModal');
-  const open  = () => { modal.classList.add('open'); document.body.style.overflow = 'hidden'; };
-  const close = () => { modal.classList.remove('open'); document.body.style.overflow = ''; };
-  document.getElementById('openUploadBtn').addEventListener('click', open);
-  document.getElementById('closeModal').addEventListener('click', close);
-  document.getElementById('cancelUploadBtn').addEventListener('click', close);
-  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  function stepActive(n) {
+    for (let i = 1; i <= 4; i++) {
+      const el = $(`st${i}`);
+      if (!el) continue;
+      el.classList.remove('active', 'done');
+      if (i < n) el.classList.add('done');
+      if (i === n) el.classList.add('active');
+    }
+  }
 
-  // Drop zone
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('fileInput');
-  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
-  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
-  dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
-  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+  /* ── Upload state ─────────────────────────────────── */
+  let selectedFile = null;
+  let estimatedCost = null;
 
-  function handleFile(file) {
+  function resetModal() {
+    selectedFile  = null;
+    estimatedCost = null;
+    $('fileInput').value = '';
+    $('filePreview').classList.add('hidden');
+    $('dropzone').classList.remove('hidden');
+    $('costPreviewWrap').classList.add('hidden');
+    $('uploadProgressWrap').classList.add('hidden');
+    $('submitBtn').disabled = true;
+    $('submitBtn').innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Submit for redaction`;
+    stepActive(1);
+    updateQuotaHint();
+  }
+
+  function updateQuotaHint() {
+    const s    = Session.get() || {};
+    const used = s.creditsUsed  ?? 0;
+    const lim  = s.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
+    const rem  = Math.max(0, lim - used);
+    const hint = $('quotaHint');
+    if (!hint) return;
+    if (rem <= 0) {
+      hint.innerHTML = `<span style="color:var(--red)">⚠ No credits remaining — <a href="/pricing" style="color:var(--red)">upgrade</a></span>`;
+      $('submitBtn').disabled = true;
+    } else {
+      hint.textContent = `${rem} credit${rem !== 1 ? 's' : ''} remaining`;
+    }
+  }
+
+  /* ── File selection / validation ──────────────────── */
+  async function handleFile(file) {
     if (!file) return;
-    if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
-      showStatus('Only PDF files are accepted. Please select a .pdf file.', 'error'); return;
+
+    if (file.type !== 'application/pdf') {
+      showToast('Only PDF files are accepted.', 'warn'); return;
     }
-    if (file.size > 50 * 1024 * 1024) {
-      showStatus('File exceeds the 50 MB limit. Please compress or split the PDF first.', 'error'); return;
+    if (file.size > APP_CONFIG.UPLOAD.MAX_BYTES) {
+      showToast(`File is too large. Maximum is ${APP_CONFIG.TRIAL.MAX_SIZE_MB} MB.`, 'warn'); return;
     }
+
+    // Check quota
+    const s   = Session.get() || {};
+    const rem = Math.max(0, (s.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES) - (s.creditsUsed ?? 0));
+    if (rem <= 0) {
+      showToast('No credits remaining. Please upgrade your plan.', 'error'); return;
+    }
+
     selectedFile = file;
-    document.getElementById('fileName').textContent = file.name;
-    document.getElementById('fileMeta').textContent = `${fmt.bytes(file.size)} · Selected ${fmt.time(new Date().toISOString())}`;
-    document.getElementById('fileInfo').classList.remove('hidden');
-    dropzone.style.display = 'none';
-    const estPages = Math.max(1, Math.ceil(file.size / 51200));
-    const cost = calcJobCost(estPages, parseFloat(fmt.mb(file.size)));
-    document.getElementById('costEstimate').textContent = `~${cost.totalFmt} (est. ${estPages} pages)`;
-    setStep(2); updateChecklist(); hideStatus();
+
+    // Show file preview
+    $('filePreviewName').textContent = fmt.trunc(file.name, 50);
+    $('filePreviewMeta').textContent = `${fmt.bytes(file.size)} · PDF`;
+    $('filePreview').classList.remove('hidden');
+    $('dropzone').classList.add('hidden');
+    $('submitBtn').disabled = false;
+    updateQuotaHint();
+
+    // Estimate cost (rough: assume 1 page per 60 KB)
+    const estPages = Math.max(1, Math.round(file.size / 60_000));
+    estimatedCost  = calcJobCost(estPages, fmt.mb(file.size));
+
+    $('costDocIntel').textContent = fmt.usd(estimatedCost.docIntel);
+    $('costInfra').textContent    = fmt.usd(estimatedCost.blob + estimatedCost.paFlow + estimatedCost.functions);
+    $('costTotal').textContent    = estimatedCost.totalFmt;
+    $('costPreviewWrap').classList.remove('hidden');
   }
 
-  document.getElementById('clearFile').addEventListener('click', resetForm);
-  document.getElementById('resetUploadBtn').addEventListener('click', resetForm);
+  /* ── Submit job ───────────────────────────────────── */
+  async function submitJob() {
+    if (!selectedFile) return;
 
-  function resetForm() {
-    selectedFile = null; fileInput.value = '';
-    document.getElementById('fileInfo').classList.add('hidden');
-    dropzone.style.display = '';
-    document.getElementById('uploadProgress').style.width = '0%';
-    document.getElementById('uploadProgress').className = 'progress-fill';
-    document.getElementById('uploadProgressLabel').textContent = '';
-    document.getElementById('consentChk').checked = false;
-    setStep(1); updateChecklist(); hideStatus();
+    const s   = Session.get() || {};
+    const rem = Math.max(0, (s.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES) - (s.creditsUsed ?? 0));
+    if (rem <= 0) { showToast('No credits remaining.', 'error'); return; }
+
+    const btn  = $('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0"></div> Submitting…';
+    stepActive(2);
+
+    $('uploadProgressWrap').classList.remove('hidden');
+    setUploadProgress(0, 'Hashing file…');
+
+    try {
+      // SHA-256 checksum
+      const checksum = await sha256(selectedFile);
+      setUploadProgress(15, 'Encoding file…');
+
+      // Convert to base64
+      const base64 = await fileToBase64(selectedFile);
+      setUploadProgress(60, 'Sending to Power Automate…');
+
+      const jobId  = genUUID();
+      const jobPayload = {
+        jobId,
+        email        : s.email,
+        token        : s.token,
+        fileName     : selectedFile.name,
+        fileSize     : selectedFile.size,
+        fileSizeMB   : +fmt.mb(selectedFile.size),
+        fileBase64   : base64,
+        checksum,
+        estCost      : estimatedCost?.total,
+        submittedAt  : new Date().toISOString(),
+      };
+
+      // If BLOB_SAS is configured, upload directly to Blob first
+      if (APP_CONFIG.FLOWS.BLOB_SAS) {
+        setUploadProgress(65, 'Getting upload URL…');
+        const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, { email: s.email, fileName: selectedFile.name });
+        if (sasRes?.sasUrl) {
+          setUploadProgress(70, 'Uploading to Azure…');
+          await fetch(sasRes.sasUrl, {
+            method  : 'PUT',
+            headers : { 'x-ms-blob-type': 'BlockBlob', 'Content-Type': 'application/pdf' },
+            body    : selectedFile,
+          });
+          jobPayload.blobUrl  = sasRes.blobUrl || sasRes.sasUrl.split('?')[0];
+          jobPayload.fileBase64 = undefined; // don't double-send
+          setUploadProgress(85, 'Submitting job…');
+        }
+      } else {
+        setUploadProgress(75, 'Submitting job…');
+      }
+
+      const res = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, jobPayload);
+      setUploadProgress(100, 'Job submitted!');
+      stepActive(3);
+
+      // Save to local history optimistically
+      const job = {
+        jobId,
+        fileName    : selectedFile.name,
+        fileSize    : selectedFile.size,
+        pageCount   : 0,
+        status      : 'Queued',
+        submittedAt : new Date().toISOString(),
+        completedAt : null,
+        blobUrl     : jobPayload.blobUrl || null,
+        resultUrl   : res?.resultUrl || null,
+        costTotal   : estimatedCost?.total || null,
+        errorMessage: null,
+      };
+      saveJob(job);
+
+      // Patch session credits optimistically
+      Session.patch({ creditsUsed: (s.creditsUsed ?? 0) + 1 });
+
+      addActivity(`Job submitted: ${fmt.trunc(selectedFile.name, 30)}`, 'info');
+      showToast('Job submitted successfully!', 'success');
+
+      // Poll for completion
+      pollJobStatus(jobId, s.email);
+
+      // Refresh UI
+      renderStats();
+      renderRecentJobs();
+      Shell.refreshQuota();
+
+      setTimeout(closeModal, 1400);
+
+    } catch (err) {
+      stepActive(1);
+      setUploadProgress(0, '');
+      $('uploadProgressWrap').classList.add('hidden');
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Submit for redaction`;
+      showToast(err.message || 'Submission failed. Please try again.', 'error');
+      addActivity(`Error: ${err.message || 'Submission failed'}`, 'error');
+    }
   }
 
-  document.getElementById('consentChk').addEventListener('change', () => { updateChecklist(); });
+  function setUploadProgress(pct, label) {
+    const fill = $('uploadProgressFill');
+    const bar  = $('uploadProgressBar');
+    const sub  = $('uploadProgressSub');
+    const pctEl = $('uploadPct');
+    if (fill) fill.style.width = pct + '%';
+    if (bar)  bar.setAttribute('aria-valuenow', pct);
+    if (sub)  sub.textContent = label;
+    if (pctEl)pctEl.textContent = pct + '%';
+  }
 
-  function setStep(n) {
-    [1,2,3,4].forEach(i => {
-      const el = document.getElementById('st' + i);
-      el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  /* ── Job status polling ───────────────────────────── */
+  const activePolls = new Map();
+
+  function pollJobStatus(jobId, email) {
+    if (!APP_CONFIG.FLOWS.JOB_STATUS || activePolls.has(jobId)) return;
+
+    let attempts = 0;
+    const MAX_ATTEMPTS = 120; // 10 min at 5 s interval
+
+    const timer = setInterval(async () => {
+      attempts++;
+      if (attempts > MAX_ATTEMPTS) {
+        clearInterval(timer);
+        activePolls.delete(jobId);
+        updateJob(jobId, { status: 'Failed', errorMessage: 'Timed out waiting for completion.' });
+        renderRecentJobs();
+        renderStats();
+        return;
+      }
+      try {
+        const res = await paFetch(APP_CONFIG.FLOWS.JOB_STATUS, { jobId, email });
+        if (!res) return;
+
+        const status = res.status || res.Status || '';
+        updateJob(jobId, { status, resultUrl: res.resultUrl, pageCount: res.pageCount, costTotal: res.costTotal });
+        renderRecentJobs();
+        renderStats();
+
+        const done = ['complete', 'failed', 'error'].includes(status.toLowerCase());
+        if (done) {
+          clearInterval(timer);
+          activePolls.delete(jobId);
+          const jobs = loadJobs();
+          const j    = jobs.find(x => x.jobId === jobId);
+          if (status.toLowerCase() === 'complete') {
+            addActivity(`Completed: ${fmt.trunc(j?.fileName || jobId, 30)}`, 'success');
+            showToast('Redaction complete! Download is ready.', 'success', 6000);
+            stepActive(4);
+          } else {
+            addActivity(`Failed: ${fmt.trunc(j?.fileName || jobId, 30)}`, 'error');
+            showToast('Job failed. Check the history page for details.', 'error');
+          }
+        }
+      } catch { /* polling is best-effort */ }
+    }, APP_CONFIG.APP.POLL_INTERVAL_MS);
+
+    activePolls.set(jobId, timer);
+  }
+
+  /* ── Resume polling for in-progress jobs ──────────── */
+  function resumePolling() {
+    const s = Session.get() || {};
+    loadJobs().forEach(j => {
+      const st = (j.status || '').toLowerCase();
+      if (st === 'processing' || st === 'queued') {
+        pollJobStatus(j.jobId, s.email);
+      }
     });
   }
 
-  function updateChecklist() {
-    const hasCredits = (s.creditsUsed ?? 0) < (s.creditsLimit ?? 5);
-    const consent = document.getElementById('consentChk').checked;
-    setCk('ckAccount', true);
-    setCk('ckFile', !!selectedFile);
-    setCk('ckConsent', consent);
-    setCk('ckCredits', hasCredits);
-    document.getElementById('submitBtn').disabled = !(selectedFile && consent && hasCredits);
-  }
-
-  function setCk(id, ok) { document.getElementById(id).className = 'check-row ' + (ok ? 'ok' : ''); }
-  function showStatus(msg, type='info') {
-    const el = document.getElementById('uploadStatus');
-    el.className = `alert alert-${type} mb-12`;
-    el.classList.remove('hidden');
-    document.getElementById('uploadStatusText').textContent = msg;
-  }
-  function hideStatus() { document.getElementById('uploadStatus').classList.add('hidden'); }
-  function setProgress(pct, label, cls='') {
-    const bar = document.getElementById('uploadProgress');
-    bar.style.width = pct + '%';
-    bar.className = 'progress-fill ' + cls;
-    document.getElementById('uploadProgressLabel').textContent = label;
-  }
-
-  // ── SUBMIT ──
-  document.getElementById('submitBtn').addEventListener('click', async () => {
-    if (!selectedFile) return;
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Processing…';
-    setStep(2); showStatus('Requesting secure upload URL from Azure…', 'info');
-
-    try {
-      const estPages = Math.max(1, Math.ceil(selectedFile.size / 51200));
-      const cost = calcJobCost(estPages, parseFloat(fmt.mb(selectedFile.size)));
-      let sasUrl = '', blobPath = selectedFile.name;
-
-      // Step 1: Get SAS URL (only if BLOB_SAS flow is configured)
-      if (APP_CONFIG.FLOWS.BLOB_SAS) {
-        setProgress(10, 'Getting secure upload URL…');
-        showStatus('Requesting Azure Blob Storage upload URL…', 'info');
-        const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
-          email: s.email, fileName: selectedFile.name, fileSize: selectedFile.size
-        });
-        sasUrl   = sasRes?.sasUrl   || sasRes?.SasUrl   || sasRes?.url   || '';
-        blobPath = sasRes?.blobPath || sasRes?.BlobPath || sasRes?.path  || selectedFile.name;
-      } else {
-        // BLOB_SAS not configured — skip blob upload, send file directly to PA
-        setProgress(20, 'Blob SAS not configured — submitting directly…');
-        showStatus('Submitting job to redaction pipeline…', 'info');
-      }
-
-      // Step 2: Upload to Blob (only if we got a SAS URL)
-      if (sasUrl) {
-        setProgress(35, 'Uploading file to Azure Blob Storage…');
-        setStep(2); showStatus('Uploading encrypted file…', 'info');
-        const uploadRes = await fetch(sasUrl, {
-          method: 'PUT',
-          headers: {
-            'x-ms-blob-type': 'BlockBlob',
-            'Content-Type': 'application/pdf',
-            'x-ms-version': '2020-02-10'
-          },
-          body: selectedFile,
-        });
-        if (!uploadRes.ok) throw new Error(`Blob upload failed: HTTP ${uploadRes.status}`);
-      }
-
-      // Step 3: Submit job to PA flow
-      setStep(3); setProgress(65, 'Submitting to redaction pipeline…');
-      showStatus('Sending to Azure Document Intelligence…', 'info');
-      const jobPayload = {
-        email:       s.email,
-        token:       s.token,
-        fileName:    selectedFile.name,
-        fileSize:    selectedFile.size,
-        pageCount:   estPages,
-        estCost:     cost.total,
-        submittedAt: new Date().toISOString(),
-      };
-      // Only include blobUrl if we actually have one (prevents PA 502 from empty string)
-      if (sasUrl || blobPath !== selectedFile.name) {
-        jobPayload.blobUrl = sasUrl || blobPath;
-      }
-      const jobRes = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, jobPayload);
-
-      // Step 4: Done
-      setProgress(100, '✓ Job submitted successfully!', 'ok');
-      setStep(4);
-      showStatus(`✓ Job queued! You'll receive the redacted PDF at ${s.email} when complete.`, 'success');
-      showToast('Redaction job submitted! Processing now.', 'success');
-
-      // Update local session credits
-      const updatedSession = { ...s, creditsUsed: (s.creditsUsed ?? 0) + 1 };
-      Session.set(updatedSession);
-
-      // Cache job locally
-      const cached = JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]');
-      cached.unshift({
-        jobId: jobRes?.jobId || jobRes?.JobId || 'job_' + Date.now(),
-        fileName: selectedFile.name, fileSize: selectedFile.size,
-        status: 'Queued', submittedAt: new Date().toISOString(),
-        costTotal: cost.total, resultUrl: '', blobUrl: sasUrl || blobPath,
-        pageCount: estPages,
-      });
-      localStorage.setItem('pp_jobs_' + s.email, JSON.stringify(cached.slice(0, 50)));
-      allJobs = cached;
-      renderStats(); renderRecent(); renderActivity();
-      startPoll();
-
-      setTimeout(() => { close(); resetForm(); }, 2500);
-    } catch(e) {
-      setProgress(0, '', 'err');
-      const msg = e.message || String(e);
-      let friendly = msg;
-      if (msg.includes('502')) friendly = 'Power Automate flow error (502). Check your JOB_SUBMIT flow is enabled and running, then try again.';
-      else if (msg.includes('timed out') || msg.includes('AbortError')) friendly = 'Request timed out. PA flows can be slow — please try again in a moment.';
-      else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) friendly = 'Network error. Check your internet connection and that the PA flow URL is correct.';
-      showStatus('❌ ' + friendly, 'error');
-      setStep(1);
-      console.error('[PrudentPDF] Submission error:', e);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg> Start Redaction';
-      updateChecklist();
-    }
+  /* ── Wire modal events ────────────────────────────── */
+  $('openUploadBtn')?.addEventListener('click', openModal);
+  $('closeModal')?.addEventListener('click', closeModal);
+  $('cancelUploadBtn')?.addEventListener('click', closeModal);
+  $('uploadModal')?.addEventListener('click', e => {
+    if (e.target === $('uploadModal')) closeModal();
   });
 
-  document.getElementById('refreshBtn').addEventListener('click', loadJobs);
-  document.getElementById('exportRecentBtn').addEventListener('click', () => {
-    exportCSV(allJobs.slice(0,8).map(j => ({ JobID:j.jobId, FileName:j.fileName, Status:j.status, SubmittedAt:j.submittedAt, CostUSD:j.costTotal?.toFixed(4)||'' })), 'recent-jobs.csv');
+  $('submitBtn')?.addEventListener('click', submitJob);
+  $('fileRemoveBtn')?.addEventListener('click', () => {
+    selectedFile = null;
+    $('fileInput').value = '';
+    $('filePreview').classList.add('hidden');
+    $('dropzone').classList.remove('hidden');
+    $('costPreviewWrap').classList.add('hidden');
+    $('submitBtn').disabled = true;
   });
 
-  init(); updateChecklist();
+  // File input change
+  $('fileInput')?.addEventListener('change', e => {
+    if (e.target.files?.[0]) handleFile(e.target.files[0]);
+  });
+
+  // Drag-and-drop
+  const dz = $('dropzone');
+  if (dz) {
+    dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', ()  => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('drag-over');
+      const f = e.dataTransfer?.files?.[0];
+      if (f) handleFile(f);
+    });
+    dz.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') $('fileInput')?.click();
+    });
+  }
+
+  // Wire refresh and export
+  $('refreshBtn')?.addEventListener('click', () => {
+    renderStats();
+    renderRecentJobs();
+    Shell.refreshQuota();
+    showToast('Refreshed', 'info', 1800);
+  });
+
+  $('exportRecentBtn')?.addEventListener('click', () => {
+    const jobs = loadJobs().slice(0, 8).map(j => ({
+      JobId     : j.jobId,
+      FileName  : j.fileName,
+      SizeMB    : fmt.mb(j.fileSize),
+      Pages     : j.pageCount || 0,
+      Status    : j.status,
+      Submitted : fmt.datetime(j.submittedAt),
+      Completed : j.completedAt ? fmt.datetime(j.completedAt) : '',
+      Cost_USD  : j.costTotal ?? '',
+    }));
+    exportCSV(jobs, 'prudent-recent-jobs.csv');
+  });
+
+  /* ── Initial render ───────────────────────────────── */
+  renderStats();
+  renderRecentJobs();
+  resumePolling();
+  updateQuotaHint();
+
 })();
 </script>
 </body>

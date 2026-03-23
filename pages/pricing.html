@@ -1,198 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Prudent PDF pricing — transparent per-document costs with no hidden fees"/>
 <title>Plans & Pricing — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 </head>
 <body>
+
 <div class="shell" id="appShell">
   <main class="main">
-    <div class="pricing-wrap">
-      <!-- Trial banner -->
-      <div class="trial-banner anim" id="trialBanner" style="flex-wrap:wrap">
-        <div style="width:40px;height:40px;border-radius:var(--r10);background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;color:var(--blue);flex-shrink:0">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+
+    <!-- ── Page header ───────────────────────────────── -->
+    <div class="page-hd anim">
+      <div>
+        <div class="page-hd-eyebrow">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" stroke-width="2"/></svg>
+          Account
         </div>
-        <div class="trial-banner-text" style="flex:1">
-          <h3>Free Trial Active</h3>
-          <p id="trialMeta">Loading your account status…</p>
-        </div>
-        <a href="/contact?plan=professional" class="btn btn-primary btn-sm">Upgrade now →</a>
+        <div class="page-title">Plans &amp; Pricing</div>
+        <div class="page-subtitle">Transparent per-document pricing. No hidden fees, no subscriptions until you're ready.</div>
       </div>
-      <!-- Hero -->
-      <div class="pricing-hero anim d1">
-        <h1>Simple, honest pricing</h1>
-        <p>No hidden fees. No surprise bills. Start free and upgrade when you're ready.</p>
-        <div class="pricing-toggle">
-          <button class="pricing-toggle-btn active" id="toggleMonthly">Monthly</button>
-          <button class="pricing-toggle-btn" id="toggleAnnual">Annual <span style="font-size:10px;color:var(--green);margin-left:3px">Save 20%</span></button>
-        </div>
-      </div>
-      <!-- Cards -->
-      <div class="pricing-grid anim d2">
-        <!-- Free -->
-        <div class="pricing-card">
-          <div class="pricing-plan">Free Trial</div>
-          <div class="pricing-price" id="p0"><sup>$</sup>0</div>
-          <div class="pricing-desc">Evaluate Prudent PDF with your own real documents. No card required.</div>
-          <div class="pricing-divider"></div>
-          <ul class="pricing-features">
-            <li>5 PDF redactions included</li>
-            <li>Azure Document Intelligence extraction</li>
-            <li>Side-by-side redaction viewer</li>
-            <li>30-day job history</li>
-            <li>CSV export of extracted fields</li>
-            <li>Per-document cost transparency</li>
-            <li>Email delivery of results</li>
-            <li class="no">Priority processing queue</li>
-            <li class="no">API / Power Automate connector</li>
-            <li class="no">Custom redaction rules</li>
-            <li class="no">Bulk upload</li>
-          </ul>
-          <div class="pricing-cta">
-            <div class="btn btn-secondary w-full" style="justify-content:center;cursor:default;opacity:.7">Your Current Plan</div>
-          </div>
-        </div>
-        <!-- Pro (featured) -->
-        <div class="pricing-card featured">
-          <div class="pricing-plan">Professional</div>
-          <div class="pricing-price" id="p1"><sup>$</sup>49<sub>/mo</sub></div>
-          <div class="pricing-desc">For teams and businesses processing documents regularly. Everything unlocked.</div>
-          <div class="pricing-divider"></div>
-          <ul class="pricing-features">
-            <li><strong>100 PDFs</strong> per month included</li>
-            <li>Azure Document Intelligence extraction</li>
-            <li>Side-by-side redaction viewer</li>
-            <li>90-day job history retention</li>
-            <li>Full CSV + JSON export</li>
-            <li>Detailed per-file cost breakdown</li>
-            <li>Priority processing queue</li>
-            <li>Bulk upload (up to 10 files)</li>
-            <li>Custom field redaction rules</li>
-            <li>Email + Teams notifications</li>
-            <li class="no">REST API access</li>
-          </ul>
-          <div class="pricing-cta">
-            <a href="/contact?plan=professional" class="btn btn-primary w-full" style="justify-content:center">Get Professional →</a>
-          </div>
-        </div>
-        <!-- Enterprise -->
-        <div class="pricing-card">
-          <div class="pricing-plan">Enterprise</div>
-          <div class="pricing-price" style="font-size:30px;padding-top:8px;letter-spacing:-.03em">Custom</div>
-          <div class="pricing-desc">Unlimited scale, your Azure tenant, full Power Platform integration and dedicated support.</div>
-          <div class="pricing-divider"></div>
-          <ul class="pricing-features">
-            <li><strong>Unlimited</strong> redactions</li>
-            <li>Custom Azure Doc Intelligence models</li>
-            <li>Full audit trail + compliance reports</li>
-            <li>Unlimited retention</li>
-            <li>REST API + Power Automate connector</li>
-            <li>SharePoint + Dataverse integration</li>
-            <li>Custom redaction rule engine</li>
-            <li>99.9% SLA uptime guarantee</li>
-            <li>Dedicated Slack / Teams support</li>
-            <li>White-label deployment available</li>
-            <li>Deploy to your Azure subscription</li>
-          </ul>
-          <div class="pricing-cta">
-            <a href="/contact?plan=enterprise" class="btn btn-gold w-full" style="justify-content:center">Contact Sales →</a>
-          </div>
-        </div>
-      </div>
-      <!-- Cost transparency -->
-      <div class="card anim d3" style="margin-top:32px">
-        <div class="card-hd">
-          <div class="card-title">
-            <div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.8"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-            Full Cost Transparency
-          </div>
-          <span style="font-size:11.5px;color:var(--ink3)">Azure-direct pricing, no markup</span>
-        </div>
-        <div class="card-body">
-          <div class="three-col" style="gap:12px">
-            <div class="insight-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r14);padding:16px 18px;position:relative;overflow:hidden">
-              <div class="stat-label">Azure Doc Intelligence</div>
-              <div style="font-size:17px;font-weight:800;color:var(--ink);font-family:var(--display);margin:6px 0">$0.001 <span style="font-size:13px;font-weight:400;color:var(--ink2)">/ page</span></div>
-              <div style="font-size:12.5px;color:var(--ink3);line-height:1.65">OCR, layout analysis, field extraction</div>
-            </div>
-            <div class="insight-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r14);padding:16px 18px">
-              <div class="stat-label">Azure Blob Storage</div>
-              <div style="font-size:17px;font-weight:800;color:var(--ink);font-family:var(--display);margin:6px 0">~$0.00002 <span style="font-size:13px;font-weight:400;color:var(--ink2)">/ MB</span></div>
-              <div style="font-size:12.5px;color:var(--ink3);line-height:1.65">Temporary storage · 7-day auto-expiry</div>
-            </div>
-            <div class="insight-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r14);padding:16px 18px">
-              <div class="stat-label">Processing + Email</div>
-              <div style="font-size:17px;font-weight:800;color:var(--ink);font-family:var(--display);margin:6px 0">~$0.001 <span style="font-size:13px;font-weight:400;color:var(--ink2)">/ job</span></div>
-              <div style="font-size:12.5px;color:var(--ink3);line-height:1.65">Azure Functions + Power Automate + SendGrid</div>
-            </div>
-          </div>
-          <div class="alert alert-info mt-20">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <span>A typical 5-page PDF costs approximately <strong>$0.0075</strong> end-to-end. Prudent PDF adds a 20% overhead buffer to ensure infrastructure reliability. Every job shows a full cost breakdown in the Document Viewer.</span>
-          </div>
-        </div>
-      </div>
-      <!-- FAQ -->
-      <div class="card anim d4" style="margin-top:20px;margin-bottom:32px">
-        <div class="card-hd"><div class="card-title"><div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>Frequently Asked Questions</div></div>
-        <div class="card-body"><div id="faqList"></div></div>
+      <div class="page-hd-actions">
+        <a href="/contact" class="btn btn-secondary">Talk to sales →</a>
+        <a href="/dashboard" class="btn btn-primary">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Upload now
+        </a>
       </div>
     </div>
+
+    <!-- ── Plan cards ─────────────────────────────────── -->
+    <div class="pricing-grid anim mb-32">
+
+      <!-- Free Trial -->
+      <div class="pricing-card">
+        <div class="plan-name">Free Trial</div>
+        <div class="plan-desc">Perfect for evaluating Prudent PDF. No credit card required.</div>
+        <div class="plan-price"><sup>$</sup>0</div>
+        <div class="plan-period">for 30 days · up to 5 documents</div>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>5 complete PDF redactions</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Azure Document Intelligence extraction</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Side-by-side document viewer</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Job history &amp; CSV export</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Email delivery of redacted PDFs</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>50 MB max file size</div>
+        </div>
+        <a href="/dashboard" class="btn btn-secondary w-full">Start free trial</a>
+      </div>
+
+      <!-- Pay-per-document (FEATURED) -->
+      <div class="pricing-card featured">
+        <div style="position:absolute;top:14px;right:14px" aria-label="Most popular plan">
+          <span class="pill pill-violet" style="font-size:10px">Most Popular</span>
+        </div>
+        <div class="plan-name">Pay Per Document</div>
+        <div class="plan-desc">Only pay for what you process. No monthly commitment.</div>
+        <div class="plan-price"><sup>$</sup>0.01<span>–$0.05</span></div>
+        <div class="plan-period">per document · billed monthly</div>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Unlimited documents</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>All extraction fields included</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Priority processing queue</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>100 MB max file size</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>30-day retention &amp; full history</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Email &amp; Teams notifications</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Cost breakdown per job</div>
+        </div>
+        <a href="/contact" class="btn btn-primary w-full">Get started →</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-desc">Custom volumes, SLAs, and integration with your existing Power Platform environment.</div>
+        <div class="plan-price" style="font-size:28px">Custom</div>
+        <div class="plan-period">volume discounts · dedicated support</div>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Everything in Pay-per-doc</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Custom PA flow integrations</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>SharePoint + Teams deployment</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Azure private endpoints</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>SLA with guaranteed uptime</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Dedicated Prudent Autolytics support</div>
+          <div class="plan-feat"><span class="plan-feat-check">✓</span>Compliance reporting</div>
+        </div>
+        <a href="/contact" class="btn btn-secondary w-full">Contact sales</a>
+      </div>
+
+    </div>
+
+    <!-- ── Cost breakdown table ───────────────────────── -->
+    <div class="mb-8">
+      <div class="page-hd-eyebrow mb-4">Transparent Cost Model</div>
+      <div class="page-title" style="font-size:20px;margin-bottom:6px">What you're actually paying for</div>
+      <div class="page-subtitle">Every charge passed through from Microsoft and SendGrid — Prudent Autolytics adds 20% overhead for hosting and orchestration.</div>
+    </div>
+
+    <div class="cost-table-wrap anim d2 mb-32">
+      <table class="tbl" aria-label="Cost breakdown by service">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>What it does</th>
+            <th>Rate</th>
+            <th>Typical per document</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--blue)">Azure Doc Intelligence</strong></td>
+            <td style="color:var(--ink2)">OCR, field extraction, PII detection</td>
+            <td><span class="font-mono text-sm">$0.001/page</span></td>
+            <td><span class="font-mono text-sm">$0.003 (3 pages avg)</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--green)">Azure Blob Storage</strong></td>
+            <td style="color:var(--ink2)">Original &amp; redacted PDF storage</td>
+            <td><span class="font-mono text-sm">$0.00002/MB</span></td>
+            <td><span class="font-mono text-sm">$0.0004 (2 MB avg)</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--violet)">Power Automate flows</strong></td>
+            <td style="color:var(--ink2)">Orchestration, approval routing</td>
+            <td><span class="font-mono text-sm">$0.0006/run</span></td>
+            <td><span class="font-mono text-sm">$0.0012 (2 flows)</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--amber)">Azure Functions</strong></td>
+            <td style="color:var(--ink2)">Processing triggers, notifications</td>
+            <td><span class="font-mono text-sm">$0.000002/run</span></td>
+            <td><span class="font-mono text-sm">$0.000006 (3 runs)</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--cyan)">SendGrid email</strong></td>
+            <td style="color:var(--ink2)">Delivery of magic links &amp; results</td>
+            <td><span class="font-mono text-sm">$0.00014/email</span></td>
+            <td><span class="font-mono text-sm">$0.00014</span></td>
+          </tr>
+          <tr style="background:var(--surface2)">
+            <td><strong>Prudent Autolytics overhead</strong></td>
+            <td style="color:var(--ink2)">Hosting, support, platform maintenance</td>
+            <td><span class="font-mono text-sm">20% multiplier</span></td>
+            <td><span class="font-mono text-sm text-ink">~$0.005 total</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── Cost calculator ────────────────────────────── -->
+    <div class="mb-8">
+      <div class="page-hd-eyebrow mb-4">Cost Calculator</div>
+      <div class="page-title" style="font-size:20px;margin-bottom:6px">Estimate your monthly bill</div>
+    </div>
+
+    <div class="card anim d3 mb-32">
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="calcDocs">Documents per month</label>
+            <input class="form-input" type="number" id="calcDocs" value="50" min="1" max="100000" aria-label="Number of documents per month"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="calcPages">Average pages per document</label>
+            <input class="form-input" type="number" id="calcPages" value="4" min="1" max="500" aria-label="Average pages per document"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="calcSizeMB">Average file size (MB)</label>
+          <input class="form-input" id="calcSizeMB" type="number" value="2" min="0.1" max="50" step="0.1" style="max-width:200px" aria-label="Average file size in megabytes"/>
+        </div>
+      </div>
+      <div class="card-footer" style="background:var(--surface);gap:20px;flex-wrap:wrap">
+        <div>
+          <div class="text-xs text-subtle mb-4">Est. monthly cost</div>
+          <div class="font-display font-extrabold" style="font-size:28px;color:var(--blue);letter-spacing:-.04em" id="calcResult">—</div>
+        </div>
+        <div>
+          <div class="text-xs text-subtle mb-4">Cost per document</div>
+          <div class="font-display font-bold" style="font-size:20px;color:var(--ink)" id="calcPerDoc">—</div>
+        </div>
+        <div>
+          <div class="text-xs text-subtle mb-4">Doc Intelligence</div>
+          <div class="font-mono text-sm" style="color:var(--ink2)" id="calcDocIntel">—</div>
+        </div>
+        <div>
+          <div class="text-xs text-subtle mb-4">Storage + Flows</div>
+          <div class="font-mono text-sm" style="color:var(--ink2)" id="calcInfra">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FAQ ───────────────────────────────────────── -->
+    <div class="mb-8">
+      <div class="page-hd-eyebrow mb-4">FAQ</div>
+      <div class="page-title" style="font-size:20px">Frequently asked questions</div>
+    </div>
+
+    <div class="card anim d4 mb-32">
+      <div class="card-body" style="padding:8px 24px">
+        <div class="faq-list" id="faqList">
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" role="button" aria-expanded="false">Do I need a credit card for the free trial?</div>
+            <div class="faq-a">No. The 5-document free trial is completely free — sign in with just your work email and you're ready to go. We only ask for payment details when you exceed the free tier.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" role="button" aria-expanded="false">Where are my documents stored?</div>
+            <div class="faq-a">All documents are uploaded directly to your Azure Blob Storage container via pre-signed SAS URLs. They never pass through Prudent Autolytics servers. Files are automatically deleted after 7 days unless you configure a longer retention policy.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" role="button" aria-expanded="false">How accurate is the PII redaction?</div>
+            <div class="faq-a">Redaction is powered by Azure Document Intelligence (formerly Form Recognizer), which achieves over 95% accuracy on standard identity documents. Confidence scores are provided for each extracted field so you can review low-confidence items manually.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" role="button" aria-expanded="false">Can I integrate this with my existing Power Automate flows?</div>
+            <div class="faq-a">Yes. The platform is built entirely on Power Automate HTTP triggers, making it trivial to chain into any existing workflow. Enterprise customers can arrange a full integration review with Prudent Autolytics consultants.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" role="button" aria-expanded="false">Is the cost calculator accurate?</div>
+            <div class="faq-a">The calculator uses the same cost model applied to every job. Actual costs may vary slightly based on exact page counts, Azure region pricing, and SendGrid tier. The 20% overhead multiplier covers Prudent Autolytics hosting and support costs.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" role="button" aria-expanded="false">What document types are supported?</div>
+            <div class="faq-a">Currently PDF only. Support for DOCX, JPEG, PNG, and TIFF is on the product roadmap. If you need a specific format urgently, contact us — custom extraction prompts can often be configured quickly for enterprise clients.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CTA banner ─────────────────────────────────── -->
+    <div class="welcome-banner anim d5" style="align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="position:relative;z-index:1">
+        <div class="welcome-title" style="font-size:20px">Ready to redact your first document?</div>
+        <div class="welcome-sub">5 free documents. No credit card. Approved in under 2 minutes.</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1">
+        <a href="/dashboard" class="btn btn-white" style="padding:11px 22px;font-size:13.5px;font-weight:700">Start free →</a>
+        <a href="/contact" class="btn" style="padding:11px 22px;font-size:13.5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff">Talk to sales</a>
+      </div>
+    </div>
+
   </main>
 </div>
+
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
-Shell.init('pricing');
-(function(){
-  const s = Session.get();
-  if (s) {
-    const used=s.creditsUsed??0, limit=s.creditsLimit??5;
-    const expiry = s.trialExpiryDate ? fmt.date(s.trialExpiryDate) : 'N/A';
-    document.getElementById('trialMeta').textContent = `${used} of ${limit} files used · ${limit-used} remaining · ${s.plan==='paid'?'Pro plan active':`Trial expires ${expiry}`}`;
-    if (s.plan === 'paid') document.getElementById('trialBanner').classList.add('hidden');
+(function () {
+  'use strict';
+  Shell.init('pricing');
+
+  /* ── Cost calculator ──────────────────────────────── */
+  function updateCalc() {
+    const docs    = parseInt(document.getElementById('calcDocs')?.value  || '50', 10)  || 50;
+    const pages   = parseInt(document.getElementById('calcPages')?.value || '4',  10)  || 4;
+    const sizeMB  = parseFloat(document.getElementById('calcSizeMB')?.value || '2') || 2;
+    const perDoc  = calcJobCost(pages, sizeMB);
+    const monthly = perDoc.total * docs;
+
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('calcResult',   '$' + monthly.toFixed(2));
+    set('calcPerDoc',   perDoc.totalFmt);
+    set('calcDocIntel', fmt.usd(perDoc.docIntel * docs));
+    set('calcInfra',    fmt.usd((perDoc.blob + perDoc.paFlow + perDoc.functions) * docs));
   }
 
-  // Annual toggle
-  let isAnnual = false;
-  const prices = [['$0','Free'], ['$49/mo','$39/mo'], ['Custom','Custom']];
-  function updatePrices() {
-    const p = document.getElementById('p1');
-    if (p) p.innerHTML = isAnnual ? '<sup>$</sup>39<sub>/mo</sub>' : '<sup>$</sup>49<sub>/mo</sub>';
-  }
-  document.getElementById('toggleMonthly').addEventListener('click', () => {
-    isAnnual = false;
-    document.getElementById('toggleMonthly').classList.add('active');
-    document.getElementById('toggleAnnual').classList.remove('active');
-    updatePrices();
+  ['calcDocs','calcPages','calcSizeMB'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateCalc);
   });
-  document.getElementById('toggleAnnual').addEventListener('click', () => {
-    isAnnual = true;
-    document.getElementById('toggleAnnual').classList.add('active');
-    document.getElementById('toggleMonthly').classList.remove('active');
-    updatePrices();
+  updateCalc();
+
+  /* ── FAQ accordion ────────────────────────────────── */
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.closest('.faq-item');
+      const open = item.classList.contains('open');
+      item.classList.toggle('open', !open);
+      q.setAttribute('aria-expanded', String(!open));
+    });
+    q.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); q.click(); }
+    });
   });
 
-  // FAQ
-  const faqs = [
-    ['What file types are supported?', 'PDF only, currently. Files must be unlocked (not password-protected), under 50 MB, and contain selectable text or clear scanned images.'],
-    ['What PII gets redacted?', 'Names, DOBs, national IDs, email addresses, phone numbers, bank account numbers, signatures, and any custom fields you define on the Enterprise plan.'],
-    ['Is my data stored permanently?', 'No. All uploaded PDFs are stored in Azure Blob with a 7-day lifecycle policy. Redacted results are available for download for 30 days.'],
-    ['Can I use my own Azure subscription?', 'Yes — Enterprise plan supports deployment to your own Azure tenant with full data sovereignty, Private Endpoints, and VNet integration.'],
-    ['How accurate is the AI extraction?', 'Azure Document Intelligence achieves 90–99%+ confidence on standard documents. Confidence scores are shown per field in the Document Viewer.'],
-    ['What happens when my trial expires?', 'Your account and job history are preserved. You can upgrade any time. No files are deleted for 30 days after trial expiry.'],
-    ['Is there a Power Automate connector?', 'Enterprise includes a custom Power Automate connector, SharePoint integration, Teams notifications, and Dataverse output.'],
-    ['Do you offer a money-back guarantee?', 'Yes — 14-day full refund on Professional plan if you\'re not satisfied for any reason.'],
-  ];
-  document.getElementById('faqList').innerHTML = faqs.map(([q,a]) => `
-    <div class="faq-item">
-      <div class="faq-q">${q}<span class="faq-arrow">▾</span></div>
-      <div class="faq-a">${a}</div>
-    </div>`).join('');
-  document.querySelectorAll('.faq-item').forEach(el =>
-    el.querySelector('.faq-q').addEventListener('click', () => el.classList.toggle('open')));
 })();
 </script>
 </body>

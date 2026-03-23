@@ -1,80 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Prudent PDF job history — search, filter, and export all processed documents"/>
 <title>Job History — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-.detail-row td{background:var(--surface2);padding:0!important}
-.detail-inner{padding:18px 22px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media(max-width:700px){.detail-inner{grid-template-columns:1fr}}
+/* ── History extras ─────────────────────────────────── */
+.filter-bar {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.filter-input {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r8);
+  padding: 7px 12px 7px 32px;
+  font-size: 13px; color: var(--ink);
+  transition: all var(--dur2) var(--ease);
+  flex: 1; min-width: 180px;
+  font-family: var(--font);
+}
+.filter-input:focus { border-color: var(--blue); box-shadow: var(--s-glow); background: var(--surface); outline: none; }
+.filter-input-wrap  { position: relative; flex: 1; min-width: 180px; }
+.filter-input-icon  { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink3); pointer-events: none; }
+
+/* Bulk action bar */
+.bulk-actions-bar {
+  display: none; align-items: center; gap: 10px;
+  padding: 10px 22px;
+  background: var(--blue-bg);
+  border-bottom: 1px solid var(--blue-bd);
+}
+.bulk-actions-bar.visible { display: flex; animation: slide-down .18s ease; }
+@keyframes slide-down { from { opacity:0; transform:translateY(-5px); } }
+
+/* Expandable detail row */
+.detail-row td  { background: var(--surface2); padding: 0 !important; }
+.detail-inner   { padding: 18px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 700px) { .detail-inner { grid-template-columns: 1fr; } }
+
+.detail-field   { display: flex; flex-direction: column; gap: 3px; }
+.detail-key     { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); }
+.detail-val     { font-size: 13px; color: var(--ink2); font-weight: 500; word-break: break-word; }
+.detail-val.mono{ font-family: var(--mono); font-size: 12px; }
+
+/* Extracted fields mini-table */
+.fields-table { width: 100%; border-collapse: collapse; grid-column: 1 / -1; }
+.fields-table th { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); padding: 6px 10px; background: var(--surface3); border: 1px solid var(--border); font-weight: 700; text-align: left; }
+.fields-table td { font-size: 12.5px; color: var(--ink2); padding: 7px 10px; border: 1px solid var(--border); }
+.fields-table tr:hover td { background: var(--surface2); }
 </style>
 </head>
 <body>
+
 <div class="shell" id="appShell">
   <main class="main">
-    <!-- Header -->
+
+    <!-- ── Page header ───────────────────────────────── -->
     <div class="page-hd anim">
-      <div class="page-hd-left">
-        <div class="page-hd-eyebrow"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Workspace</div>
+      <div>
+        <div class="page-hd-eyebrow">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Workspace
+        </div>
         <div class="page-title">Job History</div>
-        <div class="page-subtitle">All redaction jobs with full cost breakdown, field extraction results, and download links.</div>
+        <div class="page-subtitle">All redaction jobs — search, filter, and export with full cost breakdowns.</div>
       </div>
       <div class="page-hd-actions">
-        <button class="btn btn-secondary" id="refreshBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Refresh</button>
-        <button class="btn btn-secondary" id="exportAllBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Export All CSV</button>
-        <a href="/dashboard" class="btn btn-primary"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> New Redaction</a>
+        <button class="btn btn-secondary" id="refreshBtn">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Refresh
+        </button>
+        <button class="btn btn-secondary" id="exportAllBtn">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export All CSV
+        </button>
+        <a href="/dashboard" class="btn btn-primary">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          New Redaction
+        </a>
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- ── Stats ─────────────────────────────────────── -->
     <div class="stats-grid">
       <div class="stat-card blue anim d1">
         <div class="stat-label">Total Files</div>
         <div class="stat-val" id="stTotal">0</div>
         <div class="stat-note" id="stTotalNote">Last 30 days</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.4"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.4"/></svg></div>
       </div>
       <div class="stat-card green anim d2">
         <div class="stat-label">Success Rate</div>
         <div class="stat-val" id="stSuccess">—</div>
         <div class="stat-note" id="stSuccessNote">—</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
       <div class="stat-card amber anim d3">
         <div class="stat-label">Total Cost (30d)</div>
         <div class="stat-val" id="stCost">$0.0000</div>
         <div class="stat-note" id="stCostNote">—</div>
-        <div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.5"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="stat-bg-icon" aria-hidden="true"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.4"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
       </div>
       <div class="stat-card violet anim d4">
         <div class="stat-label">Avg Cost / File</div>
         <div class="stat-val" id="stAvg" style="color:var(--violet)">—</div>
         <div class="stat-note">Per processed document</div>
-        <div class="stat-bg-icon" style="color:var(--violet)"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="stat-bg-icon" style="color:var(--violet)" aria-hidden="true"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
     </div>
 
-    <!-- Bulk action bar -->
-    <div class="bulk-bar" id="bulkBar">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="color:var(--blue)"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <strong class="text-blue" id="bulkCount" style="font-family:var(--display)">0 selected</strong>
+    <!-- ── Bulk action bar ────────────────────────────── -->
+    <div class="bulk-actions-bar" id="bulkBar" role="toolbar" aria-label="Bulk actions">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="color:var(--blue)" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="font-display font-bold text-blue" id="bulkCount">0 selected</span>
       <button class="btn btn-sm btn-secondary" id="bulkExportBtn">Export selected CSV</button>
-      <button class="btn btn-sm btn-danger" id="bulkClearBtn">✕ Clear selection</button>
+      <button class="btn btn-sm btn-danger" id="bulkClearBtn">✕ Clear</button>
     </div>
 
-    <!-- Jobs table -->
+    <!-- ── Jobs table ─────────────────────────────────── -->
     <div class="card anim d2">
-      <div class="card-hd" style="flex-direction:column;align-items:stretch;gap:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <!-- Filters -->
+      <div class="card-hd" style="flex-direction:column;align-items:stretch;gap:14px">
+        <div class="flex-between gap-10">
           <div class="card-title">
-            <div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="card-title-icon" aria-hidden="true">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
             All Jobs
-            <span class="nav-link-badge blue" id="jobCountBadge">0</span>
+            <span class="nav-link-badge blue" id="jobCountBadge" aria-live="polite">0</span>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-ghost btn-sm" id="selectAllBtn">Select all visible</button>
+            <button class="btn btn-ghost btn-sm" id="deselectBtn">Deselect all</button>
           </div>
         </div>
-        <div class="filter-bar" style="flex-wrap:wrap">
-          <input class="filter-input" id="searchFilter" type="search" placeholder="Search filename…" style="flex:1;min-width:160px" aria-label="Search jobs"/>
+        <div class="filter-bar" role="search">
+          <div class="filter-input-wrap">
+            <span class="filter-input-icon" aria-hidden="true">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="1.7"/><path d="M21 21l-4.5-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </span>
+            <input class="filter-input" id="searchFilter" type="search" placeholder="Search filename…" aria-label="Search jobs by filename"/>
+          </div>
           <select class="filter-select" id="statusFilter" aria-label="Filter by status">
             <option value="">All Status</option>
             <option value="Complete">Complete</option>
@@ -87,234 +156,318 @@
             <option value="7">Last 7 days</option>
             <option value="1">Today</option>
             <option value="90">Last 90 days</option>
+            <option value="0">All time</option>
           </select>
           <select class="filter-select" id="sortFilter" aria-label="Sort order">
             <option value="date-desc">Newest first</option>
             <option value="date-asc">Oldest first</option>
             <option value="cost-desc">Highest cost</option>
             <option value="cost-asc">Lowest cost</option>
-            <option value="name-asc">Name A→Z</option>
+            <option value="name-asc">Name A → Z</option>
+            <option value="pages-desc">Most pages</option>
           </select>
         </div>
       </div>
+
+      <!-- Table -->
       <div class="tbl-wrap">
-        <table class="tbl" aria-label="Job history">
+        <table class="tbl" id="jobsTable" aria-label="Job history">
           <thead>
             <tr>
-              <th class="col-chk"><input type="checkbox" id="selectAll" aria-label="Select all jobs"/></th>
+              <th style="width:36px"><input type="checkbox" id="masterCb" class="cb" aria-label="Select all"/></th>
               <th>File</th>
-              <th>Submitted</th>
-              <th>Pages</th>
               <th>Status</th>
-              <th>Time</th>
+              <th>Pages</th>
               <th>Cost</th>
+              <th>Submitted</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="histBody">
-            <tr><td colspan="8"><div class="empty-state">
-              <svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/></svg>
-              <div class="empty-state-title">Loading jobs…</div>
-            </div></td></tr>
-          </tbody>
+          <tbody id="jobsBody"></tbody>
         </table>
       </div>
+
       <div class="card-footer">
-        <span class="text-sm text-subtle" id="histMeta">—</span>
+        <span class="text-sm text-subtle" id="tableFootMeta">—</span>
         <div style="flex:1"></div>
-        <button class="btn btn-sm btn-secondary" id="exportFilteredBtn">
-          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          Export filtered
-        </button>
+        <button class="btn btn-ghost btn-sm" id="exportFilteredBtn">↓ Export filtered CSV</button>
       </div>
     </div>
+
   </main>
 </div>
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
-Shell.init('history');
-(function(){
-  const s = Session.get();
-  let allJobs = [], filtered = [], selected = new Set();
+(function () {
+  'use strict';
+  Shell.init('history');
 
-  async function load() {
-    const days = parseInt(document.getElementById('dateFilter').value) || 30;
-    try {
-      const r = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email: s.email, days });
-      allJobs = Array.isArray(r) ? r : (r?.jobs || []);
-    } catch {
-      allJobs = JSON.parse(localStorage.getItem('pp_jobs_' + s.email) || '[]');
-    }
-    // Compute missing fields
-    allJobs = allJobs.map(j => ({
-      ...j,
-      costTotal: j.costTotal ?? calcJobCost(j.pageCount || 1, parseFloat(fmt.mb(j.fileSize || 0))).total,
-      processingMs: j.completedAt && j.submittedAt ? new Date(j.completedAt) - new Date(j.submittedAt) : null,
-    }));
-    renderSummary(); applyFilters();
-    if (allJobs.some(j => j.status === 'Processing' || j.status === 'Queued'))
-      setTimeout(load, APP_CONFIG.APP.POLL_INTERVAL);
+  const session = Session.get();
+  const JOB_KEY = `pp_jobs_${session?.userId || session?.email || 'anon'}`;
+  const $ = id => document.getElementById(id);
+
+  function loadJobs() {
+    try { return JSON.parse(localStorage.getItem(JOB_KEY) || '[]'); } catch { return []; }
   }
 
-  function renderSummary() {
-    const total = allJobs.length;
-    const done  = allJobs.filter(j => j.status === 'Complete').length;
-    const cost  = allJobs.reduce((a,j) => a + (j.costTotal||0), 0);
-    document.getElementById('stTotal').textContent = total;
-    document.getElementById('stTotalNote').textContent = `${done} complete · ${total-done} other`;
-    document.getElementById('stSuccess').textContent = total ? Math.round(done/total*100)+'%' : '—';
-    document.getElementById('stSuccessNote').textContent = total ? `${done} of ${total} completed` : 'No jobs yet';
-    document.getElementById('stCost').textContent = '$' + cost.toFixed(4);
-    document.getElementById('stCostNote').textContent = `${total} job${total!==1?'s':''}`;
-    document.getElementById('stAvg').textContent = total ? '$'+(cost/total).toFixed(4) : '—';
-  }
+  /* ── Selected row set ─────────────────────────────── */
+  const selected = new Set();
 
-  function applyFilters() {
-    const q      = document.getElementById('searchFilter').value.toLowerCase();
-    const status = document.getElementById('statusFilter').value;
-    const sort   = document.getElementById('sortFilter').value;
-    const days   = parseInt(document.getElementById('dateFilter').value) || 30;
-    const cutoff = Date.now() - days * 86400000;
+  /* ── Filter / sort jobs ───────────────────────────── */
+  function applyFilters(jobs) {
+    const q      = ($('searchFilter')?.value || '').toLowerCase().trim();
+    const status = $('statusFilter')?.value || '';
+    const days   = parseInt($('dateFilter')?.value || '30', 10);
+    const sort   = $('sortFilter')?.value || 'date-desc';
+    const cutoff = days ? Date.now() - days * 86_400_000 : 0;
 
-    filtered = allJobs.filter(j => {
-      if (new Date(j.submittedAt) < cutoff) return false;
-      if (q && !(j.fileName||'').toLowerCase().includes(q)) return false;
-      if (status && j.status !== status) return false;
+    let filtered = jobs.filter(j => {
+      if (q && !(j.fileName || '').toLowerCase().includes(q)) return false;
+      if (status && (j.status || '') !== status) return false;
+      if (cutoff && new Date(j.submittedAt).getTime() < cutoff) return false;
       return true;
     });
 
-    filtered.sort((a,b) => {
-      if (sort === 'date-desc') return new Date(b.submittedAt) - new Date(a.submittedAt);
-      if (sort === 'date-asc')  return new Date(a.submittedAt) - new Date(b.submittedAt);
-      if (sort === 'cost-desc') return (b.costTotal||0) - (a.costTotal||0);
-      if (sort === 'cost-asc')  return (a.costTotal||0) - (b.costTotal||0);
-      if (sort === 'name-asc')  return (a.fileName||'').localeCompare(b.fileName||'');
+    filtered.sort((a, b) => {
+      if (sort === 'date-desc')  return new Date(b.submittedAt) - new Date(a.submittedAt);
+      if (sort === 'date-asc')   return new Date(a.submittedAt) - new Date(b.submittedAt);
+      if (sort === 'cost-desc')  return (b.costTotal || 0) - (a.costTotal || 0);
+      if (sort === 'cost-asc')   return (a.costTotal || 0) - (b.costTotal || 0);
+      if (sort === 'name-asc')   return (a.fileName || '').localeCompare(b.fileName || '');
+      if (sort === 'pages-desc') return (b.pageCount || 0) - (a.pageCount || 0);
       return 0;
     });
 
-    document.getElementById('jobCountBadge').textContent = filtered.length;
-    document.getElementById('histMeta').textContent = `${filtered.length} of ${allJobs.length} jobs`;
-    renderTable();
+    return filtered;
   }
 
-  ['searchFilter','statusFilter','sortFilter'].forEach(id =>
-    document.getElementById(id).addEventListener('input', applyFilters));
-  document.getElementById('dateFilter').addEventListener('change', load);
-
-  function pill(st) {
-    const map = { Complete:'pill-complete', Processing:'pill-processing', Queued:'pill-queued', Failed:'pill-failed' };
-    const dot = st==='Processing' ? '<span class="pill-dot pulse"></span>' : '<span class="pill-dot"></span>';
-    return `<span class="pill ${map[st]||'pill-queued'}">${dot}${st}</span>`;
+  /* ── Status pill ──────────────────────────────────── */
+  function pill(status) {
+    const s = (status || '').toLowerCase();
+    if (s === 'complete')   return `<span class="pill pill-complete"><span class="pill-dot"></span>Complete</span>`;
+    if (s === 'processing') return `<span class="pill pill-processing"><span class="pill-dot"></span>Processing</span>`;
+    if (s === 'queued')     return `<span class="pill pill-queued">Queued</span>`;
+    if (s === 'failed')     return `<span class="pill pill-failed">Failed</span>`;
+    return `<span class="pill">${status || '—'}</span>`;
   }
 
+  /* ── Render stats ─────────────────────────────────── */
+  function renderStats(jobs) {
+    const done    = jobs.filter(j => (j.status || '').toLowerCase() === 'complete');
+    const total   = jobs.length;
+    const cost    = done.reduce((s, j) => s + (j.costTotal || 0), 0);
+    const avgCost = done.length ? cost / done.length : 0;
+    const rate    = total ? Math.round(done.length / total * 100) : 0;
+
+    const setText = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    setText('stTotal',       total || '0');
+    setText('stTotalNote',   `${total} document${total !== 1 ? 's' : ''}`);
+    setText('stSuccess',     total ? rate + '%' : '—');
+    setText('stSuccessNote', done.length ? `${done.length} of ${total} succeeded` : 'No completed jobs');
+    setText('stCost',        '$' + cost.toFixed(4));
+    setText('stCostNote',    `${done.length} completed job${done.length !== 1 ? 's' : ''}`);
+    setText('stAvg',         done.length ? fmt.usd(avgCost) : '—');
+  }
+
+  /* ── Render table ─────────────────────────────────── */
   function renderTable() {
-    const tbody = document.getElementById('histBody');
+    const all      = loadJobs();
+    const filtered = applyFilters(all);
+    const tbody    = $('jobsBody');
+    const badge    = $('jobCountBadge');
+    const meta     = $('tableFootMeta');
+    if (!tbody) return;
+
+    if (badge) badge.textContent = filtered.length;
+    if (meta)  meta.textContent  = `${filtered.length} job${filtered.length !== 1 ? 's' : ''} matching filters`;
+
+    renderStats(all);
+
     if (!filtered.length) {
-      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg><div class="empty-state-title">No jobs match your filters</div><div class="empty-state-sub">Try adjusting filters or <a href="/dashboard">upload a new PDF</a></div></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7"><div class="tbl-empty">
+        <div class="tbl-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M21 21l-4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="tbl-empty-title">No jobs found</div>
+        <div class="tbl-empty-sub">Try adjusting your filters or upload a new document</div>
+      </div></td></tr>`;
       return;
     }
 
-    tbody.innerHTML = filtered.map((j,i) => `
-      <tr class="${j.status==='Processing'?'processing-row':''}">
-        <td class="col-chk"><input type="checkbox" class="row-chk" data-id="${j.jobId}" ${selected.has(j.jobId)?'checked':''} aria-label="Select job ${j.fileName}"/></td>
-        <td><div class="file-cell"><div class="file-thumb">PDF</div><div>
-          <div class="file-name" title="${j.fileName||''}">${j.fileName||'—'}</div>
-          <div class="file-meta">${fmt.bytes(j.fileSize||0)}</div>
-        </div></div></td>
-        <td><div style="font-size:13px">${fmt.date(j.submittedAt)}</div><div class="text-xs text-subtle">${fmt.time(j.submittedAt)}</div></td>
-        <td class="text-sm text-mono">${j.pageCount ?? '—'}</td>
-        <td>${pill(j.status)}</td>
-        <td class="text-sm text-mono text-subtle">${j.processingMs ? fmt.duration(j.processingMs) : '—'}</td>
-        <td><span class="cost-chip">${j.costTotal ? '$'+j.costTotal.toFixed(4) : '—'}</span></td>
-        <td><div class="flex gap-6">
-          <button class="btn btn-xs btn-secondary expand-btn" data-idx="${i}">Details</button>
-          ${j.status==='Complete' ? `<a href="/viewer?jobId=${j.jobId}" class="btn btn-xs btn-secondary">View</a>` : ''}
-          ${j.resultUrl ? `<a href="${j.resultUrl}" class="btn btn-xs btn-ghost" target="_blank" title="Download redacted PDF">↓ PDF</a>` : ''}
-        </div></td>
-      </tr>
-      <tr class="detail-row hidden" id="detail-${i}">
-        <td colspan="8">
-          <div class="detail-inner">
-            <div>
-              <div class="detail-key">Job ID</div><div class="detail-val mb-8">${j.jobId||'—'}</div>
-              <div class="detail-key">Blob Storage</div><div class="detail-val">${j.blobUrl ? '✓ Stored on Azure Blob' : '—'}</div>
-              ${j.errorMessage ? `<div class="detail-key mt-8" style="color:var(--red)">Error</div><div class="detail-val" style="color:var(--red)">${j.errorMessage}</div>` : ''}
-            </div>
-            <div>
-              <div class="detail-key">Cost Breakdown</div>
-              ${costBreakdown(j)}
-            </div>
-            <div>
-              <div class="detail-key">Timeline</div>
-              <div class="detail-val">Submitted: ${fmt.datetime(j.submittedAt)}</div>
-              ${j.completedAt ? `<div class="detail-val mt-4">Completed: ${fmt.datetime(j.completedAt)}</div>` : ''}
-              ${j.processingMs ? `<div class="detail-val mt-4">Duration: ${fmt.duration(j.processingMs)}</div>` : ''}
-              <div class="detail-key mt-8">Pages</div>
-              <div class="detail-val">${j.pageCount ?? '—'}</div>
-            </div>
-          </div>
-        </td>
-      </tr>`).join('');
+    tbody.innerHTML = filtered.map(j => {
+      const chk = selected.has(j.jobId) ? 'checked' : '';
+      const s   = (j.status || '').toLowerCase();
+      const dur = (j.submittedAt && j.completedAt)
+        ? fmt.duration(new Date(j.completedAt) - new Date(j.submittedAt))
+        : '—';
 
-    // Expand/collapse
-    tbody.querySelectorAll('.expand-btn').forEach(btn => {
+      const actions = s === 'complete'
+        ? `<div class="flex gap-5">
+            ${j.resultUrl ? `<a href="${j.resultUrl}" class="btn btn-sm btn-primary" download title="Download redacted PDF">↓ PDF</a>` : ''}
+            <button class="btn btn-sm btn-secondary view-btn" data-id="${j.jobId}">View</button>
+            <button class="btn btn-sm btn-ghost detail-toggle" data-id="${j.jobId}" aria-expanded="false" aria-label="Toggle details">···</button>
+          </div>`
+        : `<button class="btn btn-sm btn-ghost detail-toggle" data-id="${j.jobId}" aria-expanded="false" aria-label="Toggle details">···</button>`;
+
+      return `
+<tr id="row-${j.jobId}">
+  <td><input type="checkbox" class="cb row-cb" data-id="${j.jobId}" ${chk} aria-label="Select ${j.fileName || j.jobId}"/></td>
+  <td>
+    <div class="tbl-filename">${fmt.trunc(j.fileName || '—', 40)}</div>
+    <div class="tbl-meta">${fmt.bytes(j.fileSize)} · ${j.blobUrl ? 'Blob stored' : 'Base64'}</div>
+  </td>
+  <td>${pill(j.status)}</td>
+  <td><span class="font-mono text-sm">${j.pageCount || '—'}</span></td>
+  <td><span class="font-mono text-sm">${j.costTotal != null ? fmt.usd(j.costTotal) : '—'}</span></td>
+  <td>
+    <div class="text-sm text-ink2">${fmt.date(j.submittedAt)}</div>
+    <div class="tbl-meta">${fmt.time(j.submittedAt)} · ${dur}</div>
+  </td>
+  <td>${actions}</td>
+</tr>`;
+    }).join('');
+
+    // Wire detail toggles
+    tbody.querySelectorAll('.detail-toggle').forEach(btn => {
+      btn.addEventListener('click', () => toggleDetail(btn.dataset.id, filtered));
+    });
+
+    // Wire view buttons
+    tbody.querySelectorAll('.view-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const row = document.getElementById('detail-' + btn.dataset.idx);
-        const isOpen = !row.classList.contains('hidden');
-        tbody.querySelectorAll('.detail-row').forEach(r => r.classList.add('hidden'));
-        tbody.querySelectorAll('.expand-btn').forEach(b => b.textContent = 'Details');
-        if (!isOpen) { row.classList.remove('hidden'); btn.textContent = 'Close'; }
+        location.href = `/viewer?jobId=${encodeURIComponent(btn.dataset.id)}`;
       });
     });
 
-    // Row checkboxes
-    tbody.querySelectorAll('.row-chk').forEach(chk => {
-      chk.addEventListener('change', () => {
-        chk.checked ? selected.add(chk.dataset.id) : selected.delete(chk.dataset.id);
-        updateBulk();
+    // Wire checkboxes
+    tbody.querySelectorAll('.row-cb').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) selected.add(cb.dataset.id);
+        else             selected.delete(cb.dataset.id);
+        updateBulkBar();
       });
     });
   }
 
-  function costBreakdown(j) {
-    const c = calcJobCost(j.pageCount||1, parseFloat(fmt.mb(j.fileSize||0)));
-    return [
-      ['Doc Intelligence', '$'+c.docIntel.toFixed(5)],
-      ['Blob Storage',     '$'+c.blob.toFixed(5)],
-      ['Functions',        '$'+c.functions.toFixed(5)],
-      ['Power Automate',   '$'+c.paFlow.toFixed(5)],
-      ['SendGrid Email',   '$'+c.email.toFixed(5)],
-      ['Total (20% o/h)',  '<strong style="color:var(--amber)">$'+c.total.toFixed(4)+'</strong>'],
-    ].map(([k,v]) => `<div class="flex-between text-xs mt-6"><span class="text-subtle">${k}</span><span class="text-mono">${v}</span></div>`).join('');
+  /* ── Expandable detail row ────────────────────────── */
+  function toggleDetail(jobId, allFiltered) {
+    const existing = document.getElementById(`detail-${jobId}`);
+    if (existing) { existing.remove(); return; }
+
+    const j = allFiltered.find(x => x.jobId === jobId);
+    if (!j) return;
+
+    const fields = Array.isArray(j.extractedFields) ? j.extractedFields : [];
+
+    const fieldsHtml = fields.length
+      ? `<div style="grid-column:1/-1">
+          <div class="detail-key" style="margin-bottom:8px">Extracted Fields (${fields.length})</div>
+          <table class="fields-table">
+            <thead><tr><th>Field</th><th>Value</th><th>Confidence</th></tr></thead>
+            <tbody>${fields.map(f => `<tr><td>${f.key || f.name || '—'}</td><td>${f.value || '—'}</td><td><span class="font-mono text-sm">${f.confidence != null ? (f.confidence * 100).toFixed(1) + '%' : '—'}</span></td></tr>`).join('')}</tbody>
+          </table>
+        </div>`
+      : '';
+
+    const html = `
+<tr class="detail-row" id="detail-${jobId}">
+  <td colspan="7">
+    <div class="detail-inner">
+      <div class="detail-field"><div class="detail-key">Job ID</div><div class="detail-val mono">${j.jobId}</div></div>
+      <div class="detail-field"><div class="detail-key">Submitted</div><div class="detail-val">${fmt.datetime(j.submittedAt)}</div></div>
+      <div class="detail-field"><div class="detail-key">Completed</div><div class="detail-val">${j.completedAt ? fmt.datetime(j.completedAt) : '—'}</div></div>
+      <div class="detail-field"><div class="detail-key">File Size</div><div class="detail-val mono">${fmt.bytes(j.fileSize)}</div></div>
+      <div class="detail-field"><div class="detail-key">Pages</div><div class="detail-val mono">${j.pageCount || '—'}</div></div>
+      <div class="detail-field"><div class="detail-key">Total Cost</div><div class="detail-val mono">${j.costTotal != null ? fmt.usd(j.costTotal) : '—'}</div></div>
+      ${j.errorMessage ? `<div class="detail-field" style="grid-column:1/-1"><div class="detail-key" style="color:var(--red)">Error</div><div class="detail-val" style="color:var(--red)">${j.errorMessage}</div></div>` : ''}
+      ${j.blobUrl  ? `<div class="detail-field"><div class="detail-key">Blob URL</div><div class="detail-val mono truncate"><a href="${j.blobUrl}" target="_blank" rel="noopener" style="color:var(--blue)">${j.blobUrl}</a></div></div>` : ''}
+      ${j.resultUrl? `<div class="detail-field"><div class="detail-key">Result URL</div><div class="detail-val mono truncate"><a href="${j.resultUrl}" target="_blank" rel="noopener" style="color:var(--green)">${j.resultUrl}</a></div></div>` : ''}
+      ${fieldsHtml}
+    </div>
+  </td>
+</tr>`;
+
+    const row = document.getElementById(`row-${jobId}`);
+    if (row) row.insertAdjacentHTML('afterend', html);
   }
 
-  document.getElementById('selectAll').addEventListener('change', e => {
-    filtered.forEach(j => e.target.checked ? selected.add(j.jobId) : selected.delete(j.jobId));
-    renderTable(); updateBulk();
+  /* ── Bulk bar ─────────────────────────────────────── */
+  function updateBulkBar() {
+    const bar = $('bulkBar');
+    if (!bar) return;
+    bar.classList.toggle('visible', selected.size > 0);
+    const cEl = $('bulkCount');
+    if (cEl) cEl.textContent = `${selected.size} selected`;
+    const mc = $('masterCb');
+    if (mc) mc.indeterminate = selected.size > 0;
+  }
+
+  /* ── CSV export ───────────────────────────────────── */
+  function toCSVRows(jobs) {
+    return jobs.map(j => ({
+      JobId       : j.jobId,
+      FileName    : j.fileName,
+      SizeMB      : fmt.mb(j.fileSize),
+      Pages       : j.pageCount || '',
+      Status      : j.status,
+      CostUSD     : j.costTotal ?? '',
+      Submitted   : fmt.datetime(j.submittedAt),
+      Completed   : j.completedAt ? fmt.datetime(j.completedAt) : '',
+      ResultURL   : j.resultUrl  || '',
+      ErrorMessage: j.errorMessage || '',
+    }));
+  }
+
+  /* ── Events ───────────────────────────────────────── */
+  const debouncedRender = debounce(renderTable, 200);
+
+  $('searchFilter')?.addEventListener('input',  debouncedRender);
+  $('statusFilter')?.addEventListener('change', renderTable);
+  $('dateFilter')?.addEventListener('change',   renderTable);
+  $('sortFilter')?.addEventListener('change',   renderTable);
+
+  $('refreshBtn')?.addEventListener('click', () => {
+    renderTable(); showToast('Refreshed', 'info', 1600);
   });
 
-  function updateBulk() {
-    document.getElementById('bulkCount').textContent = selected.size + ' selected';
-    document.getElementById('bulkBar').classList.toggle('show', selected.size > 0);
-  }
+  $('exportAllBtn')?.addEventListener('click', () => {
+    exportCSV(toCSVRows(loadJobs()), 'prudent-all-jobs.csv');
+  });
+  $('exportFilteredBtn')?.addEventListener('click', () => {
+    exportCSV(toCSVRows(applyFilters(loadJobs())), 'prudent-filtered-jobs.csv');
+  });
 
-  function toCSVRow(j) {
-    return { JobID:j.jobId, FileName:j.fileName, FileSize:fmt.bytes(j.fileSize||0), Pages:j.pageCount??'', Status:j.status, SubmittedAt:j.submittedAt, CompletedAt:j.completedAt||'', ProcessingTime:j.processingMs?fmt.duration(j.processingMs):'', CostUSD:j.costTotal?.toFixed(4)||'', ErrorMessage:j.errorMessage||'' };
-  }
+  $('masterCb')?.addEventListener('change', e => {
+    const filtered = applyFilters(loadJobs());
+    if (e.target.checked) filtered.forEach(j => selected.add(j.jobId));
+    else                  selected.clear();
+    renderTable();
+    updateBulkBar();
+  });
 
-  document.getElementById('refreshBtn').addEventListener('click', load);
-  document.getElementById('exportAllBtn').addEventListener('click', () => exportCSV(allJobs.map(toCSVRow), 'prudent-pdf-all-jobs.csv'));
-  document.getElementById('exportFilteredBtn').addEventListener('click', () => exportCSV(filtered.map(toCSVRow), 'prudent-pdf-filtered.csv'));
-  document.getElementById('bulkExportBtn').addEventListener('click', () => exportCSV(filtered.filter(j => selected.has(j.jobId)).map(toCSVRow), 'prudent-pdf-selected.csv'));
-  document.getElementById('bulkClearBtn').addEventListener('click', () => { selected.clear(); document.getElementById('selectAll').checked = false; renderTable(); updateBulk(); });
+  $('selectAllBtn')?.addEventListener('click', () => {
+    applyFilters(loadJobs()).forEach(j => selected.add(j.jobId));
+    renderTable(); updateBulkBar();
+  });
+  $('deselectBtn')?.addEventListener('click', () => {
+    selected.clear(); renderTable(); updateBulkBar();
+  });
 
-  // Check URL for pre-search
+  $('bulkClearBtn')?.addEventListener('click', () => {
+    selected.clear(); renderTable(); updateBulkBar();
+  });
+  $('bulkExportBtn')?.addEventListener('click', () => {
+    const sel = loadJobs().filter(j => selected.has(j.jobId));
+    exportCSV(toCSVRows(sel), 'prudent-selected-jobs.csv');
+  });
+
+  // Handle URL search param pre-fill
   const urlQ = new URLSearchParams(location.search).get('q');
-  if (urlQ) document.getElementById('searchFilter').value = urlQ;
+  if (urlQ && $('searchFilter')) $('searchFilter').value = urlQ;
 
-  load();
+  /* ── Initial render ───────────────────────────────── */
+  renderTable();
+
 })();
 </script>
 </body>
