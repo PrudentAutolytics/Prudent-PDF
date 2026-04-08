@@ -31,17 +31,18 @@ jobs:
           api_location: "api"
           output_location: ""
         env:
-          PG_HOST         : ${{ secrets.PG_HOST }}
-          PG_PORT         : ${{ secrets.PG_PORT }}
-          PG_DATABASE     : ${{ secrets.PG_DATABASE }}
-          PG_USER         : ${{ secrets.PG_USER }}
-          PG_PASSWORD     : ${{ secrets.PG_PASSWORD }}
-          PG_SSL          : ${{ secrets.PG_SSL }}
+          PG_HOST                 : ${{ secrets.PG_HOST }}
+          PG_PORT                 : ${{ secrets.PG_PORT }}
+          PG_DATABASE             : ${{ secrets.PG_DATABASE }}
+          PG_USER                 : ${{ secrets.PG_USER }}
+          PG_PASSWORD             : ${{ secrets.PG_PASSWORD }}
+          PG_SSL                  : ${{ secrets.PG_SSL }}
+          PG_CONNECTION_STRING    : ${{ secrets.PG_CONNECTION_STRING }}
           AZURE_STORAGE_ACCOUNT   : ${{ secrets.AZURE_STORAGE_ACCOUNT }}
           AZURE_STORAGE_KEY       : ${{ secrets.AZURE_STORAGE_KEY }}
           AZURE_UPLOAD_CONTAINER  : ${{ secrets.AZURE_UPLOAD_CONTAINER }}
           AZURE_RESULTS_CONTAINER : ${{ secrets.AZURE_RESULTS_CONTAINER }}
-          PA_EMAIL_SEND   : ${{ secrets.PA_EMAIL_SEND }}
+          PA_EMAIL_SEND           : ${{ secrets.PA_EMAIL_SEND }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

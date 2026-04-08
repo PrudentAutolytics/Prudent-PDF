@@ -1,38 +1,25 @@
 'use strict';
-const { Pool } = require('pg');
+const pool = require('../db');
 
 module.exports = async function (context, req) {
   const email = (req.body?.email || '').trim().toLowerCase();
 
-  // Test connection directly
-  const pool = new Pool({
-    connectionString: process.env.PG_CONNECTION_STRING,
-    ssl: { rejectUnauthorized: false },
-  });
+  if (!email) {
+    context.res = { status: 400, body: { error: 'Email required.' } };
+    return;
+  }
 
   try {
-    const result = await pool.query('SELECT NOW() as time, $1 as email', [email || 'test']);
+    const result = await pool.query(
+      'SELECT id FROM users WHERE email = $1', [email]
+    );
     context.res = {
       status: 200,
-      body: {
-        connected: true,
-        time: result.rows[0].time,
-        email: result.rows[0].email,
-        pgConnString: process.env.PG_CONNECTION_STRING ? 'SET' : 'NOT SET',
-        pgHost: process.env.PG_HOST || 'NOT SET',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      body: { exists: result.rows.length > 0 },
     };
   } catch (err) {
-    context.res = {
-      status: 200,
-      body: {
-        connected: false,
-        error: err.message,
-        pgConnString: process.env.PG_CONNECTION_STRING ? 'SET' : 'NOT SET',
-        pgHost: process.env.PG_HOST || 'NOT SET',
-      },
-    };
-  } finally {
-    await pool.end();
+    console.error('auth-check error:', err.message);
+    context.res = { status: 500, body: { error: 'Check failed.' } };
   }
 };
