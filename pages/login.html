@@ -356,18 +356,18 @@ async function handleContinue(){
     S.useCase=$('regUseCase')?.value||'';
   }
 
-  setLoading('Sending code…');
-  try{
-    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
-    S.otpSent=true; // Mark as sent — prevents any further auth-request calls
-    $('otpEmailShow').textContent=email;
-    clearDigits();
-    show('stepOTP');
-    startTimer();
-    setTimeout(()=>$('d0')?.focus(),120);
-  } catch(err){
-    eErr(err.message||'Could not send code. Please try again.');
-  } finally { resetBtn(); }
+ setLoading('Sending code…');
+S.otpSent=true;
+try{
+  await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
+  $('otpEmailShow').textContent=email;
+  clearDigits();
+  show('stepOTP');
+  startTimer();
+  setTimeout(()=>$('d0')?.focus(),120);
+} catch(err){
+  S.otpSent=false;
+  eErr(err.message||'Could not send code. Please try again.');
 }
 
 const ds=[0,1,2,3,4,5].map(i=>$('d'+i));
