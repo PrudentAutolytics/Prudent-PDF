@@ -1,27 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT PDF — shell.js v7.0
+   PRUDENT PDF — shell.js v7.1
    ─────────────────────────────────────────────────────────────────────────
    Injects the shared topbar + sidebar on every authenticated page.
-   Pattern: HTML pages have pre-placed placeholders (#appShell, .main).
-   Shell.init(activeNavId) fills them in from JS so the CSS grid never
-   collapses before paint and there is a single nav definition.
-
-   ADDING A NEW NAV ITEM:
-     Append to the correct group in NAV below. Provide:
-       id       — matches the activeNavId passed per page
-       label    — display text
-       href     — SWA route
-       icon     — key into ICONS map
-       desc     — tooltip text
-       badge    — (optional) small label e.g. "30d"
-       soon     — (optional) true = render "Soon" badge + disable link
    ═══════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
 
 const Shell = (() => {
 
-  /* ── Navigation definition ─────────────────────────────────────────────── */
   const NAV = [
     {
       group : 'WORKSPACE',
@@ -50,7 +36,6 @@ const Shell = (() => {
     },
   ];
 
-  /* ── SVG icon library ──────────────────────────────────────────────────── */
   const ICONS = {
     grid     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>`,
     upload   : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -71,23 +56,40 @@ const Shell = (() => {
     logout   : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     user     : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
     settings : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.7"/></svg>`,
-    // Prudent Autolytics logo — base64 JPEG (lightweight thumbnail quality)
-    pdf      : `<img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAcAEADASIAAhEBAxEB/8QAGgABAQEBAQEBAAAAAAAAAAAAAAUEAwYCB//EAC4QAAIBAwMDAgQHAAAAAAAAAAECAwAEEQUSITFBURMiYXGBkbHB0RQjMkL/xAAWAQEBAQAAAAAAAAAAAAAAAAABAAL/xAAWEQEBAQAAAAAAAAAAAAAAAAAAEQH/2gAMAwEAAhEDEQA/APtNKUoBSlKAUpSgFKUoBSlKAUpSgFKUoBSlKAUpSgFKUoBSlKAUpSgIVylZ2JVJv3kPIiTJb9KbP0P11WhWJrDMFXO5mwB5JoD/2Q==" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;border-radius:inherit"/>`,
   };
 
-  /* ── Build topbar HTML ─────────────────────────────────────────────────── */
-  function buildTopbar(activeId) {
-    const s         = Session.get() || {};
-    const email     = s.email || APP_CONFIG.APP.SUPPORT_EMAIL;
-    const initials  = email.slice(0, 2).toUpperCase();
-    const shortName = email.split('@')[0];
-    const display   = shortName.length > 20 ? shortName.slice(0, 18) + '…' : shortName;
-    const isDark    = document.documentElement.getAttribute('data-theme') !== 'light';
+  /* ── Helper: get display name from email ─────────────────────────────── */
+  function getDisplayName(email) {
+    if (!email) return 'User';
+    const local = email.split('@')[0];
+    // Convert dot/underscore/dash separated to Title Case
+    return local
+      .replace(/[._-]+/g, ' ')
+      .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  }
 
-    return /* html */`
+  function getInitials(email) {
+    if (!email) return 'U';
+    const name = getDisplayName(email);
+    const parts = name.trim().split(' ').filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  /* ── Build topbar HTML ───────────────────────────────────────────────── */
+  function buildTopbar(activeId) {
+    const s        = Session.get() || {};
+    const email    = s.email || '';
+    const initials = getInitials(email);
+    const display  = getDisplayName(email);
+    const isDark   = document.documentElement.getAttribute('data-theme') !== 'light';
+
+    return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
   <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home">
-    <div class="brand-logo" id="brandLogoSlot">${ICONS.pdf}</div>
+    <div class="brand-logo" style="width:36px;height:36px;border-radius:8px;overflow:hidden;flex-shrink:0">
+      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:cover"/>
+    </div>
     <div>
       <div class="brand-name">Prudent PDF</div>
       <div class="brand-tagline">Redaction Platform</div>
@@ -96,28 +98,19 @@ const Shell = (() => {
 
   <div class="topbar-search" role="search">
     <span class="topbar-search-icon" aria-hidden="true">${ICONS.search}</span>
-    <input
-      type="search"
-      id="globalSearch"
-      placeholder="Search jobs, files…"
-      autocomplete="off"
-      aria-label="Search jobs and files"
-    />
+    <input type="search" id="globalSearch" placeholder="Search jobs, files…" autocomplete="off" aria-label="Search jobs and files"/>
     <span class="topbar-search-kbd" aria-hidden="true">⌘K</span>
   </div>
 
   <div class="topbar-right">
     <div id="liveClock" class="topbar-clock hidden" aria-live="off"></div>
-
     <button class="topbar-icon-btn" id="themeBtn" aria-label="Toggle colour theme" title="Toggle theme">
       ${isDark ? ICONS.sun : ICONS.moon}
     </button>
-
     <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications" title="Notifications">
       ${ICONS.bell}
       <span class="notif-dot hidden" id="notifDot" aria-label="New notification"></span>
     </button>
-
     <div class="user-chip" id="userChip" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" title="${email}">
       <div class="user-avatar" aria-hidden="true">${initials}</div>
       <span class="user-name">${display}</span>
@@ -126,7 +119,7 @@ const Shell = (() => {
 </nav>`;
   }
 
-  /* ── Build sidebar HTML ────────────────────────────────────────────────── */
+  /* ── Build sidebar HTML ──────────────────────────────────────────────── */
   function buildSidebar(activeId) {
     const s      = Session.get() || {};
     const used   = s.creditsUsed  ?? 0;
@@ -141,50 +134,31 @@ const Shell = (() => {
       daysLeft = Math.max(0, Math.ceil((new Date(s.trialExpiryDate) - Date.now()) / 86_400_000));
     }
 
-    // Build nav groups HTML
     const navHtml = NAV.map(group => {
       const items = group.items.map(item => {
         const isActive = item.id === activeId;
-
         if (item.soon) {
-          return /* html */`
-<a class="nav-link" href="${item.href}" style="pointer-events:none;opacity:.45" title="${item.desc}" tabindex="-1" aria-disabled="true">
-  <span class="nav-link-icon" aria-hidden="true">${ICONS[item.icon] || ''}</span>
-  ${item.label}
-  <span class="nav-badge-soon">Soon</span>
-</a>`;
+          return `<a class="nav-link" href="${item.href}" style="pointer-events:none;opacity:.45" title="${item.desc}" tabindex="-1" aria-disabled="true">
+            <span class="nav-link-icon" aria-hidden="true">${ICONS[item.icon] || ''}</span>
+            ${item.label}
+            <span class="nav-badge-soon">Soon</span>
+          </a>`;
         }
-
-        const badge = item.badge
-          ? `<span class="nav-link-badge${isActive ? ' blue' : ''}">${item.badge}</span>`
-          : '';
-
-        return /* html */`
-<a class="nav-link${isActive ? ' active' : ''}" href="${item.href}" title="${item.desc}"${isActive ? ' aria-current="page"' : ''}>
-  <span class="nav-link-icon" aria-hidden="true">${ICONS[item.icon] || ''}</span>
-  ${item.label}
-  ${badge}
-</a>`;
+        const badge = item.badge ? `<span class="nav-link-badge${isActive ? ' blue' : ''}">${item.badge}</span>` : '';
+        return `<a class="nav-link${isActive ? ' active' : ''}" href="${item.href}" title="${item.desc}"${isActive ? ' aria-current="page"' : ''}>
+          <span class="nav-link-icon" aria-hidden="true">${ICONS[item.icon] || ''}</span>
+          ${item.label}${badge}
+        </a>`;
       }).join('');
 
-      return /* html */`
-<div class="nav-section">
-  <span class="nav-group-label">${group.group}</span>
-  ${items}
-</div>
-<div class="nav-sep" role="separator"></div>`;
+      return `<div class="nav-section"><span class="nav-group-label">${group.group}</span>${items}</div><div class="nav-sep" role="separator"></div>`;
     }).join('');
 
-    // Plan/quota widget
     const upgradeBtn = s.plan !== 'paid'
-      ? /* html */`<button class="btn-upgrade" onclick="location.href='/pricing'">${ICONS.bolt} Upgrade to Pro</button>`
-      : /* html */`
-<div class="flex-between mt-8">
-  <span class="pill-paid">● Pro Active</span>
-  <span class="text-xs text-subtle">Unlimited</span>
-</div>`;
+      ? `<button class="btn-upgrade" onclick="location.href='/pricing'">${ICONS.bolt} Upgrade to Pro</button>`
+      : `<div class="flex-between mt-8"><span class="pill-paid">● Pro Active</span><span class="text-xs text-subtle">Unlimited</span></div>`;
 
-    return /* html */`
+    return `
 <aside class="sidebar" role="navigation" aria-label="Main navigation">
   ${navHtml}
   <div class="sidebar-bottom">
@@ -204,7 +178,6 @@ const Shell = (() => {
 </aside>`;
   }
 
-  /* ── Theme management ──────────────────────────────────────────────────── */
   function applyTheme() {
     const saved = localStorage.getItem('pp_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
@@ -219,25 +192,20 @@ const Shell = (() => {
     });
   }
 
-  /* ── Live clock ────────────────────────────────────────────────────────── */
   function startClock() {
     const el = document.getElementById('liveClock');
     if (!el || window.innerWidth < 1280) return;
     el.classList.remove('hidden');
     const tick = () => {
-      el.textContent = new Date().toLocaleTimeString('en-GB', {
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-      });
+      el.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     };
     tick();
     setInterval(tick, 1000);
   }
 
-  /* ── Global search ─────────────────────────────────────────────────────── */
   function wireSearch() {
     const input = document.getElementById('globalSearch');
     if (!input) return;
-
     input.addEventListener('keydown', e => {
       if (e.key !== 'Enter') return;
       const q = e.target.value.trim().toLowerCase();
@@ -246,87 +214,52 @@ const Shell = (() => {
       const match = all.find(i => !i.soon && (i.label.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)));
       location.href = match ? match.href : `/history?q=${encodeURIComponent(q)}`;
     });
-
-    // ⌘K / Ctrl+K shortcut
     document.addEventListener('keydown', e => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        input.focus();
-        input.select();
-      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); input.focus(); input.select(); }
     });
   }
 
-  /* ── User chip dropdown ────────────────────────────────────────────────── */
   function wireUserChip() {
     const chip = document.getElementById('userChip');
     if (!chip) return;
 
     const MENU_ITEMS = [
-      { label: 'View Pricing',   icon: ICONS.star,     fn: () => location.href = '/pricing' },
-      { label: 'Contact Us',     icon: ICONS.mail,     fn: () => location.href = '/contact' },
+      { label: 'View Pricing', icon: ICONS.star,   fn: () => location.href = '/pricing' },
+      { label: 'Contact Us',   icon: ICONS.mail,   fn: () => location.href = '/contact' },
       { sep: true },
-      { label: 'Sign Out',       icon: ICONS.logout,   fn: signOut, danger: true },
+      { label: 'Sign Out',     icon: ICONS.logout, fn: signOut, danger: true },
     ];
 
     chip.addEventListener('click', () => {
       let menu = document.getElementById('userMenu');
       if (menu) { closeMenu(menu); return; }
-
       chip.setAttribute('aria-expanded', 'true');
       menu = document.createElement('div');
       menu.id = 'userMenu';
       menu.setAttribute('role', 'menu');
       Object.assign(menu.style, {
-        position    : 'fixed',
-        zIndex      : '9999',
-        background  : 'var(--surface)',
-        border      : '1px solid var(--border2)',
-        borderRadius: 'var(--r12)',
-        boxShadow   : 'var(--s4)',
-        padding     : '6px',
-        minWidth    : '190px',
-        right       : '18px',
-        top         : '68px',
-        animation   : 'modalIn .14s ease',
+        position:'fixed', zIndex:'9999', background:'var(--surface)',
+        border:'1px solid var(--border2)', borderRadius:'var(--r12)',
+        boxShadow:'var(--s4)', padding:'6px', minWidth:'190px',
+        right:'18px', top:'68px', animation:'modalIn .14s ease',
       });
-
       menu.innerHTML = MENU_ITEMS.map(item => {
         if (item.sep) return `<div style="height:1px;background:var(--border);margin:4px 0"></div>`;
-        return /* html */`
-<button role="menuitem" style="
-  width:100%; text-align:left; padding:9px 12px; border-radius:var(--r8);
-  font-size:13px; font-weight:500; font-family:var(--font);
-  display:flex; align-items:center; gap:9px;
-  color:${item.danger ? 'var(--red)' : 'var(--ink2)'};
-  cursor:pointer; border:none; background:none; transition:background .12s
-" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">
-  ${item.icon} ${item.label}
-</button>`;
+        return `<button role="menuitem" style="width:100%;text-align:left;padding:9px 12px;border-radius:var(--r8);font-size:13px;font-weight:500;font-family:var(--font);display:flex;align-items:center;gap:9px;color:${item.danger?'var(--red)':'var(--ink2)'};cursor:pointer;border:none;background:none;transition:background .12s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">${item.icon} ${item.label}</button>`;
       }).join('');
-
       document.body.appendChild(menu);
-
-      // Wire button clicks
       const btns = [...menu.querySelectorAll('button')];
       MENU_ITEMS.filter(i => !i.sep).forEach((item, idx) => {
         btns[idx]?.addEventListener('click', () => { closeMenu(menu); item.fn(); });
       });
-
-      // Outside click closes menu
       setTimeout(() => {
         document.addEventListener('click', function handler(e) {
-          if (!menu.contains(e.target) && e.target !== chip) {
-            closeMenu(menu);
-            document.removeEventListener('click', handler);
-          }
+          if (!menu.contains(e.target) && e.target !== chip) { closeMenu(menu); document.removeEventListener('click', handler); }
         }, { capture: true });
       }, 50);
     });
 
-    chip.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') chip.click();
-    });
+    chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') chip.click(); });
   }
 
   function closeMenu(menu) {
@@ -335,114 +268,62 @@ const Shell = (() => {
   }
 
   function signOut() {
-    if (confirm('Sign out of Prudent PDF?')) {
-      Session.clear();
-      location.replace('/login');
-    }
+    if (confirm('Sign out of Prudent PDF?')) { Session.clear(); location.replace('/login'); }
   }
 
-  /* ── Quota refresh ─────────────────────────────────────────────────────── */
   function refreshQuota() {
     const s = Session.get();
     if (!s?.email || !APP_CONFIG.FLOWS.QUOTA_GET) return;
-
     paFetch(APP_CONFIG.FLOWS.QUOTA_GET, { email: s.email })
       .then(data => {
         if (!data) return;
-        const updated = {
-          ...s,
-          creditsUsed  : data.creditsUsed  ?? s.creditsUsed,
-          creditsLimit : data.creditsLimit ?? s.creditsLimit,
-          plan         : data.plan         ?? s.plan,
-        };
+        const updated = { ...s, creditsUsed: data.creditsUsed ?? s.creditsUsed, creditsLimit: data.creditsLimit ?? s.creditsLimit, plan: data.plan ?? s.plan };
         Session.set(updated);
-
-        // Update sidebar widgets
         const used   = updated.creditsUsed  ?? 0;
         const limit  = updated.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
         const pct    = Math.min(100, limit > 0 ? Math.round(used / limit * 100) : 0);
         const remain = Math.max(0, limit - used);
         const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
-
         const bar = document.getElementById('planBarFill');
-        if (bar) {
-          bar.style.width = pct + '%';
-          bar.className  = 'plan-bar-fill ' + fillCls;
-          bar.parentElement?.setAttribute('aria-valuenow', pct);
-        }
+        if (bar) { bar.style.width = pct + '%'; bar.className = 'plan-bar-fill ' + fillCls; bar.parentElement?.setAttribute('aria-valuenow', pct); }
         const usedEl   = document.getElementById('sidebarUsed');
         const remainEl = document.getElementById('sidebarRemain');
-        if (usedEl)   usedEl.innerHTML   = `${used}<span> / ${limit} files</span>`;
+        if (usedEl)   usedEl.innerHTML    = `${used}<span> / ${limit} files</span>`;
         if (remainEl) remainEl.textContent = `${remain} remaining`;
-
-        // Low-quota notification
-        if (pct >= 90) {
-          document.getElementById('notifDot')?.classList.remove('hidden');
-          showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining`, 'warn', 6000);
-        }
+        if (pct >= 90) { document.getElementById('notifDot')?.classList.remove('hidden'); showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining`, 'warn', 6000); }
       })
-      .catch(() => { /* silent — quota is non-critical */ });
+      .catch(() => {});
   }
 
-  /* ── Escape key handler ────────────────────────────────────────────────── */
   function wireEscape() {
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      document.querySelectorAll('.modal-bg.open').forEach(m => {
-        m.classList.remove('open');
-        document.body.style.overflow = '';
-      });
+      document.querySelectorAll('.modal-bg.open').forEach(m => { m.classList.remove('open'); document.body.style.overflow = ''; });
       const menu = document.getElementById('userMenu');
       if (menu) closeMenu(menu);
     });
   }
 
-  /* ── Public API ────────────────────────────────────────────────────────── */
   return {
-    /**
-     * Initialise the shell. Call once per page after the DOM is ready.
-     * @param {string} activeId  Nav item ID to mark as active (e.g. 'dashboard')
-     */
     init(activeId) {
       if (!requireAuth()) return;
-
-      // Apply theme before paint to prevent flash
       applyTheme();
-
       const wrap = document.getElementById('appShell');
-      if (!wrap) {
-        console.error('[Shell] #appShell not found. Add <div id="appShell"> as page wrapper.');
-        return;
-      }
-
-      // Inject topbar before sidebar
+      if (!wrap) { console.error('[Shell] #appShell not found.'); return; }
       const tbEl = document.createElement('div');
       tbEl.innerHTML = buildTopbar(activeId);
       wrap.insertBefore(tbEl.firstElementChild, wrap.firstChild);
-
-      // Inject sidebar before .main
-      const sbEl  = document.createElement('div');
+      const sbEl = document.createElement('div');
       sbEl.innerHTML = buildSidebar(activeId);
       const main = wrap.querySelector('.main') || wrap.querySelector('main');
       wrap.insertBefore(sbEl.firstElementChild, main);
-
-      // Wire interactive behaviours
       wireThemeBtn();
       wireSearch();
       wireUserChip();
       wireEscape();
-
-      // Deferred — after first paint
-      requestAnimationFrame(() => {
-        startClock();
-        setTimeout(refreshQuota, 1200);
-      });
+      requestAnimationFrame(() => { startClock(); setTimeout(refreshQuota, 1200); });
     },
-
-    /** Force a quota refresh from any page (e.g. after a job completes). */
     refreshQuota,
-
-    /** Expose nav for other scripts to query if needed. */
     NAV,
   };
 
