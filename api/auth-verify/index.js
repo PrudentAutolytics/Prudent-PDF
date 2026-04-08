@@ -5,6 +5,8 @@ module.exports = async function (context, req) {
   const email = (req.body?.email || '').trim().toLowerCase();
   const otp   = (req.body?.otp   || '').trim();
 
+  context.log('auth-verify: email:', email, 'otp:', otp);
+
   if (!email || !otp) {
     context.res = { status: 400, body: { error: 'Email and code required.' } };
     return;
@@ -19,12 +21,33 @@ module.exports = async function (context, req) {
 
     const user = result.rows[0];
 
-    if (!user)                            { context.res = { status: 404, body: { error: 'User not found. Please request a new code.' } }; return; }
-    if (!user.is_active)                  { context.res = { status: 403, body: { error: 'Account inactive. Please contact support.' } }; return; }
-    if (user.otp !== otp)                 { context.res = { status: 401, body: { error: 'Invalid code. Please check and try again.' } }; return; }
-    if (new Date() > user.otp_expires_at) { context.res = { status: 401, body: { error: 'Code expired. Please request a new one.' } }; return; }
+    context.log('auth-verify: user found:', !!user, 'stored otp:', user?.otp, 'active:', user?.is_active);
 
-    await pool.query(`UPDATE users SET otp = NULL, otp_expires_at = NULL WHERE email = $1`, [email]);
+    if (!user)           { context.res = { status: 404, body: { error: 'User not found.' } }; return; }
+    if (!user.is_active) { context.res = { status: 403, body: { error: 'Account inactive. Please contact support.' } }; return; }
+
+    if (!user.otp) {
+      context.res = { status: 401, body: { error: 'No active code found. Please request a new one.' } };
+      return;
+    }
+
+    if (new Date() > new Date(user.otp_expires_at)) {
+      context.res = { status: 401, body: { error: 'Code expired. Please request a new one.' } };
+      return;
+    }
+
+    if (user.otp !== otp) {
+      context.log('auth-verify: MISMATCH — stored:', user.otp, 'received:', otp);
+      context.res = { status: 401, body: { error: 'Invalid code. Please check and try again.' } };
+      return;
+    }
+
+    // Clear OTP after successful verify
+    await pool.query(`
+      UPDATE users SET otp = NULL, otp_expires_at = NULL WHERE email = $1
+    `, [email]);
+
+    context.log('auth-verify: SUCCESS for', email);
 
     context.res = {
       status: 200,
@@ -38,8 +61,9 @@ module.exports = async function (context, req) {
         trialExpiryDate : user.trial_expiry_date,
       },
     };
+
   } catch (err) {
-    console.error('auth-verify error:', err);
+    context.log('auth-verify ERROR:', err.message);
     context.res = { status: 500, body: { error: 'Verification failed. Please try again.' } };
   }
 };
