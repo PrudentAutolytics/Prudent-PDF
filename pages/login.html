@@ -23,7 +23,6 @@ body::before {
 .pp-logo-right { display:flex; flex-direction:column; }
 .pp-logo-name { font-size:18px; font-weight:800; color:var(--ink); letter-spacing:-.4px; line-height:1.1; font-family:var(--display); }
 .pp-logo-tag { font-size:10.5px; font-weight:700; letter-spacing:2.5px; color:var(--blue); text-transform:uppercase; margin-top:3px; }
-
 .otp-row { display:flex; gap:9px; justify-content:center; margin:24px 0 20px; }
 .otp-digit {
   width:50px; height:60px; border:2px solid var(--border2); border-radius:12px;
@@ -272,7 +271,9 @@ document.documentElement.setAttribute('data-theme',t);
 if(Session.valid()){location.replace('/dashboard');return;}
 
 const $=id=>document.getElementById(id);
-let S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false};
+
+// State — otpSent flag prevents double-firing auth-request
+let S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false,otpSent:false};
 let tickTimer=null, checkDebounce=null;
 
 function show(s){['stepEmail','stepOTP','stepDone'].forEach(id=>$(id)?.classList.toggle('hidden',id!==s));}
@@ -280,6 +281,8 @@ function eErr(msg){$('emailErr').classList.remove('hidden');$('emailErrTxt').tex
 function eOk(){$('emailErr').classList.add('hidden');$('emailInput').classList.remove('invalid');}
 
 $('emailInput').addEventListener('input',()=>{
+  // Only reset if we haven't sent OTP yet
+  if(S.otpSent) return;
   eOk();
   S.checked=false; S.isNew=false;
   $('regSlide').classList.remove('open');
@@ -293,6 +296,7 @@ $('emailInput').addEventListener('input',()=>{
 });
 
 async function doCheck(email){
+  if(S.otpSent) return; // Guard
   try{
     const d=await paFetch(APP_CONFIG.FLOWS.AUTH_CHECK,{email});
     S.checked=true;
@@ -317,6 +321,8 @@ $('continueBtn').addEventListener('click',handleContinue);
 $('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleContinue();});
 
 async function handleContinue(){
+  if(S.otpSent) return; // Prevent double fire
+
   const email=($('emailInput').value||'').trim();
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){eErr('Please enter a valid work email address.');return;}
   eOk();
@@ -353,6 +359,7 @@ async function handleContinue(){
   setLoading('Sending code…');
   try{
     await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
+    S.otpSent=true; // Mark as sent — prevents any further auth-request calls
     $('otpEmailShow').textContent=email;
     clearDigits();
     show('stepOTP');
@@ -426,30 +433,31 @@ async function verifyOTP(){
     } else { throw new Error('Verification failed.'); }
   } catch(err){
     shakeDigits();
-    // ← DO NOT clear digits — let user correct their entry
     $('otpErr').textContent=
       err.message?.includes('Invalid')?'Incorrect code — please check and try again.':
       err.message?.includes('expired')?'Code expired — request a new one.':
       'Verification failed. Please try again.';
     btn.disabled=false;
     btn.innerHTML='<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verify &amp; sign in';
-    // Re-enable verify button since digits are still filled
     $('verifyBtn').disabled=!ds.every(d=>d.value);
-    setTimeout(()=>$('d0')?.focus(),80);
   }
 }
 
 $('resendBtn').addEventListener('click',async()=>{
   $('otpErr').textContent=''; clearDigits();
   $('resendBtn').disabled=true; $('resendBtn').textContent='Sending…';
-  try{await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email:S.email});startTimer();showToast('New code sent','success');}
-  catch(e){$('otpErr').textContent='Failed to resend. Try again.';}
+  try{
+    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email:S.email});
+    startTimer();
+    showToast('New code sent','success');
+  } catch(e){$('otpErr').textContent='Failed to resend. Try again.';}
   $('resendBtn').disabled=false; $('resendBtn').textContent='Resend code';
 });
 
 $('changeEmailBtn').addEventListener('click',()=>{
   clearInterval(tickTimer);
-  S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false};
+  // Full reset including otpSent flag
+  S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false,otpSent:false};
   $('emailInput').value='';
   $('regSlide').classList.remove('open');
   $('stepTitle').textContent='Welcome';
