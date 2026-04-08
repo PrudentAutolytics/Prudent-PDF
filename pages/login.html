@@ -393,7 +393,11 @@ async function handleContinue(){
 
   const btn=$('continueBtn');
   function setLoading(txt){btn.disabled=true;btn.innerHTML=`<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ${txt}`;}
-  function resetBtn(){btn.disabled=false;btn.innerHTML=`<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>${$('contBtnTxt').textContent}</span>`;}
+  function resetBtn(){
+  btn.disabled=false;
+  const btnTxt=$('contBtnTxt');
+  btn.innerHTML=`<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>${btnTxt?btnTxt.textContent:'Continue'}</span>`;
+}
 
   if(!S.checked){
     setLoading('Checking…');
