@@ -15,19 +15,25 @@ module.exports = async function (context, req) {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   try {
+    // Upsert user AND set OTP in a single query
     await pool.query(`
-      INSERT INTO users (email) VALUES ($1) ON CONFLICT (email) DO NOTHING
-    `, [email]);
+      INSERT INTO users (email, otp, otp_expires_at)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (email) DO UPDATE
+      SET otp = EXCLUDED.otp,
+          otp_expires_at = EXCLUDED.otp_expires_at
+    `, [email, otp, expiresAt]);
 
-    await pool.query(`
-      UPDATE users SET otp = $1, otp_expires_at = $2 WHERE email = $3
-    `, [otp, expiresAt, email]);
-
+    // Send email via Power Automate
     await sendEmail(email, 'Your Prudent PDF login code', otpEmailHtml(otp));
 
     context.res = { status: 200, body: { message: 'Code sent.' } };
+
   } catch (err) {
-    console.error('auth-request error:', err);
-    context.res = { status: 400, body: { error: err.message || 'Failed to send code. Please try again.' } };
+    console.error('auth-request error:', err.message);
+    context.res = {
+      status: 400,
+      body: { error: err.message || 'Failed to send code. Please try again.' },
+    };
   }
 };
