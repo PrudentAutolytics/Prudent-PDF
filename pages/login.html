@@ -6,15 +6,11 @@
 <title>Sign In — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-body {
-  display:flex; align-items:center; justify-content:center;
-  min-height:100vh; padding:24px; overflow:hidden;
-}
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; overflow:hidden; }
 body::before {
   content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(ellipse 80vw 60vh at 15% 10%, rgba(37,99,235,.10) 0%, transparent 60%),
-    radial-gradient(ellipse 60vw 50vh at 88% 90%, rgba(124,58,237,.09) 0%, transparent 55%);
+  background: radial-gradient(ellipse 80vw 60vh at 15% 10%, rgba(37,99,235,.10) 0%, transparent 60%),
+              radial-gradient(ellipse 60vw 50vh at 88% 90%, rgba(124,58,237,.09) 0%, transparent 55%);
 }
 .login-wrap { position:relative; z-index:1; width:100%; max-width:480px; }
 .pp-logo { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:28px; }
@@ -24,83 +20,32 @@ body::before {
 .pp-logo-name { font-size:18px; font-weight:800; color:var(--ink); letter-spacing:-.4px; line-height:1.1; font-family:var(--display); }
 .pp-logo-tag { font-size:10.5px; font-weight:700; letter-spacing:2.5px; color:var(--blue); text-transform:uppercase; margin-top:3px; }
 .otp-row { display:flex; gap:9px; justify-content:center; margin:24px 0 20px; }
-.otp-digit {
-  width:50px; height:60px; border:2px solid var(--border2); border-radius:12px;
-  background:var(--surface); font-family:'JetBrains Mono',monospace;
-  font-size:24px; font-weight:700; color:var(--ink); text-align:center; outline:none;
-  transition:border-color .15s, box-shadow .15s, transform .12s; box-shadow:var(--s1);
-}
+.otp-digit { width:50px; height:60px; border:2px solid var(--border2); border-radius:12px; background:var(--surface); font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:700; color:var(--ink); text-align:center; outline:none; transition:border-color .15s, box-shadow .15s, transform .12s; box-shadow:var(--s1); }
 .otp-digit:focus { border-color:var(--blue); box-shadow:var(--s-glow); transform:translateY(-2px); }
 .otp-digit.filled { border-color:var(--blue); background:var(--blue-pale); color:var(--blue); }
 .otp-digit.bad { border-color:var(--red); box-shadow:var(--s-danger); animation:shake .35s ease; }
-@keyframes shake {
-  0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)}
-  40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)}
-}
-.otp-lock-icon {
-  width:64px; height:64px; border-radius:50%;
-  background:var(--blue-pale); border:1.5px solid var(--blue-bd);
-  display:grid; place-items:center; margin:0 auto 18px; color:var(--blue); position:relative;
-}
-.otp-lock-icon::after {
-  content:''; position:absolute; inset:-5px; border-radius:50%;
-  border:1.5px dashed var(--blue-bd); animation:spin 14s linear infinite;
-}
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+.otp-lock-icon { width:64px; height:64px; border-radius:50%; background:var(--blue-pale); border:1.5px solid var(--blue-bd); display:grid; place-items:center; margin:0 auto 18px; color:var(--blue); position:relative; }
+.otp-lock-icon::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1.5px dashed var(--blue-bd); animation:spin 14s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg);} }
-.otp-email-pill {
-  display:inline-flex; align-items:center; gap:6px;
-  background:var(--surface2); border:1px solid var(--border2);
-  border-radius:999px; padding:4px 14px;
-  font-size:13px; font-weight:600; color:var(--ink2); margin-top:6px; font-family:var(--mono);
-}
-.verify-btn {
-  width:100%; padding:13px; background:linear-gradient(135deg,#2563EB,#7C3AED);
-  color:#fff; border:none; border-radius:var(--r10);
-  font-family:var(--display); font-size:14px; font-weight:700;
-  cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.30);
-  transition:opacity .18s, transform .15s, box-shadow .18s;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-}
+.otp-email-pill { display:inline-flex; align-items:center; gap:6px; background:var(--surface2); border:1px solid var(--border2); border-radius:999px; padding:4px 14px; font-size:13px; font-weight:600; color:var(--ink2); margin-top:6px; font-family:var(--mono); }
+.verify-btn { width:100%; padding:13px; background:linear-gradient(135deg,#2563EB,#7C3AED); color:#fff; border:none; border-radius:var(--r10); font-family:var(--display); font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.30); transition:opacity .18s, transform .15s, box-shadow .18s; display:flex; align-items:center; justify-content:center; gap:8px; }
 .verify-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 7px 22px rgba(37,99,235,.38); }
 .verify-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
-.timer-pill {
-  display:inline-flex; align-items:center; gap:5px;
-  background:var(--amber-pale); border:1px solid var(--amber-bd);
-  border-radius:999px; padding:3px 11px;
-  font-size:12px; color:var(--amber); font-weight:600; margin-top:14px;
-}
+.timer-pill { display:inline-flex; align-items:center; gap:5px; background:var(--amber-pale); border:1px solid var(--amber-bd); border-radius:999px; padding:3px 11px; font-size:12px; color:var(--amber); font-weight:600; margin-top:14px; }
 .otp-acts { display:flex; align-items:center; justify-content:center; gap:5px; margin-top:18px; font-size:13px; color:var(--ink3); }
 .otp-lnk { color:var(--blue); background:none; border:none; padding:0; font-size:13px; font-family:inherit; font-weight:600; cursor:pointer; }
 .otp-lnk:hover { text-decoration:underline; }
 .otp-err { text-align:center; font-size:13px; color:var(--red); margin-top:10px; min-height:18px; font-weight:500; }
-.reg-slide {
-  overflow:hidden; max-height:0; opacity:0;
-  transition:max-height .36s cubic-bezier(.4,0,.2,1), opacity .26s ease, margin .26s ease; margin-top:0;
-}
+.reg-slide { overflow:hidden; max-height:0; opacity:0; transition:max-height .36s cubic-bezier(.4,0,.2,1), opacity .26s ease, margin .26s ease; margin-top:0; }
 .reg-slide.open { max-height:560px; opacity:1; margin-top:4px; }
-.new-notice {
-  display:flex; align-items:center; gap:8px;
-  background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(124,58,237,.05));
-  border:1px solid var(--blue-bd); border-radius:var(--r8);
-  padding:10px 14px; font-size:13px; font-weight:600; color:var(--blue); margin-bottom:16px;
-}
-.cont-btn {
-  width:100%; padding:13px; background:linear-gradient(135deg,#2563EB,#7C3AED);
-  color:#fff; border:none; border-radius:var(--r10);
-  font-family:var(--display); font-size:14px; font-weight:700;
-  cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.28);
-  transition:opacity .18s, transform .15s, box-shadow .18s;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-}
+.new-notice { display:flex; align-items:center; gap:8px; background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(124,58,237,.05)); border:1px solid var(--blue-bd); border-radius:var(--r8); padding:10px 14px; font-size:13px; font-weight:600; color:var(--blue); margin-bottom:16px; }
+.cont-btn { width:100%; padding:13px; background:linear-gradient(135deg,#2563EB,#7C3AED); color:#fff; border:none; border-radius:var(--r10); font-family:var(--display); font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.28); transition:opacity .18s, transform .15s, box-shadow .18s; display:flex; align-items:center; justify-content:center; gap:8px; }
 .cont-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 7px 22px rgba(37,99,235,.36); }
 .cont-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
 .feat-list { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:0 0 18px; }
 .feat-item { display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink2); }
-.feat-check {
-  width:15px; height:15px; border-radius:50%; flex-shrink:0;
-  background:var(--green-pale); border:1px solid var(--green-bd);
-  display:grid; place-items:center; color:var(--green); font-size:8.5px; font-weight:900;
-}
+.feat-check { width:15px; height:15px; border-radius:50%; flex-shrink:0; background:var(--green-pale); border:1px solid var(--green-bd); display:grid; place-items:center; color:var(--green); font-size:8.5px; font-weight:900; }
 </style>
 </head>
 <body>
@@ -121,11 +66,9 @@ body::before {
     <div id="stepEmail">
       <div class="login-title" id="stepTitle">Welcome</div>
       <div class="login-sub" id="stepSub">Enter your work email to get started — no password required.</div>
-
       <div class="form-group">
         <label class="form-label" for="emailInput">Work email</label>
-        <input class="form-input" id="emailInput" type="email"
-          placeholder="you@company.com" autocomplete="email" autofocus spellcheck="false"/>
+        <input class="form-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email" autofocus spellcheck="false"/>
         <div id="emailErr" class="form-err hidden">
           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <span id="emailErrTxt"></span>
@@ -177,18 +120,9 @@ body::before {
 
       <div class="login-divider mt-20"><span>Secure · No password · Azure hosted</span></div>
       <div class="flex-center gap-8" style="flex-wrap:wrap">
-        <div class="security-badge">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          TLS Encrypted
-        </div>
-        <div class="security-badge" style="background:var(--blue-pale);border-color:var(--blue-bd);color:var(--blue)">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg>
-          Azure Hosted
-        </div>
-        <div class="security-badge" style="background:var(--green-pale);border-color:var(--green-bd);color:var(--green)">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          GDPR Compliant
-        </div>
+        <div class="security-badge"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg> TLS Encrypted</div>
+        <div class="security-badge" style="background:var(--blue-pale);border-color:var(--blue-bd);color:var(--blue)"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg> Azure Hosted</div>
+        <div class="security-badge" style="background:var(--green-pale);border-color:var(--green-bd);color:var(--green)"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> GDPR Compliant</div>
       </div>
     </div>
 
@@ -211,7 +145,6 @@ body::before {
           </div>
         </div>
       </div>
-
       <div class="otp-row">
         <input class="otp-digit" id="d0" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"/>
         <input class="otp-digit" id="d1" type="text" inputmode="numeric" maxlength="1"/>
@@ -220,21 +153,17 @@ body::before {
         <input class="otp-digit" id="d4" type="text" inputmode="numeric" maxlength="1"/>
         <input class="otp-digit" id="d5" type="text" inputmode="numeric" maxlength="1"/>
       </div>
-
       <button class="verify-btn" id="verifyBtn" disabled>
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Verify &amp; sign in
       </button>
-
       <div class="otp-err" id="otpErr"></div>
-
       <div style="text-align:center">
         <div class="timer-pill">
           <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           Expires in <span id="timerTxt" style="margin-left:3px;font-variant-numeric:tabular-nums">10:00</span>
         </div>
       </div>
-
       <div class="otp-acts">
         <span>Didn't get it?</span>
         <button class="otp-lnk" id="resendBtn">Resend code</button>
@@ -271,17 +200,18 @@ document.documentElement.setAttribute('data-theme',t);
 if(Session.valid()){location.replace('/dashboard');return;}
 
 const $=id=>document.getElementById(id);
-
-// State — otpSent flag prevents double-firing auth-request
 let S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false,otpSent:false};
 let tickTimer=null, checkDebounce=null;
 
+/* ── Steps ── */
 function show(s){['stepEmail','stepOTP','stepDone'].forEach(id=>$(id)?.classList.toggle('hidden',id!==s));}
+
+/* ── Email errors ── */
 function eErr(msg){$('emailErr').classList.remove('hidden');$('emailErrTxt').textContent=msg;$('emailInput').classList.add('invalid');$('emailInput').focus();}
 function eOk(){$('emailErr').classList.add('hidden');$('emailInput').classList.remove('invalid');}
 
+/* ── Smart email check ── */
 $('emailInput').addEventListener('input',()=>{
-  // Only reset if we haven't sent OTP yet
   if(S.otpSent) return;
   eOk();
   S.checked=false; S.isNew=false;
@@ -296,7 +226,7 @@ $('emailInput').addEventListener('input',()=>{
 });
 
 async function doCheck(email){
-  if(S.otpSent) return; // Guard
+  if(S.otpSent) return;
   try{
     const d=await paFetch(APP_CONFIG.FLOWS.AUTH_CHECK,{email});
     S.checked=true;
@@ -317,11 +247,12 @@ async function doCheck(email){
   } catch(e){ S.checked=false; }
 }
 
+/* ── Continue button ── */
 $('continueBtn').addEventListener('click',handleContinue);
 $('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleContinue();});
 
 async function handleContinue(){
-  if(S.otpSent) return; // Prevent double fire
+  if(S.otpSent) return;
 
   const email=($('emailInput').value||'').trim();
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){eErr('Please enter a valid work email address.');return;}
@@ -330,11 +261,7 @@ async function handleContinue(){
 
   const btn=$('continueBtn');
   function setLoading(txt){btn.disabled=true;btn.innerHTML=`<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ${txt}`;}
-  function resetBtn(){
-    btn.disabled=false;
-    const btnTxt=$('contBtnTxt');
-    btn.innerHTML=`<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>${btnTxt?btnTxt.textContent:'Continue'}</span>`;
-  }
+  function resetBtn(){btn.disabled=false;const bt=$('contBtnTxt');btn.innerHTML=`<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>${bt?bt.textContent:'Continue'}</span>`;}
 
   if(!S.checked){
     setLoading('Checking…');
@@ -356,20 +283,24 @@ async function handleContinue(){
     S.useCase=$('regUseCase')?.value||'';
   }
 
- setLoading('Sending code…');
-S.otpSent=true;
-try{
-  await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
-  $('otpEmailShow').textContent=email;
-  clearDigits();
-  show('stepOTP');
-  startTimer();
-  setTimeout(()=>$('d0')?.focus(),120);
-} catch(err){
-  S.otpSent=false;
-  eErr(err.message||'Could not send code. Please try again.');
+  // Set otpSent BEFORE the request to prevent any race condition
+  S.otpSent=true;
+  setLoading('Sending code…');
+  try{
+    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
+    $('otpEmailShow').textContent=email;
+    clearDigits();
+    show('stepOTP');
+    startTimer();
+    setTimeout(()=>$('d0')?.focus(),120);
+  } catch(err){
+    S.otpSent=false; // Reset on failure so user can try again
+    eErr(err.message||'Could not send code. Please try again.');
+    resetBtn();
+  }
 }
 
+/* ── OTP digit inputs ── */
 const ds=[0,1,2,3,4,5].map(i=>$('d'+i));
 ds.forEach((inp,i)=>{
   inp.addEventListener('input',e=>{
@@ -392,10 +323,12 @@ ds.forEach((inp,i)=>{
     $('verifyBtn').disabled=!ds.every(d=>d.value);
   });
 });
+
 function getCode(){return ds.map(d=>d.value).join('');}
 function clearDigits(){ds.forEach(d=>{d.value='';d.classList.remove('filled','bad');});$('verifyBtn').disabled=true;}
 function shakeDigits(){ds.forEach(d=>{d.classList.add('bad');setTimeout(()=>d.classList.remove('bad'),420);});}
 
+/* ── Timer ── */
 function startTimer(ms=600000){
   const dl=Date.now()+ms;
   if(tickTimer)clearInterval(tickTimer);
@@ -407,6 +340,7 @@ function startTimer(ms=600000){
   },1000);
 }
 
+/* ── Verify OTP ── */
 $('verifyBtn').addEventListener('click',verifyOTP);
 async function verifyOTP(){
   const code=getCode();
@@ -443,6 +377,7 @@ async function verifyOTP(){
   }
 }
 
+/* ── Resend + change email ── */
 $('resendBtn').addEventListener('click',async()=>{
   $('otpErr').textContent=''; clearDigits();
   $('resendBtn').disabled=true; $('resendBtn').textContent='Sending…';
@@ -456,7 +391,6 @@ $('resendBtn').addEventListener('click',async()=>{
 
 $('changeEmailBtn').addEventListener('click',()=>{
   clearInterval(tickTimer);
-  // Full reset including otpSent flag
   S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false,otpSent:false};
   $('emailInput').value='';
   $('regSlide').classList.remove('open');
