@@ -3,197 +3,202 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="Sign in or create your account — Prudent PDF by Prudent Autolytics"/>
 <title>Sign In — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
+/* ── Page layout ── */
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  overflow: hidden;
-  padding: 20px;
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh; padding:24px; overflow:hidden;
 }
 body::before {
-  content: '';
-  position: fixed; inset: 0;
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:
-    radial-gradient(ellipse 900px 700px at 12% 10%, rgba(59,130,246,.14) 0%, transparent 65%),
-    radial-gradient(ellipse 700px 600px at 90% 88%, rgba(139,92,246,.12) 0%, transparent 60%),
-    radial-gradient(ellipse 500px 500px at 55% 48%, rgba(16,185,129,.05) 0%, transparent 55%);
-  pointer-events: none; z-index: 0;
+    radial-gradient(ellipse 80vw 60vh at 15% 10%, rgba(37,99,235,.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60vw 50vh at 88% 90%, rgba(124,58,237,.09) 0%, transparent 55%);
 }
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,.022) 1px, transparent 1px);
-  background-size: 28px 28px;
-  pointer-events: none; z-index: 0;
-}
-.login-wrap { position: relative; z-index: 1; width: 100%; max-width: 510px; }
 
-/* ── Auth type toggle ──────────────────────────────── */
-.auth-toggle {
-  display: grid; grid-template-columns: 1fr 1fr;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r12);
-  padding: 4px; gap: 4px;
-  margin-bottom: 26px;
-}
-.auth-tab {
-  padding: 11px 16px;
-  border-radius: var(--r8);
-  font-family: var(--display);
-  font-size: 13.5px; font-weight: 700;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all var(--dur2) var(--ease);
-  text-align: center;
-  border: 1px solid transparent;
-  user-select: none;
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-}
-.auth-tab.active {
-  background: var(--surface);
-  color: var(--ink);
-  border-color: var(--border2);
-  box-shadow: var(--s2);
-}
-.auth-tab.new-tab.active {
-  background: linear-gradient(135deg, rgba(59,130,246,.12), rgba(139,92,246,.10));
-  border-color: var(--blue-bd);
-  color: var(--blue);
-}
-.auth-tab:hover:not(.active) { color: var(--ink2); background: var(--surface3); }
+/* ── Wrap ── */
+.login-wrap { position:relative; z-index:1; width:100%; max-width:480px; }
 
-/* ── Compact feature grid ──────────────────────────── */
-.feat-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 7px; margin-bottom: 22px;
+/* ── Logo row — clean, no background ── */
+.pp-logo {
+  display:flex; align-items:center; justify-content:center;
+  gap:12px; margin-bottom:28px;
 }
-.feat-item {
-  display: flex; align-items: flex-start; gap: 7px;
-  font-size: 12.5px; color: var(--ink2); line-height: 1.35;
+.pp-logo img {
+  height:44px; width:auto; object-fit:contain;
+  border-radius:8px;
 }
+.pp-logo-divider {
+  width:1px; height:32px; background:var(--border2); flex-shrink:0;
+}
+.pp-logo-right { display:flex; flex-direction:column; }
+.pp-logo-name {
+  font-size:18px; font-weight:800; color:var(--ink);
+  letter-spacing:-.4px; line-height:1.1;
+  font-family:var(--display);
+}
+.pp-logo-tag {
+  font-size:10.5px; font-weight:700; letter-spacing:2.5px;
+  color:var(--blue); text-transform:uppercase; margin-top:3px;
+}
+
+/* ── OTP digits ── */
+.otp-row { display:flex; gap:9px; justify-content:center; margin:24px 0 20px; }
+.otp-digit {
+  width:50px; height:60px;
+  border:2px solid var(--border2); border-radius:12px;
+  background:var(--surface);
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px; font-weight:700; color:var(--ink);
+  text-align:center; outline:none;
+  transition:border-color .15s, box-shadow .15s, transform .12s;
+  box-shadow:var(--s1);
+}
+.otp-digit:focus { border-color:var(--blue); box-shadow:var(--s-glow); transform:translateY(-2px); }
+.otp-digit.filled { border-color:var(--blue); background:var(--blue-pale); color:var(--blue); }
+.otp-digit.bad { border-color:var(--red); box-shadow:var(--s-danger); animation:shake .35s ease; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)}
+  40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)}
+}
+
+/* ── OTP step ── */
+.otp-lock-icon {
+  width:64px; height:64px; border-radius:50%;
+  background:var(--blue-pale); border:1.5px solid var(--blue-bd);
+  display:grid; place-items:center; margin:0 auto 18px; color:var(--blue);
+  position:relative;
+}
+.otp-lock-icon::after {
+  content:''; position:absolute; inset:-5px; border-radius:50%;
+  border:1.5px dashed var(--blue-bd);
+  animation:spin 14s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg);} }
+
+.otp-email-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:999px; padding:4px 14px;
+  font-size:13px; font-weight:600; color:var(--ink2);
+  margin-top:6px; font-family:var(--mono);
+}
+
+/* ── Verify button ── */
+.verify-btn {
+  width:100%; padding:13px;
+  background:linear-gradient(135deg,#2563EB,#7C3AED);
+  color:#fff; border:none; border-radius:var(--r10);
+  font-family:var(--display); font-size:14px; font-weight:700;
+  cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.30);
+  transition:opacity .18s, transform .15s, box-shadow .18s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.verify-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 7px 22px rgba(37,99,235,.38); }
+.verify-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+/* ── Timer pill ── */
+.timer-pill {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--amber-pale); border:1px solid var(--amber-bd);
+  border-radius:999px; padding:3px 11px;
+  font-size:12px; color:var(--amber); font-weight:600; margin-top:14px;
+}
+
+/* ── OTP actions ── */
+.otp-acts { display:flex; align-items:center; justify-content:center; gap:5px; margin-top:18px; font-size:13px; color:var(--ink3); }
+.otp-lnk { color:var(--blue); background:none; border:none; padding:0; font-size:13px; font-family:inherit; font-weight:600; cursor:pointer; }
+.otp-lnk:hover { text-decoration:underline; }
+
+/* ── OTP error ── */
+.otp-err { text-align:center; font-size:13px; color:var(--red); margin-top:10px; min-height:18px; font-weight:500; }
+
+/* ── Slide-in registration fields ── */
+.reg-slide {
+  overflow:hidden; max-height:0; opacity:0;
+  transition:max-height .36s cubic-bezier(.4,0,.2,1), opacity .26s ease, margin .26s ease;
+  margin-top:0;
+}
+.reg-slide.open { max-height:560px; opacity:1; margin-top:4px; }
+
+/* ── New user notice ── */
+.new-notice {
+  display:flex; align-items:center; gap:8px;
+  background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(124,58,237,.05));
+  border:1px solid var(--blue-bd); border-radius:var(--r8);
+  padding:10px 14px; font-size:13px; font-weight:600; color:var(--blue);
+  margin-bottom:16px;
+}
+
+/* ── Continue button ── */
+.cont-btn {
+  width:100%; padding:13px;
+  background:linear-gradient(135deg,#2563EB,#7C3AED);
+  color:#fff; border:none; border-radius:var(--r10);
+  font-family:var(--display); font-size:14px; font-weight:700;
+  cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.28);
+  transition:opacity .18s, transform .15s, box-shadow .18s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.cont-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 7px 22px rgba(37,99,235,.36); }
+.cont-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+/* ── Feature list ── */
+.feat-list { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:0 0 18px; }
+.feat-item { display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink2); }
 .feat-check {
-  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
-  background: var(--green-bg); border: 1px solid var(--green-bd);
-  display: grid; place-items: center;
-  color: var(--green); font-size: 9px; font-weight: 900; margin-top: 1px;
-}
-
-/* ── Confirmation pending box ──────────────────────── */
-.confirm-box {
-  background: var(--amber-bg);
-  border: 1px solid var(--amber-bd);
-  border-radius: var(--r12);
-  padding: 16px;
-  display: flex; align-items: flex-start; gap: 12px;
-  margin-bottom: 18px;
-}
-.confirm-icon {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(245,158,11,0.15);
-  display: grid; place-items: center;
-  color: var(--amber); flex-shrink: 0; font-size: 20px;
+  width:15px; height:15px; border-radius:50%; flex-shrink:0;
+  background:var(--green-pale); border:1px solid var(--green-bd);
+  display:grid; place-items:center; color:var(--green); font-size:8.5px; font-weight:900;
 }
 </style>
 </head>
 <body>
 
-<div class="login-wrap anim">
+<div class="login-wrap">
 
-  <!-- Logo -->
-  <div class="login-logo">
-    <!-- SVG logo placeholder -->
-    <div class="login-logo-mark" style="
-      background: linear-gradient(135deg,#3B82F6,#8B5CF6);
-      border-radius:var(--r10);
-      display:grid;place-items:center;
-      box-shadow:0 4px 16px rgba(59,130,246,.35)">
-      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#fff" stroke-width="1.8"/>
-        <path d="M14 2v6h6M8 13h8M8 17h5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div>
-      <div class="login-logo-text">Prudent PDF</div>
-      <div class="login-logo-sub">Redaction Platform · Prudent Autolytics</div>
+  <!-- Logo — clean, no box/background -->
+  <div class="pp-logo">
+    <img src="/assets/logo.jpg" alt="Prudent Autolytics logo"/>
+    <div class="pp-logo-divider"></div>
+    <div class="pp-logo-right">
+      <div class="pp-logo-name">Prudent PDF</div>
+      <div class="pp-logo-tag">Redaction Platform</div>
     </div>
   </div>
 
   <!-- Card -->
   <div class="login-card">
 
-    <!-- ════ USER TYPE SELECTION + FORMS ════ -->
-    <div id="stepUserType">
+    <!-- ══ STEP 1: EMAIL ══ -->
+    <div id="stepEmail">
+      <div class="login-title" id="stepTitle">Welcome</div>
+      <div class="login-sub" id="stepSub">Enter your work email to get started — no password required.</div>
 
-      <!-- Toggle -->
-      <div class="auth-toggle" role="tablist">
-        <div class="auth-tab active" id="tabExisting" role="tab" tabindex="0" aria-selected="true">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          Sign in
+      <div class="form-group">
+        <label class="form-label" for="emailInput">Work email</label>
+        <input class="form-input" id="emailInput" type="email"
+          placeholder="you@company.com" autocomplete="email" autofocus spellcheck="false"/>
+        <div id="emailErr" class="form-err hidden">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span id="emailErrTxt"></span>
         </div>
-        <div class="auth-tab new-tab" id="tabNew" role="tab" tabindex="0" aria-selected="false">
+      </div>
+
+      <!-- New user notice + reg fields (hidden until detected) -->
+      <div class="reg-slide" id="regSlide">
+        <div class="new-notice">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          Create account
-        </div>
-      </div>
-
-      <!-- ─── Existing user form ─────────────────────── -->
-      <div id="existingForm">
-        <div class="login-title">Welcome back</div>
-        <div class="login-sub">Enter your email to receive a one-click magic link — no password required.</div>
-
-        <div class="form-group">
-          <label class="form-label" for="emailInput">Work email</label>
-          <input class="form-input" id="emailInput" type="email"
-            placeholder="you@company.com" autocomplete="email"
-            autofocus spellcheck="false"/>
-          <div id="emailErr" class="form-err hidden" role="alert">
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            <span id="emailErrText"></span>
-          </div>
+          New account — complete your details to start your free trial
         </div>
 
-        <button class="btn btn-primary w-full" id="sendBtn" style="padding:13px;font-size:14px">
-          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Send magic link
-        </button>
-
-        <div class="login-divider mt-20"><span>Secure · No password · Azure hosted</span></div>
-
-        <div class="flex-center gap-8" style="flex-wrap:wrap">
-          <div class="security-badge">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            TLS Encrypted
-          </div>
-          <div class="security-badge" style="background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg>
-            Azure Hosted
-          </div>
-          <div class="security-badge" style="background:var(--green-bg);border-color:var(--green-bd);color:var(--green)">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            GDPR Compliant
-          </div>
-        </div>
-      </div>
-
-      <!-- ─── New user form ──────────────────────────── -->
-      <div id="newUserForm" class="hidden">
-        <div class="login-title" style="font-size:20px">Create your free account</div>
-        <div class="login-sub" style="margin-bottom:16px">Start your 5-document free trial — no credit card needed.</div>
-
-        <!-- What you get -->
-        <div class="feat-grid">
-          <div class="feat-item"><span class="feat-check">✓</span>5 full PDF redactions</div>
+        <div class="feat-list">
+          <div class="feat-item"><span class="feat-check">✓</span>5 free PDF redactions</div>
           <div class="feat-item"><span class="feat-check">✓</span>Azure Doc Intelligence</div>
           <div class="feat-item"><span class="feat-check">✓</span>Side-by-side viewer</div>
-          <div class="feat-item"><span class="feat-check">✓</span>Job history &amp; CSV</div>
-          <div class="feat-item"><span class="feat-check">✓</span>Email delivery of PDFs</div>
-          <div class="feat-item"><span class="feat-check">✓</span>50 MB max file size</div>
+          <div class="feat-item"><span class="feat-check">✓</span>Job history &amp; CSV export</div>
         </div>
 
         <div class="form-row" style="gap:12px">
@@ -204,16 +209,6 @@ body::after {
           <div class="form-group">
             <label class="form-label" for="regCompany">Company</label>
             <input class="form-input" id="regCompany" type="text" placeholder="Acme Corp" autocomplete="organization"/>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="regEmail">Work email <span style="color:var(--red)">*</span></label>
-          <input class="form-input" id="regEmail" type="email"
-            placeholder="you@company.com" autocomplete="email" spellcheck="false"/>
-          <div id="regEmailErr" class="form-err hidden" role="alert">
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            <span id="regEmailErrText"></span>
           </div>
         </div>
 
@@ -230,387 +225,305 @@ body::after {
           </select>
         </div>
 
-        <button class="btn w-full" id="registerBtn" style="
-          padding:13px;font-size:14px;
-          background:linear-gradient(135deg,var(--blue),var(--violet));
-          color:#fff;font-family:var(--display);font-weight:700;
-          box-shadow:0 4px 18px rgba(59,130,246,.35)">
-          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Create account &amp; verify email
-        </button>
+        <p style="font-size:12px;color:var(--ink4);margin:0 0 16px;line-height:1.6">
+          By creating an account you agree to our <a href="/pricing" style="color:var(--ink3);text-decoration:underline">Terms of Service</a>. No spam, ever.
+        </p>
+      </div>
 
-        <div class="text-xs text-subtle text-center mt-8" style="line-height:1.65">
-          By creating an account you agree to our
-          <a href="/pricing" style="color:var(--ink3);text-decoration:underline">Terms of Service</a>.
-          We send a verification link — no spam, ever.
+      <button class="cont-btn" id="continueBtn">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="contBtnTxt">Continue</span>
+      </button>
+
+      <div class="login-divider mt-20"><span>Secure · No password · Azure hosted</span></div>
+
+      <div class="flex-center gap-8" style="flex-wrap:wrap">
+        <div class="security-badge">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          TLS Encrypted
+        </div>
+        <div class="security-badge" style="background:var(--blue-pale);border-color:var(--blue-bd);color:var(--blue)">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg>
+          Azure Hosted
+        </div>
+        <div class="security-badge" style="background:var(--green-pale);border-color:var(--green-bd);color:var(--green)">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          GDPR Compliant
         </div>
       </div>
-    </div><!-- /#stepUserType -->
+    </div>
 
-    <!-- ════ WAITING (existing user magic link) ════ -->
-    <div id="stepWaiting" class="hidden">
-      <div class="waiting-state">
-        <div style="width:68px;height:68px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-bd);display:grid;place-items:center;margin:0 auto 20px;color:var(--blue)">
-          <svg width="30" height="30" fill="none" viewBox="0 0 24 24">
-            <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- ══ STEP 2: OTP ══ -->
+    <div id="stepOTP" class="hidden">
+      <div style="text-align:center;margin-bottom:4px">
+        <div class="otp-lock-icon">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
+            <rect x="3" y="8" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M7 8V6a5 5 0 0110 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="12" cy="14.5" r="1.8" fill="currentColor"/>
           </svg>
         </div>
         <div class="login-title" style="font-size:20px;margin-bottom:6px">Check your inbox</div>
-        <div style="font-size:13.5px;color:var(--ink2);margin-bottom:4px">Magic link sent to</div>
-        <div class="waiting-email" id="waitingEmail">—</div>
-        <div style="font-size:13px;color:var(--ink3);margin:12px 0 0;line-height:1.7">
-          Click <strong style="color:var(--ink2)">Sign In</strong> in the email.<br/>
-          This page updates automatically once approved.
+        <div style="font-size:13.5px;color:var(--ink3);line-height:1.6">
+          We sent a 6-digit code to
         </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r10);padding:12px 16px">
-          <div class="spinner" role="status"></div>
-          <span style="font-size:13px;color:var(--ink2)">Waiting for approval…</span>
-        </div>
-        <div class="countdown" id="countdown" aria-live="polite">5:00</div>
-        <div class="countdown-label">Link expires in</div>
-        <div id="loginStatusMsg" style="min-height:22px;margin-top:10px;font-size:13px;text-align:center" aria-live="polite"></div>
-        <div class="resend-row">
-          <button class="btn btn-secondary btn-sm" id="resendBtn">Resend email</button>
-          <button class="btn btn-ghost btn-sm" id="cancelBtn">Use different email</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ════ NEW USER — Verification pending ════ -->
-    <div id="stepNewPending" class="hidden">
-      <div class="confirm-box">
-        <div class="confirm-icon">✉</div>
-        <div>
-          <div style="font-family:var(--display);font-weight:800;font-size:14.5px;color:var(--amber);margin-bottom:5px">Verification email sent</div>
-          <div style="font-size:13px;color:var(--ink2);line-height:1.65">
-            We sent a confirmation link to<br/>
-            <strong id="newPendingEmail" style="color:var(--ink)">—</strong>
+        <div style="display:flex;justify-content:center;margin-top:6px">
+          <div class="otp-email-pill">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="otpEmailShow">—</span>
           </div>
         </div>
       </div>
-      <p style="font-size:13px;color:var(--ink3);line-height:1.7;margin-bottom:20px">
-        Click the link to verify your address and activate your free trial.
-        The link expires in <strong style="color:var(--ink2)">5 minutes</strong> — check your spam folder too.
-      </p>
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r10);padding:12px 16px;margin-bottom:16px">
-        <div class="spinner" role="status"></div>
-        <span style="font-size:13px;color:var(--ink2)">Waiting for verification…</span>
+
+      <div class="otp-row">
+        <input class="otp-digit" id="d0" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"/>
+        <input class="otp-digit" id="d1" type="text" inputmode="numeric" maxlength="1"/>
+        <input class="otp-digit" id="d2" type="text" inputmode="numeric" maxlength="1"/>
+        <input class="otp-digit" id="d3" type="text" inputmode="numeric" maxlength="1"/>
+        <input class="otp-digit" id="d4" type="text" inputmode="numeric" maxlength="1"/>
+        <input class="otp-digit" id="d5" type="text" inputmode="numeric" maxlength="1"/>
       </div>
-      <div style="min-height:22px;margin-bottom:12px;font-size:13px;text-align:center;color:var(--ink3)" id="newStatusMsg" aria-live="polite"></div>
-      <div class="resend-row">
-        <button class="btn btn-secondary btn-sm" id="resendNewBtn">Resend verification</button>
-        <button class="btn btn-ghost btn-sm" id="cancelNewBtn">Start over</button>
+
+      <button class="verify-btn" id="verifyBtn" disabled>
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Verify &amp; sign in
+      </button>
+
+      <div class="otp-err" id="otpErr"></div>
+
+      <div style="text-align:center">
+        <div class="timer-pill">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Expires in <span id="timerTxt" style="margin-left:3px;font-variant-numeric:tabular-nums">10:00</span>
+        </div>
+      </div>
+
+      <div class="otp-acts">
+        <span>Didn't get it?</span>
+        <button class="otp-lnk" id="resendBtn">Resend code</button>
+        <span>·</span>
+        <button class="otp-lnk" id="changeEmailBtn">Change email</button>
       </div>
     </div>
 
-    <!-- ════ SUCCESS / REDIRECT ════ -->
+    <!-- ══ STEP 3: SUCCESS ══ -->
     <div id="stepDone" class="hidden">
       <div class="success-view">
         <div class="success-icon">✓</div>
         <div class="success-title" id="successTitle">Signed in!</div>
         <p id="successSub" style="font-size:14px;color:var(--ink2);line-height:1.7">Redirecting to your dashboard…</p>
-        <div class="spinner" style="margin:18px auto 0" role="status"></div>
+        <div class="spinner" style="margin:16px auto 0" role="status"></div>
       </div>
     </div>
 
   </div><!-- /.login-card -->
 
   <div class="login-footer">
-    <span id="switchFooterText"></span>
-    <span id="switchFooter" style="color:var(--blue);cursor:pointer;text-decoration:underline;margin-left:4px" role="button" tabindex="0"></span>
-    &nbsp;&nbsp;·&nbsp;&nbsp;
-    <a href="/pricing">Terms</a>&nbsp;·&nbsp;<a href="/contact">Privacy</a><br/>
+    <a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>
     © 2025 Prudent Autolytics · <a href="mailto:Kabileshvijayakumar@prudentautolytics.com">Contact</a>
   </div>
 
-</div>
+</div><!-- /.login-wrap -->
 
 <script src="/js/config.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════════════════
-   LOGIN v8 — New + Existing user flows
-   ─────────────────────────────────────────────────────────────────
-   PA receives: { email, txId, type:"new"|"existing", name?, company?, useCase?, ttlSeconds }
-   type:"new"      → PA sends CONFIRMATION email (account creation)
-   type:"existing" → PA sends MAGIC-LINK email (sign-in)
-   Both then polled via AUTH_VERIFY { txId, type }
-   ═══════════════════════════════════════════════════════════════════ */
-(function () {
-  'use strict';
+(function(){
+'use strict';
 
-  // Theme first
-  const t = localStorage.getItem('pp_theme') || 'light';
-  document.documentElement.setAttribute('data-theme', t);
+/* ── Init ── */
+const t=localStorage.getItem('pp_theme')||'light';
+document.documentElement.setAttribute('data-theme',t);
+if(Session.valid()){location.replace('/dashboard');return;}
 
-  // Already signed in?
-  if (Session.valid()) { location.replace('/dashboard'); return; }
+const $=id=>document.getElementById(id);
+let S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false};
+let tickTimer=null, checkDebounce=null;
 
-  // Magic-link callback tab?
-  const up = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
-  const cb = { token: up.get('token'), txId: up.get('txId'), status: up.get('status') };
-  if (cb.token || cb.txId) { handleCallback(cb); return; }
+/* ── Steps ── */
+function show(s){['stepEmail','stepOTP','stepDone'].forEach(id=>$(id)?.classList.toggle('hidden',id!==s));}
 
-  const $ = id => document.getElementById(id);
-  const AUTH_STORE = 'pp_auth_';
-  const TTL = 300_000;
+/* ── Email error ── */
+function eErr(msg){$('emailErr').classList.remove('hidden');$('emailErrTxt').textContent=msg;$('emailInput').classList.add('invalid');$('emailInput').focus();}
+function eOk(){$('emailErr').classList.add('hidden');$('emailInput').classList.remove('invalid');}
 
-  let state = { email:'', txId:'', isNew:false, name:'', company:'', useCase:'' };
-  let deadline = 0, countTimer = null, pollTimer = null;
-  let activeTab = 'existing';
+/* ── Smart email check (debounced 650ms) ── */
+$('emailInput').addEventListener('input',()=>{
+  eOk();
+  S.checked=false; S.isNew=false;
+  $('regSlide').classList.remove('open');
+  $('stepTitle').textContent='Welcome';
+  $('stepSub').textContent='Enter your work email to get started — no password required.';
+  $('contBtnTxt').textContent='Continue';
+  clearTimeout(checkDebounce);
+  const em=($('emailInput').value||'').trim();
+  if(!em||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return;
+  checkDebounce=setTimeout(()=>doCheck(em),650);
+});
 
-  /* ── Tabs ────────────────────────────────────────── */
-  function setTab(tab) {
-    activeTab = tab;
-    $('tabExisting').classList.toggle('active', tab === 'existing');
-    $('tabNew').classList.toggle('active', tab !== 'existing');
-    $('tabExisting').setAttribute('aria-selected', tab === 'existing');
-    $('tabNew').setAttribute('aria-selected', tab !== 'existing');
-    $('existingForm').classList.toggle('hidden', tab !== 'existing');
-    $('newUserForm').classList.toggle('hidden', tab === 'existing');
-
-    // Footer helper text
-    if (tab === 'existing') {
-      $('switchFooterText').textContent = "Don't have an account?";
-      $('switchFooter').textContent = 'Create one free';
+async function doCheck(email){
+  try{
+    const d=await paFetch(APP_CONFIG.FLOWS.AUTH_CHECK,{email});
+    S.checked=true;
+    if(d.exists){
+      S.isNew=false;
+      $('stepTitle').textContent='Welcome back';
+      $('stepSub').textContent='We\'ll send a 6-digit code to your inbox — no password needed.';
+      $('contBtnTxt').textContent='Send verification code';
+      $('regSlide').classList.remove('open');
     } else {
-      $('switchFooterText').textContent = 'Already have an account?';
-      $('switchFooter').textContent = 'Sign in here';
+      S.isNew=true;
+      $('stepTitle').textContent='Create your account';
+      $('stepSub').textContent='Start your 5-document free trial — no credit card required.';
+      $('contBtnTxt').textContent='Create account & send code';
+      $('regSlide').classList.add('open');
+      setTimeout(()=>$('regName')?.focus(),360);
     }
+  } catch(e){ S.checked=false; }
+}
 
-    setTimeout(() => {
-      if (tab === 'existing') $('emailInput')?.focus();
-      else $('regName')?.focus();
-    }, 60);
+/* ── Continue ── */
+$('continueBtn').addEventListener('click',handleContinue);
+$('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleContinue();});
+
+async function handleContinue(){
+  const email=($('emailInput').value||'').trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){eErr('Please enter a valid work email address.');return;}
+  eOk();
+  S.email=email;
+
+  const btn=$('continueBtn');
+  function setLoading(txt){btn.disabled=true;btn.innerHTML=`<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ${txt}`;}
+  function resetBtn(){btn.disabled=false;btn.innerHTML=`<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>${$('contBtnTxt').textContent}</span>`;}
+
+  if(!S.checked){
+    setLoading('Checking…');
+    await doCheck(email);
+    resetBtn();
   }
 
-  $('tabExisting').addEventListener('click', () => setTab('existing'));
-  $('tabNew').addEventListener('click', () => setTab('new'));
-  ['tabExisting','tabNew'].forEach(id => {
-    $(id).addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') $(id).click();
-    });
+  if(S.isNew){
+    const name=($('regName')?.value||'').trim();
+    if(!name){
+      $('regName').classList.add('invalid');
+      $('regName').focus();
+      setTimeout(()=>$('regName').classList.remove('invalid'),2500);
+      eErr('Please enter your full name to create an account.');
+      return;
+    }
+    S.name=name;
+    S.company=($('regCompany')?.value||'').trim();
+    S.useCase=$('regUseCase')?.value||'';
+  }
+
+  setLoading('Sending code…');
+  try{
+    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
+    $('otpEmailShow').textContent=email;
+    clearDigits();
+    show('stepOTP');
+    startTimer();
+    setTimeout(()=>$('d0')?.focus(),120);
+  } catch(err){
+    eErr(err.message||'Could not send code. Please try again.');
+  } finally { resetBtn(); }
+}
+
+/* ── OTP digits ── */
+const ds=[0,1,2,3,4,5].map(i=>$('d'+i));
+ds.forEach((inp,i)=>{
+  inp.addEventListener('input',e=>{
+    const v=e.target.value.replace(/\D/g,'');
+    inp.value=v?v[0]:'';
+    inp.classList.toggle('filled',!!inp.value);
+    $('otpErr').textContent='';
+    if(inp.value&&i<5)ds[i+1].focus();
+    $('verifyBtn').disabled=!ds.every(d=>d.value);
   });
-  $('switchFooter').addEventListener('click', () => setTab(activeTab === 'existing' ? 'new' : 'existing'));
-  $('switchFooter').addEventListener('keydown', e => { if (e.key === 'Enter') $('switchFooter').click(); });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Backspace'&&!inp.value&&i>0){ds[i-1].value='';ds[i-1].classList.remove('filled');ds[i-1].focus();$('verifyBtn').disabled=true;}
+    if(e.key==='Enter'&&!$('verifyBtn').disabled)verifyOTP();
+  });
+  inp.addEventListener('paste',e=>{
+    e.preventDefault();
+    const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');
+    p.slice(0,6).split('').forEach((ch,j)=>{if(ds[j]){ds[j].value=ch;ds[j].classList.add('filled');}});
+    ds[Math.min(p.length,5)]?.focus();
+    $('verifyBtn').disabled=!ds.every(d=>d.value);
+  });
+});
+function getCode(){return ds.map(d=>d.value).join('');}
+function clearDigits(){ds.forEach(d=>{d.value='';d.classList.remove('filled','bad');});$('verifyBtn').disabled=true;}
+function shakeDigits(){ds.forEach(d=>{d.classList.add('bad');setTimeout(()=>d.classList.remove('bad'),420);});}
 
-  setTab('existing'); // initial state
+/* ── Timer ── */
+function startTimer(ms=600000){
+  const dl=Date.now()+ms;
+  if(tickTimer)clearInterval(tickTimer);
+  tickTimer=setInterval(()=>{
+    const r=Math.max(0,dl-Date.now());
+    const el=$('timerTxt');
+    if(el)el.textContent=`${Math.floor(r/60000)}:${String(Math.floor((r%60000)/1000)).padStart(2,'0')}`;
+    if(r===0){clearInterval(tickTimer);$('otpErr').textContent='Code expired — please request a new one.';$('verifyBtn').disabled=true;}
+  },1000);
+}
 
-  /* ── Step visibility ─────────────────────────────── */
-  function showStep(step) {
-    ['stepUserType','stepWaiting','stepNewPending','stepDone'].forEach(s => {
-      $(s)?.classList.toggle('hidden', s !== step);
-    });
-  }
-
-  /* ── Errors ──────────────────────────────────────── */
-  function showErr(inpId, errId, textId, msg) {
-    $(errId)?.classList.remove('hidden');
-    const et = $(textId); if (et) et.textContent = msg;
-    $(inpId)?.classList.add('invalid'); $(inpId)?.focus();
-  }
-  function hideErr(inpId, errId) {
-    $(errId)?.classList.add('hidden'); $(inpId)?.classList.remove('invalid');
-  }
-
-  /* ── Send PA request ─────────────────────────────── */
-  async function sendRequest(payload, btnId, resetBtnHTML) {
-    const btn = $(btnId);
-    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Sending…'; }
-    try {
-      state.txId = genUUID();
-      payload.txId = state.txId;
-      payload.ttlSeconds = TTL / 1000;
-      const res = await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, payload);
-      if (res?.txId) state.txId = res.txId;
-      return true;
-    } catch (err) {
-      return err.message || 'Could not reach server. Check your connection.';
-    } finally {
-      if (btn) { btn.disabled = false; btn.innerHTML = resetBtnHTML; }
-    }
-  }
-
-  /* ── Existing user ───────────────────────────────── */
-  async function sendExisting() {
-    const email = ($('emailInput')?.value || '').trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showErr('emailInput','emailErr','emailErrText','Please enter a valid email address.'); return;
-    }
-    hideErr('emailInput','emailErr');
-    state.email = email; state.isNew = false;
-
-    const BTN_HTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Send magic link';
-    const result = await sendRequest({ email, type:'existing' }, 'sendBtn', BTN_HTML);
-    if (result !== true) { showErr('emailInput','emailErr','emailErrText', result); return; }
-
-    $('waitingEmail').textContent = email;
-    showStep('stepWaiting');
-    startCountdown();
-    window.addEventListener('storage', onStorage);
-    if (APP_CONFIG.FLOWS.AUTH_VERIFY) startPoll();
-  }
-
-  /* ── New user ────────────────────────────────────── */
-  async function registerNew() {
-    const name    = ($('regName')?.value    || '').trim();
-    const email   = ($('regEmail')?.value   || '').trim();
-    const company = ($('regCompany')?.value || '').trim();
-    const useCase = $('regUseCase')?.value  || '';
-
-    if (!name) { showErr('regName','regEmailErr','regEmailErrText','Please enter your full name.'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showErr('regEmail','regEmailErr','regEmailErrText','Please enter a valid work email.'); return;
-    }
-    hideErr('regEmail','regEmailErr');
-    state.email = email; state.isNew = true;
-    state.name = name; state.company = company; state.useCase = useCase;
-
-    const BTN_HTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Create account &amp; verify email';
-    const result = await sendRequest(
-      { email, type:'new', name, company, useCase },
-      'registerBtn', BTN_HTML
-    );
-    if (result !== true) { showErr('regEmail','regEmailErr','regEmailErrText', result); return; }
-
-    $('newPendingEmail').textContent = email;
-    showStep('stepNewPending');
-    startCountdown();
-    window.addEventListener('storage', onStorage);
-    if (APP_CONFIG.FLOWS.AUTH_VERIFY) startPoll();
-  }
-
-  /* ── Countdown timer ─────────────────────────────── */
-  function startCountdown() {
-    deadline = Date.now() + TTL;
-    if (countTimer) clearInterval(countTimer);
-    countTimer = setInterval(() => {
-      const rem = Math.max(0, deadline - Date.now());
-      const el = $('countdown');
-      if (el) el.textContent = `${Math.floor(rem/60000)}:${String(Math.floor((rem%60000)/1000)).padStart(2,'0')}`;
-      if (rem === 0) { clearInterval(countTimer); stopPoll(); setMsg('Link expired. Please resend.','var(--red)'); }
-    }, 1000);
-  }
-
-  function setMsg(msg, color = 'var(--ink3)') {
-    [$('loginStatusMsg'), $('newStatusMsg')].forEach(el => {
-      if (el) { el.textContent = msg; el.style.color = color; }
-    });
-  }
-
-  /* ── Cross-tab storage ───────────────────────────── */
-  function onStorage(e) {
-    if (e.key === AUTH_STORE + state.txId && e.newValue) {
-      try { applyAuth(JSON.parse(e.newValue)); } catch {}
-    }
-  }
-
-  /* ── Poll AUTH_VERIFY ────────────────────────────── */
-  function startPoll() {
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(async () => {
-      if (Date.now() > deadline) { stopPoll(); return; }
-      try {
-        const res = await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY, {
-          txId: state.txId, type: state.isNew ? 'new' : 'existing', probe: true,
-        });
-        if (res) applyAuth(res);
-      } catch {}
-    }, 4000);
-  }
-  function stopPoll() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
-
-  /* ── Apply approved session ──────────────────────── */
-  function applyAuth(data) {
-    const raw = String(data?.status || data?.Status || '').toLowerCase();
-    const ok  = ['approved','ok','success','yes','true','1','verified','confirmed'].includes(raw);
-    const no  = ['denied','rejected','no','false','0'].includes(raw);
-
-    if (ok) {
-      stopPoll(); clearInterval(countTimer);
-      window.removeEventListener('storage', onStorage);
-
+/* ── Verify ── */
+$('verifyBtn').addEventListener('click',verifyOTP);
+async function verifyOTP(){
+  const code=getCode();
+  if(code.length!==6)return;
+  const btn=$('verifyBtn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> Verifying…';
+  try{
+    const d=await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY,{email:S.email,otp:code});
+    if(d?.status==='approved'){
+      clearInterval(tickTimer);
       Session.set({
-        email           : data.email           || state.email,
-        token           : data.token           || state.txId,
-        userId          : data.userId          || '',
-        plan            : data.plan            || 'trial',
-        creditsUsed     : data.creditsUsed     ?? 0,
-        creditsLimit    : data.creditsLimit    ?? APP_CONFIG.TRIAL.MAX_FILES,
-        trialExpiryDate : data.trialExpiryDate || null,
-        isNewUser       : state.isNew,
-        expiresAt       : Date.now() + 8 * 3_600_000,
+        email:d.email||S.email,token:d.userId||genUUID(),userId:d.userId||'',
+        plan:d.plan||'trial',creditsUsed:d.creditsUsed??0,
+        creditsLimit:d.creditsLimit??APP_CONFIG.TRIAL.MAX_FILES,
+        trialExpiryDate:d.trialExpiryDate||null,isNewUser:S.isNew,
+        expiresAt:Date.now()+8*3600000,
       });
-
-      const firstName = state.name ? state.name.split(' ')[0] : null;
-      $('successTitle').textContent = state.isNew && firstName
-        ? `Welcome, ${firstName}! 🎉`
-        : 'Signed in!';
-      $('successSub').textContent = state.isNew
-        ? 'Your free trial is active. Redirecting to your dashboard…'
-        : 'Redirecting to your dashboard…';
-
-      showStep('stepDone');
-      setTimeout(() => location.replace('/dashboard'), 1000);
-
-    } else if (no) {
-      stopPoll();
-      setMsg(
-        state.isNew
-          ? 'Verification failed. Please try again or contact support.'
-          : 'Access denied. Try a different email or contact support.',
-        'var(--red)'
-      );
-    }
+      const fn=S.name?S.name.split(' ')[0]:null;
+      $('successTitle').textContent=S.isNew&&fn?`Welcome, ${fn}!`:'Signed in!';
+      $('successSub').textContent=S.isNew?'Your free trial is active. Redirecting…':'Redirecting to your dashboard…';
+      show('stepDone');
+      setTimeout(()=>location.replace('/dashboard'),1200);
+    } else { throw new Error('Verification failed.'); }
+  } catch(err){
+    shakeDigits(); clearDigits();
+    $('otpErr').textContent=
+      err.message?.includes('Invalid')?'Incorrect code — please try again.':
+      err.message?.includes('expired')?'Code expired — request a new one.':
+      'Verification failed. Please try again.';
+    btn.disabled=false;
+    btn.innerHTML='<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verify &amp; sign in';
+    setTimeout(()=>$('d0')?.focus(),80);
   }
+}
 
-  /* ── Callback handler (confirmation tab) ─────────── */
-  function handleCallback(p) {
-    const raw = String(p.status || '').toLowerCase();
-    if (!p.token && !['approved','ok','success','verified','confirmed'].includes(raw)) return;
-    try { localStorage.setItem(AUTH_STORE + p.txId, JSON.stringify(p)); } catch {}
-    document.body.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink)">
-        <div style="text-align:center;padding:48px;max-width:420px">
-          <div style="font-size:56px;margin-bottom:18px">✓</div>
-          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px">Verified!</div>
-          <div style="font-size:14px;color:var(--ink2);line-height:1.7">You can close this tab and return to the app — you'll be signed in automatically.</div>
-        </div>
-      </div>`;
-  }
+/* ── Resend + change email ── */
+$('resendBtn').addEventListener('click',async()=>{
+  $('otpErr').textContent=''; clearDigits();
+  $('resendBtn').disabled=true; $('resendBtn').textContent='Sending…';
+  try{await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email:S.email});startTimer();showToast('New code sent','success');}
+  catch(e){$('otpErr').textContent='Failed to resend. Try again.';}
+  $('resendBtn').disabled=false; $('resendBtn').textContent='Resend code';
+});
 
-  /* ── Wire events ─────────────────────────────────── */
-  $('sendBtn')?.addEventListener('click', sendExisting);
-  $('emailInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendExisting(); });
-  $('emailInput')?.addEventListener('input', () => hideErr('emailInput','emailErr'));
-
-  $('registerBtn')?.addEventListener('click', registerNew);
-  $('regEmail')?.addEventListener('keydown', e => { if (e.key === 'Enter') registerNew(); });
-  $('regEmail')?.addEventListener('input', () => hideErr('regEmail','regEmailErr'));
-
-  // Existing user waiting
-  $('resendBtn')?.addEventListener('click', () => {
-    stopPoll(); clearInterval(countTimer);
-    showStep('stepUserType'); setTab('existing');
-    $('emailInput').value = state.email;
-    setTimeout(sendExisting, 100);
-  });
-  $('cancelBtn')?.addEventListener('click', () => {
-    stopPoll(); clearInterval(countTimer);
-    showStep('stepUserType'); setTab('existing');
-  });
-
-  // New user pending
-  $('resendNewBtn')?.addEventListener('click', () => {
-    stopPoll(); clearInterval(countTimer);
-    showStep('stepUserType'); setTab('new');
-    $('regEmail').value = state.email;
-    $('regName').value  = state.name;
-    setTimeout(registerNew, 100);
-  });
-  $('cancelNewBtn')?.addEventListener('click', () => {
-    stopPoll(); clearInterval(countTimer);
-    showStep('stepUserType'); setTab('new');
-  });
+$('changeEmailBtn').addEventListener('click',()=>{
+  clearInterval(tickTimer);
+  S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false};
+  $('emailInput').value='';
+  $('regSlide').classList.remove('open');
+  $('stepTitle').textContent='Welcome';
+  $('stepSub').textContent='Enter your work email to get started — no password required.';
+  $('contBtnTxt').textContent='Continue';
+  show('stepEmail');
+  setTimeout(()=>$('emailInput').focus(),80);
+});
 
 })();
 </script>

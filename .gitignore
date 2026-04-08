@@ -1,0 +1,6 @@
+# Secrets
+api/.env
+api/local.settings.json
+
+# Dependencies
+api/node_modules/
