@@ -40,7 +40,6 @@
 .cost-summary { padding:12px; background:var(--surface); border-top:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
 .cost-row { display:flex; justify-content:space-between; font-size:12px; color:var(--ink3); }
 .cost-row.total { font-family:var(--display); font-weight:700; font-size:13px; color:var(--ink); padding-top:6px; border-top:1px solid var(--border); }
-.pane-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:var(--ink3); }
 </style>
 </head>
 <body>
@@ -59,7 +58,7 @@
       <span class="font-mono text-xs text-subtle hidden" id="viewerMeta"></span>
       <div style="flex:1"></div>
       <select class="filter-select" id="jobSelector" style="max-width:280px;font-size:12.5px">
-        <option value="">— Select a job —</option>
+        <option value="">Loading jobs…</option>
       </select>
       <div class="viewer-divider"></div>
       <button class="btn btn-secondary btn-sm" id="dlOrigBtn" disabled>
@@ -91,7 +90,7 @@
             <button class="zoom-btn" id="oZoomIn">+</button>
           </div>
         </div>
-        <div class="pane-body" id="origBody">
+        <div class="pane-body">
           <div class="pane-empty" id="origEmpty">
             <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
             <div style="font-size:13px;line-height:1.65" id="origEmptyMsg">Select a job from the toolbar above</div>
@@ -100,9 +99,9 @@
         </div>
         <div class="pane-footer">
           <div class="page-nav">
-            <button class="page-nav-btn" id="oPrev" disabled>‹</button>
+            <button class="page-nav-btn" disabled>‹</button>
             <span class="page-val" id="oPage">1 / 1</span>
-            <button class="page-nav-btn" id="oNext" disabled>›</button>
+            <button class="page-nav-btn" disabled>›</button>
           </div>
           <div style="flex:1"></div>
           <span class="font-mono text-xs text-subtle" id="origSizeLabel"></span>
@@ -122,7 +121,7 @@
             <button class="zoom-btn" id="rZoomIn">+</button>
           </div>
         </div>
-        <div class="pane-body" id="redBody">
+        <div class="pane-body">
           <div class="pane-empty" id="redEmpty">
             <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/></svg></div>
             <div style="font-size:13px;line-height:1.65" id="redEmptyMsg">Redacted document appears here after job completes</div>
@@ -131,9 +130,9 @@
         </div>
         <div class="pane-footer">
           <div class="page-nav">
-            <button class="page-nav-btn" id="rPrev" disabled>‹</button>
+            <button class="page-nav-btn" disabled>‹</button>
             <span class="page-val" id="rPage">1 / 1</span>
-            <button class="page-nav-btn" id="rNext" disabled>›</button>
+            <button class="page-nav-btn" disabled>›</button>
           </div>
           <div style="flex:1"></div>
           <span class="font-mono text-xs text-subtle" id="redSizeLabel"></span>
@@ -161,7 +160,7 @@
           <div class="cost-row"><span>Azure Blob storage</span><span id="csBlobStorage">—</span></div>
           <div class="cost-row"><span>Power Automate flows</span><span id="csPaFlow">—</span></div>
           <div class="cost-row"><span>Notifications</span><span id="csEmail">—</span></div>
-          <div class="cost-row total"><span>Total</span><span id="csTotal">—</span></div>
+          <div class="cost-row total"><span>Total (Product Price)</span><span id="csTotal">—</span></div>
         </div>
       </div>
 
@@ -177,31 +176,64 @@
   Shell.init('viewer');
 
   const session = Session.get();
-  const JOB_KEY = `pp_jobs_${session?.userId || session?.email || 'anon'}`;
-  const $ = id => document.getElementById(id);
+  const email   = session?.email || '';
+  const $       = id => document.getElementById(id);
 
-  function loadJobs() {
-    try { return JSON.parse(localStorage.getItem(JOB_KEY) || '[]'); } catch { return []; }
-  }
-
+  let allJobs    = [];
   let currentJob = null;
   let oZoom = 100, rZoom = 100;
   let origSasUrl = null, redSasUrl = null;
+
+  /* ── Fetch jobs from Supabase ── */
+  async function fetchJobs() {
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 30 });
+      if (Array.isArray(res)) {
+        allJobs = res;
+        populateSelector();
+        // Auto-load from URL param after jobs are loaded
+        const urlJobId = new URLSearchParams(location.search).get('jobId');
+        if (urlJobId) {
+          const sel = $('jobSelector');
+          if (sel) {
+            const opt = [...sel.options].find(o => o.value === urlJobId);
+            if (opt) sel.value = urlJobId;
+          }
+          loadJob(urlJobId);
+        }
+      }
+    } catch (err) {
+      console.error('fetchJobs error:', err);
+      const sel = $('jobSelector');
+      if (sel) sel.innerHTML = '<option value="">Failed to load jobs — refresh</option>';
+    }
+  }
+
+  /* ── Populate job selector from Supabase data ── */
+  function populateSelector() {
+    const sel = $('jobSelector');
+    if (!sel) return;
+    if (!allJobs.length) {
+      sel.innerHTML = '<option value="">No jobs yet — upload a PDF first</option>';
+      return;
+    }
+    const opts = allJobs.map(j => {
+      const s    = (j.status || '').toLowerCase();
+      const icon = s === 'complete' ? '✓' : s === 'queued' ? '⏳' : s === 'processing' ? '⚙' : '●';
+      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName, 38)} — ${fmt.date(j.submittedAt)}</option>`;
+    }).join('');
+    sel.innerHTML = '<option value="">— Select a job —</option>' + opts;
+  }
 
   /* ── Get a read SAS URL for a blob ── */
   async function getReadSasUrl(blobUrl, containerHint) {
     if (!blobUrl) return null;
     try {
-      // Extract blobName from the URL
       const urlParts  = blobUrl.split('/');
       const blobName  = urlParts[urlParts.length - 1].split('?')[0];
       const container = containerHint || urlParts[urlParts.length - 2];
-
       const res = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
-        email     : session.email,
-        blobName  : blobName,
-        container : container,
-        mode      : 'read',
+        email, blobName, container, mode: 'read',
       });
       return res?.sasUrl || null;
     } catch (err) {
@@ -210,35 +242,21 @@
     }
   }
 
-  /* ── Populate job selector — show ALL jobs ── */
-  function populateSelector() {
-    const sel = $('jobSelector');
-    if (!sel) return;
-    const jobs = loadJobs();
-    if (!jobs.length) { sel.innerHTML = '<option value="">No jobs yet — upload a PDF first</option>'; return; }
-    const opts = jobs.map(j => {
-      const s = (j.status || '').toLowerCase();
-      const icon = s === 'complete' ? '✓' : s === 'queued' ? '⏳' : s === 'processing' ? '⚙' : '●';
-      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName, 38)} — ${fmt.date(j.submittedAt)}</option>`;
-    }).join('');
-    sel.innerHTML = '<option value="">— Select a job —</option>' + opts;
-  }
-
   /* ── Load a job into viewer ── */
   async function loadJob(jobId) {
     if (!jobId) return;
-    const j = loadJobs().find(x => x.jobId === jobId);
+    const j = allJobs.find(x => x.jobId === jobId);
     if (!j) { showToast('Job not found', 'warn'); return; }
     currentJob = j;
 
     const status = (j.status || '').toLowerCase();
 
-    // Update toolbar
+    // Toolbar
     setText('viewerFileName', fmt.trunc(j.fileName, 42));
     const stEl = $('viewerStatus');
     if (stEl) {
       stEl.className   = `pill ${status === 'complete' ? 'pill-complete' : status === 'processing' ? 'pill-processing' : 'pill-queued'}`;
-      stEl.textContent = j.status || 'Unknown';
+      stEl.textContent = j.status || 'Queued';
       stEl.classList.remove('hidden');
     }
     const metaEl = $('viewerMeta');
@@ -247,44 +265,45 @@
       metaEl.classList.remove('hidden');
     }
 
-    // Show loading state
+    // Show loading spinners in both panes
     showLoading('origFrame', 'origEmpty', 'origEmptyMsg', 'Loading original PDF…');
-    showLoading('redFrame',  'redEmpty',  'redEmptyMsg',  'Loading redacted PDF…');
+    showLoading('redFrame',  'redEmpty',  'redEmptyMsg',  status === 'complete' ? 'Loading redacted PDF…' : 'Redaction in progress…');
 
-    // Get SAS URLs for both files
     origSasUrl = null;
     redSasUrl  = null;
 
+    // Get SAS URL for original — from prudent-uploads
     if (j.blobUrl) {
-      origSasUrl = await getReadSasUrl(j.blobUrl, process.env.AZURE_UPLOAD_CONTAINER || 'prudent-uploads');
+      origSasUrl = await getReadSasUrl(j.blobUrl, 'prudent-uploads');
     }
 
+    // Get SAS URL for redacted — from prudent-results
     if (j.resultUrl) {
-      redSasUrl = await getReadSasUrl(j.resultUrl, process.env.AZURE_RESULTS_CONTAINER || 'prudent-results');
+      redSasUrl = await getReadSasUrl(j.resultUrl, 'prudent-results');
     }
 
-    // Load original pane
+    // Render original pane
     if (origSasUrl) {
       loadPdfFrame('origFrame', 'origEmpty', origSasUrl, 'origSizeLabel', fmt.bytes(j.fileSize));
     } else {
       showEmptyPane('origFrame', 'origEmpty', 'origEmptyMsg',
-        j.blobUrl ? 'Could not load original PDF' : 'Original PDF not available'
+        j.blobUrl ? 'Could not generate PDF preview' : 'Original PDF not available'
       );
     }
 
-    // Load redacted pane
+    // Render redacted pane
     if (redSasUrl) {
       loadPdfFrame('redFrame', 'redEmpty', redSasUrl, 'redSizeLabel', 'Redacted');
     } else {
       showEmptyPane('redFrame', 'redEmpty', 'redEmptyMsg',
-        status === 'complete'    ? 'Could not load redacted PDF' :
-        status === 'processing'  ? 'Redaction in progress — check back soon' :
-        status === 'queued'      ? 'Job is queued for processing' :
+        status === 'complete'   ? 'Could not load redacted PDF' :
+        status === 'processing' ? 'Redaction in progress — check back soon' :
+        status === 'queued'     ? 'Job is queued for processing' :
         'Redacted PDF will appear here after job completes'
       );
     }
 
-    // Buttons
+    // Toolbar buttons
     $('dlOrigBtn').disabled   = !origSasUrl;
     $('dlRedactBtn').disabled = !redSasUrl;
     $('exportFieldsBtn').disabled = false;
@@ -293,7 +312,8 @@
 
     // Page count
     const pages = j.pageCount || 1;
-    ['oPage','rPage'].forEach(id => setText(id, `1 / ${pages}`));
+    setText('oPage', `1 / ${pages}`);
+    setText('rPage', `1 / ${pages}`);
 
     renderFields(j);
     renderCostSummary(j);
@@ -312,7 +332,6 @@
     const sizeEl = $(sizeLabelId);
     if (!frame) return;
     if (sizeEl) sizeEl.textContent = sizeLabel || '';
-    // Use Google Docs viewer with SAS URL for reliable cross-origin PDF rendering
     frame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(sasUrl)}&embedded=true`;
     frame.classList.remove('hidden');
     empty?.classList.add('hidden');
@@ -331,7 +350,7 @@
   function applyZoom(which, pct) {
     const frame = $(which==='orig'?'origFrame':'redFrame');
     const label = $(which==='orig'?'oZoomVal':'rZoomVal');
-    if (!frame||frame.classList.contains('hidden')) return;
+    if (!frame || frame.classList.contains('hidden')) return;
     frame.style.transform = `scale(${pct/100})`;
     frame.style.transformOrigin = 'top center';
     if (label) label.textContent = pct + '%';
@@ -341,7 +360,7 @@
     $(`${w}ZoomOut`)?.addEventListener('click', () => { if(w==='o'){oZoom=Math.max(50,oZoom-20);applyZoom('orig',oZoom);}else{rZoom=Math.max(50,rZoom-20);applyZoom('red',rZoom);} });
   });
 
-  /* ── Fields ── */
+  /* ── Fields panel ── */
   function renderFields(j) {
     const panel = $('fieldsPanel');
     const count = $('fieldCount');
@@ -349,54 +368,55 @@
     const fields = Array.isArray(j.extractedFields) ? j.extractedFields : [];
     if (count) count.textContent = `${fields.length} field${fields.length!==1?'s':''}`;
     if (!fields.length) {
-      panel.innerHTML = `<div class="fields-empty"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><div style="font-size:13px;line-height:1.65">No extracted fields<br/>returned for this job</div></div>`;
+      panel.innerHTML = `<div class="fields-empty">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div style="font-size:13px;line-height:1.65">No extracted fields<br/>returned for this job</div>
+      </div>`;
       return;
     }
     panel.innerHTML = fields.map(f => {
-      const conf=f.confidence!=null?f.confidence:null;
-      const confPct=conf!=null?(conf*100).toFixed(1)+'%':null;
-      const confCls=conf==null?'':conf>=0.9?'conf-high':conf>=0.7?'conf-medium':'conf-low';
-      return `<div class="field-card"><div class="field-key">${f.key||f.name||'Field'}</div><div class="field-val">${f.value||'—'}</div>${confPct?`<div class="field-conf ${confCls}">Confidence: ${confPct}</div>`:''}</div>`;
+      const conf    = f.confidence != null ? f.confidence : null;
+      const confPct = conf != null ? (conf*100).toFixed(1)+'%' : null;
+      const confCls = conf==null?'':conf>=0.9?'conf-high':conf>=0.7?'conf-medium':'conf-low';
+      return `<div class="field-card">
+        <div class="field-key">${f.key||f.name||'Field'}</div>
+        <div class="field-val">${f.value||'—'}</div>
+        ${confPct?`<div class="field-conf ${confCls}">Confidence: ${confPct}</div>`:''}
+      </div>`;
     }).join('');
   }
 
   /* ── Cost summary ── */
   function renderCostSummary(j) {
-    const cs=$('costSummary');
+    const cs = $('costSummary');
     if (!cs) return;
-    if (!j.costTotal&&!j.pageCount){cs.classList.add('hidden');return;}
+    if (!j.costTotal && !j.pageCount) { cs.classList.add('hidden'); return; }
     cs.classList.remove('hidden');
-    const cost=calcJobCost(j.pageCount||1,fmt.mb(j.fileSize));
-    const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
-    set('csDocIntel',fmt.usd(cost.docIntel));
-    set('csBlobStorage',fmt.usd(cost.blob));
-    set('csPaFlow',fmt.usd(cost.paFlow));
-    set('csEmail',fmt.usd(cost.email));
-    set('csTotal',j.costTotal!=null?fmt.usd(j.costTotal):cost.totalFmt);
+    const cost = calcJobCost(j.pageCount||1, fmt.mb(j.fileSize));
+    const set  = (id, v) => { const el=$(id); if(el) el.textContent=v; };
+    set('csDocIntel',    fmt.usd(cost.docIntel));
+    set('csBlobStorage', fmt.usd(cost.blob));
+    set('csPaFlow',      fmt.usd(cost.paFlow));
+    set('csEmail',       fmt.usd(cost.email));
+    set('csTotal',       j.costTotal != null ? fmt.usd(j.costTotal) : cost.totalFmt);
   }
 
   /* ── Export fields CSV ── */
   $('exportFieldsBtn')?.addEventListener('click', () => {
-    if (!currentJob){showToast('No job loaded','warn');return;}
-    const fields=Array.isArray(currentJob.extractedFields)?currentJob.extractedFields:[];
-    if (!fields.length){showToast('No fields to export','warn');return;}
-    exportCSV(fields.map(f=>({Field:f.key||f.name,Value:f.value,Confidence:f.confidence??''})),`fields-${currentJob.jobId.slice(0,8)}.csv`);
+    if (!currentJob) { showToast('No job loaded','warn'); return; }
+    const fields = Array.isArray(currentJob.extractedFields) ? currentJob.extractedFields : [];
+    if (!fields.length) { showToast('No fields to export','warn'); return; }
+    exportCSV(
+      fields.map(f => ({ Field: f.key||f.name, Value: f.value, Confidence: f.confidence??'' })),
+      `fields-${currentJob.jobId.slice(0,8)}.csv`
+    );
   });
 
   /* ── Job selector ── */
   $('jobSelector')?.addEventListener('change', e => { if(e.target.value) loadJob(e.target.value); });
 
-  /* ── Auto-load from URL ── */
-  const urlJobId = new URLSearchParams(location.search).get('jobId');
-  populateSelector();
-  if (urlJobId) {
-    const sel = $('jobSelector');
-    if (sel) {
-      const opt = [...sel.options].find(o => o.value === urlJobId);
-      if (opt) sel.value = urlJobId;
-    }
-    loadJob(urlJobId);
-  }
+  /* ── Initial load ── */
+  fetchJobs(); // loads from Supabase, then auto-loads URL job if present
 
 })();
 </script>
