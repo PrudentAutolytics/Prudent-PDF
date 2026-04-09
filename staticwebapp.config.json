@@ -5,8 +5,9 @@
     { "route": "/viewer",    "rewrite": "/pages/viewer.html"     },
     { "route": "/pricing",   "rewrite": "/pages/pricing.html"   },
     { "route": "/contact",   "rewrite": "/pages/contact.html"   },
+    { "route": "/admin",     "rewrite": "/pages/admin.html"     },
     { "route": "/login",     "rewrite": "/pages/login.html"     },
-    { "route": "/",          "rewrite": "/pages/login.html"     }
+    { "route": "/",          "rewrite": "/index.html"           }
   ],
   "navigationFallback": {
     "rewrite": "/pages/login.html",
