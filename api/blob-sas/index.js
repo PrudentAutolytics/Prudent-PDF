@@ -41,30 +41,25 @@ module.exports = async function (context, req) {
       permissions     = BlobSASPermissions.parse('r');
       if (!targetBlobName) throw new Error('blobName required for read mode.');
     } else {
-      // Write SAS for uploading new files — enforce file size limit
+      // Write SAS — enforce file size limit
       if (fileSizeBytes > 0) {
         const pool = require('../db');
-        try {
-          const userResult = await pool.query(
-            `SELECT plan, max_file_size_mb FROM users WHERE email = $1`, [email]
-          );
-          const user = userResult.rows[0];
-          if (user) {
-            const plan       = user.plan || 'trial';
-            const planLimit  = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
-            const maxBytes   = (user.max_file_size_mb || planLimit.maxFileSizeMB) * 1024 * 1024;
-            if (fileSizeBytes > maxBytes) {
-              const maxMB = user.max_file_size_mb || planLimit.maxFileSizeMB;
-              context.res = {
-                status  : 413,
-                headers : { 'Content-Type': 'application/json' },
-                body    : { error: `File too large. Your ${plan} plan allows up to ${maxMB} MB per file. Please upgrade your plan.` },
-              };
-              return;
-            }
+        const userResult = await pool.query(
+          `SELECT plan, max_file_size_mb FROM users WHERE email = $1`, [email]
+        );
+        const user = userResult.rows[0];
+        if (user) {
+          const plan       = user.plan || 'trial';
+          const planLimits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
+          const maxBytes   = (user.max_file_size_mb || planLimits.maxFileSizeMB) * 1024 * 1024;
+          if (fileSizeBytes > maxBytes) {
+            context.res = {
+              status  : 413,
+              headers : { 'Content-Type': 'application/json' },
+              body    : { error: `File too large. Your ${plan} plan allows up to ${user.max_file_size_mb || planLimits.maxFileSizeMB} MB per file.` },
+            };
+            return;
           }
-        } catch (dbErr) {
-          context.log('blob-sas: DB check error (non-fatal):', dbErr.message);
         }
       }
 
@@ -88,6 +83,7 @@ module.exports = async function (context, req) {
     const blobUrl = `https://${account}.blob.core.windows.net/${targetContainer}/${targetBlobName}`;
 
     context.log(`blob-sas: ${mode} SAS for ${targetBlobName}`);
+
     context.res = {
       status  : 200,
       headers : { 'Content-Type': 'application/json' },
