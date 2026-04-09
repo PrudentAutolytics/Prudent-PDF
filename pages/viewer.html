@@ -365,8 +365,17 @@
     const panel = $('fieldsPanel');
     const count = $('fieldCount');
     if (!panel) return;
-    const fields = Array.isArray(j.extractedFields) ? j.extractedFields : [];
+
+    // Parse fields — handle string JSON, array, or null
+    let fields = [];
+    try {
+      const raw = j.extractedFields || j.extracted_fields;
+      if (typeof raw === 'string') fields = JSON.parse(raw);
+      else if (Array.isArray(raw)) fields = raw;
+    } catch { fields = []; }
+
     if (count) count.textContent = `${fields.length} field${fields.length!==1?'s':''}`;
+
     if (!fields.length) {
       panel.innerHTML = `<div class="fields-empty">
         <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -374,16 +383,45 @@
       </div>`;
       return;
     }
-    panel.innerHTML = fields.map(f => {
+
+    // Render as table — handles both {key,value,confidence} and {content,page,polygon} formats
+    const rows = fields.map((f, i) => {
+      const label   = f.key || f.name || `Entity ${i + 1}`;
+      const content = f.content || f.value || '—';
+      const page    = f.page != null ? `p.${f.page + 1}` : (f.pageNumber != null ? `p.${f.pageNumber}` : '—');
       const conf    = f.confidence != null ? f.confidence : null;
-      const confPct = conf != null ? (conf*100).toFixed(1)+'%' : null;
-      const confCls = conf==null?'':conf>=0.9?'conf-high':conf>=0.7?'conf-medium':'conf-low';
-      return `<div class="field-card">
-        <div class="field-key">${f.key||f.name||'Field'}</div>
-        <div class="field-val">${f.value||'—'}</div>
-        ${confPct?`<div class="field-conf ${confCls}">Confidence: ${confPct}</div>`:''}
-      </div>`;
+      const confHtml = conf != null
+        ? `<span class="font-mono" style="font-size:10px;color:${conf>=0.9?'var(--green)':conf>=0.7?'var(--amber)':'var(--red)'}">${(conf*100).toFixed(0)}%</span>`
+        : '<span style="color:var(--ink3)">—</span>';
+      const bg = i % 2 === 0 ? 'var(--surface)' : 'var(--surface2)';
+      return `<tr style="background:${bg};border-bottom:1px solid var(--border)">
+        <td style="padding:7px 10px;font-size:11px;font-weight:700;color:var(--ink3);white-space:nowrap;vertical-align:top">${label}</td>
+        <td style="padding:7px 10px;font-size:12px;color:var(--ink);word-break:break-all;vertical-align:top">${content}</td>
+        <td style="padding:7px 10px;font-size:11px;color:var(--ink3);text-align:center;white-space:nowrap;vertical-align:top">${page}</td>
+        <td style="padding:7px 10px;text-align:center;vertical-align:top">${confHtml}</td>
+      </tr>`;
     }).join('');
+
+    panel.innerHTML = `
+      <div style="padding:0 2px 8px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)">
+        ${fields.length} PII Entit${fields.length!==1?'ies':'y'} Detected
+      </div>
+      <div style="border:1px solid var(--border);border-radius:var(--r8);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--surface3);border-bottom:2px solid var(--border)">
+              <th style="padding:7px 10px;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Type</th>
+              <th style="padding:7px 10px;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Content</th>
+              <th style="padding:7px 10px;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center">Page</th>
+              <th style="padding:7px 10px;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center">Conf</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div style="padding:8px 2px 0;font-size:11px;color:var(--ink3);line-height:1.6">
+        ⚠ These ${fields.length} entit${fields.length!==1?'ies':'y'} have been redacted in the output document.
+      </div>`;
   }
 
   /* ── Cost summary ── */
