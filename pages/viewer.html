@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="Prudent PDF document viewer — side-by-side original and redacted document comparison"/>
 <title>Document Viewer — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-/* ── Viewer layout overrides ────────────────────────── */
 .main {
   padding: 0 !important;
   overflow: hidden !important;
@@ -15,8 +13,6 @@
   flex-direction: column !important;
   height: calc(100vh - var(--topbar-h)) !important;
 }
-
-/* Toolbar */
 .viewer-toolbar {
   height: 52px; flex-shrink: 0;
   display: flex; align-items: center; gap: 10px;
@@ -26,16 +22,12 @@
   overflow-x: auto;
 }
 .viewer-divider { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
-
-/* Three-pane: orig | redacted | fields */
 .viewer-content {
   flex: 1; min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr 320px;
   overflow: hidden;
 }
-
-/* Single pane */
 .viewer-pane {
   display: flex; flex-direction: column;
   border-right: 1px solid var(--border);
@@ -43,7 +35,6 @@
   position: relative;
 }
 .viewer-pane:last-child { border-right: none; }
-
 .pane-hd {
   height: 40px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: space-between;
@@ -51,124 +42,35 @@
   background: var(--surface2);
   border-bottom: 1px solid var(--border);
 }
-.pane-label {
-  font-family: var(--display);
-  font-size: 10.5px; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 6px;
-}
+.pane-label { font-family:var(--display); font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
 .pane-label.orig     { color: var(--ink3); }
 .pane-label.redacted { color: var(--red); }
 .pane-label.fields   { color: var(--blue); }
-
-/* Zoom controls */
-.zoom-group { display: flex; align-items: center; gap: 4px; }
-.zoom-btn {
-  width: 24px; height: 24px;
-  border-radius: var(--r4);
-  display: grid; place-items: center;
-  background: var(--surface3); color: var(--ink2);
-  font-size: 16px; font-weight: 600; line-height: 1;
-  cursor: pointer; border: 1px solid var(--border2);
-  transition: all var(--dur) var(--ease);
-}
-.zoom-btn:hover { background: var(--surface); color: var(--ink); }
-.zoom-val {
-  font-family: var(--mono); font-size: 11px; color: var(--ink3);
-  min-width: 38px; text-align: center;
-}
-
-/* Pane scroll area */
-.pane-body {
-  flex: 1; overflow: auto;
-  background: var(--bg3);
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 16px;
-}
-.pane-body iframe {
-  width: 100%; height: 100%;
-  border: none;
-  border-radius: var(--r4);
-  box-shadow: var(--s3);
-}
-
-/* Empty state */
-.pane-empty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; gap: 12px; color: var(--ink3);
-  text-align: center; padding: 40px 24px;
-}
-.pane-empty-icon {
-  width: 56px; height: 56px; border-radius: var(--r14);
-  background: var(--surface2); border: 1px solid var(--border);
-  display: grid; place-items: center; color: var(--ink4);
-}
-
-/* Pane footer (page nav) */
-.pane-footer {
-  height: 40px; flex-shrink: 0;
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 14px;
-  background: var(--surface2);
-  border-top: 1px solid var(--border);
-}
-.page-nav { display: flex; align-items: center; gap: 6px; }
-.page-nav-btn {
-  width: 26px; height: 26px;
-  border-radius: var(--r4);
-  background: var(--surface3); border: 1px solid var(--border2);
-  color: var(--ink2); font-size: 16px;
-  display: grid; place-items: center;
-  cursor: pointer; transition: all var(--dur) var(--ease);
-}
-.page-nav-btn:hover   { background: var(--surface); color: var(--ink); }
-.page-nav-btn:disabled{ opacity: .3; pointer-events: none; }
-.page-val { font-family: var(--mono); font-size: 11.5px; color: var(--ink3); white-space: nowrap; }
-
-/* Fields panel */
-.fields-panel {
-  flex: 1; overflow-y: auto;
-  padding: 12px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.field-card {
-  padding: 10px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--r8);
-  transition: border-color var(--dur);
-}
-.field-card:hover { border-color: var(--border2); }
-.field-key  { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink3); margin-bottom: 3px; }
-.field-val  { font-size: 13px; color: var(--ink); font-weight: 500; word-break: break-word; }
-.field-conf { font-family: var(--mono); font-size: 10px; color: var(--ink3); margin-top: 2px; }
-
-/* Confidence colour */
-.conf-high   { color: var(--green); }
-.conf-medium { color: var(--amber); }
-.conf-low    { color: var(--red); }
-
-.fields-empty {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 10px; padding: 40px 20px; color: var(--ink3);
-  text-align: center;
-}
-
-/* Job cost summary */
-.cost-summary {
-  padding: 12px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: 6px;
-}
-.cost-row {
-  display: flex; justify-content: space-between;
-  font-size: 12px; color: var(--ink3);
-}
-.cost-row.total {
-  font-family: var(--display); font-weight: 700; font-size: 13px;
-  color: var(--ink); padding-top: 6px; border-top: 1px solid var(--border);
-}
+.zoom-group { display:flex; align-items:center; gap:4px; }
+.zoom-btn { width:24px; height:24px; border-radius:var(--r4); display:grid; place-items:center; background:var(--surface3); color:var(--ink2); font-size:16px; font-weight:600; cursor:pointer; border:1px solid var(--border2); transition:all var(--dur) var(--ease); }
+.zoom-btn:hover { background:var(--surface); color:var(--ink); }
+.zoom-val { font-family:var(--mono); font-size:11px; color:var(--ink3); min-width:38px; text-align:center; }
+.pane-body { flex:1; overflow:auto; background:var(--bg3); display:flex; align-items:flex-start; justify-content:center; padding:16px; }
+.pane-body iframe { width:100%; height:100%; border:none; border-radius:var(--r4); box-shadow:var(--s3); min-height:500px; }
+.pane-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:var(--ink3); text-align:center; padding:40px 24px; }
+.pane-empty-icon { width:56px; height:56px; border-radius:var(--r14); background:var(--surface2); border:1px solid var(--border); display:grid; place-items:center; color:var(--ink4); }
+.pane-footer { height:40px; flex-shrink:0; display:flex; align-items:center; gap:8px; padding:0 14px; background:var(--surface2); border-top:1px solid var(--border); }
+.page-nav { display:flex; align-items:center; gap:6px; }
+.page-nav-btn { width:26px; height:26px; border-radius:var(--r4); background:var(--surface3); border:1px solid var(--border2); color:var(--ink2); font-size:16px; display:grid; place-items:center; cursor:pointer; transition:all var(--dur) var(--ease); }
+.page-nav-btn:hover { background:var(--surface); color:var(--ink); }
+.page-nav-btn:disabled { opacity:.3; pointer-events:none; }
+.page-val { font-family:var(--mono); font-size:11.5px; color:var(--ink3); white-space:nowrap; }
+.fields-panel { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.field-card { padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r8); }
+.field-card:hover { border-color:var(--border2); }
+.field-key  { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:3px; }
+.field-val  { font-size:13px; color:var(--ink); font-weight:500; word-break:break-word; }
+.field-conf { font-family:var(--mono); font-size:10px; color:var(--ink3); margin-top:2px; }
+.conf-high { color:var(--green); } .conf-medium { color:var(--amber); } .conf-low { color:var(--red); }
+.fields-empty { display:flex; flex-direction:column; align-items:center; gap:10px; padding:40px 20px; color:var(--ink3); text-align:center; }
+.cost-summary { padding:12px; background:var(--surface); border-top:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
+.cost-row { display:flex; justify-content:space-between; font-size:12px; color:var(--ink3); }
+.cost-row.total { font-family:var(--display); font-weight:700; font-size:13px; color:var(--ink); padding-top:6px; border-top:1px solid var(--border); }
 </style>
 </head>
 <body>
@@ -176,8 +78,8 @@
 <div class="shell" id="appShell">
   <main class="main main-viewer">
 
-    <!-- ── Viewer toolbar ────────────────────────────── -->
-    <div class="viewer-toolbar" role="toolbar" aria-label="Viewer controls">
+    <!-- Toolbar -->
+    <div class="viewer-toolbar" role="toolbar">
       <a href="/history" class="btn btn-ghost btn-sm">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         History
@@ -187,54 +89,54 @@
       <span class="pill hidden" id="viewerStatus"></span>
       <span class="font-mono text-xs text-subtle hidden" id="viewerMeta"></span>
       <div style="flex:1"></div>
-      <select class="filter-select" id="jobSelector" style="max-width:260px;font-size:12.5px" aria-label="Select a completed job">
-        <option value="">— Select a completed job —</option>
+      <select class="filter-select" id="jobSelector" style="max-width:280px;font-size:12.5px">
+        <option value="">— Select a job —</option>
       </select>
       <div class="viewer-divider"></div>
-      <button class="btn btn-secondary btn-sm" id="dlOrigBtn"    disabled aria-label="Download original PDF">
+      <button class="btn btn-secondary btn-sm" id="dlOrigBtn" disabled>
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Original
       </button>
-      <button class="btn btn-primary btn-sm" id="dlRedactBtn"  disabled aria-label="Download redacted PDF">
+      <button class="btn btn-primary btn-sm" id="dlRedactBtn" disabled>
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Redacted PDF
       </button>
-      <button class="btn btn-secondary btn-sm" id="exportFieldsBtn" disabled aria-label="Export extracted fields as CSV">
+      <button class="btn btn-secondary btn-sm" id="exportFieldsBtn" disabled>
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Fields CSV
       </button>
     </div>
 
-    <!-- ── Three-pane viewer ─────────────────────────── -->
+    <!-- Three-pane viewer -->
     <div class="viewer-content">
 
       <!-- Original -->
       <div class="viewer-pane">
         <div class="pane-hd">
-          <div class="pane-label orig" aria-label="Original document">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
+          <div class="pane-label orig">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
             Original
           </div>
           <div class="zoom-group">
-            <button class="zoom-btn" id="oZoomOut" aria-label="Zoom out">−</button>
+            <button class="zoom-btn" id="oZoomOut">−</button>
             <span class="zoom-val" id="oZoomVal">100%</span>
-            <button class="zoom-btn" id="oZoomIn"  aria-label="Zoom in">+</button>
+            <button class="zoom-btn" id="oZoomIn">+</button>
           </div>
         </div>
         <div class="pane-body" id="origBody">
           <div class="pane-empty" id="origEmpty">
-            <div class="pane-empty-icon" aria-hidden="true">
+            <div class="pane-empty-icon">
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
             </div>
             <div style="font-size:13px;line-height:1.65">Select a completed job<br/>from the toolbar above</div>
           </div>
-          <iframe id="origFrame" class="hidden" title="Original PDF document" aria-label="Original document viewer"></iframe>
+          <iframe id="origFrame" class="hidden" title="Original PDF"></iframe>
         </div>
         <div class="pane-footer">
           <div class="page-nav">
-            <button class="page-nav-btn" id="oPrev" disabled aria-label="Previous page">‹</button>
+            <button class="page-nav-btn" id="oPrev" disabled>‹</button>
             <span class="page-val" id="oPage">1 / 1</span>
-            <button class="page-nav-btn" id="oNext" disabled aria-label="Next page">›</button>
+            <button class="page-nav-btn" id="oNext" disabled>›</button>
           </div>
           <div style="flex:1"></div>
           <span class="font-mono text-xs text-subtle" id="origSizeLabel"></span>
@@ -244,30 +146,30 @@
       <!-- Redacted -->
       <div class="viewer-pane">
         <div class="pane-hd">
-          <div class="pane-label redacted" aria-label="Redacted document">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
+          <div class="pane-label redacted">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
             Redacted
           </div>
           <div class="zoom-group">
-            <button class="zoom-btn" id="rZoomOut" aria-label="Zoom out">−</button>
+            <button class="zoom-btn" id="rZoomOut">−</button>
             <span class="zoom-val" id="rZoomVal">100%</span>
-            <button class="zoom-btn" id="rZoomIn"  aria-label="Zoom in">+</button>
+            <button class="zoom-btn" id="rZoomIn">+</button>
           </div>
         </div>
         <div class="pane-body" id="redBody">
           <div class="pane-empty" id="redEmpty">
-            <div class="pane-empty-icon" aria-hidden="true">
+            <div class="pane-empty-icon">
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
             </div>
             <div style="font-size:13px;line-height:1.65">Redacted document will<br/>appear here after job completes</div>
           </div>
-          <iframe id="redFrame" class="hidden" title="Redacted PDF document" aria-label="Redacted document viewer"></iframe>
+          <iframe id="redFrame" class="hidden" title="Redacted PDF"></iframe>
         </div>
         <div class="pane-footer">
           <div class="page-nav">
-            <button class="page-nav-btn" id="rPrev" disabled aria-label="Previous page">‹</button>
+            <button class="page-nav-btn" id="rPrev" disabled>‹</button>
             <span class="page-val" id="rPage">1 / 1</span>
-            <button class="page-nav-btn" id="rNext" disabled aria-label="Next page">›</button>
+            <button class="page-nav-btn" id="rNext" disabled>›</button>
           </div>
           <div style="flex:1"></div>
           <span class="font-mono text-xs text-subtle" id="redSizeLabel"></span>
@@ -277,34 +179,29 @@
       <!-- Fields panel -->
       <div class="viewer-pane">
         <div class="pane-hd">
-          <div class="pane-label fields" aria-label="Extracted fields">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="pane-label fields">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Extracted Fields
           </div>
           <span class="font-mono text-xs text-subtle" id="fieldCount">0 fields</span>
         </div>
-
-        <!-- Fields list -->
-        <div class="fields-panel" id="fieldsPanel" aria-live="polite" aria-label="Extracted field data">
+        <div class="fields-panel" id="fieldsPanel">
           <div class="fields-empty">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <div style="font-size:13px;line-height:1.65">Extracted fields from<br/>Document Intelligence<br/>appear here</div>
           </div>
         </div>
-
-        <!-- Cost summary footer -->
         <div class="cost-summary hidden" id="costSummary">
           <div class="font-display font-bold text-xs text-subtle" style="letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Job Cost Breakdown</div>
           <div class="cost-row"><span>Document Intelligence</span><span id="csDocIntel">—</span></div>
-          <div class="cost-row"><span>Azure Blob storage</span>  <span id="csBlobStorage">—</span></div>
+          <div class="cost-row"><span>Azure Blob storage</span><span id="csBlobStorage">—</span></div>
           <div class="cost-row"><span>Power Automate flows</span><span id="csPaFlow">—</span></div>
-          <div class="cost-row"><span>Notifications</span>       <span id="csEmail">—</span></div>
-          <div class="cost-row total"><span>Total</span>         <span id="csTotal">—</span></div>
+          <div class="cost-row"><span>Notifications</span><span id="csEmail">—</span></div>
+          <div class="cost-row total"><span>Total</span><span id="csTotal">—</span></div>
         </div>
       </div>
 
-    </div><!-- /.viewer-content -->
-
+    </div>
   </main>
 </div>
 
@@ -326,37 +223,46 @@
   let currentJob = null;
   let oZoom = 100, rZoom = 100;
 
-  /* ── Populate job selector ────────────────────────── */
-  function populateSelector() {
-    const sel  = $('jobSelector');
-    if (!sel) return;
-    const done = loadJobs().filter(j => (j.status || '').toLowerCase() === 'complete');
-    if (!done.length) {
-      sel.innerHTML = '<option value="">No completed jobs yet</option>';
-      return;
-    }
-    const opts = done.map(j =>
-      `<option value="${j.jobId}">${fmt.trunc(j.fileName, 40)} — ${fmt.date(j.submittedAt)}</option>`
-    ).join('');
-    sel.innerHTML = '<option value="">— Select a completed job —</option>' + opts;
+  /* ── PDF viewer helper — uses Google Docs viewer to bypass CORS ── */
+  function pdfViewerUrl(blobUrl) {
+    if (!blobUrl) return null;
+    // Google Docs viewer can render public Azure Blob PDFs
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(blobUrl)}&embedded=true`;
   }
 
-  /* ── Load a job into viewer ───────────────────────── */
+  /* ── Populate job selector — show ALL jobs not just complete ── */
+  function populateSelector() {
+    const sel = $('jobSelector');
+    if (!sel) return;
+    const jobs = loadJobs();
+    if (!jobs.length) {
+      sel.innerHTML = '<option value="">No jobs yet</option>';
+      return;
+    }
+    // Show all jobs — complete ones will have PDF preview, others will show status
+    const opts = jobs.map(j => {
+      const status = (j.status || 'unknown').toLowerCase();
+      const label  = status === 'complete' ? '✓' : status === 'queued' ? '⏳' : status === 'processing' ? '⚙' : '?';
+      return `<option value="${j.jobId}">${label} ${fmt.trunc(j.fileName, 38)} — ${fmt.date(j.submittedAt)}</option>`;
+    }).join('');
+    sel.innerHTML = '<option value="">— Select a job —</option>' + opts;
+  }
+
+  /* ── Load a job into viewer ── */
   function loadJob(jobId) {
     if (!jobId) return;
-    const jobs = loadJobs();
-    const j    = jobs.find(x => x.jobId === jobId);
-    if (!j) { showToast('Job not found in local history', 'warn'); return; }
+    const j = loadJobs().find(x => x.jobId === jobId);
+    if (!j) { showToast('Job not found', 'warn'); return; }
     currentJob = j;
 
-    // Toolbar meta
-    const fnEl = $('viewerFileName');
-    if (fnEl) fnEl.textContent = fmt.trunc(j.fileName, 42);
+    const status = (j.status || '').toLowerCase();
 
+    // Toolbar
+    setText('viewerFileName', fmt.trunc(j.fileName, 42));
     const stEl = $('viewerStatus');
     if (stEl) {
-      stEl.className  = `pill ${(j.status||'').toLowerCase() === 'complete' ? 'pill-complete' : 'pill-processing'}`;
-      stEl.textContent = j.status || '—';
+      stEl.className  = `pill ${status === 'complete' ? 'pill-complete' : status === 'processing' ? 'pill-processing' : 'pill-queued'}`;
+      stEl.textContent = j.status || 'Unknown';
       stEl.classList.remove('hidden');
     }
     const metaEl = $('viewerMeta');
@@ -365,76 +271,92 @@
       metaEl.classList.remove('hidden');
     }
 
-    // Load frames
-    loadFrame('orig',  j.blobUrl, 'origFrame', 'origEmpty', 'origSizeLabel', fmt.bytes(j.fileSize));
-    loadFrame('red',   j.resultUrl, 'redFrame', 'redEmpty',  'redSizeLabel', j.resultUrl ? 'Redacted' : '');
+    // Load original PDF — use Google Docs viewer for cross-origin support
+    if (j.blobUrl) {
+      loadFrame('origFrame', 'origEmpty', pdfViewerUrl(j.blobUrl), fmt.bytes(j.fileSize), 'origSizeLabel');
+    } else {
+      showEmptyPane('origFrame', 'origEmpty', 'Original PDF not available');
+    }
 
-    // Enable/disable toolbar buttons
+    // Load redacted PDF
+    if (j.resultUrl) {
+      loadFrame('redFrame', 'redEmpty', pdfViewerUrl(j.resultUrl), 'Redacted', 'redSizeLabel');
+    } else {
+      showEmptyPane('redFrame', 'redEmpty',
+        status === 'complete' ? 'Redacted PDF not available' :
+        status === 'queued'   ? 'Processing queued — check back soon' :
+        status === 'processing' ? 'Redaction in progress…' :
+        'Job not yet complete'
+      );
+    }
+
+    // Buttons
     $('dlOrigBtn').disabled    = !j.blobUrl;
     $('dlRedactBtn').disabled  = !j.resultUrl;
     $('exportFieldsBtn').disabled = false;
+    if (j.blobUrl)   $('dlOrigBtn').onclick   = () => window.open(j.blobUrl,   '_blank');
+    if (j.resultUrl) $('dlRedactBtn').onclick = () => window.open(j.resultUrl, '_blank');
 
-    if (j.blobUrl)    $('dlOrigBtn').onclick    = () => window.open(j.blobUrl,   '_blank');
-    if (j.resultUrl)  $('dlRedactBtn').onclick  = () => window.open(j.resultUrl, '_blank');
-
-    // Page indicators
+    // Page count
     const pages = j.pageCount || 1;
-    ['oPage','rPage'].forEach(id => { const el=$(id); if(el) el.textContent = `1 / ${pages}`; });
+    ['oPage','rPage'].forEach(id => setText(id, `1 / ${pages}`));
 
-    // Fields
     renderFields(j);
     renderCostSummary(j);
   }
 
-  function loadFrame(which, url, frameId, emptyId, sizeId, sizeLabel) {
-    const frame = $(frameId);
-    const empty = $(emptyId);
-    const sizeEl = $(sizeId);
-
-    if (!url) {
-      frame?.classList.add('hidden');
-      empty?.classList.remove('hidden');
-      return;
-    }
-    if (sizeEl) sizeEl.textContent = sizeLabel;
-    frame.src = url + '#toolbar=1&navpanes=0';
+  function loadFrame(frameId, emptyId, url, sizeLabel, sizeLabelId) {
+    const frame  = $(frameId);
+    const empty  = $(emptyId);
+    const sizeEl = $(sizeLabelId);
+    if (!frame) return;
+    if (sizeEl) sizeEl.textContent = sizeLabel || '';
+    frame.src = url;
     frame.classList.remove('hidden');
     empty?.classList.add('hidden');
-    applyZoom(which, which === 'orig' ? oZoom : rZoom);
   }
 
-  /* ── Zoom ─────────────────────────────────────────── */
+  function showEmptyPane(frameId, emptyId, message) {
+    const frame = $(frameId);
+    const empty = $(emptyId);
+    frame?.classList.add('hidden');
+    if (empty) {
+      empty.classList.remove('hidden');
+      const msgEl = empty.querySelector('div[style]');
+      if (msgEl) msgEl.textContent = message;
+    }
+  }
+
+  function setText(id, val) { const el=$(id); if(el) el.textContent=val; }
+
+  /* ── Zoom ── */
   function applyZoom(which, pct) {
     const frame = $(which === 'orig' ? 'origFrame' : 'redFrame');
     const label = $(which === 'orig' ? 'oZoomVal'  : 'rZoomVal');
     if (!frame || frame.classList.contains('hidden')) return;
-    frame.style.transform = `scale(${pct / 100})`;
+    frame.style.transform = `scale(${pct/100})`;
     frame.style.transformOrigin = 'top center';
     if (label) label.textContent = pct + '%';
   }
 
-  ['o', 'r'].forEach(which => {
-    const inBtn  = $(`${which}ZoomIn`);
-    const outBtn = $(`${which}ZoomOut`);
-    if (inBtn) inBtn.addEventListener('click', () => {
-      if (which === 'o') { oZoom = Math.min(200, oZoom + 20); applyZoom('orig', oZoom); }
-      else               { rZoom = Math.min(200, rZoom + 20); applyZoom('red',  rZoom); }
+  ['o','r'].forEach(w => {
+    $(`${w}ZoomIn`)?.addEventListener('click', () => {
+      if (w==='o') { oZoom=Math.min(200,oZoom+20); applyZoom('orig',oZoom); }
+      else         { rZoom=Math.min(200,rZoom+20); applyZoom('red', rZoom); }
     });
-    if (outBtn) outBtn.addEventListener('click', () => {
-      if (which === 'o') { oZoom = Math.max(50, oZoom - 20); applyZoom('orig', oZoom); }
-      else               { rZoom = Math.max(50, rZoom - 20); applyZoom('red',  rZoom); }
+    $(`${w}ZoomOut`)?.addEventListener('click', () => {
+      if (w==='o') { oZoom=Math.max(50,oZoom-20); applyZoom('orig',oZoom); }
+      else         { rZoom=Math.max(50,rZoom-20); applyZoom('red', rZoom); }
     });
   });
 
-  /* ── Fields panel ─────────────────────────────────── */
+  /* ── Fields ── */
   function renderFields(j) {
     const panel = $('fieldsPanel');
     const count = $('fieldCount');
     if (!panel) return;
-
     const fields = Array.isArray(j.extractedFields) ? j.extractedFields : [];
-    if (count) count.textContent = `${fields.length} field${fields.length !== 1 ? 's' : ''}`;
-
+    if (count) count.textContent = `${fields.length} field${fields.length!==1?'s':''}`;
     if (!fields.length) {
       panel.innerHTML = `<div class="fields-empty">
         <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -442,61 +364,53 @@
       </div>`;
       return;
     }
-
     panel.innerHTML = fields.map(f => {
       const conf    = f.confidence != null ? f.confidence : null;
-      const confPct = conf != null ? (conf * 100).toFixed(1) + '%' : null;
-      const confCls = conf == null ? '' : conf >= 0.9 ? 'conf-high' : conf >= 0.7 ? 'conf-medium' : 'conf-low';
+      const confPct = conf != null ? (conf*100).toFixed(1)+'%' : null;
+      const confCls = conf==null?'':conf>=0.9?'conf-high':conf>=0.7?'conf-medium':'conf-low';
       return `<div class="field-card">
-        <div class="field-key">${f.key || f.name || 'Field'}</div>
-        <div class="field-val">${f.value || '—'}</div>
-        ${confPct ? `<div class="field-conf ${confCls}">Confidence: ${confPct}</div>` : ''}
+        <div class="field-key">${f.key||f.name||'Field'}</div>
+        <div class="field-val">${f.value||'—'}</div>
+        ${confPct?`<div class="field-conf ${confCls}">Confidence: ${confPct}</div>`:''}
       </div>`;
     }).join('');
   }
 
-  /* ── Cost summary ─────────────────────────────────── */
+  /* ── Cost summary ── */
   function renderCostSummary(j) {
     const cs = $('costSummary');
     if (!cs) return;
     if (!j.costTotal && !j.pageCount) { cs.classList.add('hidden'); return; }
     cs.classList.remove('hidden');
-
-    const cost = calcJobCost(j.pageCount || 1, fmt.mb(j.fileSize));
-    const set  = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    const cost = calcJobCost(j.pageCount||1, fmt.mb(j.fileSize));
+    const set  = (id,v) => { const el=$(id); if(el) el.textContent=v; };
     set('csDocIntel',    fmt.usd(cost.docIntel));
     set('csBlobStorage', fmt.usd(cost.blob));
     set('csPaFlow',      fmt.usd(cost.paFlow));
     set('csEmail',       fmt.usd(cost.email));
-    set('csTotal',       j.costTotal != null ? fmt.usd(j.costTotal) : cost.totalFmt);
+    set('csTotal',       j.costTotal!=null ? fmt.usd(j.costTotal) : cost.totalFmt);
   }
 
-  /* ── Export fields CSV ────────────────────────────── */
+  /* ── Export fields CSV ── */
   $('exportFieldsBtn')?.addEventListener('click', () => {
-    if (!currentJob) { showToast('No job loaded', 'warn'); return; }
+    if (!currentJob) { showToast('No job loaded','warn'); return; }
     const fields = Array.isArray(currentJob.extractedFields) ? currentJob.extractedFields : [];
-    if (!fields.length) { showToast('No fields to export', 'warn'); return; }
-    exportCSV(
-      fields.map(f => ({ Field: f.key || f.name, Value: f.value, Confidence: f.confidence ?? '' })),
-      `fields-${currentJob.jobId.slice(0, 8)}.csv`
-    );
+    if (!fields.length) { showToast('No fields to export','warn'); return; }
+    exportCSV(fields.map(f=>({Field:f.key||f.name,Value:f.value,Confidence:f.confidence??''})), `fields-${currentJob.jobId.slice(0,8)}.csv`);
   });
 
-  /* ── Job selector change ──────────────────────────── */
-  $('jobSelector')?.addEventListener('change', e => {
-    if (e.target.value) loadJob(e.target.value);
-  });
+  /* ── Job selector ── */
+  $('jobSelector')?.addEventListener('change', e => { if(e.target.value) loadJob(e.target.value); });
 
-  /* ── URL param auto-load ──────────────────────────── */
+  /* ── Auto-load from URL param ── */
   const urlJobId = new URLSearchParams(location.search).get('jobId');
-
   populateSelector();
-
   if (urlJobId) {
     const sel = $('jobSelector');
     if (sel) {
       const opt = [...sel.options].find(o => o.value === urlJobId);
       if (opt) { sel.value = urlJobId; loadJob(urlJobId); }
+      else { loadJob(urlJobId); } // Try loading even if not in selector
     }
   }
 
