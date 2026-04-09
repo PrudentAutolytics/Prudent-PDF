@@ -11,6 +11,31 @@
 .right-col           { display:flex;flex-direction:column;gap:22px; }
 .activity-wrap       { display:flex;flex-direction:column; }
 .tbl-row-processing td { background:var(--blue-pale)!important; }
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  border-radius:6px;
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  display:inline-block;
+}
+.skeleton-val  { height:36px; width:60px; }
+.skeleton-note { height:14px; width:100px; margin-top:6px; }
+.skeleton-row  { height:44px; width:100%; border-radius:8px; }
+
+/* ── Keyboard shortcut badge ── */
+.kbd-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  font-family:var(--mono); font-size:10px; font-weight:600;
+  color:var(--ink3); background:var(--surface2);
+  border:1px solid var(--border2); border-radius:5px;
+  padding:1px 5px; vertical-align:middle; margin-left:6px;
+}
 </style>
 </head>
 <body>
@@ -30,16 +55,16 @@
       <div class="welcome-actions">
         <button class="btn btn-white" id="openUploadBtn" style="padding:12px 24px;font-size:13.5px;font-weight:700">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Upload PDF
+          Upload PDF <span class="kbd-badge">N</span>
         </button>
       </div>
     </div>
 
     <div class="stats-grid">
-      <div class="stat-card blue anim d1"><div class="stat-label">Total Jobs (30d)</div><div class="stat-val" id="sTotal">0</div><div class="stat-note" id="sTotalNote">Loading…</div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.4"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.4"/></svg></div></div>
-      <div class="stat-card green anim d2"><div class="stat-label">Completed</div><div class="stat-val" id="sDone">0</div><div class="stat-note" id="sDoneNote">—</div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-      <div class="stat-card amber anim d3"><div class="stat-label">Total Cost (30d)</div><div class="stat-val" id="sCost">$0.0000</div><div class="stat-note" id="sCostNote">0 completed jobs</div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.4"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div></div>
-      <div class="stat-card violet anim d4"><div class="stat-label">Credits Remaining</div><div class="stat-val" id="sCredits">—</div><div class="stat-note" id="sCreditsNote">—</div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div></div>
+      <div class="stat-card blue anim d1"><div class="stat-label">Total Jobs (30d)</div><div class="stat-val" id="sTotal"><span class="skeleton skeleton-val"></span></div><div class="stat-note" id="sTotalNote"><span class="skeleton skeleton-note"></span></div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.4"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.4"/></svg></div></div>
+      <div class="stat-card green anim d2"><div class="stat-label">Completed</div><div class="stat-val" id="sDone"><span class="skeleton skeleton-val"></span></div><div class="stat-note" id="sDoneNote"><span class="skeleton skeleton-note"></span></div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="stat-card amber anim d3"><div class="stat-label">Total Cost (30d)</div><div class="stat-val" id="sCost"><span class="skeleton skeleton-val"></span></div><div class="stat-note" id="sCostNote"><span class="skeleton skeleton-note"></span></div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.4"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div></div>
+      <div class="stat-card violet anim d4"><div class="stat-label">Credits Remaining</div><div class="stat-val" id="sCredits"><span class="skeleton skeleton-val"></span></div><div class="stat-note" id="sCreditsNote"><span class="skeleton skeleton-note"></span></div><div class="stat-bg-icon"><svg width="44" height="44" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div></div>
     </div>
 
     <div class="two-col anim d2">
@@ -53,7 +78,7 @@
         </div>
         <div class="tbl-wrap">
           <table class="tbl"><thead><tr><th>File</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead>
-          <tbody id="recentBody"><tr><td colspan="4"><div class="tbl-empty"><div class="tbl-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div><div class="tbl-empty-title">Loading jobs…</div></div></td></tr></tbody>
+          <tbody id="recentBody"><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:180px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:110px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:210px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:130px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:150px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:95px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr></tbody>
           </table>
         </div>
         <div class="card-footer"><span class="text-sm text-subtle" id="recentMeta">—</span><div style="flex:1"></div><button class="btn btn-ghost btn-sm" id="exportRecentBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Export CSV</button></div>
@@ -74,7 +99,7 @@
             <a href="/pricing" class="btn btn-sm btn-secondary" style="font-size:11.5px">View breakdown →</a>
           </div>
           <div class="card-body" style="padding:12px 20px 16px">
-            <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px">Average cost per processed document. Azure Document Intelligence charges $0.001/page.</div>
+            <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px">Average cost per processed document. Azure Document Intelligence pricing: OCR $1.50 + PII $10.00 per 1,000 pages (~$0.043/page).</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
               <div style="background:var(--amber-pale);border:1px solid var(--amber-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:5px">Avg / file</div><div class="font-display font-bold" id="avgCost" style="font-size:18px;color:var(--amber)">$0.0000</div></div>
               <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Total pages</div><div class="font-display font-bold" id="totalPages" style="font-size:18px;color:var(--ink)">0</div></div>
@@ -119,8 +144,8 @@
         <div class="dropzone-sub">or click to browse files</div>
         <div class="dropzone-constraints">
           <div class="dropzone-constraint"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.7"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.7"/></svg> PDF only</div>
-          <div class="dropzone-constraint"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Max 50 MB</div>
-          <div class="dropzone-constraint"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Any page count</div>
+          <div class="dropzone-constraint"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Max <span id="dropzoneMaxSize">10</span> MB</div>
+          <div class="dropzone-constraint"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Max <span id="dropzoneMaxPages">50</span> pages</div>
         </div>
       </div>
       <div class="file-preview hidden" id="filePreview">
@@ -166,15 +191,26 @@
   const $       = id => document.getElementById(id);
   const email   = session?.email || '';
 
-  /* ── Greeting ── */
+  /* ── Greeting — always prefer fullName from session ── */
   const greetEl = $('welcomeTitle');
-  if (greetEl && email) {
+  if (greetEl) {
     const s    = Session.get() || {};
-    const name = s.fullName || email.split('@')[0]
-      .replace(/[._-]+/g, ' ')
-      .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    const name = s.fullName
+      || (email ? email.split('@')[0].replace(/[._-]+/g,' ').replace(/\w\S*/g,w=>w[0].toUpperCase()+w.slice(1).toLowerCase()) : 'there');
     greetEl.textContent = `${greeting()}, ${name} 👋`;
   }
+
+  /* ── Dynamic dropzone constraints from session plan ── */
+  function updateDropzoneConstraints() {
+    const s     = Session.get() || {};
+    const maxMB = s.maxFileSizeMB   || APP_CONFIG.PLANS?.[s.plan||'trial']?.maxFileSizeMB   || 10;
+    const maxPg = s.maxPagesPerFile || APP_CONFIG.PLANS?.[s.plan||'trial']?.maxPagesPerFile  || 50;
+    const sizeEl = $('dropzoneMaxSize');
+    const pageEl = $('dropzoneMaxPages');
+    if (sizeEl) sizeEl.textContent = maxMB;
+    if (pageEl) pageEl.textContent = maxPg;
+  }
+  updateDropzoneConstraints();
 
   /* ══════════════════════════════════════════════════════
      JOBS — driven entirely from Supabase via jobs-list API
@@ -215,7 +251,7 @@
   function renderStats() {
     const s     = Session.get() || {};
     const used  = s.creditsUsed  ?? 0;
-    const limit = s.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
+    const limit = s.creditsLimit ?? APP_CONFIG.PLANS?.trial?.filesPerMonth ?? 5;
     const done  = allJobs.filter(j => (j.status || '').toLowerCase() === 'complete');
     const total = allJobs.length;
     const cost  = done.reduce((sum, j) => sum + (+(j.costTotal || 0)), 0);
@@ -224,6 +260,7 @@
     const avgPgs = done.length ? pages / done.length : 0;
     const rate   = total ? Math.round(done.length / total * 100) : 0;
 
+    // Clear skeletons and set real values
     setText('sTotal',       String(total));
     setText('sTotalNote',   total === 1 ? '1 document' : `${total} documents`);
     setText('sDone',        String(done.length));
@@ -231,7 +268,11 @@
     setText('sCost',        '$' + cost.toFixed(4));
     setText('sCostNote',    `${done.length} completed job${done.length !== 1 ? 's' : ''}`);
     setText('sCredits',     String(Math.max(0, limit - used)));
-    setText('sCreditsNote', `${used} of ${limit} used`);
+    setText('sCreditsNote', `${used} of ${limit} used · ${s.planLabel || s.plan || 'Trial'}`);
+    setText('avgCost',      done.length ? fmt.usd(avgCst)   : '$0.0000');
+    setText('totalPages',   pages > 0   ? String(pages)     : '0');
+    setText('avgPages',     done.length ? avgPgs.toFixed(1) : '0');
+    setText('sCostInsight', '$' + cost.toFixed(4));
     setText('avgCost',      done.length ? fmt.usd(avgCst)   : '$0.0000');
     setText('totalPages',   pages > 0   ? String(pages)     : '0');
     setText('avgPages',     done.length ? avgPgs.toFixed(1) : '0');
@@ -241,6 +282,8 @@
       srEl.textContent = total ? rate + '%' : '0%';
       srEl.style.color = total === 0 ? 'var(--ink3)' : rate >= 90 ? 'var(--green)' : rate >= 70 ? 'var(--amber)' : 'var(--red)';
     }
+    // Update dropzone constraints in case plan changed
+    updateDropzoneConstraints();
   }
 
   function setText(id, val) { const el=$(id); if(el) el.textContent=val; }
@@ -267,10 +310,26 @@
     }
 
     if (!jobs.length) {
-      tbody.innerHTML = `<tr><td colspan="4"><div class="tbl-empty">
-        <div class="tbl-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
-        <div class="tbl-empty-title">No jobs yet</div>
-        <div class="tbl-empty-sub">Click <strong>Upload PDF</strong> above to get started</div>
+      tbody.innerHTML = `<tr><td colspan="4"><div class="tbl-empty" style="padding:40px 24px">
+        <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;opacity:.7">
+          <rect x="20" y="10" width="52" height="66" rx="6" fill="var(--surface2)" stroke="var(--border2)" stroke-width="1.5"/>
+          <rect x="28" y="24" width="28" height="3" rx="1.5" fill="var(--border2)"/>
+          <rect x="28" y="32" width="36" height="3" rx="1.5" fill="var(--border2)"/>
+          <rect x="28" y="40" width="22" height="3" rx="1.5" fill="var(--border2)"/>
+          <rect x="28" y="48" width="30" height="3" rx="1.5" fill="var(--border2)"/>
+          <path d="M34 14h24l10 10v8H34V14z" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1.2"/>
+          <path d="M58 14v10h10" stroke="var(--blue-bd)" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="85" cy="68" r="22" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1.5"/>
+          <path d="M85 60v8M85 72h.01" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M78 55l7-7 7 7M85 48v16" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="tbl-empty-title" style="font-size:15px;font-weight:700;margin-bottom:6px">No jobs yet</div>
+        <div class="tbl-empty-sub" style="margin-bottom:16px">Upload your first PDF to get started with AI-powered redaction</div>
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('openUploadBtn')?.click()">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Upload your first PDF
+        </button>
+      </div></td></tr>`;
       </div></td></tr>`;
       if (meta) meta.textContent = 'No jobs in history';
       return;
@@ -352,7 +411,14 @@
           const j = getJob(jobId);
           if (status.toLowerCase() === 'complete') {
             addActivity(`✓ Completed: ${fmt.trunc(j?.fileName || jobId, 30)}`, 'success');
-            showToast('Redaction complete! Your file is ready.', 'success', 6000);
+            showToast('Redaction complete! Your file is ready to download.', 'success', 8000);
+            // Browser notification if tab not focused
+            if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+              new Notification('Prudent PDF — Redaction Complete', {
+                body : `${j?.fileName || 'Your file'} is ready to download.`,
+                icon : '/favicon.svg',
+              });
+            }
           } else {
             addActivity(`✕ Failed: ${fmt.trunc(j?.fileName || jobId, 30)}`, 'error');
             showToast('Job failed. Check history for details.', 'error');
@@ -393,40 +459,69 @@
   }
 
   function updateQuotaHint() {
-    const s=Session.get()||{}; const rem=Math.max(0,(s.creditsLimit??APP_CONFIG.TRIAL.MAX_FILES)-(s.creditsUsed??0));
-    const hint=$('quotaHint'); if(!hint) return;
-    if(rem<=0){hint.innerHTML=`<span style="color:var(--red)">⚠ No credits — <a href="/pricing" style="color:var(--red)">upgrade</a></span>`;$('submitBtn').disabled=true;}
-    else hint.textContent=`${rem} credit${rem!==1?'s':''} remaining`;
+    const s       = Session.get() || {};
+    const used    = s.creditsUsed  ?? 0;
+    const limit   = s.creditsLimit ?? APP_CONFIG.PLANS.trial.filesPerMonth;
+    const rem     = Math.max(0, limit - used);
+    const maxMB   = s.maxFileSizeMB   || APP_CONFIG.PLANS.trial.maxFileSizeMB;
+    const maxPg   = s.maxPagesPerFile || APP_CONFIG.PLANS.trial.maxPagesPerFile;
+    const plan    = s.planLabel       || s.plan || 'trial';
+    const hint    = $('quotaHint');
+    if (!hint) return;
+    if (rem <= 0) {
+      hint.innerHTML = `<span style="color:var(--red)">⚠ No files remaining — <a href="/pricing" style="color:var(--red)">upgrade</a></span>`;
+      $('submitBtn').disabled = true;
+    } else {
+      hint.innerHTML = `<span>${rem} file${rem!==1?'s':''} left</span> <span style="color:var(--ink3);margin:0 4px">·</span> <span style="color:var(--ink3)">Max ${maxMB} MB · ${maxPg} pages</span>`;
+    }
   }
 
   async function handleFile(file) {
-    if(!file) return;
-    if(file.type!=='application/pdf'){showToast('Only PDF files are accepted.','warn');return;}
-    if(file.size>APP_CONFIG.UPLOAD.MAX_BYTES){showToast(`Max size is ${APP_CONFIG.TRIAL.MAX_SIZE_MB} MB.`,'warn');return;}
-    const s=Session.get()||{};
-    const rem=Math.max(0,(s.creditsLimit??APP_CONFIG.TRIAL.MAX_FILES)-(s.creditsUsed??0));
-    if(rem<=0){showToast('No credits remaining.','error');return;}
-    selectedFile=file;
-    $('filePreviewName').textContent=fmt.trunc(file.name,50);
-    $('filePreviewMeta').textContent=`${fmt.bytes(file.size)} · PDF`;
+    if (!file) return;
+    if (file.type !== 'application/pdf') { showToast('Only PDF files are accepted.', 'warn'); return; }
+
+    const s      = Session.get() || {};
+    const maxMB  = s.maxFileSizeMB   || APP_CONFIG.PLANS[s.plan || 'trial']?.maxFileSizeMB   || 10;
+    const maxPg  = s.maxPagesPerFile || APP_CONFIG.PLANS[s.plan || 'trial']?.maxPagesPerFile  || 50;
+    const maxBytes = maxMB * 1024 * 1024;
+
+    if (file.size > maxBytes) {
+      showToast(`File too large. Your ${s.planLabel || 'plan'} allows up to ${maxMB} MB per file.`, 'error');
+      return;
+    }
+
+    const rem = Math.max(0, (s.creditsLimit ?? APP_CONFIG.PLANS.trial.filesPerMonth) - (s.creditsUsed ?? 0));
+    if (rem <= 0) { showToast('No files remaining. Please upgrade your plan.', 'error'); return; }
+
+    selectedFile = file;
+    $('filePreviewName').textContent = fmt.trunc(file.name, 50);
+    $('filePreviewMeta').textContent = `${fmt.bytes(file.size)} · PDF`;
     $('filePreview').classList.remove('hidden');
     $('dropzone').classList.add('hidden');
-    $('submitBtn').disabled=false;
+    $('submitBtn').disabled = false;
     updateQuotaHint();
-    const estPages=Math.max(1,Math.round(file.size/60_000));
-    estimatedCost=calcJobCost(estPages,fmt.mb(file.size));
-    $('costDocIntel').textContent=fmt.usd(estimatedCost.docIntel);
-    $('costInfra').textContent=fmt.usd(estimatedCost.blob+estimatedCost.paFlow+estimatedCost.functions);
-    $('costTotal').textContent=estimatedCost.totalFmt;
+
+    // Estimate pages from file size (~60KB per page)
+    const estPages = Math.max(1, Math.round(file.size / 60_000));
+
+    // Warn if estimated pages may exceed plan limit
+    if (estPages > maxPg) {
+      showToast(`Warning: this file may exceed your ${maxPg}-page limit. Large files may be rejected after processing.`, 'warn', 6000);
+    }
+
+    estimatedCost = calcJobCost(estPages, fmt.mb(file.size));
+    $('costDocIntel').textContent = fmt.usd(estimatedCost.docIntel);
+    $('costInfra').textContent    = fmt.usd((estimatedCost.blob || 0) + (estimatedCost.paFlow || 0));
+    $('costTotal').textContent    = estimatedCost.totalFmt;
     $('costPreviewWrap').classList.remove('hidden');
   }
 
   /* ── Submit job ── */
   async function submitJob() {
     if(!selectedFile) return;
-    const s=Session.get()||{};
-    const rem=Math.max(0,(s.creditsLimit??APP_CONFIG.TRIAL.MAX_FILES)-(s.creditsUsed??0));
-    if(rem<=0){showToast('No credits remaining.','error');return;}
+    const s   = Session.get() || {};
+    const rem = Math.max(0, (s.creditsLimit ?? APP_CONFIG.PLANS.trial.filesPerMonth) - (s.creditsUsed ?? 0));
+    if (rem <= 0) { showToast('No files remaining. Please upgrade your plan.', 'error'); return; }
 
     const btn=$('submitBtn');
     btn.disabled=true;
@@ -437,9 +532,9 @@
 
     try {
       const checksum = await sha256(selectedFile);
-      setUploadProgress(15,'Encoding file…');
+      setUploadProgress(15, 'Encoding file…');
       const base64 = await fileToBase64(selectedFile);
-      setUploadProgress(40,'Getting upload URL…');
+      setUploadProgress(40, 'Getting upload URL…');
 
       const jobId = genUUID();
       let blobUrl  = null;
@@ -447,32 +542,32 @@
 
       // Get SAS URL from blob-sas — it defines the blob name
       if (APP_CONFIG.FLOWS.BLOB_SAS) {
-        setUploadProgress(45,'Getting secure upload URL…');
+        setUploadProgress(45, 'Getting secure upload URL…');
         const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
           email, fileName: selectedFile.name, jobId,
         });
         if (sasRes?.sasUrl) {
-          setUploadProgress(55,'Uploading PDF to Azure Blob…');
+          setUploadProgress(55, 'Uploading PDF to Azure Blob…');
           const uploadRes = await fetch(sasRes.sasUrl, {
-            method:'PUT',
-            headers:{'x-ms-blob-type':'BlockBlob','Content-Type':'application/pdf'},
-            body:selectedFile,
+            method  : 'PUT',
+            headers : { 'x-ms-blob-type': 'BlockBlob', 'Content-Type': 'application/pdf' },
+            body    : selectedFile,
           });
           if (!uploadRes.ok) throw new Error(`Blob upload failed (${uploadRes.status})`);
-          blobUrl  = sasRes.blobUrl;   // exact URL from blob-sas
-          blobName = sasRes.blobName;  // exact name from blob-sas
-          setUploadProgress(75,'File uploaded. Triggering PA flow…');
+          blobUrl  = sasRes.blobUrl;
+          blobName = sasRes.blobName;
+          setUploadProgress(75, 'File uploaded. Triggering PA flow…');
         }
       }
 
-      // Submit job — PA flow is triggered inside jobs-submit
+      // Submit job — includes base64 for PA to process directly
       const res = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, {
         jobId,
         email,
         fileName   : selectedFile.name,
-        blobName,             // exact name blob-sas created
-        blobUrl,              // exact URL blob-sas created
-        fileBase64 : base64,  // always send for PA to use directly
+        blobName,
+        blobUrl,
+        fileBase64 : base64,
         fileSize   : selectedFile.size,
         fileSizeMB : +fmt.mb(selectedFile.size),
         checksum,
@@ -505,6 +600,10 @@
 
       // Start polling for this job
       startPolling(newJob.jobId);
+      // Request browser notification permission for job complete alerts
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
       renderRecentJobs();
       renderStats();
       Shell.refreshQuota();
@@ -518,8 +617,17 @@
       $('uploadProgressWrap').classList.add('hidden');
       btn.disabled=false;
       btn.innerHTML=`<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Submit for redaction`;
-      showToast(err.message||'Submission failed. Please try again.','error');
-      addActivity(`Error: ${fmt.trunc(err.message||'Submission failed',40)}`,'error');
+      // Sanitise — never expose internal DB/stack errors to user
+      const raw = err.message || '';
+      const userMsg = raw.includes('uuid') || raw.includes('syntax') || raw.includes('relation') || raw.includes('column')
+        ? 'Something went wrong on our end. Please try again.'
+        : raw.includes('quota') || raw.includes('limit') || raw.includes('Quota')
+          ? raw
+          : raw.includes('large') || raw.includes('413')
+            ? raw
+            : raw || 'Submission failed. Please try again.';
+      showToast(userMsg, 'error');
+      addActivity(`Error: ${fmt.trunc(userMsg, 40)}`, 'error');
     }
   }
 
@@ -553,6 +661,12 @@
   /* ── Initial load ── */
   fetchJobsFromSupabase();  // load from Supabase immediately
   updateQuotaHint();
+
+  // Auto-open upload modal if navigated via #upload hash (sidebar "New Redaction")
+  if (location.hash === '#upload') {
+    history.replaceState(null, '', location.pathname);
+    setTimeout(openModal, 300);
+  }
 
 })();
 </script>

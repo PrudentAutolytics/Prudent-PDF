@@ -11,7 +11,7 @@ const Shell = (() => {
       group : 'WORKSPACE',
       items : [
         { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: 'Overview, stats, and quick upload' },
-        { id: 'upload',    label: 'New Redaction',    href: '/dashboard', icon: 'upload',  desc: 'Upload and process a PDF' },
+        { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: 'Upload and process a PDF' },
         { id: 'history',   label: 'Job History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs — last 30 days', badge: '30d' },
         { id: 'viewer',    label: 'Document Viewer',  href: '/viewer',    icon: 'eye',     desc: 'Side-by-side original vs redacted' },
       ],
@@ -83,9 +83,9 @@ const Shell = (() => {
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
   <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
-    <div style="width:48px;height:48px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1.5px solid var(--border2);box-shadow:var(--s2);background:#fff">
-  <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:2px"/>
-</div>
+    <div style="width:42px;height:42px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1.5px solid var(--border2);box-shadow:var(--s2)">
+      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:cover;display:block"/>
+    </div>
     <div>
       <div class="brand-name" style="font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px;line-height:1.1">Prudent PDF</div>
       <div class="brand-tagline" style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-top:2px">Redaction Platform</div>
@@ -201,17 +201,116 @@ const Shell = (() => {
   function wireSearch() {
     const input = document.getElementById('globalSearch');
     if (!input) return;
-    input.addEventListener('keydown', e => {
-      if (e.key !== 'Enter') return;
-      const q = e.target.value.trim().toLowerCase();
-      if (!q) return;
-      const all   = NAV.flatMap(g => g.items);
-      const match = all.find(i => !i.soon && (i.label.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)));
-      location.href = match ? match.href : `/history?q=${encodeURIComponent(q)}`;
+
+    // Create dropdown container
+    const dropdown = document.createElement('div');
+    dropdown.id = 'searchDropdown';
+    Object.assign(dropdown.style, {
+      position:'absolute', top:'100%', left:'0', right:'0', zIndex:'9998',
+      background:'var(--surface)', border:'1px solid var(--border2)',
+      borderRadius:'var(--r12)', boxShadow:'var(--s4)', marginTop:'6px',
+      maxHeight:'320px', overflowY:'auto', display:'none',
     });
+    input.parentElement.style.position = 'relative';
+    input.parentElement.appendChild(dropdown);
+
+    function closeDropdown() { dropdown.style.display = 'none'; }
+
+    function showDropdown(results) {
+      if (!results.length) { closeDropdown(); return; }
+      dropdown.innerHTML = results.map(r => `
+        <div class="search-result-item" data-href="${r.href}"
+          style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s"
+          onmouseover="this.style.background='var(--surface2)'"
+          onmouseout="this.style.background='transparent'">
+          <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:${r.color||'var(--blue-bg)'};display:grid;place-items:center;color:${r.iconColor||'var(--blue)'}">${r.icon}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">${r.label}</div>
+            <div style="font-size:11.5px;color:var(--ink3)">${r.sub}</div>
+          </div>
+          ${r.badge ? `<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${r.badgeBg};color:${r.badgeColor}">${r.badge}</span>` : ''}
+        </div>`).join('');
+      dropdown.style.display = 'block';
+      dropdown.querySelectorAll('.search-result-item').forEach(el => {
+        el.addEventListener('click', () => { closeDropdown(); location.href = el.dataset.href; });
+      });
+    }
+
+    function search(q) {
+      if (!q || q.length < 1) { closeDropdown(); return; }
+      const results = [];
+
+      // Search nav items
+      const navItems = NAV.flatMap(g => g.items);
+      navItems.filter(i => !i.soon && (i.label.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)))
+        .slice(0, 3)
+        .forEach(i => results.push({
+          href: i.href, label: i.label, sub: i.desc,
+          icon: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+          color: 'var(--blue-bg)', iconColor: 'var(--blue)',
+        }));
+
+      // Search recent jobs from localStorage / window cache
+      try {
+        const session = Session.get();
+        const jobKey  = `pp_jobs_${session?.userId || session?.email || 'anon'}`;
+        const jobs    = JSON.parse(localStorage.getItem(jobKey) || '[]');
+        jobs.filter(j => j.fileName?.toLowerCase().includes(q))
+          .slice(0, 4)
+          .forEach(j => {
+            const s = (j.status || '').toLowerCase();
+            results.push({
+              href      : `/viewer?jobId=${j.jobId}`,
+              label     : j.fileName,
+              sub       : `${s} · ${j.submittedAt ? new Date(j.submittedAt).toLocaleDateString('en-GB') : ''}`,
+              icon      : `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>`,
+              color     : s === 'complete' ? 'var(--green-bg)' : 'var(--surface2)',
+              iconColor : s === 'complete' ? 'var(--green)' : 'var(--ink3)',
+              badge     : s === 'complete' ? 'Complete' : s === 'queued' ? 'Queued' : s,
+              badgeBg   : s === 'complete' ? 'var(--green-bg)' : 'var(--surface3)',
+              badgeColor: s === 'complete' ? 'var(--green)' : 'var(--ink3)',
+            });
+          });
+      } catch {}
+
+      // Fallback — search all jobs in history
+      if (!results.find(r => r.href?.includes('history'))) {
+        results.push({
+          href: `/history?q=${encodeURIComponent(q)}`,
+          label: `Search all jobs for "${q}"`,
+          sub  : 'View full results in Job History',
+          icon : `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+          color: 'var(--surface2)', iconColor: 'var(--ink3)',
+        });
+      }
+
+      showDropdown(results);
+    }
+
+    let searchTimer;
+    input.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => search(input.value.trim().toLowerCase()), 180);
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const q = input.value.trim();
+        closeDropdown();
+        if (q) location.href = `/history?q=${encodeURIComponent(q)}`;
+      }
+      if (e.key === 'Escape') { closeDropdown(); input.blur(); }
+    });
+
+    // ⌘K / Ctrl+K to focus
     document.addEventListener('keydown', e => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); input.focus(); input.select(); }
     });
+
+    // Close when clicking outside
+    document.addEventListener('click', e => {
+      if (!input.parentElement.contains(e.target)) closeDropdown();
+    }, true);
   }
 
   function wireUserChip() {
@@ -269,30 +368,88 @@ const Shell = (() => {
     paFetch(APP_CONFIG.FLOWS.QUOTA_GET, { email: s.email })
       .then(data => {
         if (!data) return;
-        const updated = { ...s, creditsUsed: data.creditsUsed ?? s.creditsUsed, creditsLimit: data.creditsLimit ?? s.creditsLimit, plan: data.plan ?? s.plan };
+        // Store ALL plan limits in session so dashboard/upload modal can use them
+        const updated = {
+          ...s,
+          creditsUsed      : data.creditsUsed      ?? s.creditsUsed,
+          creditsLimit     : data.creditsLimit      ?? s.creditsLimit,
+          creditsRemaining : data.creditsRemaining  ?? null,
+          plan             : data.plan              ?? s.plan,
+          planLabel        : data.planLabel         ?? s.planLabel,
+          maxFileSizeMB    : data.maxFileSizeMB     ?? s.maxFileSizeMB,
+          maxFileSizeBytes : data.maxFileSizeBytes  ?? s.maxFileSizeBytes,
+          maxPagesPerFile  : data.maxPagesPerFile   ?? s.maxPagesPerFile,
+          maxPagesPerMonth : data.maxPagesPerMonth  ?? s.maxPagesPerMonth,
+          fullName         : data.fullName          ?? s.fullName,
+        };
         Session.set(updated);
+
+        // Update greeting if fullName just arrived from Supabase
+        const greetEl = document.getElementById('welcomeTitle');
+        if (greetEl && updated.fullName) {
+          const h = new Date().getHours();
+          const greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+          greetEl.textContent = `${greet}, ${updated.fullName} 👋`;
+        }
+
         const used    = updated.creditsUsed  ?? 0;
         const limit   = updated.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
         const pct     = Math.min(100, limit > 0 ? Math.round(used / limit * 100) : 0);
         const remain  = Math.max(0, limit - used);
         const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
+
         const bar = document.getElementById('planBarFill');
         if (bar) { bar.style.width = pct + '%'; bar.className = 'plan-bar-fill ' + fillCls; bar.parentElement?.setAttribute('aria-valuenow', pct); }
+
         const usedEl   = document.getElementById('sidebarUsed');
         const remainEl = document.getElementById('sidebarRemain');
         if (usedEl)   usedEl.innerHTML    = `${used}<span> / ${limit} files</span>`;
         if (remainEl) remainEl.textContent = `${remain} remaining`;
-        if (pct >= 90) { document.getElementById('notifDot')?.classList.remove('hidden'); showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining`, 'warn', 6000); }
+
+        // Update plan label in sidebar
+        const planLabelEl = document.getElementById('sidebarPlanLabel');
+        if (planLabelEl) planLabelEl.textContent = updated.planLabel || updated.plan || 'Free Trial';
+
+        if (pct >= 90) {
+          document.getElementById('notifDot')?.classList.remove('hidden');
+          showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining — consider upgrading`, 'warn', 6000);
+        }
       })
       .catch(() => {});
   }
 
   function wireEscape() {
     document.addEventListener('keydown', e => {
-      if (e.key !== 'Escape') return;
-      document.querySelectorAll('.modal-bg.open').forEach(m => { m.classList.remove('open'); document.body.style.overflow = ''; });
-      const menu = document.getElementById('userMenu');
-      if (menu) closeMenu(menu);
+      // Skip if typing in an input
+      const tag = document.activeElement?.tagName;
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-bg.open').forEach(m => { m.classList.remove('open'); document.body.style.overflow = ''; });
+        const menu = document.getElementById('userMenu');
+        if (menu) closeMenu(menu);
+        return;
+      }
+
+      if (isInput) return;
+
+      // N → open New Redaction modal
+      if (e.key === 'n' || e.key === 'N') {
+        const btn = document.getElementById('openUploadBtn');
+        if (btn) { e.preventDefault(); btn.click(); return; }
+        // If not on dashboard, navigate there
+        if (!location.pathname.includes('dashboard')) location.href = '/dashboard';
+        return;
+      }
+
+      // H → go to history
+      if (e.key === 'h' || e.key === 'H') { e.preventDefault(); location.href = '/history'; return; }
+
+      // V → go to viewer
+      if (e.key === 'v' || e.key === 'V') { e.preventDefault(); location.href = '/viewer'; return; }
+
+      // D → go to dashboard
+      if (e.key === 'd' || e.key === 'D') { e.preventDefault(); location.href = '/dashboard'; return; }
     });
   }
 
@@ -300,6 +457,12 @@ const Shell = (() => {
     init(activeId) {
       if (!requireAuth()) return;
       applyTheme();
+      // Inject favicon
+      if (!document.querySelector('link[rel="icon"]')) {
+        const link = document.createElement('link');
+        link.rel = 'icon'; link.type = 'image/svg+xml'; link.href = '/favicon.svg';
+        document.head.appendChild(link);
+      }
       const wrap = document.getElementById('appShell');
       if (!wrap) { console.error('[Shell] #appShell not found.'); return; }
       const tbEl = document.createElement('div');

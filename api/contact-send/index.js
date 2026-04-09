@@ -59,16 +59,16 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
 <table width="580" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;width:100%">
 
   <!-- Header -->
-  <tr><td style="background:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);border-radius:16px 16px 0 0;padding:28px 32px 24px">
+  <tr><td style="background:#1E3A8A;border-radius:16px 16px 0 0;padding:28px 32px 24px">
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
         <td>
-          <p style="margin:0 0 4px;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65)">PRUDENT PDF · PRUDENT AUTOLYTICS</p>
-          <h1 style="margin:0 0 6px;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">New Contact Message</h1>
-          <p style="margin:0;font-size:12.5px;color:rgba(255,255,255,.75)">${dateStr}</p>
+          <p style="margin:0 0 4px;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ffffff">PRUDENT PDF · PRUDENT AUTOLYTICS</p>
+          <h1 style="margin:0 0 6px;font-size:22px;font-weight:900;color:#FFFFFF;letter-spacing:-.5px">New Contact Message</h1>
+          <p style="margin:0;font-size:12.5px;color:#e0e7ff">${dateStr}</p>
         </td>
         <td align="right" valign="top">
-          <span style="display:inline-block;background:rgba(255,255,255,.18);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap">${subjectLabel}</span>
+          <span style="display:inline-block;background:rgba(255,255,255,.20);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;color:#FFFFFF;white-space:nowrap;border:1px solid rgba(255,255,255,.3)">${subjectLabel}</span>
         </td>
       </tr>
     </table>
@@ -109,7 +109,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #F1F5F9">
       <tr><td style="padding:20px 32px" align="left">
         <a href="mailto:${email}?subject=Re%3A%20${encodeURIComponent(subjectLabel)}%20%E2%80%94%20Prudent%20PDF"
-           style="display:inline-block;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;text-decoration:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;letter-spacing:.01em">
+           style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;letter-spacing:.01em">
           ↩&nbsp; Reply to ${name}
         </a>
       </td></tr>
