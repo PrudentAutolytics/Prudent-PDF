@@ -6,48 +6,17 @@
 <title>Document Viewer — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-.main {
-  padding: 0 !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  height: calc(100vh - var(--topbar-h)) !important;
-}
-.viewer-toolbar {
-  height: 52px; flex-shrink: 0;
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 18px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-}
-.viewer-divider { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
-.viewer-content {
-  flex: 1; min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr 320px;
-  overflow: hidden;
-}
-.viewer-pane {
-  display: flex; flex-direction: column;
-  border-right: 1px solid var(--border);
-  overflow: hidden;
-  position: relative;
-}
-.viewer-pane:last-child { border-right: none; }
-.pane-hd {
-  height: 40px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 14px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-}
+.main { padding:0!important; overflow:hidden!important; display:flex!important; flex-direction:column!important; height:calc(100vh - var(--topbar-h))!important; }
+.viewer-toolbar { height:52px; flex-shrink:0; display:flex; align-items:center; gap:10px; padding:0 18px; background:var(--surface); border-bottom:1px solid var(--border); overflow-x:auto; }
+.viewer-divider { width:1px; height:22px; background:var(--border2); flex-shrink:0; }
+.viewer-content { flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr 320px; overflow:hidden; }
+.viewer-pane { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
+.viewer-pane:last-child { border-right:none; }
+.pane-hd { height:40px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 14px; background:var(--surface2); border-bottom:1px solid var(--border); }
 .pane-label { font-family:var(--display); font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
-.pane-label.orig     { color: var(--ink3); }
-.pane-label.redacted { color: var(--red); }
-.pane-label.fields   { color: var(--blue); }
+.pane-label.orig { color:var(--ink3); } .pane-label.redacted { color:var(--red); } .pane-label.fields { color:var(--blue); }
 .zoom-group { display:flex; align-items:center; gap:4px; }
-.zoom-btn { width:24px; height:24px; border-radius:var(--r4); display:grid; place-items:center; background:var(--surface3); color:var(--ink2); font-size:16px; font-weight:600; cursor:pointer; border:1px solid var(--border2); transition:all var(--dur) var(--ease); }
+.zoom-btn { width:24px; height:24px; border-radius:var(--r4); display:grid; place-items:center; background:var(--surface3); color:var(--ink2); font-size:16px; font-weight:600; cursor:pointer; border:1px solid var(--border2); }
 .zoom-btn:hover { background:var(--surface); color:var(--ink); }
 .zoom-val { font-family:var(--mono); font-size:11px; color:var(--ink3); min-width:38px; text-align:center; }
 .pane-body { flex:1; overflow:auto; background:var(--bg3); display:flex; align-items:flex-start; justify-content:center; padding:16px; }
@@ -56,21 +25,22 @@
 .pane-empty-icon { width:56px; height:56px; border-radius:var(--r14); background:var(--surface2); border:1px solid var(--border); display:grid; place-items:center; color:var(--ink4); }
 .pane-footer { height:40px; flex-shrink:0; display:flex; align-items:center; gap:8px; padding:0 14px; background:var(--surface2); border-top:1px solid var(--border); }
 .page-nav { display:flex; align-items:center; gap:6px; }
-.page-nav-btn { width:26px; height:26px; border-radius:var(--r4); background:var(--surface3); border:1px solid var(--border2); color:var(--ink2); font-size:16px; display:grid; place-items:center; cursor:pointer; transition:all var(--dur) var(--ease); }
+.page-nav-btn { width:26px; height:26px; border-radius:var(--r4); background:var(--surface3); border:1px solid var(--border2); color:var(--ink2); font-size:16px; display:grid; place-items:center; cursor:pointer; }
 .page-nav-btn:hover { background:var(--surface); color:var(--ink); }
 .page-nav-btn:disabled { opacity:.3; pointer-events:none; }
 .page-val { font-family:var(--mono); font-size:11.5px; color:var(--ink3); white-space:nowrap; }
 .fields-panel { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
 .field-card { padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r8); }
 .field-card:hover { border-color:var(--border2); }
-.field-key  { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:3px; }
-.field-val  { font-size:13px; color:var(--ink); font-weight:500; word-break:break-word; }
+.field-key { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:3px; }
+.field-val { font-size:13px; color:var(--ink); font-weight:500; word-break:break-word; }
 .field-conf { font-family:var(--mono); font-size:10px; color:var(--ink3); margin-top:2px; }
 .conf-high { color:var(--green); } .conf-medium { color:var(--amber); } .conf-low { color:var(--red); }
 .fields-empty { display:flex; flex-direction:column; align-items:center; gap:10px; padding:40px 20px; color:var(--ink3); text-align:center; }
 .cost-summary { padding:12px; background:var(--surface); border-top:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
 .cost-row { display:flex; justify-content:space-between; font-size:12px; color:var(--ink3); }
 .cost-row.total { font-family:var(--display); font-weight:700; font-size:13px; color:var(--ink); padding-top:6px; border-top:1px solid var(--border); }
+.pane-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:var(--ink3); }
 </style>
 </head>
 <body>
@@ -78,7 +48,6 @@
 <div class="shell" id="appShell">
   <main class="main main-viewer">
 
-    <!-- Toolbar -->
     <div class="viewer-toolbar" role="toolbar">
       <a href="/history" class="btn btn-ghost btn-sm">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -107,7 +76,6 @@
       </button>
     </div>
 
-    <!-- Three-pane viewer -->
     <div class="viewer-content">
 
       <!-- Original -->
@@ -125,10 +93,8 @@
         </div>
         <div class="pane-body" id="origBody">
           <div class="pane-empty" id="origEmpty">
-            <div class="pane-empty-icon">
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
-            </div>
-            <div style="font-size:13px;line-height:1.65">Select a completed job<br/>from the toolbar above</div>
+            <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="font-size:13px;line-height:1.65" id="origEmptyMsg">Select a job from the toolbar above</div>
           </div>
           <iframe id="origFrame" class="hidden" title="Original PDF"></iframe>
         </div>
@@ -158,10 +124,8 @@
         </div>
         <div class="pane-body" id="redBody">
           <div class="pane-empty" id="redEmpty">
-            <div class="pane-empty-icon">
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
-            </div>
-            <div style="font-size:13px;line-height:1.65">Redacted document will<br/>appear here after job completes</div>
+            <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/></svg></div>
+            <div style="font-size:13px;line-height:1.65" id="redEmptyMsg">Redacted document appears here after job completes</div>
           </div>
           <iframe id="redFrame" class="hidden" title="Redacted PDF"></iframe>
         </div>
@@ -222,34 +186,46 @@
 
   let currentJob = null;
   let oZoom = 100, rZoom = 100;
+  let origSasUrl = null, redSasUrl = null;
 
-  /* ── PDF viewer helper — uses Google Docs viewer to bypass CORS ── */
-  function pdfViewerUrl(blobUrl) {
+  /* ── Get a read SAS URL for a blob ── */
+  async function getReadSasUrl(blobUrl, containerHint) {
     if (!blobUrl) return null;
-    // Google Docs viewer can render public Azure Blob PDFs
-    return `https://docs.google.com/viewer?url=${encodeURIComponent(blobUrl)}&embedded=true`;
+    try {
+      // Extract blobName from the URL
+      const urlParts  = blobUrl.split('/');
+      const blobName  = urlParts[urlParts.length - 1].split('?')[0];
+      const container = containerHint || urlParts[urlParts.length - 2];
+
+      const res = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
+        email     : session.email,
+        blobName  : blobName,
+        container : container,
+        mode      : 'read',
+      });
+      return res?.sasUrl || null;
+    } catch (err) {
+      console.error('getReadSasUrl error:', err.message);
+      return null;
+    }
   }
 
-  /* ── Populate job selector — show ALL jobs not just complete ── */
+  /* ── Populate job selector — show ALL jobs ── */
   function populateSelector() {
     const sel = $('jobSelector');
     if (!sel) return;
     const jobs = loadJobs();
-    if (!jobs.length) {
-      sel.innerHTML = '<option value="">No jobs yet</option>';
-      return;
-    }
-    // Show all jobs — complete ones will have PDF preview, others will show status
+    if (!jobs.length) { sel.innerHTML = '<option value="">No jobs yet — upload a PDF first</option>'; return; }
     const opts = jobs.map(j => {
-      const status = (j.status || 'unknown').toLowerCase();
-      const label  = status === 'complete' ? '✓' : status === 'queued' ? '⏳' : status === 'processing' ? '⚙' : '?';
-      return `<option value="${j.jobId}">${label} ${fmt.trunc(j.fileName, 38)} — ${fmt.date(j.submittedAt)}</option>`;
+      const s = (j.status || '').toLowerCase();
+      const icon = s === 'complete' ? '✓' : s === 'queued' ? '⏳' : s === 'processing' ? '⚙' : '●';
+      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName, 38)} — ${fmt.date(j.submittedAt)}</option>`;
     }).join('');
     sel.innerHTML = '<option value="">— Select a job —</option>' + opts;
   }
 
   /* ── Load a job into viewer ── */
-  function loadJob(jobId) {
+  async function loadJob(jobId) {
     if (!jobId) return;
     const j = loadJobs().find(x => x.jobId === jobId);
     if (!j) { showToast('Job not found', 'warn'); return; }
@@ -257,11 +233,11 @@
 
     const status = (j.status || '').toLowerCase();
 
-    // Toolbar
+    // Update toolbar
     setText('viewerFileName', fmt.trunc(j.fileName, 42));
     const stEl = $('viewerStatus');
     if (stEl) {
-      stEl.className  = `pill ${status === 'complete' ? 'pill-complete' : status === 'processing' ? 'pill-processing' : 'pill-queued'}`;
+      stEl.className   = `pill ${status === 'complete' ? 'pill-complete' : status === 'processing' ? 'pill-processing' : 'pill-queued'}`;
       stEl.textContent = j.status || 'Unknown';
       stEl.classList.remove('hidden');
     }
@@ -271,31 +247,49 @@
       metaEl.classList.remove('hidden');
     }
 
-    // Load original PDF — use Google Docs viewer for cross-origin support
+    // Show loading state
+    showLoading('origFrame', 'origEmpty', 'origEmptyMsg', 'Loading original PDF…');
+    showLoading('redFrame',  'redEmpty',  'redEmptyMsg',  'Loading redacted PDF…');
+
+    // Get SAS URLs for both files
+    origSasUrl = null;
+    redSasUrl  = null;
+
     if (j.blobUrl) {
-      loadFrame('origFrame', 'origEmpty', pdfViewerUrl(j.blobUrl), fmt.bytes(j.fileSize), 'origSizeLabel');
-    } else {
-      showEmptyPane('origFrame', 'origEmpty', 'Original PDF not available');
+      origSasUrl = await getReadSasUrl(j.blobUrl, process.env.AZURE_UPLOAD_CONTAINER || 'prudent-uploads');
     }
 
-    // Load redacted PDF
     if (j.resultUrl) {
-      loadFrame('redFrame', 'redEmpty', pdfViewerUrl(j.resultUrl), 'Redacted', 'redSizeLabel');
+      redSasUrl = await getReadSasUrl(j.resultUrl, process.env.AZURE_RESULTS_CONTAINER || 'prudent-results');
+    }
+
+    // Load original pane
+    if (origSasUrl) {
+      loadPdfFrame('origFrame', 'origEmpty', origSasUrl, 'origSizeLabel', fmt.bytes(j.fileSize));
     } else {
-      showEmptyPane('redFrame', 'redEmpty',
-        status === 'complete' ? 'Redacted PDF not available' :
-        status === 'queued'   ? 'Processing queued — check back soon' :
-        status === 'processing' ? 'Redaction in progress…' :
-        'Job not yet complete'
+      showEmptyPane('origFrame', 'origEmpty', 'origEmptyMsg',
+        j.blobUrl ? 'Could not load original PDF' : 'Original PDF not available'
+      );
+    }
+
+    // Load redacted pane
+    if (redSasUrl) {
+      loadPdfFrame('redFrame', 'redEmpty', redSasUrl, 'redSizeLabel', 'Redacted');
+    } else {
+      showEmptyPane('redFrame', 'redEmpty', 'redEmptyMsg',
+        status === 'complete'    ? 'Could not load redacted PDF' :
+        status === 'processing'  ? 'Redaction in progress — check back soon' :
+        status === 'queued'      ? 'Job is queued for processing' :
+        'Redacted PDF will appear here after job completes'
       );
     }
 
     // Buttons
-    $('dlOrigBtn').disabled    = !j.blobUrl;
-    $('dlRedactBtn').disabled  = !j.resultUrl;
+    $('dlOrigBtn').disabled   = !origSasUrl;
+    $('dlRedactBtn').disabled = !redSasUrl;
     $('exportFieldsBtn').disabled = false;
-    if (j.blobUrl)   $('dlOrigBtn').onclick   = () => window.open(j.blobUrl,   '_blank');
-    if (j.resultUrl) $('dlRedactBtn').onclick = () => window.open(j.resultUrl, '_blank');
+    if (origSasUrl) $('dlOrigBtn').onclick   = () => window.open(origSasUrl, '_blank');
+    if (redSasUrl)  $('dlRedactBtn').onclick = () => window.open(redSasUrl,  '_blank');
 
     // Page count
     const pages = j.pageCount || 1;
@@ -305,49 +299,46 @@
     renderCostSummary(j);
   }
 
-  function loadFrame(frameId, emptyId, url, sizeLabel, sizeLabelId) {
+  function showLoading(frameId, emptyId, msgId, msg) {
+    $(frameId)?.classList.add('hidden');
+    $(emptyId)?.classList.remove('hidden');
+    const msgEl = $(msgId);
+    if (msgEl) msgEl.innerHTML = `<div class="spinner" style="width:20px;height:20px;margin:0 auto 8px"></div>${msg}`;
+  }
+
+  function loadPdfFrame(frameId, emptyId, sasUrl, sizeLabelId, sizeLabel) {
     const frame  = $(frameId);
     const empty  = $(emptyId);
     const sizeEl = $(sizeLabelId);
     if (!frame) return;
     if (sizeEl) sizeEl.textContent = sizeLabel || '';
-    frame.src = url;
+    // Use Google Docs viewer with SAS URL for reliable cross-origin PDF rendering
+    frame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(sasUrl)}&embedded=true`;
     frame.classList.remove('hidden');
     empty?.classList.add('hidden');
   }
 
-  function showEmptyPane(frameId, emptyId, message) {
-    const frame = $(frameId);
-    const empty = $(emptyId);
-    frame?.classList.add('hidden');
-    if (empty) {
-      empty.classList.remove('hidden');
-      const msgEl = empty.querySelector('div[style]');
-      if (msgEl) msgEl.textContent = message;
-    }
+  function showEmptyPane(frameId, emptyId, msgId, message) {
+    $(frameId)?.classList.add('hidden');
+    $(emptyId)?.classList.remove('hidden');
+    const msgEl = $(msgId);
+    if (msgEl) msgEl.textContent = message;
   }
 
   function setText(id, val) { const el=$(id); if(el) el.textContent=val; }
 
   /* ── Zoom ── */
   function applyZoom(which, pct) {
-    const frame = $(which === 'orig' ? 'origFrame' : 'redFrame');
-    const label = $(which === 'orig' ? 'oZoomVal'  : 'rZoomVal');
-    if (!frame || frame.classList.contains('hidden')) return;
+    const frame = $(which==='orig'?'origFrame':'redFrame');
+    const label = $(which==='orig'?'oZoomVal':'rZoomVal');
+    if (!frame||frame.classList.contains('hidden')) return;
     frame.style.transform = `scale(${pct/100})`;
     frame.style.transformOrigin = 'top center';
     if (label) label.textContent = pct + '%';
   }
-
   ['o','r'].forEach(w => {
-    $(`${w}ZoomIn`)?.addEventListener('click', () => {
-      if (w==='o') { oZoom=Math.min(200,oZoom+20); applyZoom('orig',oZoom); }
-      else         { rZoom=Math.min(200,rZoom+20); applyZoom('red', rZoom); }
-    });
-    $(`${w}ZoomOut`)?.addEventListener('click', () => {
-      if (w==='o') { oZoom=Math.max(50,oZoom-20); applyZoom('orig',oZoom); }
-      else         { rZoom=Math.max(50,rZoom-20); applyZoom('red', rZoom); }
-    });
+    $(`${w}ZoomIn`)?.addEventListener('click',  () => { if(w==='o'){oZoom=Math.min(200,oZoom+20);applyZoom('orig',oZoom);}else{rZoom=Math.min(200,rZoom+20);applyZoom('red',rZoom);} });
+    $(`${w}ZoomOut`)?.addEventListener('click', () => { if(w==='o'){oZoom=Math.max(50,oZoom-20);applyZoom('orig',oZoom);}else{rZoom=Math.max(50,rZoom-20);applyZoom('red',rZoom);} });
   });
 
   /* ── Fields ── */
@@ -358,60 +349,53 @@
     const fields = Array.isArray(j.extractedFields) ? j.extractedFields : [];
     if (count) count.textContent = `${fields.length} field${fields.length!==1?'s':''}`;
     if (!fields.length) {
-      panel.innerHTML = `<div class="fields-empty">
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div style="font-size:13px;line-height:1.65">No extracted fields<br/>returned for this job</div>
-      </div>`;
+      panel.innerHTML = `<div class="fields-empty"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><div style="font-size:13px;line-height:1.65">No extracted fields<br/>returned for this job</div></div>`;
       return;
     }
     panel.innerHTML = fields.map(f => {
-      const conf    = f.confidence != null ? f.confidence : null;
-      const confPct = conf != null ? (conf*100).toFixed(1)+'%' : null;
-      const confCls = conf==null?'':conf>=0.9?'conf-high':conf>=0.7?'conf-medium':'conf-low';
-      return `<div class="field-card">
-        <div class="field-key">${f.key||f.name||'Field'}</div>
-        <div class="field-val">${f.value||'—'}</div>
-        ${confPct?`<div class="field-conf ${confCls}">Confidence: ${confPct}</div>`:''}
-      </div>`;
+      const conf=f.confidence!=null?f.confidence:null;
+      const confPct=conf!=null?(conf*100).toFixed(1)+'%':null;
+      const confCls=conf==null?'':conf>=0.9?'conf-high':conf>=0.7?'conf-medium':'conf-low';
+      return `<div class="field-card"><div class="field-key">${f.key||f.name||'Field'}</div><div class="field-val">${f.value||'—'}</div>${confPct?`<div class="field-conf ${confCls}">Confidence: ${confPct}</div>`:''}</div>`;
     }).join('');
   }
 
   /* ── Cost summary ── */
   function renderCostSummary(j) {
-    const cs = $('costSummary');
+    const cs=$('costSummary');
     if (!cs) return;
-    if (!j.costTotal && !j.pageCount) { cs.classList.add('hidden'); return; }
+    if (!j.costTotal&&!j.pageCount){cs.classList.add('hidden');return;}
     cs.classList.remove('hidden');
-    const cost = calcJobCost(j.pageCount||1, fmt.mb(j.fileSize));
-    const set  = (id,v) => { const el=$(id); if(el) el.textContent=v; };
-    set('csDocIntel',    fmt.usd(cost.docIntel));
-    set('csBlobStorage', fmt.usd(cost.blob));
-    set('csPaFlow',      fmt.usd(cost.paFlow));
-    set('csEmail',       fmt.usd(cost.email));
-    set('csTotal',       j.costTotal!=null ? fmt.usd(j.costTotal) : cost.totalFmt);
+    const cost=calcJobCost(j.pageCount||1,fmt.mb(j.fileSize));
+    const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+    set('csDocIntel',fmt.usd(cost.docIntel));
+    set('csBlobStorage',fmt.usd(cost.blob));
+    set('csPaFlow',fmt.usd(cost.paFlow));
+    set('csEmail',fmt.usd(cost.email));
+    set('csTotal',j.costTotal!=null?fmt.usd(j.costTotal):cost.totalFmt);
   }
 
   /* ── Export fields CSV ── */
   $('exportFieldsBtn')?.addEventListener('click', () => {
-    if (!currentJob) { showToast('No job loaded','warn'); return; }
-    const fields = Array.isArray(currentJob.extractedFields) ? currentJob.extractedFields : [];
-    if (!fields.length) { showToast('No fields to export','warn'); return; }
-    exportCSV(fields.map(f=>({Field:f.key||f.name,Value:f.value,Confidence:f.confidence??''})), `fields-${currentJob.jobId.slice(0,8)}.csv`);
+    if (!currentJob){showToast('No job loaded','warn');return;}
+    const fields=Array.isArray(currentJob.extractedFields)?currentJob.extractedFields:[];
+    if (!fields.length){showToast('No fields to export','warn');return;}
+    exportCSV(fields.map(f=>({Field:f.key||f.name,Value:f.value,Confidence:f.confidence??''})),`fields-${currentJob.jobId.slice(0,8)}.csv`);
   });
 
   /* ── Job selector ── */
   $('jobSelector')?.addEventListener('change', e => { if(e.target.value) loadJob(e.target.value); });
 
-  /* ── Auto-load from URL param ── */
+  /* ── Auto-load from URL ── */
   const urlJobId = new URLSearchParams(location.search).get('jobId');
   populateSelector();
   if (urlJobId) {
     const sel = $('jobSelector');
     if (sel) {
       const opt = [...sel.options].find(o => o.value === urlJobId);
-      if (opt) { sel.value = urlJobId; loadJob(urlJobId); }
-      else { loadJob(urlJobId); } // Try loading even if not in selector
+      if (opt) sel.value = urlJobId;
     }
+    loadJob(urlJobId);
   }
 
 })();

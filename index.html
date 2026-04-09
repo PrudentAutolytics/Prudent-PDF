@@ -2,14 +2,483 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="refresh" content="0;url=/login"/>
-<title>Prudent PDF</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Prudent PDF — AI-powered PDF redaction platform by Prudent Autolytics. Redact PII from documents instantly with Azure Document Intelligence."/>
+<title>Prudent PDF — AI-Powered Document Redaction</title>
 <style>
-body{margin:0;background:#080C18;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui,sans-serif;color:#8596C0}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue      : #2563EB;
+  --blue-dark : #1D4ED8;
+  --violet    : #7C3AED;
+  --ink       : #0F172A;
+  --ink2      : #334155;
+  --ink3      : #64748B;
+  --surface   : #FFFFFF;
+  --bg        : #F8FAFC;
+  --border    : #E2E8F0;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ── Topbar ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none;
+}
+.topbar-logo {
+  width: 40px; height: 40px;
+  border-radius: 10px; overflow: hidden;
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+.topbar-logo img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 2px; }
+.topbar-name { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -.4px; }
+.topbar-tag  { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); margin-top: 2px; }
+.topbar-nav  { display: flex; align-items: center; gap: 28px; }
+.topbar-nav a { font-size: 14px; font-weight: 500; color: var(--ink2); text-decoration: none; transition: color .15s; }
+.topbar-nav a:hover { color: var(--blue); }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.btn-signin {
+  padding: 9px 20px; border-radius: 8px;
+  font-size: 13.5px; font-weight: 600;
+  color: var(--blue); background: transparent;
+  border: 1.5px solid var(--blue);
+  cursor: pointer; text-decoration: none;
+  transition: all .15s;
+}
+.btn-signin:hover { background: var(--blue); color: #fff; }
+.btn-start {
+  padding: 9px 20px; border-radius: 8px;
+  font-size: 13.5px; font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--blue), var(--violet));
+  border: none; cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37,99,235,.35);
+  transition: all .15s;
+}
+.btn-start:hover { transform: translateY(-1px); box-shadow: 0 7px 20px rgba(37,99,235,.45); }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 100px 24px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80vw 60vh at 50% 0%, rgba(37,99,235,.10) 0%, transparent 65%),
+    radial-gradient(ellipse 60vw 40vh at 80% 80%, rgba(124,58,237,.08) 0%, transparent 55%),
+    radial-gradient(ellipse 40vw 30vh at 10% 70%, rgba(37,99,235,.06) 0%, transparent 55%);
+}
+
+.hero-badge {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(37,99,235,.08);
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 12.5px; font-weight: 600; color: var(--blue);
+  margin-bottom: 28px;
+}
+.hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+/* ── Big logo block ── */
+.hero-logo-block {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 32px;
+}
+.hero-logo-img {
+  width: 96px; height: 96px;
+  border-radius: 22px;
+  border: 2px solid var(--border);
+  box-shadow: 0 8px 32px rgba(37,99,235,.18), 0 2px 8px rgba(0,0,0,.08);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.hero-logo-img img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.hero-product-name {
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 900;
+  letter-spacing: -3px;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.hero-product-name span {
+  background: linear-gradient(135deg, var(--blue), var(--violet));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-company {
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.hero-tagline {
+  position: relative; z-index: 1;
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 500;
+  color: var(--ink2);
+  max-width: 640px;
+  line-height: 1.55;
+  margin-bottom: 40px;
+}
+.hero-tagline strong { color: var(--ink); font-weight: 700; }
+
+.hero-actions {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 14px;
+  flex-wrap: wrap; justify-content: center;
+  margin-bottom: 60px;
+}
+.btn-hero-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px; border-radius: 12px;
+  font-size: 15px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, var(--blue), var(--violet));
+  border: none; cursor: pointer; text-decoration: none;
+  box-shadow: 0 6px 24px rgba(37,99,235,.40);
+  transition: all .18s;
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(37,99,235,.50); }
+.btn-hero-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 12px;
+  font-size: 15px; font-weight: 600; color: var(--ink2);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  transition: all .18s;
+}
+.btn-hero-secondary:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-1px); }
+
+/* ── Trust badges ── */
+.trust-row {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 20px;
+  flex-wrap: wrap; justify-content: center;
+}
+.trust-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--ink3);
+}
+.trust-badge svg { opacity: .6; }
+.trust-sep { width: 4px; height: 4px; border-radius: 50%; background: var(--border); }
+
+/* ── Features section ── */
+.features {
+  padding: 80px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-label {
+  text-align: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--blue);
+  margin-bottom: 14px;
+}
+.section-title {
+  text-align: center;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800; letter-spacing: -1px;
+  color: var(--ink); margin-bottom: 14px;
+}
+.section-sub {
+  text-align: center;
+  font-size: 16px; color: var(--ink3);
+  max-width: 560px; margin: 0 auto 56px;
+  line-height: 1.65;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  transition: all .2s;
+}
+.feature-card:hover { border-color: rgba(37,99,235,.3); box-shadow: 0 8px 32px rgba(37,99,235,.10); transform: translateY(-2px); }
+.feature-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center;
+  margin-bottom: 18px;
+}
+.feature-icon.blue   { background: rgba(37,99,235,.1);  color: var(--blue); }
+.feature-icon.violet { background: rgba(124,58,237,.1); color: var(--violet); }
+.feature-icon.green  { background: rgba(16,185,129,.1); color: #10B981; }
+.feature-icon.amber  { background: rgba(245,158,11,.1); color: #F59E0B; }
+.feature-icon.red    { background: rgba(239,68,68,.1);  color: #EF4444; }
+.feature-icon.cyan   { background: rgba(6,182,212,.1);  color: #06B6D4; }
+.feature-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.feature-desc  { font-size: 14px; color: var(--ink3); line-height: 1.65; }
+
+/* ── Stats bar ── */
+.stats-bar {
+  background: linear-gradient(135deg, var(--blue), var(--violet));
+  padding: 48px 24px;
+}
+.stats-inner {
+  max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 32px; text-align: center;
+}
+.stat-num  { font-size: 40px; font-weight: 900; color: #fff; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
+.stat-desc { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.75); }
+
+/* ── CTA section ── */
+.cta-section {
+  padding: 80px 24px;
+  text-align: center;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.cta-title {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900; letter-spacing: -1.5px;
+  color: var(--ink); margin-bottom: 16px;
+}
+.cta-sub {
+  font-size: 16px; color: var(--ink3);
+  max-width: 480px; margin: 0 auto 36px;
+  line-height: 1.65;
+}
+.cta-note { font-size: 12px; color: var(--ink3); margin-top: 16px; }
+
+/* ── Footer ── */
+footer {
+  padding: 24px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px; color: var(--ink3);
+  flex-wrap: wrap; gap: 12px;
+}
+footer a { color: var(--ink3); text-decoration: none; }
+footer a:hover { color: var(--blue); }
+.footer-links { display: flex; gap: 20px; }
 </style>
 </head>
 <body>
-<p>Redirecting…</p>
-<script>window.location.replace('/login');</script>
+
+<!-- Topbar -->
+<nav class="topbar">
+  <a class="topbar-brand" href="/">
+    <div class="topbar-logo">
+      <img src="/assets/logo.jpg" alt="Prudent Autolytics"/>
+    </div>
+    <div>
+      <div class="topbar-name">Prudent PDF</div>
+      <div class="topbar-tag">Redaction Platform</div>
+    </div>
+  </a>
+  <nav class="topbar-nav">
+    <a href="#features">Features</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <div class="topbar-actions">
+    <a href="/login" class="btn-signin">Sign in</a>
+    <a href="/login" class="btn-start">Try for free →</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+
+  <div class="hero-badge">
+    <div class="hero-badge-dot"></div>
+    Powered by Azure Document Intelligence
+  </div>
+
+  <div class="hero-logo-block">
+    <div class="hero-logo-img">
+      <img src="/assets/logo.jpg" alt="Prudent Autolytics logo"/>
+    </div>
+    <div class="hero-product-name">Prudent <span>PDF</span></div>
+    <div class="hero-company">by Prudent Autolytics</div>
+  </div>
+
+  <p class="hero-tagline">
+    <strong>AI-powered document redaction</strong> that automatically detects and removes PII from your PDFs — in seconds, not hours.
+  </p>
+
+  <div class="hero-actions">
+    <a href="/login" class="btn-hero-primary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Start free trial
+    </a>
+    <a href="#features" class="btn-hero-secondary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      See how it works
+    </a>
+  </div>
+
+  <div class="trust-row">
+    <div class="trust-badge">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg>
+      TLS Encrypted
+    </div>
+    <div class="trust-sep"></div>
+    <div class="trust-badge">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg>
+      Azure Hosted
+    </div>
+    <div class="trust-sep"></div>
+    <div class="trust-badge">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      GDPR Compliant
+    </div>
+    <div class="trust-sep"></div>
+    <div class="trust-badge">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Auto-deleted in 7 days
+    </div>
+    <div class="trust-sep"></div>
+    <div class="trust-badge">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      No password required
+    </div>
+  </div>
+
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-label">What we do</div>
+  <h2 class="section-title">Everything you need for document redaction</h2>
+  <p class="section-sub">Built for legal, HR, finance, and compliance teams who need to redact PII at scale — without compromising security.</p>
+
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon blue">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="feature-title">Automatic PII Detection</div>
+      <div class="feature-desc">Azure Document Intelligence scans every page and identifies names, addresses, ID numbers, dates, and more — automatically.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon violet">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
+      </div>
+      <div class="feature-title">Instant Redaction</div>
+      <div class="feature-desc">Get a fully redacted PDF in seconds. Black-box redactions are burned into the document — no metadata leakage.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon green">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="feature-title">Side-by-side Viewer</div>
+      <div class="feature-desc">Compare original and redacted documents side-by-side. Review every redaction before downloading.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon amber">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="feature-title">Full Job History</div>
+      <div class="feature-desc">Every redaction job is logged with cost breakdown, page count, and timestamp. Export to CSV at any time.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon red">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="feature-title">Extracted Fields CSV</div>
+      <div class="feature-desc">Download all detected PII fields as a CSV — names, entities, confidence scores — for audit and compliance records.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon cyan">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="feature-title">Secure Azure Storage</div>
+      <div class="feature-desc">Files are stored in private Azure Blob Storage with SAS-based access. Auto-deleted after 7 days. Zero public access.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-num">$0.001</div>
+      <div class="stat-desc">Per page processed</div>
+    </div>
+    <div>
+      <div class="stat-num">5</div>
+      <div class="stat-desc">Free documents on trial</div>
+    </div>
+    <div>
+      <div class="stat-num">7s</div>
+      <div class="stat-desc">Average processing time</div>
+    </div>
+    <div>
+      <div class="stat-num">100%</div>
+      <div class="stat-desc">Azure hosted & encrypted</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Start redacting in minutes</h2>
+  <p class="cta-sub">No credit card. No password. Just sign in with your work email and upload your first document.</p>
+  <a href="/login" class="btn-hero-primary" style="display:inline-flex">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Get started free
+  </a>
+  <p class="cta-note">5 free documents included · No credit card required · Cancel anytime</p>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:28px;height:28px;border-radius:6px;overflow:hidden;border:1px solid #E2E8F0">
+      <img src="/assets/logo.jpg" style="width:100%;height:100%;object-fit:contain;padding:2px"/>
+    </div>
+    <span>© 2026 Prudent Autolytics · India</span>
+  </div>
+  <div class="footer-links">
+    <a href="/pricing">Pricing</a>
+    <a href="/contact">Contact</a>
+    <a href="mailto:Kabileshvijayakumar@prudentautolytics.com">Support</a>
+  </div>
+</footer>
+
 </body>
 </html>
