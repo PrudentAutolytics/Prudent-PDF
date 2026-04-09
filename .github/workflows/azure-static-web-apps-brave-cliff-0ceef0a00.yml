@@ -43,6 +43,7 @@ jobs:
           AZURE_UPLOAD_CONTAINER  : ${{ secrets.AZURE_UPLOAD_CONTAINER }}
           AZURE_RESULTS_CONTAINER : ${{ secrets.AZURE_RESULTS_CONTAINER }}
           PA_EMAIL_SEND           : ${{ secrets.PA_EMAIL_SEND }}
+          PA_JOB_SUBMIT_FLOW      : ${{ secrets.PA_JOB_SUBMIT_FLOW }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
