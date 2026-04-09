@@ -1,7 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT PDF — shell.js v7.1
-   ─────────────────────────────────────────────────────────────────────────
-   Injects the shared topbar + sidebar on every authenticated page.
+   PRUDENT PDF — shell.js v7.2
    ═══════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
@@ -51,18 +49,16 @@ const Shell = (() => {
     moon     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     sun      : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
     bell     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    shield   : `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     bolt     : `<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     logout   : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    user     : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-    settings : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.7"/></svg>`,
+    star2    : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" stroke-width="1.7"/></svg>`,
+    settings : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.7"/></svg>`,
   };
 
-  /* ── Helper: get display name from email ─────────────────────────────── */
+  /* ── Helper: get display name from email ── */
   function getDisplayName(email) {
     if (!email) return 'User';
     const local = email.split('@')[0];
-    // Convert dot/underscore/dash separated to Title Case
     return local
       .replace(/[._-]+/g, ' ')
       .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
@@ -70,13 +66,13 @@ const Shell = (() => {
 
   function getInitials(email) {
     if (!email) return 'U';
-    const name = getDisplayName(email);
+    const name  = getDisplayName(email);
     const parts = name.trim().split(' ').filter(Boolean);
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
   }
 
-  /* ── Build topbar HTML ───────────────────────────────────────────────── */
+  /* ── Build topbar HTML ── */
   function buildTopbar(activeId) {
     const s        = Session.get() || {};
     const email    = s.email || '';
@@ -86,13 +82,13 @@ const Shell = (() => {
 
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
-  <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home">
-    <div class="brand-logo" style="width:36px;height:36px;border-radius:8px;overflow:hidden;flex-shrink:0">
-      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:cover"/>
+  <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
+    <div style="width:42px;height:42px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1.5px solid var(--border2);box-shadow:var(--s2)">
+      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:cover;display:block"/>
     </div>
     <div>
-      <div class="brand-name">Prudent PDF</div>
-      <div class="brand-tagline">Redaction Platform</div>
+      <div class="brand-name" style="font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px;line-height:1.1">Prudent PDF</div>
+      <div class="brand-tagline" style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-top:2px">Redaction Platform</div>
     </div>
   </a>
 
@@ -119,7 +115,7 @@ const Shell = (() => {
 </nav>`;
   }
 
-  /* ── Build sidebar HTML ──────────────────────────────────────────────── */
+  /* ── Build sidebar HTML ── */
   function buildSidebar(activeId) {
     const s      = Session.get() || {};
     const used   = s.creditsUsed  ?? 0;
@@ -150,7 +146,6 @@ const Shell = (() => {
           ${item.label}${badge}
         </a>`;
       }).join('');
-
       return `<div class="nav-section"><span class="nav-group-label">${group.group}</span>${items}</div><div class="nav-sep" role="separator"></div>`;
     }).join('');
 
@@ -222,14 +217,12 @@ const Shell = (() => {
   function wireUserChip() {
     const chip = document.getElementById('userChip');
     if (!chip) return;
-
     const MENU_ITEMS = [
-      { label: 'View Pricing', icon: ICONS.star,   fn: () => location.href = '/pricing' },
+      { label: 'View Pricing', icon: ICONS.star2,  fn: () => location.href = '/pricing' },
       { label: 'Contact Us',   icon: ICONS.mail,   fn: () => location.href = '/contact' },
       { sep: true },
       { label: 'Sign Out',     icon: ICONS.logout, fn: signOut, danger: true },
     ];
-
     chip.addEventListener('click', () => {
       let menu = document.getElementById('userMenu');
       if (menu) { closeMenu(menu); return; }
@@ -258,7 +251,6 @@ const Shell = (() => {
         }, { capture: true });
       }, 50);
     });
-
     chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') chip.click(); });
   }
 
@@ -279,10 +271,10 @@ const Shell = (() => {
         if (!data) return;
         const updated = { ...s, creditsUsed: data.creditsUsed ?? s.creditsUsed, creditsLimit: data.creditsLimit ?? s.creditsLimit, plan: data.plan ?? s.plan };
         Session.set(updated);
-        const used   = updated.creditsUsed  ?? 0;
-        const limit  = updated.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
-        const pct    = Math.min(100, limit > 0 ? Math.round(used / limit * 100) : 0);
-        const remain = Math.max(0, limit - used);
+        const used    = updated.creditsUsed  ?? 0;
+        const limit   = updated.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
+        const pct     = Math.min(100, limit > 0 ? Math.round(used / limit * 100) : 0);
+        const remain  = Math.max(0, limit - used);
         const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
         const bar = document.getElementById('planBarFill');
         if (bar) { bar.style.width = pct + '%'; bar.className = 'plan-bar-fill ' + fillCls; bar.parentElement?.setAttribute('aria-valuenow', pct); }
