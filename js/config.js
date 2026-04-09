@@ -17,15 +17,19 @@ const APP_CONFIG = Object.freeze({
 
   /* ── API Endpoints ─────────────────────────────────────────────────────── */
   FLOWS: {
-    AUTH_CHECK   : '/api/auth-check',
-    AUTH_REQUEST : '/api/auth-request',
-    AUTH_VERIFY  : '/api/auth-verify',
-    QUOTA_GET    : '/api/quota-get',
-    JOB_SUBMIT   : '/api/jobs-submit',
-    JOB_STATUS   : '/api/jobs-status',
-    JOB_LIST     : '/api/jobs-list',
-    CONTACT_SEND : '/api/contact-send',
-    BLOB_SAS     : '/api/blob-sas',
+    AUTH_CHECK     : '/api/auth-check',
+    AUTH_REQUEST   : '/api/auth-request',
+    AUTH_VERIFY    : '/api/auth-verify',
+    QUOTA_GET      : '/api/quota-get',
+    JOB_SUBMIT     : '/api/jobs-submit',
+    JOB_STATUS     : '/api/jobs-status',
+    JOB_LIST       : '/api/jobs-list',
+    CONTACT_SEND   : '/api/contact-send',
+    BLOB_SAS       : '/api/blob-sas',
+    ADMIN_USERS    : '/api/admin',
+    ADMIN_UPDATE   : '/api/admin',
+    ADMIN_CONTACTS : '/api/admin',
+    ADMIN_APIKEYS  : '/api/admin',
   },
 
   /* ── Azure Blob ────────────────────────────────────────────────────────── */

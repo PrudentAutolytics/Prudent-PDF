@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Prudent PDF</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<style>
+.admin-gate  { display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px;text-align:center; }
+.admin-grid  { display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px; }
+.admin-stat  { background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r12);padding:18px 20px; }
+.admin-stat-val  { font-size:28px;font-weight:900;font-family:var(--display);color:var(--ink);letter-spacing:-1px; }
+.admin-stat-label{ font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-top:4px; }
+.plan-pill   { display:inline-block;font-size:10.5px;font-weight:700;padding:2px 10px;border-radius:99px;color:#fff; }
+.plan-trial  { background:#64748B; }
+.plan-starter{ background:#059669; }
+.plan-professional{ background:#0891B2; }
+.plan-business    { background:#2563EB; }
+.plan-enterprise  { background:#7C3AED; }
+.user-row:hover td { background:var(--surface2); }
+.upgrade-select { font-size:12px;padding:4px 8px;border:1px solid var(--border2);border-radius:var(--r6);background:var(--surface2);color:var(--ink);font-family:var(--font); }
+.search-bar { width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--r8);font-size:13.5px;font-family:var(--font);color:var(--ink);background:var(--surface2);margin-bottom:16px; }
+.search-bar:focus { border-color:var(--blue);outline:none;box-shadow:var(--s-glow); }
+.tab-bar { display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0; }
+.tab-btn { padding:9px 18px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--ink3);border-bottom:2.5px solid transparent;margin-bottom:-1px;font-family:var(--font);transition:all .15s; }
+.tab-btn.active { color:var(--blue);border-bottom-color:var(--blue); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+.action-btn { font-size:11.5px;padding:4px 10px;border-radius:var(--r6);border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-family:var(--font);color:var(--ink2);transition:all .12s; }
+.action-btn:hover { border-color:var(--blue);color:var(--blue); }
+.action-btn.danger:hover { border-color:var(--red);color:var(--red); }
+.contact-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--r10);padding:16px 18px;margin-bottom:10px; }
+.contact-meta { font-size:11.5px;color:var(--ink3);margin-top:4px; }
+.contact-msg  { font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.65;padding:10px 12px;background:var(--surface2);border-radius:var(--r8); }
+</style>
+</head>
+<body>
+<div class="shell" id="appShell">
+<main class="main">
+
+  <!-- Gate — shown while checking access -->
+  <div id="adminGate" class="admin-gate hidden">
+    <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="var(--red)" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <div style="font-size:18px;font-weight:800;color:var(--ink)">Access Denied</div>
+    <div style="font-size:14px;color:var(--ink3)">This page is restricted to Prudent Autolytics administrators.</div>
+    <a href="/dashboard" class="btn btn-primary" style="margin-top:8px">Back to Dashboard</a>
+  </div>
+
+  <!-- Admin content — shown after auth check passes -->
+  <div id="adminContent" class="hidden">
+
+    <div class="page-hd anim">
+      <div>
+        <div class="page-hd-eyebrow">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg>
+          Admin
+        </div>
+        <div class="page-title">Admin Panel</div>
+        <div class="page-subtitle">Manage users, plans, and contact requests. Restricted to Prudent Autolytics only.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn btn-ghost btn-sm" id="refreshAdminBtn">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Refresh
+        </button>
+        <button class="btn btn-secondary btn-sm" id="exportUsersBtn">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="admin-grid anim">
+      <div class="admin-stat">
+        <div class="admin-stat-val" id="aTotal">—</div>
+        <div class="admin-stat-label">Total users</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-val" id="aActive">—</div>
+        <div class="admin-stat-label">Active this month</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-val" id="aJobs">—</div>
+        <div class="admin-stat-label">Total jobs</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-val" id="aRevenue">—</div>
+        <div class="admin-stat-label">Est. monthly cost</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="users">Users</button>
+      <button class="tab-btn" data-tab="contacts">Contact Requests</button>
+      <button class="tab-btn" data-tab="api">API Keys</button>
+    </div>
+
+    <!-- Users tab -->
+    <div class="tab-panel active" id="tab-users">
+      <input class="search-bar" id="userSearch" placeholder="Search by email or name…" type="search"/>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr>
+              <th>User</th>
+              <th>Plan</th>
+              <th>Usage</th>
+              <th>Joined</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr></thead>
+            <tbody id="usersBody">
+              <tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Loading users…</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacts tab -->
+    <div class="tab-panel" id="tab-contacts">
+      <div id="contactsList">
+        <div class="tbl-empty" style="padding:32px"><div class="tbl-empty-title">Loading contact requests…</div></div>
+      </div>
+    </div>
+
+    <!-- API Keys tab -->
+    <div class="tab-panel" id="tab-api">
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-hd">
+          <div class="card-title">
+            <div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            API Keys
+          </div>
+          <button class="btn btn-primary btn-sm" id="generateKeyBtn">+ Generate Key</button>
+        </div>
+        <div class="card-body" style="padding:16px 20px">
+          <div style="font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.6">
+            API keys allow Business and Enterprise users to submit redaction jobs programmatically. Keys are scoped to a single user account and inherit their plan limits.
+          </div>
+          <div id="apiKeysList">
+            <div class="tbl-empty" style="padding:24px 0"><div class="tbl-empty-title">Loading API keys…</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Docs preview -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title"><div class="card-title-icon" style="background:var(--violet-bg);border-color:var(--violet-bd);color:var(--violet)"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>API Reference</div></div>
+        <div class="card-body" style="padding:16px 20px">
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:16px">Base URL: <code style="background:var(--surface2);padding:2px 8px;border-radius:4px;font-family:var(--mono);font-size:12px">https://brave-cliff-0ceef0a00.4.azurestaticapps.net/api</code></div>
+
+          <div style="margin-bottom:20px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Submit Redaction Job</div>
+            <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:14px 16px;font-size:12px;color:var(--ink2);overflow-x:auto;line-height:1.6">POST /api/jobs-submit
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "email":     "you@company.com",
+  "fileName":  "contract.pdf",
+  "fileBase64":"&lt;base64 encoded PDF&gt;",
+  "jobId":     "optional-custom-id"
+}</pre>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Check Job Status</div>
+            <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:14px 16px;font-size:12px;color:var(--ink2);overflow-x:auto;line-height:1.6">POST /api/jobs-status
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "email": "you@company.com",
+  "jobId": "your-job-id"
+}</pre>
+          </div>
+
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Response</div>
+            <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:14px 16px;font-size:12px;color:var(--ink2);overflow-x:auto;line-height:1.6">{
+  "jobId":     "abc-123",
+  "status":    "complete",
+  "resultUrl": "https://...",
+  "pageCount": 8,
+  "costTotal": 0.344,
+  "extractedFields": [...]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /adminContent -->
+</main>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  Shell.init('admin');
+
+  const ADMIN_EMAILS = ['kabileshvijayakumar@prudentautolytics.com'];
+  const $ = id => document.getElementById(id);
+
+  /* ── Auth gate ── */
+  const session = Session.get();
+  const email   = (session?.email || '').toLowerCase();
+
+  if (!ADMIN_EMAILS.includes(email)) {
+    $('adminGate').classList.remove('hidden');
+    return;
+  }
+  $('adminContent').classList.remove('hidden');
+
+  /* ── Tabs ── */
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      $('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ── Load all data ── */
+  let allUsers    = [];
+  let allContacts = [];
+  let allApiKeys  = [];
+
+  async function loadAll() {
+    await Promise.all([loadUsers(), loadContacts(), loadApiKeys()]);
+  }
+
+  /* ── Users ── */
+  async function loadUsers() {
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.ADMIN_USERS || APP_CONFIG.FLOWS.JOB_LIST, { email, adminMode: true });
+      if (res?.users) {
+        allUsers = res.users;
+        renderUsers(allUsers);
+        renderSummaryStats(allUsers, res.totalJobs || 0, res.totalCost || 0);
+      }
+    } catch (e) {
+      $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users — ' + e.message + '</div></div></td></tr>';
+    }
+  }
+
+  function renderSummaryStats(users, totalJobs, totalCost) {
+    setText('aTotal',   String(users.length));
+    setText('aActive',  String(users.filter(u => (u.credits_used || 0) > 0).length));
+    setText('aJobs',    String(totalJobs));
+    setText('aRevenue', '$' + (totalCost || 0).toFixed(2));
+  }
+
+  const PLAN_ORDER = ['trial','starter','professional','business','enterprise'];
+
+  function planPill(plan) {
+    const p = (plan || 'trial').toLowerCase();
+    return '<span class="plan-pill plan-' + p + '">' + (p.charAt(0).toUpperCase() + p.slice(1)) + '</span>';
+  }
+
+  function renderUsers(users) {
+    const body = $('usersBody');
+    if (!users.length) {
+      body.innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">No users found</div></div></td></tr>';
+      return;
+    }
+    body.innerHTML = users.map(u => {
+      const used   = u.credits_used  || 0;
+      const limit  = u.credits_limit || 5;
+      const pct    = limit > 0 ? Math.round(used / limit * 100) : 0;
+      const plan   = (u.plan || 'trial').toLowerCase();
+      return '<tr class="user-row">'
+        + '<td><div style="font-weight:600;font-size:13px;color:var(--ink)">' + (u.full_name || '—') + '</div><div style="font-size:11.5px;color:var(--ink3)">' + u.email + '</div></td>'
+        + '<td>' + planPill(plan) + '</td>'
+        + '<td><div style="font-size:12px;color:var(--ink2)">' + used + ' / ' + limit + ' files</div>'
+          + '<div style="height:4px;border-radius:2px;background:var(--border);margin-top:4px;width:80px"><div style="height:100%;border-radius:2px;background:' + (pct>=90?'var(--red)':pct>=70?'var(--amber)':'var(--green)') + ';width:' + Math.min(100,pct) + '%"></div></div></td>'
+        + '<td style="font-size:12px;color:var(--ink3)">' + fmt.date(u.created_at) + '</td>'
+        + '<td><span style="font-size:11px;font-weight:700;color:' + (u.is_active?'var(--green)':'var(--red)') + '">' + (u.is_active ? 'Active' : 'Inactive') + '</span></td>'
+        + '<td><div style="display:flex;gap:6px;align-items:center">'
+          + '<select class="upgrade-select" onchange="upgradePlan(\'' + u.email + '\',this.value)">'
+          + PLAN_ORDER.map(p => '<option value="' + p + '"' + (p===plan?' selected':'') + '>' + p.charAt(0).toUpperCase()+p.slice(1) + '</option>').join('')
+          + '</select>'
+          + '<button class="action-btn" onclick="resetCredits(\'' + u.email + '\')">Reset</button>'
+          + '<button class="action-btn danger" onclick="toggleActive(\'' + u.email + '\',' + !u.is_active + ')">' + (u.is_active?'Disable':'Enable') + '</button>'
+          + '</div></td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  window.upgradePlan = async function(userEmail, plan) {
+    try {
+      await paFetch(APP_CONFIG.FLOWS.ADMIN_UPDATE || APP_CONFIG.FLOWS.QUOTA_GET, { adminEmail: email, targetEmail: userEmail, action: 'setPlan', plan });
+      showToast('Plan updated to ' + plan + ' for ' + userEmail, 'success');
+      await loadUsers();
+    } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.resetCredits = async function(userEmail) {
+    if (!confirm('Reset credits_used to 0 for ' + userEmail + '?')) return;
+    try {
+      await paFetch(APP_CONFIG.FLOWS.ADMIN_UPDATE || APP_CONFIG.FLOWS.QUOTA_GET, { adminEmail: email, targetEmail: userEmail, action: 'resetCredits' });
+      showToast('Credits reset for ' + userEmail, 'success');
+      await loadUsers();
+    } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.toggleActive = async function(userEmail, active) {
+    try {
+      await paFetch(APP_CONFIG.FLOWS.ADMIN_UPDATE || APP_CONFIG.FLOWS.QUOTA_GET, { adminEmail: email, targetEmail: userEmail, action: 'setActive', active });
+      showToast((active ? 'Enabled' : 'Disabled') + ' ' + userEmail, 'success');
+      await loadUsers();
+    } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+  };
+
+  /* ── User search ── */
+  $('userSearch')?.addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    renderUsers(q ? allUsers.filter(u => u.email.includes(q) || (u.full_name||'').toLowerCase().includes(q)) : allUsers);
+  });
+
+  /* ── Contact requests ── */
+  async function loadContacts() {
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.ADMIN_CONTACTS || APP_CONFIG.FLOWS.JOB_LIST, { email, adminMode: true, type: 'contacts' });
+      if (res?.contacts) {
+        allContacts = res.contacts;
+        renderContacts(allContacts);
+      }
+    } catch(e) {
+      $('contactsList').innerHTML = '<div class="tbl-empty" style="padding:32px"><div class="tbl-empty-title">Could not load contacts</div></div>';
+    }
+  }
+
+  function renderContacts(contacts) {
+    const el = $('contactsList');
+    if (!contacts.length) {
+      el.innerHTML = '<div class="tbl-empty" style="padding:32px"><div class="tbl-empty-title">No contact requests yet</div></div>';
+      return;
+    }
+    el.innerHTML = contacts.map(c => {
+      const subjectLabel = {pricing:'Pricing Enquiry',demo:'Demo Request',technical:'Technical Support',enterprise:'Enterprise',billing:'Billing',other:'General'}[c.subject] || c.subject || 'General';
+      return '<div class="contact-card">'
+        + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">'
+        + '<div>'
+        + '<div style="font-weight:700;font-size:13.5px;color:var(--ink)">' + (c.name||'—') + '</div>'
+        + '<div class="contact-meta">' + c.email + ' · ' + subjectLabel + (c.plan_interest?' · '+c.plan_interest:'') + ' · ' + fmt.relative(c.submitted_at) + '</div>'
+        + '</div>'
+        + '<a href="mailto:' + c.email + '?subject=Re: ' + encodeURIComponent(subjectLabel) + ' — Prudent PDF" class="btn btn-sm btn-primary">Reply</a>'
+        + '</div>'
+        + '<div class="contact-msg">' + (c.message||'').replace(/</g,'&lt;').replace(/\n/g,'<br/>') + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  /* ── API Keys ── */
+  async function loadApiKeys() {
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.ADMIN_APIKEYS || APP_CONFIG.FLOWS.JOB_LIST, { email, adminMode: true, type: 'apikeys' });
+      if (res?.apiKeys) {
+        allApiKeys = res.apiKeys;
+        renderApiKeys(allApiKeys);
+      }
+    } catch(e) {
+      $('apiKeysList').innerHTML = '<div class="tbl-empty" style="padding:24px 0"><div class="tbl-empty-title">Could not load API keys</div></div>';
+    }
+  }
+
+  function renderApiKeys(keys) {
+    if (!keys.length) {
+      $('apiKeysList').innerHTML = '<div style="font-size:13px;color:var(--ink3);padding:12px 0">No API keys generated yet.</div>';
+      return;
+    }
+    $('apiKeysList').innerHTML = '<table class="tbl"><thead><tr><th>User</th><th>Key</th><th>Plan</th><th>Created</th><th>Last used</th><th></th></tr></thead><tbody>'
+      + keys.map(k => '<tr>'
+        + '<td style="font-size:12.5px">' + k.email + '</td>'
+        + '<td><code style="font-family:var(--mono);font-size:11.5px;background:var(--surface2);padding:2px 8px;border-radius:4px">' + k.key_prefix + '••••••••</code></td>'
+        + '<td>' + planPill(k.plan) + '</td>'
+        + '<td style="font-size:12px;color:var(--ink3)">' + fmt.date(k.created_at) + '</td>'
+        + '<td style="font-size:12px;color:var(--ink3)">' + (k.last_used_at ? fmt.relative(k.last_used_at) : 'Never') + '</td>'
+        + '<td><button class="action-btn danger" onclick="revokeKey(\'' + k.id + '\')">Revoke</button></td>'
+        + '</tr>').join('')
+      + '</tbody></table>';
+  }
+
+  $('generateKeyBtn')?.addEventListener('click', async () => {
+    const targetEmail = prompt('Generate API key for which user email?');
+    if (!targetEmail) return;
+    try {
+      const res = await paFetch(APP_CONFIG.FLOWS.ADMIN_UPDATE || APP_CONFIG.FLOWS.QUOTA_GET, { adminEmail: email, targetEmail, action: 'generateApiKey' });
+      if (res?.apiKey) {
+        prompt('API key generated (copy now — shown only once):', res.apiKey);
+        await loadApiKeys();
+      }
+    } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+  });
+
+  window.revokeKey = async function(keyId) {
+    if (!confirm('Revoke this API key? This cannot be undone.')) return;
+    try {
+      await paFetch(APP_CONFIG.FLOWS.ADMIN_UPDATE || APP_CONFIG.FLOWS.QUOTA_GET, { adminEmail: email, keyId, action: 'revokeApiKey' });
+      showToast('Key revoked', 'success');
+      await loadApiKeys();
+    } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+  };
+
+  /* ── Export CSV ── */
+  $('exportUsersBtn')?.addEventListener('click', () => {
+    const rows = allUsers.map(u => ({ Email: u.email, Name: u.full_name||'', Plan: u.plan||'trial', CreditsUsed: u.credits_used||0, CreditsLimit: u.credits_limit||5, Joined: fmt.datetime(u.created_at), Active: u.is_active }));
+    exportCSV(rows, 'prudent-users.csv');
+  });
+
+  $('refreshAdminBtn')?.addEventListener('click', () => { loadAll(); showToast('Refreshed', 'info', 1500); });
+
+  function setText(id, val) { const el=$(id); if(el) el.textContent=val; }
+
+  loadAll();
+})();
+</script>
+</body>
+</html>
