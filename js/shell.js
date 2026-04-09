@@ -202,17 +202,29 @@ const Shell = (() => {
     const input = document.getElementById('globalSearch');
     if (!input) return;
 
-    // Create dropdown container
+    // Append dropdown to body — avoids topbar overflow clipping
     const dropdown = document.createElement('div');
     dropdown.id = 'searchDropdown';
     Object.assign(dropdown.style, {
-      position:'absolute', top:'100%', left:'0', right:'0', zIndex:'9998',
-      background:'var(--surface)', border:'1px solid var(--border2)',
-      borderRadius:'var(--r12)', boxShadow:'var(--s4)', marginTop:'6px',
-      maxHeight:'320px', overflowY:'auto', display:'none',
+      position   : 'fixed',
+      zIndex     : '9998',
+      background : 'var(--surface)',
+      border     : '1px solid var(--border2)',
+      borderRadius : 'var(--r12)',
+      boxShadow  : 'var(--s4)',
+      maxHeight  : '340px',
+      overflowY  : 'auto',
+      display    : 'none',
+      minWidth   : '320px',
     });
-    input.parentElement.style.position = 'relative';
-    input.parentElement.appendChild(dropdown);
+    document.body.appendChild(dropdown);
+
+    function positionDropdown() {
+      const rect = input.getBoundingClientRect();
+      dropdown.style.top  = (rect.bottom + 6) + 'px';
+      dropdown.style.left = rect.left + 'px';
+      dropdown.style.width = Math.max(rect.width, 320) + 'px';
+    }
 
     function closeDropdown() { dropdown.style.display = 'none'; }
 
@@ -224,12 +236,13 @@ const Shell = (() => {
           onmouseover="this.style.background='var(--surface2)'"
           onmouseout="this.style.background='transparent'">
           <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:${r.color||'var(--blue-bg)'};display:grid;place-items:center;color:${r.iconColor||'var(--blue)'}">${r.icon}</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--ink)">${r.label}</div>
+          <div style="min-width:0;flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.label}</div>
             <div style="font-size:11.5px;color:var(--ink3)">${r.sub}</div>
           </div>
-          ${r.badge ? `<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${r.badgeBg};color:${r.badgeColor}">${r.badge}</span>` : ''}
+          ${r.badge ? `<span style="flex-shrink:0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${r.badgeBg};color:${r.badgeColor}">${r.badge}</span>` : ''}
         </div>`).join('');
+      positionDropdown();
       dropdown.style.display = 'block';
       dropdown.querySelectorAll('.search-result-item').forEach(el => {
         el.addEventListener('click', () => { closeDropdown(); location.href = el.dataset.href; });
@@ -309,7 +322,7 @@ const Shell = (() => {
 
     // Close when clicking outside
     document.addEventListener('click', e => {
-      if (!input.parentElement.contains(e.target)) closeDropdown();
+      if (!dropdown.contains(e.target) && e.target !== input) closeDropdown();
     }, true);
   }
 
