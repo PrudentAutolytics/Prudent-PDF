@@ -170,7 +170,7 @@
           </div>
         </div>
 
-        <!-- Cost Efficiency — matches Activity Feed card style -->
+        <!-- Cost Efficiency -->
         <div class="card" role="region" aria-label="Cost efficiency">
           <div class="card-hd">
             <div class="card-title">
@@ -212,8 +212,8 @@
           </div>
         </div>
 
-      </div><!-- /.right-col -->
-    </div><!-- /.two-col -->
+      </div>
+    </div>
 
   </main>
 </div>
@@ -326,10 +326,12 @@
   /* ── Welcome greeting ── */
   const greetEl = $('welcomeTitle');
   if (greetEl && session?.email) {
-    const local = session.email.split('@')[0];
-    const name  = local
-      .replace(/[._-]+/g, ' ')
-      .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    const s    = Session.get() || {};
+    const name = s.fullName || (() => {
+      const local = session.email.split('@')[0];
+      return local.replace(/[._-]+/g, ' ')
+        .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    })();
     greetEl.textContent = `${greeting()}, ${name} 👋`;
   }
 
@@ -397,7 +399,7 @@
     if (s === 'processing') return `<span class="pill pill-processing"><span class="pill-dot"></span>Processing</span>`;
     if (s === 'queued')     return `<span class="pill pill-queued">Queued</span>`;
     if (s === 'failed')     return `<span class="pill pill-failed">Failed</span>`;
-    return `<span class="pill">${status || 'Unknown'}</span>`;
+    return `<span class="pill pill-queued">${status || 'Queued'}</span>`;
   }
 
   function renderRecentJobs() {
@@ -421,7 +423,7 @@
       const rowCls = isProc ? ' class="tbl-row-processing"' : '';
       const actions = s === 'complete'
         ? `<div class="flex gap-6">${j.resultUrl ? `<a href="${j.resultUrl}" class="btn btn-sm btn-secondary" download>↓ PDF</a>` : ''}<button class="btn btn-sm btn-ghost" onclick="viewJob('${j.jobId}')">View</button></div>`
-        : isProc ? `<span class="text-xs text-subtle">Polling…</span>` : `<span class="text-xs text-subtle">—</span>`;
+        : isProc ? `<span class="text-xs text-subtle">Processing…</span>` : `<span class="text-xs text-subtle">—</span>`;
       return `<tr${rowCls}>
         <td><div class="tbl-filename">${fmt.trunc(j.fileName, 36)}</div><div class="tbl-meta">${fmt.bytes(j.fileSize)} · ${fmt.pages(j.pageCount || 0)} · ${fmt.relative(j.submittedAt)}</div></td>
         <td>${statusPill(j.status)}</td>
@@ -507,7 +509,7 @@
     $('costPreviewWrap').classList.remove('hidden');
   }
 
-  /* ── Submit job — calls Power Automate flow ── */
+  /* ── Submit job ── */
   async function submitJob() {
     if (!selectedFile) return;
     const s   = Session.get() || {};
@@ -522,65 +524,60 @@
     setUploadProgress(0, 'Hashing file…');
 
     try {
-      // Step 1 — hash the file
+      // Step 1 — checksum
       const checksum = await sha256(selectedFile);
       setUploadProgress(15, 'Encoding file…');
 
-      // Step 2 — convert to base64
+      // Step 2 — base64 (always keep for PA)
       const base64 = await fileToBase64(selectedFile);
       setUploadProgress(40, 'Getting upload URL…');
 
       const jobId = genUUID();
-      const safeName = (s.email || 'user').split('@')[0].replace(/[^a-z0-9]/gi, '-');
-      const blobName = `${safeName}-${jobId}-${selectedFile.name}`;
 
-      let blobUrl = null;
+      // Step 3 — get SAS URL from blob-sas (it generates the blob name)
+      let blobUrl  = null;
+      let blobName = '';
 
-      // Step 3 — get SAS URL and upload directly to Azure Blob
       if (APP_CONFIG.FLOWS.BLOB_SAS) {
         setUploadProgress(45, 'Getting secure upload URL…');
         const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
           email    : s.email,
           fileName : selectedFile.name,
-          blobName : blobName,
+          jobId    : jobId,
         });
 
         if (sasRes?.sasUrl) {
           setUploadProgress(55, 'Uploading PDF to Azure Blob…');
           const uploadRes = await fetch(sasRes.sasUrl, {
             method  : 'PUT',
-            headers : {
-              'x-ms-blob-type' : 'BlockBlob',
-              'Content-Type'   : 'application/pdf',
-            },
-            body : selectedFile,
+            headers : { 'x-ms-blob-type': 'BlockBlob', 'Content-Type': 'application/pdf' },
+            body    : selectedFile,
           });
-
           if (!uploadRes.ok) throw new Error(`Blob upload failed (${uploadRes.status})`);
-          blobUrl = sasRes.blobUrl || `https://${APP_CONFIG.BLOB.CONTAINER_URL.split('/')[2]}/${sasRes.blobName || blobName}`;
+
+          // Use blobName and blobUrl from sasRes — single source of truth
+          blobUrl  = sasRes.blobUrl;
+          blobName = sasRes.blobName;
           setUploadProgress(75, 'File uploaded. Submitting job…');
         }
       } else {
         setUploadProgress(55, 'Submitting job with file…');
       }
 
-      // Step 4 — submit job to Power Automate flow
-      // PA flow will: save to prudent-uploads, run Doc Intelligence, save result to prudent-results
+      // Step 4 — submit job (includes base64 for PA to use directly)
       const jobPayload = {
         jobId,
         email        : s.email,
         token        : s.token,
         fileName     : selectedFile.name,
-        blobName     : blobName,
-        blobUrl      : blobUrl,
-        fileBase64   : blobUrl ? undefined : base64, // only send base64 if no blob upload
+        blobName     : blobName,   // exact name from blob-sas
+        blobUrl      : blobUrl,    // exact URL from blob-sas
+        fileBase64   : base64,     // always send base64 so PA can process directly
         fileSize     : selectedFile.size,
         fileSizeMB   : +fmt.mb(selectedFile.size),
         checksum,
         estCost      : estimatedCost?.total,
         submittedAt  : new Date().toISOString(),
-        uploadContainer  : APP_CONFIG.APP.UPLOAD_CONTAINER  || 'prudent-uploads',
-        resultsContainer : APP_CONFIG.APP.RESULTS_CONTAINER || 'prudent-results',
       };
 
       setUploadProgress(85, 'Triggering Power Automate flow…');
@@ -588,7 +585,7 @@
       setUploadProgress(100, 'Job submitted successfully!');
       stepActive(3);
 
-      // Save to local history
+      // Save to local history with status queued
       const job = {
         jobId,
         fileName    : selectedFile.name,
@@ -596,10 +593,10 @@
         blobName,
         blobUrl     : blobUrl || null,
         pageCount   : 0,
-        status      : 'Queued',
+        status      : 'queued',
         submittedAt : new Date().toISOString(),
         completedAt : null,
-        resultUrl   : res?.resultUrl || null,
+        resultUrl   : res?.outputBlobUrl || res?.resultUrl || null,
         costTotal   : estimatedCost?.total || null,
         errorMessage: null,
       };
@@ -635,7 +632,7 @@
     if (pctEl) pctEl.textContent = pct + '%';
   }
 
-  /* ── Job status polling ── */
+  /* ── Job status polling — syncs from Supabase via jobs-status API ── */
   const activePolls = new Map();
 
   function pollJobStatus(jobId, email) {
@@ -645,14 +642,17 @@
       attempts++;
       if (attempts > 120) {
         clearInterval(timer); activePolls.delete(jobId);
-        updateJob(jobId, { status: 'Failed', errorMessage: 'Timed out.' });
+        updateJob(jobId, { status: 'failed', errorMessage: 'Timed out.' });
         renderRecentJobs(); renderStats(); return;
       }
       try {
         const res = await paFetch(APP_CONFIG.FLOWS.JOB_STATUS, { jobId, email });
         if (!res) return;
-        const status = res.status || res.Status || '';
-        updateJob(jobId, { status, resultUrl: res.resultUrl, pageCount: res.pageCount, costTotal: res.costTotal });
+        const status    = res.status || '';
+        const resultUrl = res.result_url || res.resultUrl || null;
+        const pageCount = res.page_count || res.pageCount || 0;
+        const costTotal = res.cost_total || res.costTotal || null;
+        updateJob(jobId, { status, resultUrl, pageCount, costTotal });
         renderRecentJobs(); renderStats();
         if (['complete','failed','error'].includes(status.toLowerCase())) {
           clearInterval(timer); activePolls.delete(jobId);
@@ -660,7 +660,6 @@
           if (status.toLowerCase() === 'complete') {
             addActivity(`Completed: ${fmt.trunc(j?.fileName || jobId, 30)}`, 'success');
             showToast('Redaction complete! Your file is ready.', 'success', 6000);
-            stepActive(4);
           } else {
             addActivity(`Failed: ${fmt.trunc(j?.fileName || jobId, 30)}`, 'error');
             showToast('Job failed. Check history for details.', 'error');
