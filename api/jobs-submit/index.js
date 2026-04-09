@@ -4,14 +4,14 @@ const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCred
 
 const PA_FLOW_FALLBACK = 'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6f1b9fb734594602b3cdef26e0166ed6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7yVwfmA-5Aog_IJW3XN7Vz3uNnKcBE1NyoYwluTGlpc';
 
-function generateReadSasUrl(account, accountKey, container, blobName) {
+function generateSasUrl(account, accountKey, container, blobName, permissions, hours = 2) {
   try {
     const credential = new StorageSharedKeyCredential(account, accountKey);
     const sasToken   = generateBlobSASQueryParameters({
       containerName : container,
       blobName      : blobName,
-      permissions   : BlobSASPermissions.parse('r'),
-      expiresOn     : new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+      permissions   : BlobSASPermissions.parse(permissions),
+      expiresOn     : new Date(Date.now() + hours * 60 * 60 * 1000),
     }, credential).toString();
     return `https://${account}.blob.core.windows.net/${container}/${blobName}?${sasToken}`;
   } catch (err) {
@@ -19,17 +19,14 @@ function generateReadSasUrl(account, accountKey, container, blobName) {
   }
 }
 
-function generateWriteSasUrl(account, accountKey, container, blobName) {
+// Extract blob name from a full blob URL
+function extractBlobName(blobUrl) {
   try {
-    const credential = new StorageSharedKeyCredential(account, accountKey);
-    const sasToken   = generateBlobSASQueryParameters({
-      containerName : container,
-      blobName      : blobName,
-      permissions   : BlobSASPermissions.parse('cw'),
-      expiresOn     : new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
-    }, credential).toString();
-    return `https://${account}.blob.core.windows.net/${container}/${blobName}?${sasToken}`;
-  } catch (err) {
+    const url   = new URL(blobUrl);
+    const parts = url.pathname.split('/');
+    // pathname = /container/blobname — so parts[2] onwards is the blob name
+    return parts.slice(2).join('/');
+  } catch {
     return null;
   }
 }
@@ -37,13 +34,14 @@ function generateWriteSasUrl(account, accountKey, container, blobName) {
 module.exports = async function (context, req) {
   const PA_JOB_FLOW_URL = process.env.PA_JOB_SUBMIT_FLOW || PA_FLOW_FALLBACK;
 
-  const email         = (req.body?.email    || '').trim().toLowerCase();
-  const fileName      = (req.body?.fileName || '').trim();
-  const blobUrl       = (req.body?.blobUrl  || '').trim();
-  const blobName      = (req.body?.blobName || '').trim();
-  const jobId         = (req.body?.jobId    || '').trim();
-  const fileSizeBytes = req.body?.fileSize  || 0;
-  const estCost       = req.body?.estCost   || null;
+  const email         = (req.body?.email      || '').trim().toLowerCase();
+  const fileName      = (req.body?.fileName   || '').trim();
+  const blobUrl       = (req.body?.blobUrl    || '').trim();
+  const blobName      = (req.body?.blobName   || extractBlobName(blobUrl) || '').trim();
+  const fileBase64    = req.body?.fileBase64  || null;
+  const jobId         = (req.body?.jobId      || '').trim();
+  const fileSizeBytes = req.body?.fileSize    || 0;
+  const estCost       = req.body?.estCost     || null;
 
   if (!email || !fileName || !blobUrl) {
     context.res = {
@@ -83,20 +81,24 @@ module.exports = async function (context, req) {
     const uploadContainer  = process.env.AZURE_UPLOAD_CONTAINER  || 'prudent-uploads';
     const resultsContainer = process.env.AZURE_RESULTS_CONTAINER || 'prudent-results';
 
-    // Output file naming
+    // Output naming
     const outputBlobName = `${finalJobId}_redacted_${fileName}`;
     const outputBlobUrl  = `https://${storageAccount}.blob.core.windows.net/${resultsContainer}/${outputBlobName}`;
 
     // Update DB with expected result URL
     await pool.query(`UPDATE jobs SET result_url = $1 WHERE id = $2`, [outputBlobUrl, finalJobId]);
 
-    // Generate SAS URLs for PA to read input and write output
-    const inputSasUrl  = generateReadSasUrl(storageAccount, accountKey, uploadContainer,  blobName);
-    const outputSasUrl = generateWriteSasUrl(storageAccount, accountKey, resultsContainer, outputBlobName);
+    // Generate SAS URLs using the ACTUAL blob name from the uploaded file URL
+    const actualBlobName = blobName || extractBlobName(blobUrl);
+    context.log('actualBlobName:', actualBlobName);
+    context.log('outputBlobName:', outputBlobName);
+
+    const inputSasUrl  = actualBlobName
+      ? generateSasUrl(storageAccount, accountKey, uploadContainer,  actualBlobName, 'r', 2)
+      : null;
+    const outputSasUrl = generateSasUrl(storageAccount, accountKey, resultsContainer, outputBlobName, 'cw', 2);
 
     context.log('jobs-submit: triggering PA for job', finalJobId);
-    context.log('inputSasUrl:', inputSasUrl ? 'generated' : 'FAILED');
-    context.log('outputSasUrl:', outputSasUrl ? 'generated' : 'FAILED');
 
     let paStatus = 0;
     let paError  = null;
@@ -111,23 +113,23 @@ module.exports = async function (context, req) {
           email            : email,
           fileName         : fileName,
 
-          // Input — PA reads original PDF via SAS URL
-          blobName         : blobName,
+          // Input file — PA can use either SAS URL or base64
+          blobName         : actualBlobName,
           blobUrl          : blobUrl,
-          inputSasUrl      : inputSasUrl,   // ← PA uses this to GET the PDF
+          inputSasUrl      : inputSasUrl,   // GET original PDF via this URL
+          fileBase64       : fileBase64,    // base64 of the PDF (if sent from frontend)
 
-          // Output — PA saves redacted PDF via SAS URL
+          // Output — PA saves redacted PDF here
           outputBlobName   : outputBlobName,
           outputBlobUrl    : outputBlobUrl,
-          outputSasUrl     : outputSasUrl,  // ← PA uses this to PUT the redacted PDF
-          outputContainer  : resultsContainer,
+          outputSasUrl     : outputSasUrl,  // PUT redacted PDF via this URL
 
-          // Storage info
+          // Storage details
           storageAccount   : storageAccount,
           uploadContainer  : uploadContainer,
           resultsContainer : resultsContainer,
 
-          // Callback — PA calls this when done
+          // Callback when done
           callbackUrl      : 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net/api/jobs-status',
         }),
       });
@@ -145,7 +147,7 @@ module.exports = async function (context, req) {
         jobId          : finalJobId,
         status         : 'queued',
         blobUrl,
-        blobName,
+        blobName       : actualBlobName,
         outputBlobName,
         outputBlobUrl,
         paTriggered    : paStatus >= 200 && paStatus < 300,
