@@ -6,99 +6,361 @@
 <title>Sign In — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; overflow:hidden; }
-body::before {
-  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
-  background: radial-gradient(ellipse 80vw 60vh at 15% 10%, rgba(37,99,235,.10) 0%, transparent 60%),
-              radial-gradient(ellipse 60vw 50vh at 88% 90%, rgba(124,58,237,.09) 0%, transparent 55%);
+/* ── Layout ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh; display: grid;
+  grid-template-columns: 1fr 480px;
+  background: #fff;
+  overflow: hidden;
 }
-.login-wrap { position:relative; z-index:1; width:100%; max-width:480px; }
-.pp-logo { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:28px; }
-.pp-logo img { height:44px; width:auto; object-fit:contain; border-radius:8px; }
-.pp-logo-divider { width:1px; height:32px; background:var(--border2); flex-shrink:0; }
-.pp-logo-right { display:flex; flex-direction:column; }
-.pp-logo-name { font-size:18px; font-weight:800; color:var(--ink); letter-spacing:-.4px; line-height:1.1; font-family:var(--display); }
-.pp-logo-tag { font-size:10.5px; font-weight:700; letter-spacing:2.5px; color:var(--blue); text-transform:uppercase; margin-top:3px; }
-.otp-row { display:flex; gap:9px; justify-content:center; margin:24px 0 20px; }
-.otp-digit { width:50px; height:60px; border:2px solid var(--border2); border-radius:12px; background:var(--surface); font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:700; color:var(--ink); text-align:center; outline:none; transition:border-color .15s, box-shadow .15s, transform .12s; box-shadow:var(--s1); }
-.otp-digit:focus { border-color:var(--blue); box-shadow:var(--s-glow); transform:translateY(-2px); }
-.otp-digit.filled { border-color:var(--blue); background:var(--blue-pale); color:var(--blue); }
-.otp-digit.bad { border-color:var(--red); box-shadow:var(--s-danger); animation:shake .35s ease; }
+
+/* ── Left panel ── */
+.left-panel {
+  background: linear-gradient(160deg, #0F172A 0%, #1E1B4B 50%, #1E3A8A 100%);
+  display: flex; flex-direction: column;
+  padding: 48px 56px;
+  position: relative; overflow: hidden;
+}
+.left-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 100% 100% at 0% 0%, black 20%, transparent 80%);
+}
+.left-glow {
+  position: absolute; pointer-events: none;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,.25) 0%, transparent 70%);
+  bottom: -100px; right: -100px;
+}
+.left-brand { position: relative; z-index: 1; margin-bottom: auto; }
+.left-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; margin-bottom: 56px;
+}
+.left-logo-img {
+  height: 36px; width: 108px; object-fit: contain;
+  border-radius: 8px; display: block;
+  filter: brightness(10); opacity: .92;
+  background: transparent;
+}
+.left-tagline {
+  font-size: clamp(28px, 3.5vw, 40px); font-weight: 900;
+  color: #fff; letter-spacing: -1.5px; line-height: 1.15;
+  margin-bottom: 16px;
+}
+.left-tagline span {
+  background: linear-gradient(135deg, #60A5FA, #A78BFA);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.left-sub {
+  font-size: 15px; color: rgba(255,255,255,.55);
+  line-height: 1.7; margin-bottom: 48px; max-width: 340px;
+}
+.left-features { display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 1; }
+.left-feat {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 14px; color: rgba(255,255,255,.75);
+}
+.left-feat-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
+  display: grid; place-items: center; flex-shrink: 0; color: #60A5FA;
+}
+.left-bottom {
+  position: relative; z-index: 1; margin-top: 48px;
+  padding-top: 28px; border-top: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.left-trust {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: rgba(255,255,255,.35); font-weight: 500;
+}
+.left-trust svg { opacity: .5; }
+
+/* ── Right panel ── */
+.right-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 40px; background: #fff; position: relative;
+  border-left: 1px solid #E2E8F0;
+}
+.right-top {
+  position: absolute; top: 24px; right: 28px;
+  font-size: 13px; color: #64748B;
+}
+.right-top a { color: #2563EB; font-weight: 600; text-decoration: none; }
+.right-top a:hover { text-decoration: underline; }
+
+.form-wrap { width: 100%; max-width: 360px; }
+
+.form-header { margin-bottom: 32px; }
+.form-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: #2563EB; margin-bottom: 8px;
+}
+.form-h1 {
+  font-size: 26px; font-weight: 900; letter-spacing: -.6px;
+  color: #0F172A; margin-bottom: 6px; line-height: 1.15;
+}
+.form-sub { font-size: 14px; color: #64748B; line-height: 1.6; }
+
+/* Input overrides for login */
+.login-input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid #E2E8F0; border-radius: 10px;
+  font-size: 14px; font-family: inherit; color: #0F172A;
+  background: #fff; transition: all .15s; outline: none;
+}
+.login-input:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.login-input.invalid { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.1); }
+.login-input::placeholder { color: #94A3B8; }
+
+.input-label {
+  display: block; font-size: 12.5px; font-weight: 600;
+  color: #374151; margin-bottom: 6px; letter-spacing: .01em;
+}
+.input-group { margin-bottom: 16px; }
+.input-err {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: #EF4444; margin-top: 6px; font-weight: 500;
+}
+
+/* Buttons */
+.btn-main {
+  width: 100%; padding: 12px 20px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; color: #fff; font-family: inherit;
+  background: linear-gradient(135deg, #2563EB, #4F46E5);
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37,99,235,.35);
+  transition: all .18s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-main:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.45); }
+.btn-main:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* Divider */
+.form-divider {
+  display: flex; align-items: center; gap: 12px; margin: 20px 0;
+}
+.form-divider::before, .form-divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
+.form-divider span { font-size: 12px; color: #94A3B8; font-weight: 500; white-space: nowrap; }
+
+/* Security badges */
+.security-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.sec-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 600; color: #64748B;
+  background: #F8FAFC; border: 1px solid #E2E8F0;
+  border-radius: 6px; padding: 4px 10px;
+}
+
+/* New user slide */
+.reg-slide { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .36s cubic-bezier(.4,0,.2,1), opacity .26s ease, margin .26s; margin-top: 0; }
+.reg-slide.open { max-height: 580px; opacity: 1; margin-top: 0; }
+.new-user-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: #EFF6FF; border: 1px solid #BFDBFE;
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 13px; font-weight: 600; color: #1D4ED8;
+  margin-bottom: 16px;
+}
+.trial-perks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; }
+.trial-perk {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: #374151; font-weight: 500;
+}
+.perk-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: #D1FAE5; border: 1px solid #6EE7B7; display: grid; place-items: center; }
+.perk-dot svg { color: #059669; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* OTP */
+.otp-header { text-align: center; margin-bottom: 24px; }
+.otp-lock {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: #EFF6FF; border: 1.5px solid #BFDBFE;
+  display: grid; place-items: center; margin: 0 auto 16px;
+  color: #2563EB; position: relative;
+}
+.otp-lock::after {
+  content: ''; position: absolute; inset: -5px; border-radius: 50%;
+  border: 1.5px dashed #BFDBFE; animation: spin 12s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.otp-email-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #F8FAFC; border: 1px solid #E2E8F0;
+  border-radius: 999px; padding: 4px 14px;
+  font-size: 13px; font-weight: 600; color: #334155;
+  font-family: monospace; margin-top: 6px;
+}
+.otp-digits { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+.otp-digit {
+  width: 48px; height: 56px; border: 1.5px solid #E2E8F0;
+  border-radius: 10px; background: #fff;
+  font-size: 22px; font-weight: 800; color: #0F172A;
+  text-align: center; outline: none;
+  transition: all .15s; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.otp-digit:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.1); transform: translateY(-1px); }
+.otp-digit.filled { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
+.otp-digit.bad { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.1); animation: shake .35s ease; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
-.otp-lock-icon { width:64px; height:64px; border-radius:50%; background:var(--blue-pale); border:1.5px solid var(--blue-bd); display:grid; place-items:center; margin:0 auto 18px; color:var(--blue); position:relative; }
-.otp-lock-icon::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1.5px dashed var(--blue-bd); animation:spin 14s linear infinite; }
-@keyframes spin { to{transform:rotate(360deg);} }
-.otp-email-pill { display:inline-flex; align-items:center; gap:6px; background:var(--surface2); border:1px solid var(--border2); border-radius:999px; padding:4px 14px; font-size:13px; font-weight:600; color:var(--ink2); margin-top:6px; font-family:var(--mono); }
-.verify-btn { width:100%; padding:13px; background:linear-gradient(135deg,#2563EB,#7C3AED); color:#fff; border:none; border-radius:var(--r10); font-family:var(--display); font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.30); transition:opacity .18s, transform .15s, box-shadow .18s; display:flex; align-items:center; justify-content:center; gap:8px; }
-.verify-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 7px 22px rgba(37,99,235,.38); }
-.verify-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
-.timer-pill { display:inline-flex; align-items:center; gap:5px; background:var(--amber-pale); border:1px solid var(--amber-bd); border-radius:999px; padding:3px 11px; font-size:12px; color:var(--amber); font-weight:600; margin-top:14px; }
-.otp-acts { display:flex; align-items:center; justify-content:center; gap:5px; margin-top:18px; font-size:13px; color:var(--ink3); }
-.otp-lnk { color:var(--blue); background:none; border:none; padding:0; font-size:13px; font-family:inherit; font-weight:600; cursor:pointer; }
-.otp-lnk:hover { text-decoration:underline; }
-.otp-err { text-align:center; font-size:13px; color:var(--red); margin-top:10px; min-height:18px; font-weight:500; }
-.reg-slide { overflow:hidden; max-height:0; opacity:0; transition:max-height .36s cubic-bezier(.4,0,.2,1), opacity .26s ease, margin .26s ease; margin-top:0; }
-.reg-slide.open { max-height:560px; opacity:1; margin-top:4px; }
-.new-notice { display:flex; align-items:center; gap:8px; background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(124,58,237,.05)); border:1px solid var(--blue-bd); border-radius:var(--r8); padding:10px 14px; font-size:13px; font-weight:600; color:var(--blue); margin-bottom:16px; }
-.cont-btn { width:100%; padding:13px; background:linear-gradient(135deg,#2563EB,#7C3AED); color:#fff; border:none; border-radius:var(--r10); font-family:var(--display); font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(37,99,235,.28); transition:opacity .18s, transform .15s, box-shadow .18s; display:flex; align-items:center; justify-content:center; gap:8px; }
-.cont-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 7px 22px rgba(37,99,235,.36); }
-.cont-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
-.feat-list { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:0 0 18px; }
-.feat-item { display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink2); }
-.feat-check { width:15px; height:15px; border-radius:50%; flex-shrink:0; background:var(--green-pale); border:1px solid var(--green-bd); display:grid; place-items:center; color:var(--green); font-size:8.5px; font-weight:900; }
+.otp-err { text-align: center; font-size: 13px; color: #EF4444; min-height: 20px; font-weight: 500; margin-top: 8px; }
+.timer-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #FFFBEB; border: 1px solid #FDE68A;
+  border-radius: 999px; padding: 3px 12px;
+  font-size: 12px; color: #D97706; font-weight: 600;
+}
+.otp-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-top: 16px; font-size: 13px; color: #64748B;
+}
+.otp-link {
+  color: #2563EB; background: none; border: none; padding: 0;
+  font-size: 13px; font-family: inherit; font-weight: 600;
+  cursor: pointer; transition: opacity .15s;
+}
+.otp-link:hover { opacity: .75; }
+
+/* Success */
+.success-view { text-align: center; padding: 20px 0; }
+.success-circle {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, #10B981, #059669);
+  display: grid; place-items: center; margin: 0 auto 20px;
+  box-shadow: 0 8px 24px rgba(16,185,129,.35);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.success-title { font-size: 22px; font-weight: 900; color: #0F172A; margin-bottom: 8px; letter-spacing: -.4px; }
+.success-sub { font-size: 14px; color: #64748B; line-height: 1.6; margin-bottom: 20px; }
+
+/* Footer */
+.right-footer {
+  position: absolute; bottom: 20px;
+  font-size: 12px; color: #94A3B8; text-align: center;
+}
+.right-footer a { color: #94A3B8; text-decoration: none; }
+.right-footer a:hover { color: #64748B; }
+
+/* Responsive */
+@media (max-width: 780px) {
+  body { grid-template-columns: 1fr; }
+  .left-panel { display: none; }
+  .right-panel { min-height: 100vh; padding: 40px 24px; }
+}
 </style>
 </head>
 <body>
 
-<div class="login-wrap">
-  <div class="pp-logo">
-    <img src="/assets/logo.jpg" alt="Prudent Autolytics logo"/>
-    <div class="pp-logo-divider"></div>
-    <div class="pp-logo-right">
-      <div class="pp-logo-name">Prudent PDF</div>
-      <div class="pp-logo-tag">Redaction Platform</div>
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-grid"></div>
+  <div class="left-glow"></div>
+
+  <div class="left-brand">
+    <a href="/" class="left-logo">
+      <img class="left-logo-img" src="/assets/logo.jpg" alt="Prudent PDF"/>
+    </a>
+
+    <div class="left-tagline">
+      Redact documents<br/>with <span>enterprise AI</span>
+    </div>
+    <p class="left-sub">
+      Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams.
+    </p>
+
+    <div class="left-features">
+      <div class="left-feat">
+        <div class="left-feat-icon">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        Azure Document Intelligence — detects names, IDs, addresses and more
+      </div>
+      <div class="left-feat">
+        <div class="left-feat-icon">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
+        </div>
+        Permanent black-box redaction — no metadata, no recovery
+      </div>
+      <div class="left-feat">
+        <div class="left-feat-icon">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        Side-by-side viewer — compare original vs redacted instantly
+      </div>
+      <div class="left-feat">
+        <div class="left-feat-icon">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        Private Azure Blob Storage — auto-deleted after 7 days
+      </div>
     </div>
   </div>
 
-  <div class="login-card">
+  <div class="left-bottom">
+    <div class="left-trust"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>GDPR Compliant</div>
+    <div class="left-trust"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>TLS Encrypted</div>
+    <div class="left-trust"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Auto-deleted 7 days</div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+
+  <div class="right-top">
+    New to Prudent PDF? <a href="/">Learn more</a>
+  </div>
+
+  <div class="form-wrap">
 
     <!-- STEP 1: EMAIL -->
     <div id="stepEmail">
-      <div class="login-title" id="stepTitle">Welcome</div>
-      <div class="login-sub" id="stepSub">Enter your work email to get started — no password required.</div>
-      <div class="form-group">
-        <label class="form-label" for="emailInput">Work email</label>
-        <input class="form-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email" autofocus spellcheck="false"/>
-        <div id="emailErr" class="form-err hidden">
+      <div class="form-header">
+        <div class="form-eyebrow">Prudent PDF</div>
+        <h1 class="form-h1" id="stepTitle">Welcome back</h1>
+        <p class="form-sub" id="stepSub">Enter your work email to continue — no password required.</p>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="emailInput">Work email</label>
+        <input class="login-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email" autofocus spellcheck="false"/>
+        <div id="emailErr" class="input-err hidden">
           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <span id="emailErrTxt"></span>
         </div>
       </div>
 
+      <!-- New user registration slide -->
       <div class="reg-slide" id="regSlide">
-        <div class="new-notice">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          New account — complete your details to start your free trial
+        <div class="new-user-banner">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          New account — 5 free documents included
         </div>
-        <div class="feat-list">
-          <div class="feat-item"><span class="feat-check">✓</span>5 free PDF redactions</div>
-          <div class="feat-item"><span class="feat-check">✓</span>Azure Doc Intelligence</div>
-          <div class="feat-item"><span class="feat-check">✓</span>Side-by-side viewer</div>
-          <div class="feat-item"><span class="feat-check">✓</span>Job history &amp; CSV export</div>
+        <div class="trial-perks">
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>5 free redactions</div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Azure AI detection</div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Side-by-side viewer</div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>No credit card</div>
         </div>
-        <div class="form-row" style="gap:12px">
-          <div class="form-group">
-            <label class="form-label" for="regName">Full name <span style="color:var(--red)">*</span></label>
-            <input class="form-input" id="regName" type="text" placeholder="Jane Smith" autocomplete="name"/>
+        <div class="form-row-2">
+          <div class="input-group" style="margin-bottom:0">
+            <label class="input-label" for="regName">Full name <span style="color:#EF4444">*</span></label>
+            <input class="login-input" id="regName" type="text" placeholder="Jane Smith" autocomplete="name"/>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="regCompany">Company</label>
-            <input class="form-input" id="regCompany" type="text" placeholder="Acme Corp" autocomplete="organization"/>
+          <div class="input-group" style="margin-bottom:0">
+            <label class="input-label" for="regCompany">Company</label>
+            <input class="login-input" id="regCompany" type="text" placeholder="Acme Corp" autocomplete="organization"/>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="regUseCase">Primary use case</label>
-          <select class="form-select" id="regUseCase">
+        <div class="input-group" style="margin-top:10px">
+          <label class="input-label" for="regUseCase">Primary use case</label>
+          <select class="login-input" id="regUseCase" style="cursor:pointer">
             <option value="">Select one…</option>
             <option value="legal">Legal document redaction</option>
             <option value="hr">HR / employee records</option>
@@ -108,44 +370,44 @@ body::before {
             <option value="other">Other</option>
           </select>
         </div>
-        <p style="font-size:12px;color:var(--ink4);margin:0 0 16px;line-height:1.6">
-          By creating an account you agree to our <a href="/pricing" style="color:var(--ink3);text-decoration:underline">Terms of Service</a>. No spam, ever.
+        <p style="font-size:11.5px;color:#94A3B8;margin:0 0 14px;line-height:1.6">
+          By continuing you agree to our <a href="/pricing" style="color:#64748B;text-decoration:underline">Terms of Service</a>.
         </p>
       </div>
 
-      <button class="cont-btn" id="continueBtn">
+      <button class="btn-main" id="continueBtn">
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span id="contBtnTxt">Continue</span>
       </button>
 
-      <div class="login-divider mt-20"><span>Secure · No password · Azure hosted</span></div>
-      <div class="flex-center gap-8" style="flex-wrap:wrap">
-        <div class="security-badge"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg> TLS Encrypted</div>
-        <div class="security-badge" style="background:var(--blue-pale);border-color:var(--blue-bd);color:var(--blue)"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.9"/></svg> Azure Hosted</div>
-        <div class="security-badge" style="background:var(--green-pale);border-color:var(--green-bd);color:var(--green)"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> GDPR Compliant</div>
+      <div class="form-divider"><span>secured by</span></div>
+      <div class="security-row">
+        <div class="sec-badge"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg>TLS</div>
+        <div class="sec-badge"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg>Azure</div>
+        <div class="sec-badge"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>GDPR</div>
+        <div class="sec-badge">No password</div>
       </div>
     </div>
 
     <!-- STEP 2: OTP -->
     <div id="stepOTP" class="hidden">
-      <div style="text-align:center;margin-bottom:4px">
-        <div class="otp-lock-icon">
-          <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
+      <div class="otp-header">
+        <div class="otp-lock">
+          <svg width="26" height="26" fill="none" viewBox="0 0 24 24">
             <rect x="3" y="8" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.8"/>
             <path d="M7 8V6a5 5 0 0110 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             <circle cx="12" cy="14.5" r="1.8" fill="currentColor"/>
           </svg>
         </div>
-        <div class="login-title" style="font-size:20px;margin-bottom:6px">Check your inbox</div>
-        <div style="font-size:13.5px;color:var(--ink3);line-height:1.6">We sent a 6-digit code to</div>
-        <div style="display:flex;justify-content:center;margin-top:6px">
-          <div class="otp-email-pill">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span id="otpEmailShow">—</span>
-          </div>
+        <h2 style="font-size:22px;font-weight:900;color:#0F172A;letter-spacing:-.4px;margin-bottom:6px">Check your inbox</h2>
+        <p style="font-size:14px;color:#64748B;line-height:1.6">We sent a 6-digit code to</p>
+        <div class="otp-email-badge">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="otpEmailShow">—</span>
         </div>
       </div>
-      <div class="otp-row">
+
+      <div class="otp-digits">
         <input class="otp-digit" id="d0" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"/>
         <input class="otp-digit" id="d1" type="text" inputmode="numeric" maxlength="1"/>
         <input class="otp-digit" id="d2" type="text" inputmode="numeric" maxlength="1"/>
@@ -153,40 +415,46 @@ body::before {
         <input class="otp-digit" id="d4" type="text" inputmode="numeric" maxlength="1"/>
         <input class="otp-digit" id="d5" type="text" inputmode="numeric" maxlength="1"/>
       </div>
-      <button class="verify-btn" id="verifyBtn" disabled>
+
+      <button class="btn-main" id="verifyBtn" disabled>
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Verify &amp; sign in
       </button>
+
       <div class="otp-err" id="otpErr"></div>
-      <div style="text-align:center">
-        <div class="timer-pill">
+
+      <div style="text-align:center;margin-top:14px">
+        <div class="timer-badge">
           <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          Expires in <span id="timerTxt" style="margin-left:3px;font-variant-numeric:tabular-nums">10:00</span>
+          Code expires in <span id="timerTxt" style="margin-left:3px;font-variant-numeric:tabular-nums;font-weight:700">10:00</span>
         </div>
       </div>
-      <div class="otp-acts">
-        <span>Didn't get it?</span>
-        <button class="otp-lnk" id="resendBtn">Resend code</button>
-        <span>·</span>
-        <button class="otp-lnk" id="changeEmailBtn">Change email</button>
+
+      <div class="otp-actions">
+        <span>Didn't receive it?</span>
+        <button class="otp-link" id="resendBtn">Resend code</button>
+        <span style="color:#CBD5E1">·</span>
+        <button class="otp-link" id="changeEmailBtn">Change email</button>
       </div>
     </div>
 
     <!-- STEP 3: SUCCESS -->
     <div id="stepDone" class="hidden">
       <div class="success-view">
-        <div class="success-icon">✓</div>
+        <div class="success-circle">
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
         <div class="success-title" id="successTitle">Signed in!</div>
-        <p id="successSub" style="font-size:14px;color:var(--ink2);line-height:1.7">Redirecting to your dashboard…</p>
-        <div class="spinner" style="margin:16px auto 0" role="status"></div>
+        <p class="success-sub" id="successSub">Redirecting to your dashboard…</p>
+        <div class="spinner" style="margin:0 auto" role="status"></div>
       </div>
     </div>
 
   </div>
 
-  <div class="login-footer">
+  <div class="right-footer">
     <a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>
-    © 2026 Prudent Autolytics · <a href="mailto:Kabileshvijayakumar@prudentautolytics.com">Contact</a>
+    © 2026 Prudent Autolytics · Chennai, India
   </div>
 </div>
 
@@ -195,210 +463,207 @@ body::before {
 (function(){
 'use strict';
 
-const t=localStorage.getItem('pp_theme')||'light';
-document.documentElement.setAttribute('data-theme',t);
-if(Session.valid()){location.replace('/dashboard');return;}
+const t = localStorage.getItem('pp_theme') || 'light';
+document.documentElement.setAttribute('data-theme', t);
+if (Session.valid()) { location.replace('/dashboard'); return; }
 
-const $=id=>document.getElementById(id);
-let S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false,otpSent:false};
-let tickTimer=null, checkDebounce=null;
+try {
+  if (sessionStorage.getItem('pp_expired')) {
+    sessionStorage.removeItem('pp_expired');
+    setTimeout(() => showToast('Your session has expired. Please sign in again.', 'warn', 6000), 400);
+  }
+} catch {}
 
-/* ── Steps ── */
-function show(s){['stepEmail','stepOTP','stepDone'].forEach(id=>$(id)?.classList.toggle('hidden',id!==s));}
+const $ = id => document.getElementById(id);
+let S = { email:'', isNew:false, name:'', company:'', useCase:'', checked:false, otpSent:false };
+let tickTimer = null, checkDebounce = null;
 
-/* ── Email errors ── */
-function eErr(msg){$('emailErr').classList.remove('hidden');$('emailErrTxt').textContent=msg;$('emailInput').classList.add('invalid');$('emailInput').focus();}
-function eOk(){$('emailErr').classList.add('hidden');$('emailInput').classList.remove('invalid');}
+function show(s) { ['stepEmail','stepOTP','stepDone'].forEach(id => $(id)?.classList.toggle('hidden', id !== s)); }
+function eErr(msg) { $('emailErr').classList.remove('hidden'); $('emailErrTxt').textContent = msg; $('emailInput').classList.add('invalid'); $('emailInput').focus(); }
+function eOk()  { $('emailErr').classList.add('hidden'); $('emailInput').classList.remove('invalid'); }
 
-/* ── Smart email check ── */
-$('emailInput').addEventListener('input',()=>{
-  if(S.otpSent) return;
+$('emailInput').addEventListener('input', () => {
+  if (S.otpSent) return;
   eOk();
-  S.checked=false; S.isNew=false;
+  S.checked = false; S.isNew = false;
   $('regSlide').classList.remove('open');
-  $('stepTitle').textContent='Welcome';
-  $('stepSub').textContent='Enter your work email to get started — no password required.';
-  $('contBtnTxt').textContent='Continue';
+  $('stepTitle').textContent = 'Welcome back';
+  $('stepSub').textContent = 'Enter your work email to continue — no password required.';
+  $('contBtnTxt').textContent = 'Continue';
   clearTimeout(checkDebounce);
-  const em=($('emailInput').value||'').trim();
-  if(!em||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return;
-  checkDebounce=setTimeout(()=>doCheck(em),650);
+  const em = ($('emailInput').value || '').trim();
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return;
+  checkDebounce = setTimeout(() => doCheck(em), 650);
 });
 
-async function doCheck(email){
-  if(S.otpSent) return;
-  try{
-    const d=await paFetch(APP_CONFIG.FLOWS.AUTH_CHECK,{email});
-    S.checked=true;
-    if(d.exists){
-      S.isNew=false;
-      $('stepTitle').textContent='Welcome back';
-      $('stepSub').textContent='We\'ll send a 6-digit code to your inbox — no password needed.';
-      $('contBtnTxt').textContent='Send verification code';
+async function doCheck(email) {
+  if (S.otpSent) return;
+  try {
+    const d = await paFetch(APP_CONFIG.FLOWS.AUTH_CHECK, { email });
+    S.checked = true;
+    if (d.exists) {
+      S.isNew = false;
+      $('stepTitle').textContent = 'Welcome back';
+      $('stepSub').textContent = "We'll send a 6-digit code to your inbox — no password needed.";
+      $('contBtnTxt').textContent = 'Send verification code';
       $('regSlide').classList.remove('open');
     } else {
-      S.isNew=true;
-      $('stepTitle').textContent='Create your account';
-      $('stepSub').textContent='Start your 5-document free trial — no credit card required.';
-      $('contBtnTxt').textContent='Create account & send code';
+      S.isNew = true;
+      $('stepTitle').textContent = 'Create your account';
+      $('stepSub').textContent = 'Start your 5-document free trial — no credit card required.';
+      $('contBtnTxt').textContent = 'Create account & send code';
       $('regSlide').classList.add('open');
-      setTimeout(()=>$('regName')?.focus(),360);
+      setTimeout(() => $('regName')?.focus(), 360);
     }
-  } catch(e){ S.checked=false; }
+  } catch(e) { S.checked = false; }
 }
 
-/* ── Continue button ── */
-$('continueBtn').addEventListener('click',handleContinue);
-$('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleContinue();});
+$('continueBtn').addEventListener('click', handleContinue);
+$('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleContinue(); });
 
-async function handleContinue(){
-  if(S.otpSent) return;
-
-  const email=($('emailInput').value||'').trim();
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){eErr('Please enter a valid work email address.');return;}
+async function handleContinue() {
+  if (S.otpSent) return;
+  const email = ($('emailInput').value || '').trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { eErr('Please enter a valid work email address.'); return; }
   eOk();
-  S.email=email;
+  S.email = email;
 
-  const btn=$('continueBtn');
-  function setLoading(txt){btn.disabled=true;btn.innerHTML=`<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ${txt}`;}
-  function resetBtn(){btn.disabled=false;const bt=$('contBtnTxt');btn.innerHTML=`<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>${bt?bt.textContent:'Continue'}</span>`;}
+  const btn = $('continueBtn');
+  function setLoading(txt) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ' + txt; }
+  function resetBtn()      { btn.disabled = false; btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span id="contBtnTxt">' + (S.isNew ? 'Create account & send code' : S.checked ? 'Send verification code' : 'Continue') + '</span>'; }
 
-  if(!S.checked){
-    setLoading('Checking…');
-    await doCheck(email);
-    resetBtn();
-  }
+  if (!S.checked) { setLoading('Checking…'); await doCheck(email); resetBtn(); }
 
-  if(S.isNew){
-    const name=($('regName')?.value||'').trim();
-    if(!name){
+  if (S.isNew) {
+    const name = ($('regName')?.value || '').trim();
+    if (!name) {
       $('regName').classList.add('invalid');
       $('regName').focus();
-      setTimeout(()=>$('regName').classList.remove('invalid'),2500);
+      setTimeout(() => $('regName').classList.remove('invalid'), 2500);
       eErr('Please enter your full name to create an account.');
       return;
     }
-    S.name=name;
-    S.company=($('regCompany')?.value||'').trim();
-    S.useCase=$('regUseCase')?.value||'';
+    S.name    = name;
+    S.company = ($('regCompany')?.value || '').trim();
+    S.useCase = $('regUseCase')?.value || '';
   }
 
-  // Set otpSent BEFORE the request to prevent any race condition
-  S.otpSent=true;
+  S.otpSent = true;
   setLoading('Sending code…');
-  try{
-    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email});
-    $('otpEmailShow').textContent=email;
+  try {
+    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email });
+    $('otpEmailShow').textContent = email;
     clearDigits();
     show('stepOTP');
     startTimer();
-    setTimeout(()=>$('d0')?.focus(),120);
-  } catch(err){
-    S.otpSent=false; // Reset on failure so user can try again
-    eErr(err.message||'Could not send code. Please try again.');
+    setTimeout(() => $('d0')?.focus(), 120);
+  } catch(err) {
+    S.otpSent = false;
+    eErr(err.message || 'Could not send code. Please try again.');
     resetBtn();
   }
 }
 
-/* ── OTP digit inputs ── */
-const ds=[0,1,2,3,4,5].map(i=>$('d'+i));
-ds.forEach((inp,i)=>{
-  inp.addEventListener('input',e=>{
-    const v=e.target.value.replace(/\D/g,'');
-    inp.value=v?v[0]:'';
-    inp.classList.toggle('filled',!!inp.value);
-    $('otpErr').textContent='';
-    if(inp.value&&i<5)ds[i+1].focus();
-    $('verifyBtn').disabled=!ds.every(d=>d.value);
+const ds = [0,1,2,3,4,5].map(i => $('d'+i));
+ds.forEach((inp, i) => {
+  inp.addEventListener('input', e => {
+    const v = e.target.value.replace(/\D/g, '');
+    inp.value = v ? v[0] : '';
+    inp.classList.toggle('filled', !!inp.value);
+    $('otpErr').textContent = '';
+    if (inp.value && i < 5) ds[i+1].focus();
+    $('verifyBtn').disabled = !ds.every(d => d.value);
   });
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Backspace'&&!inp.value&&i>0){ds[i-1].value='';ds[i-1].classList.remove('filled');ds[i-1].focus();$('verifyBtn').disabled=true;}
-    if(e.key==='Enter'&&!$('verifyBtn').disabled)verifyOTP();
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !inp.value && i > 0) { ds[i-1].value = ''; ds[i-1].classList.remove('filled'); ds[i-1].focus(); $('verifyBtn').disabled = true; }
+    if (e.key === 'Enter' && !$('verifyBtn').disabled) verifyOTP();
   });
-  inp.addEventListener('paste',e=>{
+  inp.addEventListener('paste', e => {
     e.preventDefault();
-    const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');
-    p.slice(0,6).split('').forEach((ch,j)=>{if(ds[j]){ds[j].value=ch;ds[j].classList.add('filled');}});
+    const p = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+    p.slice(0,6).split('').forEach((ch,j) => { if (ds[j]) { ds[j].value = ch; ds[j].classList.add('filled'); } });
     ds[Math.min(p.length,5)]?.focus();
-    $('verifyBtn').disabled=!ds.every(d=>d.value);
+    $('verifyBtn').disabled = !ds.every(d => d.value);
   });
 });
 
-function getCode(){return ds.map(d=>d.value).join('');}
-function clearDigits(){ds.forEach(d=>{d.value='';d.classList.remove('filled','bad');});$('verifyBtn').disabled=true;}
-function shakeDigits(){ds.forEach(d=>{d.classList.add('bad');setTimeout(()=>d.classList.remove('bad'),420);});}
+function getCode()    { return ds.map(d => d.value).join(''); }
+function clearDigits(){ ds.forEach(d => { d.value = ''; d.classList.remove('filled','bad'); }); $('verifyBtn').disabled = true; }
+function shakeDigits(){ ds.forEach(d => { d.classList.add('bad'); setTimeout(() => d.classList.remove('bad'), 420); }); }
 
-/* ── Timer ── */
-function startTimer(ms=600000){
-  const dl=Date.now()+ms;
-  if(tickTimer)clearInterval(tickTimer);
-  tickTimer=setInterval(()=>{
-    const r=Math.max(0,dl-Date.now());
-    const el=$('timerTxt');
-    if(el)el.textContent=`${Math.floor(r/60000)}:${String(Math.floor((r%60000)/1000)).padStart(2,'0')}`;
-    if(r===0){clearInterval(tickTimer);$('otpErr').textContent='Code expired — please request a new one.';$('verifyBtn').disabled=true;}
-  },1000);
+function startTimer(ms = 600000) {
+  const dl = Date.now() + ms;
+  if (tickTimer) clearInterval(tickTimer);
+  tickTimer = setInterval(() => {
+    const r = Math.max(0, dl - Date.now());
+    const el = $('timerTxt');
+    if (el) el.textContent = Math.floor(r/60000) + ':' + String(Math.floor((r%60000)/1000)).padStart(2,'0');
+    if (r === 0) { clearInterval(tickTimer); $('otpErr').textContent = 'Code expired — please request a new one.'; $('verifyBtn').disabled = true; }
+  }, 1000);
 }
 
-/* ── Verify OTP ── */
-$('verifyBtn').addEventListener('click',verifyOTP);
-async function verifyOTP(){
-  const code=getCode();
-  if(code.length!==6)return;
-  const btn=$('verifyBtn');
-  btn.disabled=true;
-  btn.innerHTML='<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> Verifying…';
-  try{
-    const d=await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY,{email:S.email,otp:code});
-    if(d?.status==='approved'){
+$('verifyBtn').addEventListener('click', verifyOTP);
+async function verifyOTP() {
+  const code = getCode();
+  if (code.length !== 6) return;
+  const btn = $('verifyBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> Verifying…';
+  try {
+    const d = await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY, { email: S.email, otp: code });
+    if (d?.status === 'approved') {
       clearInterval(tickTimer);
       Session.set({
-        email:d.email||S.email,token:d.userId||genUUID(),userId:d.userId||'',
-        plan:d.plan||'trial',creditsUsed:d.creditsUsed??0,
-        creditsLimit:d.creditsLimit??APP_CONFIG.TRIAL.MAX_FILES,
-        trialExpiryDate:d.trialExpiryDate||null,isNewUser:S.isNew,
-        expiresAt:Date.now()+8*3600000,
+        email          : d.email || S.email,
+        token          : d.userId || genUUID(),
+        userId         : d.userId || '',
+        plan           : d.plan   || 'trial',
+        creditsUsed    : d.creditsUsed    ?? 0,
+        creditsLimit   : d.creditsLimit   ?? APP_CONFIG.PLANS.trial.filesPerMonth,
+        trialExpiryDate: d.trialExpiryDate || null,
+        isNewUser      : S.isNew,
+        expiresAt      : Date.now() + 8 * 3600000,
+        fullName       : d.fullName || S.name || null,
       });
-      const fn=S.name?S.name.split(' ')[0]:null;
-      $('successTitle').textContent=S.isNew&&fn?`Welcome, ${fn}!`:'Signed in!';
-      $('successSub').textContent=S.isNew?'Your free trial is active. Redirecting…':'Redirecting to your dashboard…';
+      const fn = d.fullName || S.name;
+      const firstName = fn ? fn.split(' ')[0] : null;
+      $('successTitle').textContent = S.isNew && firstName ? 'Welcome, ' + firstName + '!' : 'Signed in!';
+      $('successSub').textContent   = S.isNew ? 'Your free trial is active. Redirecting…' : 'Redirecting to your dashboard…';
       show('stepDone');
-      setTimeout(()=>location.replace('/dashboard'),1200);
+      setTimeout(() => location.replace('/dashboard'), 1200);
     } else { throw new Error('Verification failed.'); }
-  } catch(err){
+  } catch(err) {
     shakeDigits();
-    $('otpErr').textContent=
-      err.message?.includes('Invalid')?'Incorrect code — please check and try again.':
-      err.message?.includes('expired')?'Code expired — request a new one.':
+    $('otpErr').textContent =
+      err.message?.includes('Invalid') ? 'Incorrect code — please check and try again.' :
+      err.message?.includes('expired') ? 'Code expired — request a new one.' :
       'Verification failed. Please try again.';
-    btn.disabled=false;
-    btn.innerHTML='<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verify &amp; sign in';
-    $('verifyBtn').disabled=!ds.every(d=>d.value);
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verify &amp; sign in';
+    $('verifyBtn').disabled = !ds.every(d => d.value);
   }
 }
 
-/* ── Resend + change email ── */
-$('resendBtn').addEventListener('click',async()=>{
-  $('otpErr').textContent=''; clearDigits();
-  $('resendBtn').disabled=true; $('resendBtn').textContent='Sending…';
-  try{
-    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST,{email:S.email});
+$('resendBtn').addEventListener('click', async () => {
+  $('otpErr').textContent = ''; clearDigits();
+  $('resendBtn').disabled = true; $('resendBtn').textContent = 'Sending…';
+  try {
+    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email: S.email });
     startTimer();
-    showToast('New code sent','success');
-  } catch(e){$('otpErr').textContent='Failed to resend. Try again.';}
-  $('resendBtn').disabled=false; $('resendBtn').textContent='Resend code';
+    showToast('New code sent to ' + S.email, 'success');
+  } catch(e) { $('otpErr').textContent = 'Failed to resend. Try again.'; }
+  $('resendBtn').disabled = false; $('resendBtn').textContent = 'Resend code';
 });
 
-$('changeEmailBtn').addEventListener('click',()=>{
+$('changeEmailBtn').addEventListener('click', () => {
   clearInterval(tickTimer);
-  S={email:'',isNew:false,name:'',company:'',useCase:'',checked:false,otpSent:false};
-  $('emailInput').value='';
+  S = { email:'', isNew:false, name:'', company:'', useCase:'', checked:false, otpSent:false };
+  $('emailInput').value = '';
   $('regSlide').classList.remove('open');
-  $('stepTitle').textContent='Welcome';
-  $('stepSub').textContent='Enter your work email to get started — no password required.';
-  $('contBtnTxt').textContent='Continue';
+  $('stepTitle').textContent = 'Welcome back';
+  $('stepSub').textContent = 'Enter your work email to continue — no password required.';
   show('stepEmail');
-  setTimeout(()=>$('emailInput').focus(),80);
+  setTimeout(() => $('emailInput')?.focus(), 60);
 });
 
 })();
