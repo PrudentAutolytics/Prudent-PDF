@@ -87,12 +87,8 @@ const Shell = (() => {
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
   <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
-    <div style="width:42px;height:42px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1.5px solid var(--border2);box-shadow:var(--s2)">
-      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:cover;display:block"/>
-    </div>
-    <div>
-      <div class="brand-name" style="font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px;line-height:1.1">Prudent PDF</div>
-      <div class="brand-tagline" style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-top:2px">Redaction Platform</div>
+    <div style="width:120px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);background:var(--surface2)">
+      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:3px;box-sizing:border-box"/>
     </div>
   </a>
 
