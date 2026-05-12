@@ -5,24 +5,28 @@
     { "route": "/viewer",    "rewrite": "/pages/viewer.html"     },
     { "route": "/pricing",   "rewrite": "/pages/pricing.html"   },
     { "route": "/contact",   "rewrite": "/pages/contact.html"   },
-    { "route": "/admin",     "rewrite": "/pages/admin.html"     },
+    { "route": "/admin",     "rewrite": "/pages/admin.html"      },
     { "route": "/login",     "rewrite": "/pages/login.html"     },
+    { "route": "/robots.txt","rewrite": "/robots.txt"           },
     { "route": "/",          "rewrite": "/index.html"           }
   ],
   "navigationFallback": {
     "rewrite": "/pages/login.html",
-    "exclude": ["/css/*", "/js/*", "/assets/*", "/*.json", "/*.ico", "/*.png", "/*.svg"]
+    "exclude": ["/css/*", "/js/*", "/assets/*", "/*.json", "/*.ico", "/*.png", "/*.svg", "/*.txt"]
   },
   "globalHeaders": {
-    "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "SAMEORIGIN",
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    "X-Content-Type-Options"  : "nosniff",
+    "X-Frame-Options"         : "SAMEORIGIN",
+    "Referrer-Policy"         : "strict-origin-when-cross-origin",
+    "Permissions-Policy"      : "camera=(), microphone=(), geolocation=()",
+    "X-Robots-Tag"            : "noindex, nofollow, nosnippet, noarchive, noimageindex",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
   },
   "mimeTypes": {
     ".json": "application/json",
     ".css":  "text/css",
     ".js":   "application/javascript",
-    ".svg":  "image/svg+xml"
+    ".svg":  "image/svg+xml",
+    ".txt":  "text/plain"
   }
 }
