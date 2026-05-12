@@ -1,4 +1,5 @@
 'use strict';
+const { getCorsHeaders, handleCors } = require('../cors');
 const pool = require('../db');
 
 module.exports = async function (context, req) {
@@ -7,7 +8,7 @@ module.exports = async function (context, req) {
   const status = (req.body?.status || '').trim();
 
   if (!jobId) {
-    context.res = { status: 400, headers: {'Content-Type':'application/json'}, body: { error: 'jobId required.' } };
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'jobId required.' } };
     return;
   }
 
@@ -40,7 +41,7 @@ module.exports = async function (context, req) {
 
       context.res = {
         status  : 200,
-        headers : { 'Content-Type': 'application/json' },
+        headers : getCorsHeaders(req),
         body    : { success: true, jobId, status },
       };
       return;
@@ -62,18 +63,18 @@ module.exports = async function (context, req) {
     `, params);
 
     if (!result.rows[0]) {
-      context.res = { status: 404, headers: {'Content-Type':'application/json'}, body: { error: 'Job not found.' } };
+      context.res = { status: 404, headers: getCorsHeaders(req), body: { error: 'Job not found.' } };
       return;
     }
 
     context.res = {
       status  : 200,
-      headers : { 'Content-Type': 'application/json' },
+      headers : getCorsHeaders(req),
       body    : result.rows[0],
     };
 
   } catch (err) {
     context.log('jobs-status ERROR:', err.message);
-    context.res = { status: 500, headers: {'Content-Type':'application/json'}, body: { error: err.message } };
+    context.res = { status: 500, headers: getCorsHeaders(req), body: { error: err.message } };
   }
 };

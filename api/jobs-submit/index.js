@@ -1,38 +1,49 @@
 'use strict';
+const { getCorsHeaders, handleCors } = require('../cors');
 const pool = require('../db');
 const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
 
 const PA_FLOW_FALLBACK = 'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6f1b9fb734594602b3cdef26e0166ed6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7yVwfmA-5Aog_IJW3XN7Vz3uNnKcBE1NyoYwluTGlpc';
 
-/* ── Cost calculator ── */
+/* ── Plan tier limits ── */
+const PLAN_LIMITS = {
+  trial        : { maxFileSizeMB: 10,  maxPagesPerFile: 50,    maxPagesPerMonth: 50    },
+  starter      : { maxFileSizeMB: 25,  maxPagesPerFile: 100,   maxPagesPerMonth: 500   },
+  professional : { maxFileSizeMB: 50,  maxPagesPerFile: 500,   maxPagesPerMonth: 2000  },
+  business     : { maxFileSizeMB: 100, maxPagesPerFile: 1000,  maxPagesPerMonth: 10000 },
+  enterprise   : { maxFileSizeMB: 500, maxPagesPerFile: 999999,maxPagesPerMonth: 50000 },
+};
+
+/* ── Real Azure cost calculation ── */
 function calculateCosts(pageCount, fileSizeMB) {
-  const pages = pageCount || 1;
-  const sizeMB = fileSizeMB || 0.1;
+  const pages = Math.max(1, pageCount || 1);
+  const mb    = fileSizeMB || 0.1;
 
-  // Azure actual costs
-  const docIntelCost  = pages   * 0.001;           // $0.001 per page
-  const blobCost      = sizeMB  * 0.00002;          // $0.00002 per MB
-  const functionsCost = 0.000002 * 3;               // 3 function calls
-  const paFlowCost    = 0.0006  * 2;                // 2 PA flow runs
-  const emailCost     = 0.00014;                    // 1 email notification
-  const azureTotal    = docIntelCost + blobCost + functionsCost + paFlowCost + emailCost;
-  const azureTotalWithOverhead = azureTotal * 1.20; // 20% overhead
+  // Real Azure Document Intelligence pricing
+  const docIntelRead   = pages * 0.0015;  // Read/OCR: $1.50/1000 pages
+  const docIntelCustom = pages * 0.010;   // Custom/Prebuilt PII: $10/1000 pages
+  const blob           = mb   * 0.00002;
+  const functions      = 0.000002 * 3;
+  const paFlow         = 0.0006 * 2;
+  const email          = 0.00014;
 
-  // Product price = 2x Azure cost (your margin)
-  const productPrice  = azureTotalWithOverhead * 2;
+  const azureSubtotal = docIntelRead + docIntelCustom + blob + functions + paFlow + email;
+  const azureCost     = azureSubtotal * 1.20;  // +20% overhead
+  const productPrice  = azureCost * 3.5;       // 3.5x margin ~72% gross margin
 
   return {
     breakdown: {
-      docIntelligence : +docIntelCost.toFixed(6),
-      blobStorage     : +blobCost.toFixed(6),
-      azureFunctions  : +functionsCost.toFixed(6),
-      powerAutomate   : +paFlowCost.toFixed(6),
-      notification    : +emailCost.toFixed(6),
+      docIntelRead   : +docIntelRead  .toFixed(6),
+      docIntelCustom : +docIntelCustom.toFixed(6),
+      blob           : +blob          .toFixed(6),
+      functions      : +functions     .toFixed(6),
+      paFlow         : +paFlow        .toFixed(6),
+      email          : +email         .toFixed(6),
     },
-    azureCost    : +azureTotalWithOverhead.toFixed(6), // what it costs you
-    productPrice : +productPrice.toFixed(6),           // what you charge (2x)
+    azureCost    : +azureCost   .toFixed(6), // your cost
+    productPrice : +productPrice.toFixed(6), // what customer pays
     pageCount    : pages,
-    fileSizeMB   : +sizeMB.toFixed(3),
+    fileSizeMB   : +mb.toFixed(3),
   };
 }
 
@@ -68,23 +79,45 @@ module.exports = async function (context, req) {
   const actualBlobName = extractBlobName(blobUrl) || (req.body?.blobName || '').trim();
 
   if (!email || !fileName || !blobUrl) {
-    context.res = { status: 400, headers: {'Content-Type':'application/json'}, body: { error: `Missing: ${!email?'email ':''} ${!fileName?'fileName ':''} ${!blobUrl?'blobUrl':''}`.trim() } };
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: `Missing: ${!email?'email ':''} ${!fileName?'fileName ':''} ${!blobUrl?'blobUrl':''}`.trim() } };
     return;
   }
 
   try {
-    // Validate user
-    const userResult = await pool.query(`SELECT id, credits_used, credits_limit, is_active FROM users WHERE email = $1`, [email]);
+    // Get user + plan
+    const userResult = await pool.query(`
+      SELECT id, credits_used, credits_limit, is_active, plan,
+             max_file_size_mb, max_pages_per_file, max_pages_per_month
+      FROM users WHERE email = $1
+    `, [email]);
     const user = userResult.rows[0];
-    if (!user)           { context.res = { status: 404, headers: {'Content-Type':'application/json'}, body: { error: 'User not found.' } }; return; }
-    if (!user.is_active) { context.res = { status: 403, headers: {'Content-Type':'application/json'}, body: { error: 'Account inactive.' } }; return; }
-    if (user.credits_used >= user.credits_limit) { context.res = { status: 403, headers: {'Content-Type':'application/json'}, body: { error: 'Quota exceeded. Please upgrade.' } }; return; }
+    if (!user)           { context.res = { status: 404, headers: getCorsHeaders(req), body: { error: 'User not found.' } }; return; }
+    if (!user.is_active) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Account inactive.' } }; return; }
+    if (user.credits_used >= user.credits_limit) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Monthly file limit reached. Please upgrade your plan.' } }; return; }
 
-    // Calculate costs upfront
+    // Get plan limits — from DB columns or fall back to PLAN_LIMITS defaults
+    const plan       = user.plan || 'trial';
+    const planLimits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
+    const maxSizeMB  = user.max_file_size_mb    || planLimits.maxFileSizeMB;
+    const maxPages   = user.max_pages_per_file  || planLimits.maxPagesPerFile;
+
+    // Enforce file size limit
+    if (fileSizeMB > maxSizeMB) {
+      context.res = { status: 413, headers: getCorsHeaders(req), body: { error: `File too large. Your ${plan} plan allows up to ${maxSizeMB} MB per file. Please upgrade to process larger files.` } };
+      return;
+    }
+
+    // Enforce estimated page limit (hard check after actual processing in PA)
+    if (estPageCount > maxPages) {
+      context.res = { status: 422, headers: getCorsHeaders(req), body: { error: `Document too long. Your ${plan} plan allows up to ${maxPages} pages per file. Please upgrade for larger documents.` } };
+      return;
+    }
+
+    // Calculate costs with real Azure pricing
     const costs = calculateCosts(estPageCount, fileSizeMB);
     context.log('jobs-submit costs:', JSON.stringify(costs));
 
-    // Insert job
+    // Insert job — store product price as cost_total
     const jobResult = await pool.query(`
       INSERT INTO jobs (id, user_id, file_name, blob_url, file_size_bytes, status, cost_total)
       VALUES (COALESCE($1::uuid, gen_random_uuid()), $2, $3, $4, $5, 'queued', $6)
@@ -101,7 +134,7 @@ module.exports = async function (context, req) {
     const uploadContainer  = process.env.AZURE_UPLOAD_CONTAINER  || 'prudent-uploads';
     const resultsContainer = process.env.AZURE_RESULTS_CONTAINER || 'prudent-results';
 
-    // Output naming
+    // Output naming: {jobId}_redacted_{fileName}
     const outputBlobName = `${finalJobId}_redacted_${fileName}`;
     const outputBlobUrl  = `https://${storageAccount}.blob.core.windows.net/${resultsContainer}/${outputBlobName}`;
     await pool.query(`UPDATE jobs SET result_url = $1 WHERE id = $2`, [outputBlobUrl, finalJobId]);
@@ -110,12 +143,10 @@ module.exports = async function (context, req) {
     const inputSasUrl  = actualBlobName ? generateSasUrl(storageAccount, accountKey, uploadContainer,  actualBlobName, 'r',  4) : null;
     const outputSasUrl = generateSasUrl(storageAccount, accountKey, resultsContainer, outputBlobName, 'cw', 4);
 
-    context.log('jobs-submit: job created', finalJobId);
-
-    // ── Return 200 IMMEDIATELY ──
+    // ── Return 200 immediately ──
     context.res = {
       status  : 200,
-      headers : { 'Content-Type': 'application/json' },
+      headers : getCorsHeaders(req),
       body    : {
         jobId          : finalJobId,
         status         : 'queued',
@@ -124,45 +155,34 @@ module.exports = async function (context, req) {
         outputBlobName,
         outputBlobUrl,
         costs,
-        message        : 'Job queued. Power Automate is processing your file.',
+        message        : 'Job queued. Power Automate triggered.',
       },
     };
 
-    // ── FIRE AND FORGET — PA runs in background ──
+    // ── Fire and forget PA flow ──
     fetch(PA_JOB_FLOW_URL, {
       method  : 'POST',
-      headers : { 'Content-Type': 'application/json' },
+      headers : getCorsHeaders(req),
       body    : JSON.stringify({
-        // Job info
         jobId            : finalJobId,
         email,
         fileName,
-
-        // Input file
         blobName         : actualBlobName,
         blobUrl,
         inputSasUrl,
         fileBase64,
-
-        // Output file
         outputBlobName,
         outputBlobUrl,
         outputSasUrl,
-
-        // Storage
         storageAccount,
         uploadContainer,
         resultsContainer,
-
-        // Cost breakdown — both actual and product price
         estimatedPageCount : costs.pageCount,
         fileSizeMB         : costs.fileSizeMB,
         costBreakdown      : costs.breakdown,
-        azureCost          : costs.azureCost,      // what it costs you (Azure)
-        productPrice       : costs.productPrice,   // what to charge customer (2x)
-
-        // Callback
-        callbackUrl : 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net/api/jobs-status',
+        azureCost          : costs.azureCost,     // your cost
+        productPrice       : costs.productPrice,  // charge customer this
+        callbackUrl        : 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net/api/jobs-status',
       }),
     })
     .then(r => context.log('PA triggered, status:', r.status))
@@ -170,6 +190,6 @@ module.exports = async function (context, req) {
 
   } catch (err) {
     context.log('jobs-submit ERROR:', err.message);
-    context.res = { status: 500, headers: {'Content-Type':'application/json'}, body: { error: err.message } };
+    context.res = { status: 500, headers: getCorsHeaders(req), body: { error: err.message } };
   }
 };

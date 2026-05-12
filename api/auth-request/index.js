@@ -1,4 +1,5 @@
 'use strict';
+const { getCorsHeaders, handleCors } = require('../cors');
 const crypto = require('crypto');
 const pool   = require('../db');
 const { sendEmail, otpEmailHtml } = require('../email');
@@ -12,12 +13,12 @@ module.exports = async function (context, req) {
   const useCase  = (req.body?.useCase  || '').trim();
 
   if (!email || !email.includes('@')) {
-    context.res = { status: 400, headers: {'Content-Type':'application/json'}, body: { error: 'Please enter a valid email address.' } };
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Please enter a valid email address.' } };
     return;
   }
 
   if (pendingRequests.has(email)) {
-    context.res = { status: 200, headers: {'Content-Type':'application/json'}, body: { message: 'Code already being sent.' } };
+    context.res = { status: 200, headers: getCorsHeaders(req), body: { message: 'Code already being sent.' } };
     return;
   }
 
@@ -44,11 +45,11 @@ module.exports = async function (context, req) {
     await sendEmail(email, 'Your Prudent PDF login code', otpEmailHtml(otp));
 
     context.log('auth-request: success for', email);
-    context.res = { status: 200, headers: {'Content-Type':'application/json'}, body: { message: 'Code sent.' } };
+    context.res = { status: 200, headers: getCorsHeaders(req), body: { message: 'Code sent.' } };
 
   } catch (err) {
     context.log('auth-request ERROR:', err.message);
-    context.res = { status: 400, headers: {'Content-Type':'application/json'}, body: { error: err.message || 'Failed to send code. Please try again.' } };
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: err.message || 'Failed to send code. Please try again.' } };
   } finally {
     pendingRequests.delete(email);
   }

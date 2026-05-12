@@ -1,4 +1,5 @@
 'use strict';
+const { getCorsHeaders, handleCors } = require('../cors');
 const pool = require('../db');
 
 module.exports = async function (context, req) {
@@ -6,7 +7,7 @@ module.exports = async function (context, req) {
   const otp   = (req.body?.otp   || '').trim();
 
   if (!email || !otp) {
-    context.res = { status: 400, headers: {'Content-Type':'application/json'}, body: { error: 'Email and code required.' } };
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Email and code required.' } };
     return;
   }
 
@@ -20,11 +21,11 @@ module.exports = async function (context, req) {
 
     const user = result.rows[0];
 
-    if (!user)           { context.res = { status: 404, headers: {'Content-Type':'application/json'}, body: { error: 'User not found.' } }; return; }
-    if (!user.is_active) { context.res = { status: 403, headers: {'Content-Type':'application/json'}, body: { error: 'Account inactive. Please contact support.' } }; return; }
-    if (!user.otp)       { context.res = { status: 401, headers: {'Content-Type':'application/json'}, body: { error: 'No active code found. Please request a new one.' } }; return; }
-    if (new Date() > new Date(user.otp_expires_at)) { context.res = { status: 401, headers: {'Content-Type':'application/json'}, body: { error: 'Code expired. Please request a new one.' } }; return; }
-    if (user.otp !== otp) { context.res = { status: 401, headers: {'Content-Type':'application/json'}, body: { error: 'Invalid code. Please check and try again.' } }; return; }
+    if (!user)           { context.res = { status: 404, headers: getCorsHeaders(req), body: { error: 'User not found.' } }; return; }
+    if (!user.is_active) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Account inactive. Please contact support.' } }; return; }
+    if (!user.otp)       { context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'No active code found. Please request a new one.' } }; return; }
+    if (new Date() > new Date(user.otp_expires_at)) { context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Code expired. Please request a new one.' } }; return; }
+    if (user.otp !== otp) { context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Invalid code. Please check and try again.' } }; return; }
 
     // Clear OTP after successful verify
     await pool.query(`UPDATE users SET otp = NULL, otp_expires_at = NULL WHERE email = $1`, [email]);
@@ -33,7 +34,7 @@ module.exports = async function (context, req) {
 
     context.res = {
       status  : 200,
-      headers : { 'Content-Type': 'application/json' },
+      headers : getCorsHeaders(req),
       body    : {
         status          : 'approved',
         email           : user.email,
@@ -50,6 +51,6 @@ module.exports = async function (context, req) {
 
   } catch (err) {
     context.log('auth-verify ERROR:', err.message);
-    context.res = { status: 500, headers: {'Content-Type':'application/json'}, body: { error: 'Verification failed. Please try again.' } };
+    context.res = { status: 500, headers: getCorsHeaders(req), body: { error: 'Verification failed. Please try again.' } };
   }
 };

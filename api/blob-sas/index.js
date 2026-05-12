@@ -1,4 +1,5 @@
 'use strict';
+const { getCorsHeaders, handleCors } = require('../cors');
 const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
 
 const PLAN_LIMITS = {
@@ -19,7 +20,7 @@ module.exports = async function (context, req) {
   const fileSizeBytes = req.body?.fileSize || 0;
 
   if (!email) {
-    context.res = { status: 400, headers: {'Content-Type':'application/json'}, body: { error: 'Email required.' } };
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Email required.' } };
     return;
   }
 
@@ -55,7 +56,7 @@ module.exports = async function (context, req) {
           if (fileSizeBytes > maxBytes) {
             context.res = {
               status  : 413,
-              headers : { 'Content-Type': 'application/json' },
+              headers : getCorsHeaders(req),
               body    : { error: `File too large. Your ${plan} plan allows up to ${user.max_file_size_mb || planLimits.maxFileSizeMB} MB per file.` },
             };
             return;
@@ -86,11 +87,11 @@ module.exports = async function (context, req) {
 
     context.res = {
       status  : 200,
-      headers : { 'Content-Type': 'application/json' },
+      headers : getCorsHeaders(req),
       body    : { sasUrl, blobUrl, blobName: targetBlobName, container: targetContainer },
     };
   } catch (err) {
     context.log('blob-sas ERROR:', err.message);
-    context.res = { status: 500, headers: {'Content-Type':'application/json'}, body: { error: err.message } };
+    context.res = { status: 500, headers: getCorsHeaders(req), body: { error: err.message } };
   }
 };
