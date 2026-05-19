@@ -1,19 +1,43 @@
 'use strict';
-const { getCorsHeaders, handleCors } = require('../cors');
 const crypto = require('crypto');
 const pool   = require('../db');
 const { sendEmail, otpEmailHtml } = require('../email');
+const { getCorsHeaders, handleCors } = require('../cors');
 
+// In-memory rate limiting — per email and per IP
 const pendingRequests = new Set();
+const rateLimitMap    = new Map(); // email -> { count, resetAt }
+const OTP_RATE_LIMIT  = 5;        // max requests per window
+const OTP_WINDOW_MS   = 15 * 60 * 1000; // 15 minutes
+
+function isRateLimited(key) {
+  const now   = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + OTP_WINDOW_MS });
+    return false;
+  }
+  if (entry.count >= OTP_RATE_LIMIT) return true;
+  entry.count++;
+  return false;
+}
 
 module.exports = async function (context, req) {
+  if (handleCors(context, req)) return;
+
   const email    = (req.body?.email    || '').trim().toLowerCase();
   const fullName = (req.body?.fullName || '').trim();
   const company  = (req.body?.company  || '').trim();
   const useCase  = (req.body?.useCase  || '').trim();
 
-  if (!email || !email.includes('@')) {
+  if (!email || !email.includes('@') || email.length > 254) {
     context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Please enter a valid email address.' } };
+    return;
+  }
+
+  // Rate limit by email
+  if (isRateLimited(email)) {
+    context.res = { status: 429, headers: getCorsHeaders(req), body: { error: 'Too many requests. Please wait 15 minutes before requesting another code.' } };
     return;
   }
 
@@ -30,7 +54,6 @@ module.exports = async function (context, req) {
   try {
     context.log('auth-request: upserting for', email);
 
-    // Upsert user — insert new or update OTP only, preserve existing name/company
     await pool.query(`
       INSERT INTO users (email, otp, otp_expires_at, full_name, company, use_case)
       VALUES ($1, $2, $3, $4, $5, $6)

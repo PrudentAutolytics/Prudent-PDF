@@ -1,8 +1,11 @@
 'use strict';
-const { getCorsHeaders, handleCors } = require('../cors');
-const pool = require('../db');
+const pool                              = require('../db');
+const { getCorsHeaders, handleCors }    = require('../cors');
+const { generateSessionToken }          = require('../auth');
 
 module.exports = async function (context, req) {
+  if (handleCors(context, req)) return;
+
   const email = (req.body?.email || '').trim().toLowerCase();
   const otp   = (req.body?.otp   || '').trim();
 
@@ -24,11 +27,20 @@ module.exports = async function (context, req) {
     if (!user)           { context.res = { status: 404, headers: getCorsHeaders(req), body: { error: 'User not found.' } }; return; }
     if (!user.is_active) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Account inactive. Please contact support.' } }; return; }
     if (!user.otp)       { context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'No active code found. Please request a new one.' } }; return; }
-    if (new Date() > new Date(user.otp_expires_at)) { context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Code expired. Please request a new one.' } }; return; }
-    if (user.otp !== otp) { context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Invalid code. Please check and try again.' } }; return; }
+    if (new Date() > new Date(user.otp_expires_at)) {
+      context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Code expired. Please request a new one.' } };
+      return;
+    }
+    if (user.otp !== otp) {
+      context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Invalid code. Please check and try again.' } };
+      return;
+    }
 
     // Clear OTP after successful verify
     await pool.query(`UPDATE users SET otp = NULL, otp_expires_at = NULL WHERE email = $1`, [email]);
+
+    // Issue a signed session token
+    const token = generateSessionToken(user.email, user.id);
 
     context.log('auth-verify: SUCCESS for', email);
 
@@ -39,6 +51,7 @@ module.exports = async function (context, req) {
         status          : 'approved',
         email           : user.email,
         userId          : user.id,
+        token,                          // <-- signed session token
         plan            : user.plan,
         creditsUsed     : user.credits_used,
         creditsLimit    : user.credits_limit,

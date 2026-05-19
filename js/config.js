@@ -233,6 +233,12 @@ const Session = (() => {
 async function paFetch(url, body = {}, timeoutMs = 55_000) {
   if (!url) throw new Error('Endpoint not configured.');
 
+  // Automatically attach session token to every API call
+  const session = Session.get();
+  if (session?.token && !body.token) {
+    body = { ...body, token: session.token };
+  }
+
   const ctrl  = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
 

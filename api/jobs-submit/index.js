@@ -1,5 +1,7 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
+const { verifySession }              = require('../auth');
+'use strict';
 const pool = require('../db');
 const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
 
@@ -66,6 +68,15 @@ function extractBlobName(blobUrl) {
 }
 
 module.exports = async function (context, req) {
+  if (handleCors(context, req)) return;
+
+  // ── Session auth ──
+  const auth = await verifySession(req);
+  if (!auth.ok) {
+    context.res = { status: auth.status, headers: getCorsHeaders(req), body: { error: auth.error } };
+    return;
+  }
+
   const PA_JOB_FLOW_URL = process.env.PA_JOB_SUBMIT_FLOW || PA_FLOW_FALLBACK;
 
   const email         = (req.body?.email    || '').trim().toLowerCase();

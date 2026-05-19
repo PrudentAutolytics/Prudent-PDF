@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Document Viewer — Prudent PDF</title>
@@ -29,7 +30,14 @@
 .cost-summary { padding:10px 12px; background:var(--surface); border-top:1px solid var(--border); display:flex; flex-direction:column; gap:5px; }
 .cost-row { display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink3); }
 .cost-row.total { font-family:var(--display); font-weight:700; font-size:12.5px; color:var(--ink); padding-top:5px; border-top:1px solid var(--border); }
-.pdf-loading { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg3); gap:12px; color:var(--ink3); font-size:13px; z-index:10; }
+.conf-high { color:var(--green); } .conf-medium { color:var(--amber); } .conf-low { color:var(--red); }
+/* PDF loading overlay */
+.pdf-loading {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:var(--bg3); gap:12px; color:var(--ink3); font-size:13px;
+  z-index:10;
+}
 .pdf-loading.hidden { display:none; }
 </style>
 </head>
@@ -47,6 +55,7 @@
       <span class="pill hidden" id="viewerStatus"></span>
       <span class="font-mono text-xs text-subtle hidden" id="viewerMeta"></span>
       <div style="flex:1"></div>
+      <!-- Job selector dropdown -->
       <select class="filter-select" id="jobSelector" style="max-width:260px;font-size:12px">
         <option value="">Loading jobs…</option>
       </select>
@@ -85,10 +94,9 @@
             <div class="spinner" style="width:24px;height:24px;border-width:2.5px;margin:0"></div>
             <span>Loading original PDF…</span>
           </div>
-          <!-- BUG-06 FIXED: empty state shows CTA to upload when no jobs -->
           <div class="pane-empty hidden" id="origEmpty">
             <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
-            <div id="origEmptyMsg" style="font-size:13px;line-height:1.65;text-align:center">Select a job above</div>
+            <div style="font-size:13px;line-height:1.65" id="origEmptyMsg">Select a job from the toolbar above</div>
           </div>
           <iframe id="origFrame" class="hidden" title="Original PDF"></iframe>
         </div>
@@ -175,13 +183,14 @@
   let origSasUrl = null;
   let redSasUrl  = null;
 
-  /* ── Fetch jobs ── */
+  /* ── Fetch jobs from Supabase ── */
   async function fetchJobs() {
     try {
-      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 0 });
+      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 30 });
       if (Array.isArray(res)) {
         allJobs = res;
         populateSelector();
+        // Auto-load from URL param
         const urlJobId = new URLSearchParams(location.search).get('jobId');
         if (urlJobId) {
           const sel = $('jobSelector');
@@ -191,6 +200,7 @@
           }
           await loadJob(urlJobId);
         } else {
+          // Show empty state if no URL param
           showInitialEmpty();
         }
       }
@@ -202,7 +212,7 @@
     }
   }
 
-  /* ── BUG-06 FIXED: proper empty state for no jobs ── */
+  /* ── BUG-06: Empty state — shows CTA to upload when no jobs, otherwise prompts to select ── */
   function showInitialEmpty() {
     $('origLoading')?.classList.add('hidden');
     $('redLoading')?.classList.add('hidden');
@@ -212,10 +222,10 @@
     origEmpty?.classList.remove('hidden');
 
     if (!allJobs.length) {
-      // No jobs at all — show CTA
+      // No jobs at all — guide user to dashboard
       if (origMsg) origMsg.innerHTML = `
-        <div style="font-weight:700;color:var(--ink);margin-bottom:6px">No document loaded</div>
-        <div style="color:var(--ink3);font-size:12.5px;margin-bottom:14px">Process your first file to view results here.</div>
+        <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:6px">No document loaded</div>
+        <div style="font-size:12.5px;color:var(--ink3);line-height:1.65;margin-bottom:14px">Process your first file to view results here.</div>
         <a href="/dashboard" class="btn btn-primary btn-sm">Upload a document →</a>`;
     } else {
       if (origMsg) origMsg.textContent = 'Select a job from the dropdown above';
@@ -229,20 +239,15 @@
     const sel = $('jobSelector');
     if (!sel) return;
     if (!allJobs.length) {
-      sel.innerHTML = '<option value="">No jobs yet — upload one first</option>';
+      sel.innerHTML = '<option value="">No jobs yet</option>';
       return;
     }
-    const completed = allJobs.filter(j => (j.status||'').toLowerCase() === 'complete');
-    const others    = allJobs.filter(j => (j.status||'').toLowerCase() !== 'complete');
-    const toOpt     = j => {
+    const opts = allJobs.map(j => {
       const s    = (j.status||'').toLowerCase();
       const icon = s==='complete'?'✓':s==='queued'?'⏳':s==='processing'?'⚙':'●';
-      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName, 36)} — ${fmt.date(j.submittedAt)}</option>`;
-    };
-    let html = '<option value="">— Select a job —</option>';
-    if (completed.length) html += `<optgroup label="Completed">${completed.map(toOpt).join('')}</optgroup>`;
-    if (others.length)    html += `<optgroup label="In Progress">${others.map(toOpt).join('')}</optgroup>`;
-    sel.innerHTML = html;
+      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName,36)} — ${fmt.date(j.submittedAt)}</option>`;
+    }).join('');
+    sel.innerHTML = '<option value="">— Select a job —</option>' + opts;
   }
 
   /* ── Get read SAS URL ── */
@@ -257,15 +262,16 @@
     } catch { return null; }
   }
 
-  /* ── Load job ── */
+  /* ── Load job into viewer ── */
   async function loadJob(jobId) {
     if (!jobId) return;
     const j = allJobs.find(x => x.jobId === jobId);
-    if (!j) { showToast('Job not found', 'warn'); return; }
+    if (!j) { showToast('Job not found','warn'); return; }
     currentJob = j;
 
     const status = (j.status||'').toLowerCase();
 
+    // Update toolbar info
     setText('viewerFileName', fmt.trunc(j.fileName, 38));
     const stEl = $('viewerStatus');
     if (stEl) {
@@ -279,11 +285,14 @@
       metaEl.classList.remove('hidden');
     }
 
+    // Show loading spinners
     setPaneLoading('orig', true);
     setPaneLoading('red',  true);
+
     origSasUrl = null;
     redSasUrl  = null;
 
+    // Fetch both SAS URLs in parallel for speed
     const [oSas, rSas] = await Promise.all([
       j.blobUrl   ? getReadSasUrl(j.blobUrl,   'prudent-uploads')  : Promise.resolve(null),
       j.resultUrl ? getReadSasUrl(j.resultUrl, 'prudent-results') : Promise.resolve(null),
@@ -292,38 +301,52 @@
     origSasUrl = oSas;
     redSasUrl  = rSas;
 
-    if (origSasUrl) loadPdfFrame('orig', origSasUrl, fmt.bytes(j.fileSize));
-    else setPaneEmpty('orig', j.blobUrl ? 'Could not load original PDF' : 'Original not available');
+    // Render original
+    if (origSasUrl) {
+      loadPdfFrame('orig', origSasUrl, fmt.bytes(j.fileSize));
+    } else {
+      setPaneEmpty('orig', j.blobUrl ? 'Could not load original PDF' : 'Original not available');
+    }
 
-    if (redSasUrl) loadPdfFrame('red', redSasUrl, 'Redacted');
-    else setPaneEmpty('red',
-      status==='complete'   ? 'Could not load redacted PDF' :
-      status==='processing' ? 'Redaction in progress…' :
-      status==='queued'     ? 'Job is queued — check back soon' :
-      'Redacted PDF appears after job completes'
-    );
+    // Render redacted
+    if (redSasUrl) {
+      loadPdfFrame('red', redSasUrl, 'Redacted');
+    } else {
+      setPaneEmpty('red',
+        status==='complete'   ? 'Could not load redacted PDF' :
+        status==='processing' ? 'Redaction in progress…' :
+        status==='queued'     ? 'Job is queued — check back soon' :
+        'Redacted PDF appears after job completes'
+      );
+    }
 
-    $('dlOrigBtn').disabled    = !origSasUrl;
-    $('dlRedactBtn').disabled  = !redSasUrl;
+    // Buttons
+    $('dlOrigBtn').disabled   = !origSasUrl;
+    $('dlRedactBtn').disabled = !redSasUrl;
     $('exportFieldsBtn').disabled = false;
     if (origSasUrl) $('dlOrigBtn').onclick   = () => window.open(origSasUrl, '_blank');
     if (redSasUrl)  $('dlRedactBtn').onclick = () => window.open(redSasUrl,  '_blank');
 
-    setText('oPage', fmt.pages(j.pageCount||0));
-    setText('rPage', fmt.pages(j.pageCount||0));
+    // Page count
+    const pages = j.pageCount || '?';
+    setText('oPage', `${fmt.pages(j.pageCount||0)}`);
+    setText('rPage', `${fmt.pages(j.pageCount||0)}`);
 
     renderFields(j);
     renderCostSummary(j);
   }
 
   function setPaneLoading(which, isLoading) {
-    if (!isLoading) return;
-    $(`${which}Loading`)?.classList.remove('hidden');
-    $(`${which}Empty`)?.classList.add('hidden');
-    $(`${which}Frame`)?.classList.add('hidden');
+    const loading = $(`${which}Loading`);
+    const empty   = $(`${which}Empty`);
+    const frame   = $(`${which}Frame`);
+    if (isLoading) {
+      loading?.classList.remove('hidden');
+      empty?.classList.add('hidden');
+      frame?.classList.add('hidden');
+    }
   }
 
-  /* ── Load PDF frame with 12s fallback ── */
   function loadPdfFrame(which, sasUrl, sizeLabel) {
     const loading = $(`${which}Loading`);
     const empty   = $(`${which}Empty`);
@@ -341,13 +364,14 @@
       frame.classList.remove('hidden');
     };
 
-    // 12s fallback — show download button if Google Docs viewer times out
+    // If Google Docs fails after 12s show download fallback
     setTimeout(() => {
       if (!loaded) {
         loading?.classList.add('hidden');
         frame.classList.add('hidden');
-        empty?.classList.remove('hidden');
-        const msgEl = $(`${which}EmptyMsg`);
+        const emptyEl = $(`${which}Empty`);
+        const msgEl   = $(`${which}EmptyMsg`);
+        emptyEl?.classList.remove('hidden');
         if (msgEl) msgEl.innerHTML = `
           <div style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">
             Preview unavailable — viewer timed out.<br/>
@@ -367,49 +391,50 @@
   function setPaneEmpty(which, msg) {
     $(`${which}Loading`)?.classList.add('hidden');
     $(`${which}Frame`)?.classList.add('hidden');
-    const empty = $(`${which}Empty`);
-    const msgEl = $(`${which}EmptyMsg`);
+    const empty  = $(`${which}Empty`);
+    const msgEl  = $(`${which}EmptyMsg`);
     empty?.classList.remove('hidden');
     if (msgEl) msgEl.textContent = msg;
   }
 
-  const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+  function setText(id, val) { const el=$(id); if(el) el.textContent=val; }
 
   /* ── Zoom ── */
   ['o','r'].forEach(w => {
     let zoom = 100;
     $(`${w}ZoomIn`)?.addEventListener('click', () => {
-      zoom = Math.min(200, zoom + 20);
-      const f = $(w === 'o' ? 'origFrame' : 'redFrame');
-      const l = $(w === 'o' ? 'oZoomVal'  : 'rZoomVal');
-      if (f && !f.classList.contains('hidden')) { f.style.transform = `scale(${zoom/100})`; f.style.transformOrigin = 'top center'; }
-      if (l) l.textContent = zoom + '%';
+      zoom = Math.min(200, zoom+20);
+      const f = $(w==='o'?'origFrame':'redFrame');
+      const l = $(w==='o'?'oZoomVal':'rZoomVal');
+      if(f&&!f.classList.contains('hidden')){f.style.transform=`scale(${zoom/100})`;f.style.transformOrigin='top center';}
+      if(l) l.textContent=zoom+'%';
     });
     $(`${w}ZoomOut`)?.addEventListener('click', () => {
-      zoom = Math.max(50, zoom - 20);
-      const f = $(w === 'o' ? 'origFrame' : 'redFrame');
-      const l = $(w === 'o' ? 'oZoomVal'  : 'rZoomVal');
-      if (f && !f.classList.contains('hidden')) { f.style.transform = `scale(${zoom/100})`; f.style.transformOrigin = 'top center'; }
-      if (l) l.textContent = zoom + '%';
+      zoom = Math.max(50, zoom-20);
+      const f = $(w==='o'?'origFrame':'redFrame');
+      const l = $(w==='o'?'oZoomVal':'rZoomVal');
+      if(f&&!f.classList.contains('hidden')){f.style.transform=`scale(${zoom/100})`;f.style.transformOrigin='top center';}
+      if(l) l.textContent=zoom+'%';
     });
   });
 
-  /* ── Extracted fields ── */
+  /* ── Extracted fields table ── */
   function renderFields(j) {
     const panel = $('fieldsPanel');
     const count = $('fieldCount');
     if (!panel) return;
 
+    // Parse fields from Supabase — could be object, array, or string
     let fields = [];
     try {
       const raw = j.extractedFields || j.extracted_fields;
       if (!raw) fields = [];
       else if (typeof raw === 'string') fields = JSON.parse(raw);
-      else if (Array.isArray(raw))      fields = raw;
+      else if (Array.isArray(raw)) fields = raw;
       else if (typeof raw === 'object') fields = [raw];
     } catch { fields = []; }
 
-    if (count) count.textContent = `${fields.length} field${fields.length !== 1 ? 's' : ''}`;
+    if (count) count.textContent = `${fields.length} field${fields.length!==1?'s':''}`;
 
     if (!fields.length) {
       panel.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;color:var(--ink3);text-align:center">
@@ -420,14 +445,15 @@
     }
 
     const rows = fields.map((f, i) => {
-      const content  = f.content || f.value || '—';
-      const page     = f.page != null ? `p.${f.page+1}` : (f.pageNumber != null ? `p.${f.pageNumber}` : '—');
-      const conf     = f.confidence != null ? f.confidence : null;
+      // Handle both {key,value,confidence} and {content,page,polygon} formats from PA
+      const content = f.content || f.value || '—';
+      const page    = f.page != null ? `p.${f.page+1}` : (f.pageNumber!=null ? `p.${f.pageNumber}` : '—');
+      const conf    = f.confidence != null ? f.confidence : null;
       const confHtml = conf != null
         ? `<span style="font-family:var(--mono);font-size:10px;color:${conf>=0.9?'var(--green)':conf>=0.7?'var(--amber)':'var(--red)'}">${(conf*100).toFixed(0)}%</span>`
         : '<span style="color:var(--ink4)">—</span>';
       const label = f.key || f.name || f.type || `#${i+1}`;
-      const bg    = i % 2 === 0 ? 'var(--surface)' : 'var(--surface2)';
+      const bg    = i%2===0 ? 'var(--surface)' : 'var(--surface2)';
       return `<tr style="background:${bg};border-bottom:1px solid var(--border)">
         <td style="padding:6px 8px;font-size:10.5px;font-weight:700;color:var(--ink3);white-space:nowrap;vertical-align:top;max-width:70px;overflow:hidden;text-overflow:ellipsis">${label}</td>
         <td style="padding:6px 8px;font-size:11.5px;color:var(--ink);word-break:break-all;vertical-align:top">${content}</td>
@@ -438,14 +464,14 @@
 
     panel.innerHTML = `
       <div style="padding:4px 2px 8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)">
-        ${fields.length} PII entit${fields.length !== 1 ? 'ies' : 'y'} detected
+        ${fields.length} PII entit${fields.length!==1?'ies':'y'} detected
       </div>
       <div style="border:1px solid var(--border);border-radius:var(--r8);overflow:hidden;font-size:0">
         <table style="width:100%;border-collapse:collapse">
           <thead>
             <tr style="background:var(--surface3);border-bottom:2px solid var(--border)">
               <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Type</th>
-              <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Content</th>
+              <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Content (Redacted)</th>
               <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center">Pg</th>
               <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center">Conf</th>
             </tr>
@@ -454,7 +480,7 @@
         </table>
       </div>
       <div style="padding:8px 2px 0;font-size:10.5px;color:var(--ink3);line-height:1.6">
-        ⚠ ${fields.length} entit${fields.length !== 1 ? 'ies' : 'y'} redacted from output document.
+        ⚠ ${fields.length} entit${fields.length!==1?'ies':'y'} redacted from output document.
       </div>`;
   }
 
@@ -464,40 +490,42 @@
     if (!cs) return;
     if (!j.costTotal && !j.pageCount) { cs.classList.add('hidden'); return; }
     cs.classList.remove('hidden');
-    const cost = calcJobCost(j.pageCount || 1, fmt.mb(j.fileSize));
-    const set  = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    const cost = calcJobCost(j.pageCount||1, fmt.mb(j.fileSize));
+    const set  = (id,v) => { const el=$(id); if(el) el.textContent=v; };
     set('csDocIntel',    fmt.usd(cost.docIntel));
     set('csBlobStorage', fmt.usd(cost.blob));
     set('csPaFlow',      fmt.usd(cost.paFlow));
     set('csEmail',       fmt.usd(cost.email));
-    set('csTotal',       j.costTotal != null ? fmt.usd(j.costTotal) : cost.totalFmt);
+    set('csTotal',       j.costTotal!=null ? fmt.usd(j.costTotal) : cost.totalFmt);
   }
 
   /* ── Export fields CSV ── */
   $('exportFieldsBtn')?.addEventListener('click', () => {
-    if (!currentJob) { showToast('No job loaded', 'warn'); return; }
+    if (!currentJob) { showToast('No job loaded','warn'); return; }
     let fields = [];
     try {
       const raw = currentJob.extractedFields || currentJob.extracted_fields;
-      if (typeof raw === 'string')   fields = JSON.parse(raw);
+      if (typeof raw === 'string') fields = JSON.parse(raw);
       else if (Array.isArray(raw)) fields = raw;
     } catch {}
-    if (!fields.length) { showToast('No fields to export', 'warn'); return; }
+    if (!fields.length) { showToast('No fields to export','warn'); return; }
     exportCSV(
-      fields.map((f, i) => ({
-        Type       : f.key || f.name || f.type || `Field ${i+1}`,
-        Content    : f.content || f.value || '',
-        Page       : f.page != null ? f.page+1 : (f.pageNumber || ''),
-        Confidence : f.confidence != null ? (f.confidence*100).toFixed(1)+'%' : '',
+      fields.map((f,i) => ({
+        Type       : f.key||f.name||f.type||`Field ${i+1}`,
+        Content    : f.content||f.value||'',
+        Page       : f.page!=null?f.page+1:(f.pageNumber||''),
+        Confidence : f.confidence!=null?(f.confidence*100).toFixed(1)+'%':'',
       })),
-      `fields-${currentJob.jobId.slice(0, 8)}.csv`
+      `fields-${currentJob.jobId.slice(0,8)}.csv`
     );
   });
 
   /* ── Job selector ── */
-  $('jobSelector')?.addEventListener('change', e => { if (e.target.value) loadJob(e.target.value); });
+  $('jobSelector')?.addEventListener('change', e => { if(e.target.value) loadJob(e.target.value); });
 
+  /* ── Initial load ── */
   fetchJobs();
+
 })();
 </script>
 </body>

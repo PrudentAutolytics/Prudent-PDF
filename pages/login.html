@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Sign In — Prudent PDF</title>
@@ -624,14 +625,14 @@ async function verifyOTP() {
       clearInterval(tickTimer);
       Session.set({
         email          : d.email || S.email,
-        token          : d.userId || genUUID(),
+        token          : d.token || d.userId || '',   // signed session token from auth-verify
         userId         : d.userId || '',
         plan           : d.plan   || 'trial',
         creditsUsed    : d.creditsUsed    ?? 0,
         creditsLimit   : d.creditsLimit   ?? APP_CONFIG.PLANS.trial.filesPerMonth,
         trialExpiryDate: d.trialExpiryDate || null,
         isNewUser      : S.isNew,
-        expiresAt      : Date.now() + 8 * 3600000,
+        expiresAt      : Date.now() + 30 * 24 * 3600000,  // 30 days, matches server
         fullName       : d.fullName || S.name || null,
       });
       const fn = d.fullName || S.name;

@@ -1,5 +1,7 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
+const { verifySession }              = require('../auth');
+'use strict';
 const pool = require('../db');
 
 const PLAN_LIMITS = {
@@ -11,6 +13,15 @@ const PLAN_LIMITS = {
 };
 
 module.exports = async function (context, req) {
+  if (handleCors(context, req)) return;
+
+  // ── Session auth ──
+  const auth = await verifySession(req);
+  if (!auth.ok) {
+    context.res = { status: auth.status, headers: getCorsHeaders(req), body: { error: auth.error } };
+    return;
+  }
+
   const email = (req.body?.email || '').trim().toLowerCase();
 
   if (!email) {
