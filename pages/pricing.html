@@ -5,8 +5,8 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="Prudent PDF pricing — transparent per-page pricing powered by Azure Document Intelligence"/>
-<title>Plans & Pricing — Prudent PDF</title>
+
+<title>Pricing</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
 /* ── Billing toggle ── */
@@ -133,425 +133,230 @@
 </style>
 </head>
 <body>
-<div class="shell" id="appShell">
-  <main class="main">
-
-    <!-- Page header -->
-    <div class="page-hd anim">
-      <div>
-        <div class="page-hd-eyebrow">
-          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" stroke-width="2"/></svg>
-          Plans &amp; Pricing
-        </div>
-        <div class="page-title">Simple, transparent pricing</div>
-        <div class="page-subtitle">Powered by Azure Document Intelligence. No hidden fees. No contracts. Cancel anytime.</div>
-      </div>
-      <div class="page-hd-actions">
-        <div class="toggle-wrap">
-          <button class="toggle-btn active" id="toggleMonthly">Monthly</button>
-          <button class="toggle-btn" id="toggleAnnual">Annual <span class="save-pill">Save 20%</span></button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Plan cards -->
-    <div class="plans-grid anim d1">
-
-      <!-- Free Trial -->
-      <div class="plan-card">
-        <div class="plan-name">Free Trial</div>
-        <div class="plan-price-wrap"><span class="plan-price-num">$0</span><span class="plan-price-per">/mo</span></div>
-        <div class="plan-annual-note">&nbsp;</div>
-        <div class="plan-desc">Try Prudent PDF with 5 documents. No credit card required.</div>
-        <a href="/login" class="plan-btn ghost">Get started free</a>
-        <div class="plan-sep"></div>
-        <div class="plan-limits">
-          <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">5</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">10 MB</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">50 pg</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Pages / month</span><span class="plan-limit-val">50 pg</span></div>
-        </div>
-        <div class="plan-sep"></div>
-        <div class="plan-features">
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Azure Doc Intelligence</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Side-by-side viewer</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Secure Azure storage</div>
-          <div class="plan-feat off"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Priority processing</div>
-          <div class="plan-feat off"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>API access</div>
-        </div>
-      </div>
-
-      <!-- Starter -->
-      <div class="plan-card">
-        <div class="plan-name">Starter</div>
-        <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="19" data-annual="15">$19</span><span class="plan-price-per">/mo</span></div>
-        <div class="plan-annual-note" id="ann-starter">&nbsp;</div>
-        <div class="plan-desc">For individuals and small teams processing contracts and HR docs.</div>
-        <a href="/login" class="plan-btn ghost">Get started</a>
-        <div class="plan-sep"></div>
-        <div class="plan-limits">
-          <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">50</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">25 MB</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">100 pg</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Pages / month</span><span class="plan-limit-val">500 pg</span></div>
-        </div>
-        <div class="plan-sep"></div>
-        <div class="plan-features">
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Free Trial</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>CSV field export</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Email support</div>
-          <div class="plan-feat off"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Priority processing</div>
-          <div class="plan-feat off"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>API access</div>
-        </div>
-      </div>
-
-      <!-- Professional — Most Popular -->
-      <div class="plan-card popular">
-        <div class="popular-pill">⭐ Most Popular</div>
-        <div class="plan-name">Professional</div>
-        <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="79" data-annual="63">$79</span><span class="plan-price-per">/mo</span></div>
-        <div class="plan-annual-note" id="ann-professional">&nbsp;</div>
-        <div class="plan-desc">For compliance teams, legal and finance with regular redaction needs.</div>
-        <a href="/login" class="plan-btn primary">Get started</a>
-        <div class="plan-sep"></div>
-        <div class="plan-limits">
-          <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">200</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">50 MB</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">500 pg</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Pages / month</span><span class="plan-limit-val">2,000 pg</span></div>
-        </div>
-        <div class="plan-sep"></div>
-        <div class="plan-features">
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Starter</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority processing</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Confidence score reports</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated support</div>
-          <div class="plan-feat off"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>API access</div>
-        </div>
-      </div>
-
-      <!-- Business -->
-      <div class="plan-card">
-        <div class="plan-name">Business</div>
-        <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="399" data-annual="319">$399</span><span class="plan-price-per">/mo</span></div>
-        <div class="plan-annual-note" id="ann-business">&nbsp;</div>
-        <div class="plan-desc">For organisations with high-volume processing across multiple teams.</div>
-        <a href="/login" class="plan-btn ghost">Get started</a>
-        <div class="plan-sep"></div>
-        <div class="plan-limits">
-          <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">1,000</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">100 MB</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">1,000 pg</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Pages / month</span><span class="plan-limit-val">10,000 pg</span></div>
-        </div>
-        <div class="plan-sep"></div>
-        <div class="plan-features">
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Professional</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>API access</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Custom redaction rules</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>SLA guarantee</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>RBAC &amp; audit logs</div>
-        </div>
-      </div>
-
-      <!-- Enterprise -->
-      <div class="plan-card">
-        <div class="plan-name">Enterprise</div>
-        <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="1499" data-annual="1199">$1,499</span><span class="plan-price-per">/mo</span></div>
-        <div class="plan-annual-note" id="ann-enterprise">&nbsp;</div>
-        <div class="plan-desc">Unlimited processing, custom deployments and on-premise options.</div>
-        <a href="/contact" class="plan-btn ghost">Talk to us</a>
-        <div class="plan-sep"></div>
-        <div class="plan-limits">
-          <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">Unlimited</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">500 MB</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">Unlimited</span></div>
-          <div class="plan-limit-row"><span class="plan-limit-label">Pages / month</span><span class="plan-limit-val">50,000 pg</span></div>
-        </div>
-        <div class="plan-sep"></div>
-        <div class="plan-features">
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Business</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Custom Azure deployment</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>SharePoint integration</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated account manager</div>
-          <div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Custom SLA &amp; NDA</div>
-        </div>
-      </div>
-
-    </div><!-- /.plans-grid -->
-
-    <!-- Cost calculator -->
-    <div class="calc-card anim d2">
-      <div class="calc-header">
-        <div>
-          <div class="calc-title">Estimate your cost</div>
-          <div class="calc-sub">Based on real Azure pricing — OCR ($1.50/1k pages) + PII detection ($10/1k pages) + 3.5× margin.</div>
-          <div class="calc-fields" style="margin-top:18px">
-            <div class="form-group" style="margin:0">
-              <label class="form-label">Documents / month</label>
-              <input class="form-input" type="number" id="calcDocs" value="100" min="1"/>
-            </div>
-            <div class="form-group" style="margin:0">
-              <label class="form-label">Avg pages / doc</label>
-              <input class="form-input" type="number" id="calcPages" value="10" min="1"/>
-            </div>
-            <div class="form-group" style="margin:0">
-              <label class="form-label">Avg file size (MB)</label>
-              <input class="form-input" type="number" id="calcSizeMB" value="2" min="0.1" step="0.5"/>
-            </div>
-            <div class="form-group" style="margin:0">
-              <label class="form-label">Billing period</label>
-              <select class="form-select" id="calcPeriod">
-                <option value="monthly">Monthly</option>
-                <option value="annual">Annual (−20%)</option>
-              </select>
-            </div>
-          </div>
-          <div class="calc-breakdown-row">
-            <div class="calc-item">
-              <div class="calc-item-label">Azure OCR</div>
-              <div class="calc-item-val" id="calcOcr">$0.00</div>
-            </div>
-            <div class="calc-item">
-              <div class="calc-item-label">PII Detection</div>
-              <div class="calc-item-val" id="calcPii">$0.00</div>
-            </div>
-            <div class="calc-item">
-              <div class="calc-item-label">Infrastructure</div>
-              <div class="calc-item-val" id="calcInfra">$0.00</div>
-            </div>
-          </div>
-        </div>
-        <div class="calc-result-pill">
-          <div class="calc-result-label">Est. monthly cost</div>
-          <div class="calc-result-price" id="calcPrice">$0.00</div>
-          <div class="calc-result-sub" id="calcSub">—</div>
-          <div id="calcRec" style="margin-top:10px;font-size:11px;font-weight:600;line-height:1.5;opacity:.95"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Feature comparison table -->
-    <div class="card anim d3" style="margin-bottom:32px;overflow:hidden">
-      <div class="card-hd">
-        <div class="card-title">
-          <div class="card-title-icon">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          Feature comparison
-        </div>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="compare-table">
-          <thead>
-            <tr>
-              <th style="width:36%">Feature</th>
-              <th>Trial</th>
-              <th>Starter</th>
-              <th class="hi" style="color:var(--blue)">Pro</th>
-              <th>Business</th>
-              <th>Enterprise</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Azure Doc Intelligence</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Side-by-side viewer</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Secure Azure Blob storage</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>CSV field export</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Priority processing</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Confidence score reports</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>API access</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Custom redaction rules</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>SLA guarantee</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>SharePoint integration</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Custom Azure deployment</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Dedicated account manager</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- FAQ -->
-    <div class="card anim d4">
-      <div class="card-hd">
-        <div class="card-title">
-          <div class="card-title-icon">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </div>
-          Frequently asked questions
-        </div>
-      </div>
-      <div class="card-body" style="padding:0 20px 8px">
-        <div class="faq-list">
-
-          <div class="faq-item">
-            <div class="faq-q" data-faq="0">
-              How is pricing calculated?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-            <div class="faq-a">Pricing uses real Azure Document Intelligence costs — $1.50 per 1,000 pages for OCR (Read model) and $10 per 1,000 pages for PII detection (Custom/Prebuilt model). We add 20% overhead and apply a 3.5× margin. Per page: ~$0.043.</div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-q" data-faq="1">
-              What happens if I exceed my page limit?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-            <div class="faq-a">Files that exceed your plan's page or size limit are rejected before processing with a clear error message. Your credit is not consumed. You can upgrade your plan at any time to process larger documents.</div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-q" data-faq="2">
-              Is my data secure?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-            <div class="faq-a">Yes. All files are stored in private Azure Blob Storage with SAS-based access only — no public URLs. Files are automatically deleted after 7 days. All processing happens within Azure's infrastructure. We never store your document content permanently.</div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-q" data-faq="3">
-              Can I cancel anytime?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-            <div class="faq-a">Yes — no long-term contracts. Cancel or downgrade at any time. Annual plans are non-refundable after the first 14 days.</div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-q" data-faq="4">
-              Do you offer custom enterprise pricing?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-            <div class="faq-a">Yes. For organisations with specific requirements — custom Azure deployment, SharePoint integration, volume discounts, or on-premise — contact us and we'll put together a custom proposal within 48 hours.</div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-q" data-faq="5">
-              What Azure services does this use?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-            <div class="faq-a">Prudent PDF uses Azure Document Intelligence (Read + Prebuilt PII models), Azure Blob Storage, Azure Static Web Apps, Azure Functions, and Power Automate. All services run within a single Azure subscription in your chosen region.</div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-  </main>
-</div>
-
+<!-- Content injected by JS only -->
+<div class="shell-public" id="pricingShell"></div>
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
-(function () {
+(function(){
   'use strict';
   Shell.init('pricing');
 
-  /* ── Billing toggle ── */
-  let isAnnual = false;
-  const monthlyPrices = { starter:19, professional:79, business:399, enterprise:1499 };
+  function s(id,h){var e=document.getElementById(id);if(e)e.innerHTML=h;}
 
-  function updatePrices() {
-    document.querySelectorAll('[data-monthly]').forEach(el => {
-      const m = +el.dataset.monthly;
-      const a = Math.round(m * 0.8);
-      el.textContent = '$' + (isAnnual ? a.toLocaleString() : m.toLocaleString());
-    });
-    Object.entries(monthlyPrices).forEach(([plan, m]) => {
-      const el = document.getElementById(`ann-${plan}`);
-      if (!el) return;
-      if (isAnnual) {
-        const a = Math.round(m * 0.8);
-        el.textContent = `$${a * 12}/yr — save $${(m - a) * 12}`;
-        el.style.color = 'var(--green)';
-      } else {
-        el.textContent = '\u00a0';
-        el.style.color = '';
-      }
-    });
-  }
+  var shell = document.getElementById('pricingShell');
+  if (!shell) return;
 
-  document.getElementById('toggleMonthly')?.addEventListener('click', () => {
-    isAnnual = false;
-    document.getElementById('toggleMonthly').classList.add('active');
-    document.getElementById('toggleAnnual').classList.remove('active');
-    updatePrices();
-  });
-  document.getElementById('toggleAnnual')?.addEventListener('click', () => {
-    isAnnual = true;
-    document.getElementById('toggleAnnual').classList.add('active');
-    document.getElementById('toggleMonthly').classList.remove('active');
-    updatePrices();
-  });
+  // Inject entire pricing page content via JS
+  shell.innerHTML = [
+    '<div class="main">',
 
-  /* ── Cost calculator + BUG-10: plan recommendation ── */
-  const plans = [
-    { name: 'Free Trial',     maxDocs: 5,    price: 0,    href: '/login' },
-    { name: 'Starter',        maxDocs: 50,   price: 19,   href: '/login' },
-    { name: 'Professional',   maxDocs: 200,  price: 79,   href: '/login' },
-    { name: 'Business',       maxDocs: 1000, price: 399,  href: '/contact' },
-    { name: 'Enterprise',     maxDocs: Infinity, price: 1499, href: '/contact' },
+    // Header
+    '<div class="page-hd anim"><div>',
+    '<div class="page-hd-eyebrow">Plans &amp; Pricing</div>',
+    '<div class="page-title">Simple, transparent pricing</div>',
+    '<div class="page-subtitle">Powered by Azure Document Intelligence. No hidden fees. No contracts. Cancel anytime.</div>',
+    '</div></div>',
+
+    // Billing toggle
+    '<div style="display:flex;justify-content:center;margin-bottom:28px">',
+    '<div class="toggle-group"><button class="toggle-btn active" id="toggleMonthly">Monthly</button>',
+    '<button class="toggle-btn" id="toggleAnnual">Annual <span class="save-pill">Save 20%</span></button></div>',
+    '</div>',
+
+    // Plans grid
+    '<div class="plans-grid anim d1" id="plansGrid"></div>',
+
+    // Calculator
+    '<div class="calc-card anim d2" id="calcCard"></div>',
+
+    // Compare table
+    '<div class="card anim d3" id="compareCard"></div>',
+
+    // FAQ
+    '<div id="faqCard"></div>',
+
+    '</div>'
+  ].join('');
+
+  // Plans data
+  var plans = [
+    {id:'trial',       name:'Free Trial',   price:0,    annual:0,    desc:'Try Prudent PDF with 5 documents. No credit card required.',       files:5,    size:'10 MB',  pages:'50 pg',  cta:'Get started free', href:'/login',    ghost:true,  feats:['Azure Doc Intelligence','Side-by-side viewer','Secure Azure Blob','CSV field export']},
+    {id:'starter',     name:'Starter',      price:19,   annual:15,   desc:'For individuals and small teams with occasional redaction needs.',  files:50,   size:'25 MB',  pages:'100 pg', cta:'Get started',      href:'/login',    ghost:true,  feats:['Everything in Free','Bulk export','Email support']},
+    {id:'professional',name:'Professional', price:79,   annual:63,   desc:'For compliance teams, legal and finance with regular needs.',       files:200,  size:'50 MB',  pages:'500 pg', cta:'Get started',      href:'/login',    ghost:false, feats:['Everything in Starter','Priority processing','Confidence score reports','Dedicated support'], popular:true},
+    {id:'business',    name:'Business',     price:399,  annual:319,  desc:'For organisations with high-volume processing across teams.',       files:1000, size:'100 MB', pages:'1,000 pg',cta:'Contact sales',   href:'/contact',  ghost:true,  feats:['Everything in Professional','API access','Custom redaction rules','SLA guarantee']},
+    {id:'enterprise',  name:'Enterprise',   price:1499, annual:1199, desc:'For large enterprises with custom deployment and compliance needs.',files:'Unlimited',size:'500 MB',pages:'Unlimited',cta:'Talk to us',href:'/contact',ghost:true,feats:['Everything in Business','SharePoint integration','Custom Azure deployment','Dedicated account manager']}
   ];
 
-  function calcEstimate() {
-    const docs   = Math.max(1, +document.getElementById('calcDocs')?.value   || 100);
-    const pages  = Math.max(1, +document.getElementById('calcPages')?.value  || 10);
-    const sizeMB = Math.max(.1,+document.getElementById('calcSizeMB')?.value || 2);
-    const annual = document.getElementById('calcPeriod')?.value === 'annual';
+  var isAnnual = false;
 
-    const totalPages = docs * pages;
-    const ocr        = totalPages * 0.0015;
-    const pii        = totalPages * 0.010;
-    const infra      = (docs * sizeMB * 0.00002) + (docs * 0.0012) + (docs * 0.000006) + (docs * 0.00014);
-    const azure      = (ocr + pii + infra) * 1.20;
-    const product    = azure * 3.5 * (annual ? 0.8 : 1);
-
-    const f2 = n => '$' + n.toFixed(2);
-    document.getElementById('calcPrice').textContent = f2(product);
-    document.getElementById('calcOcr').textContent   = f2(ocr);
-    document.getElementById('calcPii').textContent   = f2(pii);
-    document.getElementById('calcInfra').textContent = f2(infra * 1.2);
-    document.getElementById('calcSub').textContent   =
-      `${docs.toLocaleString()} docs × ${pages} pages${annual ? ' · Annual' : ''}`;
-
-    // BUG-10: Recommend a plan based on volume
-    const rec    = plans.find(p => p.maxDocs >= docs) || plans[plans.length - 1];
-    const recEl  = document.getElementById('calcRec');
-    if (recEl) {
-      const label = rec.price === 0
-        ? `✓ Fits the <strong>Free Trial</strong> — <a href="${rec.href}" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>`
-        : `✓ Recommended: <strong>${rec.name}</strong> ($${rec.price}/mo) — <a href="${rec.href}" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>`;
-      recEl.innerHTML = label;
-    }
+  function renderPlans() {
+    var g = document.getElementById('plansGrid');
+    if (!g) return;
+    g.innerHTML = plans.map(function(p){
+      var price = isAnnual ? p.annual : p.price;
+      var priceStr = price === 0 ? 'Free' : '$' + price;
+      var perStr   = price === 0 ? '' : '<span class="plan-price-per">/mo</span>';
+      var annNote  = (isAnnual && price > 0) ? '<div class="plan-annual-note" style="color:var(--green)">$' + (p.annual*12) + '/yr — save $' + ((p.price-p.annual)*12) + '</div>' : '<div class="plan-annual-note">&nbsp;</div>';
+      var pop = p.popular ? '<div class="popular-pill">⭐ Most Popular</div>' : '';
+      var btnCls = p.ghost ? 'plan-btn ghost' : 'plan-btn primary';
+      var feats = p.feats.map(function(f){ return '<div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + f + '</div>'; }).join('');
+      return '<div class="plan-card' + (p.popular?' popular':'') + '">' + pop +
+        '<div class="plan-name">' + p.name + '</div>' +
+        '<div class="plan-price-wrap"><span class="plan-price-num" data-monthly="' + p.price + '" data-annual="' + p.annual + '">' + priceStr + '</span>' + perStr + '</div>' +
+        annNote +
+        '<div class="plan-desc">' + p.desc + '</div>' +
+        '<a href="' + p.href + '" class="' + btnCls + '">' + p.cta + '</a>' +
+        '<div class="plan-sep"></div>' +
+        '<div class="plan-limits">' +
+          '<div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">' + p.files + '</span></div>' +
+          '<div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">' + p.size + '</span></div>' +
+          '<div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">' + p.pages + '</span></div>' +
+        '</div>' +
+        '<div class="plan-sep"></div>' +
+        '<div class="plan-features">' + feats + '</div>' +
+        '</div>';
+    }).join('');
   }
 
-  ['calcDocs','calcPages','calcSizeMB','calcPeriod'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', calcEstimate);
-  });
-  calcEstimate();
+  // Calculator
+  var calcCard = document.getElementById('calcCard');
+  if (calcCard) {
+    calcCard.innerHTML = [
+      '<div class="calc-header"><div>',
+      '<div class="calc-title">Estimate your cost</div>',
+      '<div class="calc-sub">Based on real Azure pricing — OCR ($1.50/1k pages) + PII detection ($10/1k pages) + 3.5× margin.</div>',
+      '<div class="calc-fields" style="margin-top:18px">',
+      '<div class="form-group" style="margin:0"><label class="form-label">Documents / month</label><input class="form-input" type="number" id="calcDocs" value="100" min="1"/></div>',
+      '<div class="form-group" style="margin:0"><label class="form-label">Avg pages / doc</label><input class="form-input" type="number" id="calcPages" value="10" min="1"/></div>',
+      '<div class="form-group" style="margin:0"><label class="form-label">Avg file size (MB)</label><input class="form-input" type="number" id="calcSizeMB" value="2" min="0.1" step="0.5"/></div>',
+      '<div class="form-group" style="margin:0"><label class="form-label">Billing period</label><select class="form-select" id="calcPeriod"><option value="monthly">Monthly</option><option value="annual">Annual (−20%)</option></select></div>',
+      '</div>',
+      '<div class="calc-breakdown-row">',
+      '<div class="calc-item"><div class="calc-item-label">Azure OCR</div><div class="calc-item-val" id="calcOcr">$0.00</div></div>',
+      '<div class="calc-item"><div class="calc-item-label">PII Detection</div><div class="calc-item-val" id="calcPii">$0.00</div></div>',
+      '<div class="calc-item"><div class="calc-item-label">Infrastructure</div><div class="calc-item-val" id="calcInfra">$0.00</div></div>',
+      '</div></div>',
+      '<div class="calc-result-pill">',
+      '<div class="calc-result-label">Est. monthly cost</div>',
+      '<div class="calc-result-price" id="calcPrice">$0.00</div>',
+      '<div class="calc-result-sub" id="calcSub">—</div>',
+      '<div id="calcRec" style="margin-top:10px;font-size:11px;font-weight:600;line-height:1.5;opacity:.95"></div>',
+      '</div></div>'
+    ].join('');
+  }
 
-  /* ── FAQ accordion ── */
-  document.querySelectorAll('.faq-q').forEach(q => {
-    q.addEventListener('click', () => {
-      const a      = q.nextElementSibling;
-      const icon   = q.querySelector('.faq-q-icon');
-      const isOpen = a.classList.contains('open');
-      // Close all
-      document.querySelectorAll('.faq-a').forEach(el => el.classList.remove('open'));
-      document.querySelectorAll('.faq-q').forEach(el => {
-        el.classList.remove('open');
-        const i = el.querySelector('.faq-q-icon');
-        if (i) i.textContent = '+';
-      });
-      // Open this one if it was closed
-      if (!isOpen) {
-        a.classList.add('open');
-        q.classList.add('open');
-        if (icon) icon.textContent = '−';
+  // Compare table
+  var compareCard = document.getElementById('compareCard');
+  if (compareCard) {
+    var rows = [
+      ['Azure Doc Intelligence',      true, true, true, true, true],
+      ['Side-by-side viewer',         true, true, true, true, true],
+      ['Secure Azure Blob storage',   true, true, true, true, true],
+      ['CSV field export',            false,true, true, true, true],
+      ['Priority processing',         false,false,true, true, true],
+      ['Confidence score reports',    false,false,true, true, true],
+      ['API access',                  false,false,false,true, true],
+      ['Custom redaction rules',      false,false,false,true, true],
+      ['SLA guarantee',               false,false,false,true, true],
+      ['SharePoint integration',      false,false,false,false,true],
+      ['Custom Azure deployment',     false,false,false,false,true],
+      ['Dedicated account manager',   false,false,false,false,true],
+    ];
+    var tableHtml = '<div class="card-hd"><div class="card-title"><div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Feature comparison</div></div><div style="overflow-x:auto"><table class="compare-table"><thead><tr><th>Feature</th><th>Trial</th><th>Starter</th><th class="hi">Professional</th><th>Business</th><th>Enterprise</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      tableHtml += '<tr><td>' + r[0] + '</td>';
+      for (var i=1;i<6;i++){
+        var cls = i===3?' class="hi"':'';
+        tableHtml += '<td'+cls+'>' + (r[i] ? '<span class="ck">✓</span>' : '<span class="cx">✗</span>') + '</td>';
       }
+      tableHtml += '</tr>';
     });
+    tableHtml += '</tbody></table></div>';
+    compareCard.innerHTML = tableHtml;
+  }
+
+  // FAQ
+  var faqCard = document.getElementById('faqCard');
+  if (faqCard) {
+    var faqs = [
+      ['How is pricing calculated?','Pricing uses real Azure Document Intelligence costs — $1.50 per 1,000 pages for OCR and $10 per 1,000 pages for PII detection. We add 20% overhead and a 3.5× margin. Per page: ~$0.043.'],
+      ['Is my data secure?','All files are stored in private Azure Blob Storage with SAS-based access only. Files are automatically deleted after 7 days. We never store document content permanently.'],
+      ['Can I cancel anytime?','Yes. No long-term contracts. Cancel or downgrade at any time.'],
+      ['Do you offer enterprise plans?','Yes. For organisations with custom requirements — contact us and we'll put together a proposal within 48 hours.'],
+    ];
+    faqCard.innerHTML = '<div class="faq-wrap anim d4">' + faqs.map(function(f){
+      return '<div class="faq-item"><button class="faq-q">' + f[0] + '<span class="faq-q-icon">›</span></button><div class="faq-a"><p>' + f[1] + '</p></div></div>';
+    }).join('') + '</div>';
+    // Wire accordion
+    faqCard.querySelectorAll('.faq-q').forEach(function(q){
+      q.addEventListener('click', function(){
+        var a = q.nextElementSibling;
+        var open = a.classList.contains('open');
+        faqCard.querySelectorAll('.faq-a').forEach(function(x){x.classList.remove('open');});
+        if (!open) a.classList.add('open');
+      });
+    });
+  }
+
+  // Render plans
+  renderPlans();
+
+  // Plan recommendation plans list
+  var recPlans = [
+    {name:'Free Trial',  maxDocs:5,    price:0,   href:'/login'},
+    {name:'Starter',     maxDocs:50,   price:19,  href:'/login'},
+    {name:'Professional',maxDocs:200,  price:79,  href:'/login'},
+    {name:'Business',    maxDocs:1000, price:399, href:'/contact'},
+    {name:'Enterprise',  maxDocs:Infinity,price:1499,href:'/contact'},
+  ];
+
+  // Calculator logic
+  function calcEstimate() {
+    var docs   = Math.max(1, +(document.getElementById('calcDocs')?.value)   || 100);
+    var pages  = Math.max(1, +(document.getElementById('calcPages')?.value)  || 10);
+    var sizeMB = Math.max(.1,+(document.getElementById('calcSizeMB')?.value) || 2);
+    var annual = document.getElementById('calcPeriod')?.value === 'annual';
+    var totalPages = docs * pages;
+    var ocr   = totalPages * 0.0015;
+    var pii   = totalPages * 0.010;
+    var infra = (docs*sizeMB*0.00002)+(docs*0.0012)+(docs*0.000002*3)+(docs*0.000006)+(docs*0.00014);
+    var azure = (ocr+pii+infra)*1.20;
+    var prod  = azure*3.5*(annual?0.8:1);
+    var f2 = function(n){return '$'+n.toFixed(2);};
+    var el = function(id){return document.getElementById(id);};
+    if(el('calcPrice')) el('calcPrice').textContent = f2(prod);
+    if(el('calcOcr'))   el('calcOcr').textContent   = f2(ocr);
+    if(el('calcPii'))   el('calcPii').textContent   = f2(pii);
+    if(el('calcInfra')) el('calcInfra').textContent = f2(infra*1.2);
+    if(el('calcSub'))   el('calcSub').textContent   = docs.toLocaleString()+' docs × '+pages+' pages'+(annual?' · Annual':'');
+    var rec = recPlans.find(function(p){return p.maxDocs>=docs;})||recPlans[recPlans.length-1];
+    if(el('calcRec')) el('calcRec').innerHTML = rec.price===0
+      ? '✓ Fits <strong>Free Trial</strong> — <a href="'+rec.href+'" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>'
+      : '✓ Recommended: <strong>'+rec.name+'</strong> ($'+rec.price+'/mo) — <a href="'+rec.href+'" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>';
+  }
+
+  document.addEventListener('input', function(e){
+    if(['calcDocs','calcPages','calcSizeMB','calcPeriod'].includes(e.target.id)) calcEstimate();
+  });
+  setTimeout(calcEstimate, 100);
+
+  // Billing toggle
+  document.getElementById('toggleMonthly')?.addEventListener('click', function(){
+    isAnnual=false;
+    document.getElementById('toggleMonthly').classList.add('active');
+    document.getElementById('toggleAnnual').classList.remove('active');
+    renderPlans();
+  });
+  document.getElementById('toggleAnnual')?.addEventListener('click', function(){
+    isAnnual=true;
+    document.getElementById('toggleAnnual').classList.add('active');
+    document.getElementById('toggleMonthly').classList.remove('active');
+    renderPlans();
   });
 
+  document.title = 'Pricing';
 })();
 </script>
-</body>
+
 </html>

@@ -1,11 +1,19 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
+const { verifySession } = require('../auth');
 const pool = require('../db');
 
 const ADMIN_EMAILS = ['kabileshvijayakumar@prudentautolytics.com'];
 
 module.exports = async function (context, req) {
   if (handleCors(context, req)) return;
+
+  // Session auth — must be logged in AND be admin
+  const auth = await verifySession(req);
+  if (!auth.ok) {
+    context.res = { status: auth.status, headers: getCorsHeaders(req), body: { error: auth.error } };
+    return;
+  }
 
   const adminEmail = (req.body?.email || req.body?.adminEmail || '').trim().toLowerCase();
   if (!ADMIN_EMAILS.includes(adminEmail)) {
@@ -112,6 +120,6 @@ module.exports = async function (context, req) {
 
   } catch (err) {
     context.log('admin ERROR:', err.message);
-    context.res = { status:500, headers:getCorsHeaders(req), body:{ error:err.message } };
+    context.res = { status:500, headers:getCorsHeaders(req), body:{ error: 'An internal error occurred. Please try again.' } };
   }
 };

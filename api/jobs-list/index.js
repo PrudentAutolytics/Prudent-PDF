@@ -51,6 +51,6 @@ module.exports = async function (context, req) {
     };
   } catch (err) {
     context.log('jobs-list ERROR:', err.message);
-    context.res = { status: 500, headers: getCorsHeaders(req), body: { error: err.message } };
+    context.res = { status: 500, headers: getCorsHeaders(req), body: { error: 'An internal error occurred. Please try again.' } };
   }
 };

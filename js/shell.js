@@ -123,7 +123,7 @@ const Shell = (() => {
     const pct    = Math.min(100, limit > 0 ? Math.round(used / limit * 100) : 0);
     const remain = Math.max(0, limit - used);
     const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
-    const planLabel = s.plan === 'paid' ? 'PRO PLAN' : 'FREE TRIAL';
+    const planLabel = s.planLabel || (s.plan && s.plan !== 'trial' ? s.plan.toUpperCase() : 'FREE TRIAL');
 
     let daysLeft = APP_CONFIG.TRIAL.DAYS;
     if (s.trialExpiryDate) {
@@ -400,9 +400,7 @@ const Shell = (() => {
         // Update greeting if fullName just arrived from Supabase
         const greetEl = document.getElementById('welcomeTitle');
         if (greetEl && updated.fullName) {
-          const h = new Date().getHours();
-          const greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-          greetEl.textContent = `${greet}, ${updated.fullName} 👋`;
+            greetEl.textContent = `${greeting()}, ${updated.fullName} 👋`;
         }
 
         const used    = updated.creditsUsed  ?? 0;

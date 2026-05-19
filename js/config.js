@@ -190,9 +190,9 @@ function calcJobCost(pageCount = 1, fileSizeMB = 0.1) {
     azureCost     : +azureCost   .toFixed(6),  // your cost
     productPrice  : +productPrice.toFixed(6),  // customer pays
     total         : +productPrice.toFixed(6),  // alias
-    totalFmt      : '$' + productPrice.toFixed(4),
-    productFmt    : '$' + productPrice.toFixed(4),
-    azureFmt      : '$' + azureCost.toFixed(4),
+    totalFmt      : '$' + productPrice.toFixed(2),
+    productFmt    : '$' + productPrice.toFixed(2),
+    azureFmt      : '$' + azureCost.toFixed(2),
     // Legacy aliases for existing code
     docIntel      : +(docIntelRead + docIntelCustom).toFixed(6),
     blob          : +blob.toFixed(6),
@@ -348,7 +348,7 @@ const fmt = {
     return `${Math.floor(ms/60_000)}m ${Math.floor((ms%60_000)/1000)}s`;
   },
   pages(n) { return n === 1 ? '1 page' : `${n || 0} pages`; },
-  usd(n)   { return n != null ? `$${Number(n).toFixed(4)}` : '—'; },
+  usd(n)   { return n != null ? `$${Number(n).toFixed(2)}` : '—'; },
   trunc(str, max=40) {
     if (!str) return '—';
     return str.length > max ? str.slice(0, max-1) + '…' : str;

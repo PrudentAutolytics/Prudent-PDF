@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sign In — Prudent PDF</title>
+<title>Sign In</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
 /* ── Layout ── */
@@ -266,63 +266,19 @@ body {
 </head>
 <body>
 
-<!-- LEFT PANEL -->
-<div class="left-panel">
+<!-- LEFT PANEL — content injected by JS to prevent scraping -->
+<div class="left-panel" id="leftPanel">
   <div class="left-grid"></div>
   <div class="left-glow"></div>
-
-  <div class="left-brand">
-    <a href="/" class="left-logo">
-      <img class="left-logo-img" src="/assets/logo.jpg" alt="Prudent PDF"/>
-    </a>
-
-    <div class="left-tagline">
-      Redact documents<br/>with <span>enterprise AI</span>
-    </div>
-    <p class="left-sub">
-      Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams.
-    </p>
-
-    <div class="left-features">
-      <div class="left-feat">
-        <div class="left-feat-icon">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
-        </div>
-        Azure Document Intelligence — detects names, IDs, addresses and more
-      </div>
-      <div class="left-feat">
-        <div class="left-feat-icon">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
-        </div>
-        Permanent black-box redaction — no metadata, no recovery
-      </div>
-      <div class="left-feat">
-        <div class="left-feat-icon">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
-        </div>
-        Side-by-side viewer — compare original vs redacted instantly
-      </div>
-      <div class="left-feat">
-        <div class="left-feat-icon">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.8"/></svg>
-        </div>
-        Private Azure Blob Storage — auto-deleted after 7 days
-      </div>
-    </div>
-  </div>
-
-  <div class="left-bottom">
-    <div class="left-trust"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>GDPR Compliant</div>
-    <div class="left-trust"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>TLS Encrypted</div>
-    <div class="left-trust"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Auto-deleted 7 days</div>
-  </div>
+  <div class="left-brand" id="leftBrand"></div>
+  <div class="left-bottom" id="leftBottom"></div>
 </div>
 
 <!-- RIGHT PANEL -->
 <div class="right-panel">
 
   <div class="right-top">
-    New to Prudent PDF? <a href="/">Learn more</a>
+    <span id="rightTopHint"></span>
   </div>
 
   <div class="right-inner">
@@ -331,9 +287,9 @@ body {
     <!-- STEP 1: EMAIL -->
     <div id="stepEmail">
       <div class="form-header">
-        <div class="form-eyebrow">Prudent PDF</div>
-        <h1 class="form-h1" id="stepTitle">Welcome back</h1>
-        <p class="form-sub" id="stepSub">Enter your work email to continue — no password required.</p>
+        <div class="form-eyebrow" id="formEyebrow"></div>
+        <h1 class="form-h1" id="stepTitle"></h1>
+        <p class="form-sub" id="stepSub"></p>
       </div>
 
       <div class="input-group">
@@ -349,13 +305,13 @@ body {
       <div class="reg-slide" id="regSlide">
         <div class="new-user-banner">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          New account — 5 free documents included
+          <span id="newUserBannerTxt"></span>
         </div>
         <div class="trial-perks">
-          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>5 free redactions</div>
-          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Azure AI detection</div>
-          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Side-by-side viewer</div>
-          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>No credit card</div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="pk">5fr</span></div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="pk">aid</span></div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="pk">sbv</span></div>
+          <div class="trial-perk"><div class="perk-dot"><svg width="8" height="8" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="pk">ncc</span></div>
         </div>
         <div class="form-row-2">
           <div class="input-group" style="margin-bottom:0">
@@ -462,10 +418,7 @@ body {
   </div><!-- /form-wrap -->
   </div><!-- /right-inner -->
 
-  <div class="right-footer">
-    <a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>
-    © 2026 Prudent Autolytics · Chennai, India
-  </div>
+  <div class="right-footer" id="rightFooter"></div>
 </div>
 
 <script src="/js/config.js"></script>
@@ -678,5 +631,61 @@ $('changeEmailBtn').addEventListener('click', () => {
 
 })();
 </script>
+
+<script>
+/* Content injection — runs after DOM ready, invisible to non-JS crawlers */
+(function(){
+  var d = document;
+  function el(tag, cls, html) {
+    var e = d.createElement(tag);
+    if (cls) e.className = cls;
+    if (html) e.innerHTML = html;
+    return e;
+  }
+  function set(id, html) {
+    var e = d.getElementById(id);
+    if (e) e.innerHTML = html;
+  }
+
+  // Left panel brand
+  var brand = d.getElementById('leftBrand');
+  if (brand) {
+    brand.innerHTML = [
+      '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/logo.jpg" alt=""/></a>',
+      '<div class="left-tagline">Redact documents<br/>with <span>enterprise AI</span></div>',
+      '<p class="left-sub">Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams.</p>',
+      '<div class="left-features" id="lf"></div>'
+    ].join('');
+    var feats = [
+      ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z','Azure Document Intelligence — detects names, IDs, addresses and more'],
+      ['','Permanent black-box redaction — no metadata, no recovery'],
+      ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z','Side-by-side viewer — compare original vs redacted instantly'],
+      ['M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z','Private Azure Blob Storage — auto-deleted after 7 days']
+    ];
+    var lf = d.getElementById('lf');
+    if (lf) feats.forEach(function(f){ lf.innerHTML += '<div class="left-feat"><div class="left-feat-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="'+f[0]+'" stroke="currentColor" stroke-width="1.8"/></svg></div>'+f[1]+'</div>'; });
+  }
+
+  // Left bottom trust badges
+  set('leftBottom', [
+    '<div class="left-trust">GDPR Compliant</div>',
+    '<div class="left-trust">TLS Encrypted</div>',
+    '<div class="left-trust">Auto-deleted 7 days</div>'
+  ].join(''));
+
+  // Right panel
+  set('rightTopHint', 'New to Prudent PDF? <a href="/">Learn more</a>');
+  set('formEyebrow', 'Prudent PDF');
+  set('stepTitle', 'Welcome back');
+  set('stepSub', 'Enter your work email to continue — no password required.');
+  set('newUserBannerTxt', 'New account — 5 free documents included');
+  set('rightFooter', '<a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>© 2026 Prudent Autolytics · Chennai, India');
+
+  // Trial perks
+  var pkMap = {'5fr':'5 free redactions','aid':'Azure AI detection','sbv':'Side-by-side viewer','ncc':'No credit card'};
+  d.querySelectorAll('.pk').forEach(function(e){ e.textContent = pkMap[e.textContent] || e.textContent; });
+})();
+</script>
+
 </body>
 </html>

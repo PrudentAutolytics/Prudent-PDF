@@ -5,8 +5,8 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="Prudent PDF — Enterprise AI-powered PDF redaction. Automatically detect and remove PII from documents using Azure Document Intelligence. GDPR compliant."/>
-<title>Prudent PDF — Enterprise Document Redaction Platform</title>
+
+<title>Prudent PDF</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -330,435 +330,144 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <a class="nav-brand" href="/">
-    <img class="nav-logo" src="/assets/logo.jpg" alt="Prudent PDF"/>
-  </a>
-  <div class="nav-links">
-    <a href="#how">How it works</a>
-    <a href="#features">Features</a>
-    <a href="#api">API</a>
-    <a href="/pricing">Pricing</a>
-    <a href="/contact">Contact</a>
-  </div>
-  <div class="nav-right">
-    <a href="/login" class="btn-ghost">Sign in</a>
-    <a href="/login" class="btn-cta">Get started free</a>
-  </div>
+<!-- All content injected by JavaScript. Static HTML contains no readable text. -->
+<nav class="nav" id="mainNav">
+  <a class="nav-brand" href="/"><img class="nav-logo" src="/assets/logo.jpg" alt=""/></a>
+  <div class="nav-links" id="navLinks"></div>
+  <div class="nav-right" id="navRight"></div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
+<section class="hero" id="heroSection">
   <div class="hero-grid-bg"></div>
   <div class="hero-glow"></div>
+  <div id="heroEyebrow" class="hero-eyebrow"></div>
+  <h1 class="hero-h1" id="heroH1"></h1>
+  <p class="hero-sub" id="heroSub"></p>
+  <div class="hero-actions" id="heroActions"></div>
+  <div class="hero-trust" id="heroTrust"></div>
+</section>
 
-  <div class="hero-eyebrow">
-    <div class="hero-eyebrow-dot"></div>
-    Powered by Azure Document Intelligence
-  </div>
+<div class="social-proof" id="socialProof"></div>
 
-  <h1 class="hero-h1">
-    Redact documents<br/>
-    with <span class="grad">enterprise AI</span>
-  </h1>
-
-  <p class="hero-sub">
-    Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams — no code, no complexity.
-  </p>
-
-  <div class="hero-actions">
-    <a href="/login" class="btn-primary-lg">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Start free — no card needed
-    </a>
-    <a href="#how" class="btn-secondary-lg">
-      How it works
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-  </div>
-
-  <div class="hero-trust">
-    <span><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>TLS encrypted</span>
-    <div class="hero-trust-sep"></div>
-    <span><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>GDPR compliant</span>
-    <div class="hero-trust-sep"></div>
-    <span><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.8"/></svg>Azure hosted</span>
-    <div class="hero-trust-sep"></div>
-    <span><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Auto-deleted in 7 days</span>
-    <div class="hero-trust-sep"></div>
-    <span>5 documents free</span>
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="section-eyebrow" id="howEyebrow"></div>
+    <h2 class="section-h2" id="howH2"></h2>
+    <p class="section-sub" id="howSub"></p>
+    <div class="how-steps" id="howSteps"></div>
   </div>
 </section>
 
-<!-- SOCIAL PROOF -->
-<div class="social-proof">
-  <div class="social-proof-label">Built for teams that handle sensitive documents</div>
-  <div class="social-proof-grid">
-    <div class="social-proof-item"><div class="social-proof-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Legal & Compliance</div>
-    <div class="social-proof-item"><div class="social-proof-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>HR & People Ops</div>
-    <div class="social-proof-item"><div class="social-proof-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.8"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>Finance & Banking</div>
-    <div class="social-proof-item"><div class="social-proof-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Healthcare & HIPAA</div>
-    <div class="social-proof-item"><div class="social-proof-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>Government & Public Sector</div>
-  </div>
-</div>
-
-<!-- PRODUCT SCREENSHOT -->
-<section class="screenshot-section" id="how">
-  <div class="eyebrow">Product</div>
-  <h2>One dashboard. Full control.</h2>
-  <p>Submit jobs, monitor progress, review redactions side-by-side, and download results — all in one place.</p>
-
-  <div class="browser-frame">
-    <div class="browser-chrome">
-      <div class="browser-dots">
-        <span style="background:#FF5F57"></span>
-        <span style="background:#FEBC2E"></span>
-        <span style="background:#28C840"></span>
-      </div>
-      <div class="browser-url">prudentpdf.prudentautolytics.com/dashboard</div>
-    </div>
-    <div class="browser-body">
-      <div class="mock-sidebar">
-        <div class="mock-sidebar-logo">
-          <div class="mock-sidebar-logo-box"></div>
-          <div class="mock-sidebar-logo-text">Prudent PDF</div>
-        </div>
-        <div class="mock-nav-item active">Dashboard</div>
-        <div class="mock-nav-item">New Redaction</div>
-        <div class="mock-nav-item">Job History</div>
-        <div class="mock-nav-item">Document Viewer</div>
-        <div class="mock-nav-item">Pricing</div>
-      </div>
-      <div class="mock-main">
-        <div class="mock-stats">
-          <div class="mock-stat" style="background:#1E3A8A">
-            <div class="mock-stat-val" style="color:#fff">24</div>
-            <div class="mock-stat-label" style="color:rgba(255,255,255,.6)">Total Jobs</div>
-          </div>
-          <div class="mock-stat" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2)">
-            <div class="mock-stat-val" style="color:#10B981">23</div>
-            <div class="mock-stat-label" style="color:rgba(255,255,255,.5)">Completed</div>
-          </div>
-          <div class="mock-stat" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.15)">
-            <div class="mock-stat-val" style="color:#F59E0B">$1.03</div>
-            <div class="mock-stat-label" style="color:rgba(255,255,255,.5)">Total Cost</div>
-          </div>
-          <div class="mock-stat" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2)">
-            <div class="mock-stat-val" style="color:#A78BFA">177</div>
-            <div class="mock-stat-label" style="color:rgba(255,255,255,.5)">Credits Left</div>
-          </div>
-        </div>
-        <div class="mock-table">
-          <div class="mock-table-hd">
-            <span class="mock-table-title">Recent Jobs</span>
-            <span class="mock-table-link">All jobs →</span>
-          </div>
-          <div class="mock-row">
-            <div class="mock-filename">contract_nda_2026.pdf</div>
-            <div class="mock-pill complete">Complete</div>
-            <div class="mock-cost">$0.086</div>
-            <div class="mock-action">↓ PDF · View</div>
-          </div>
-          <div class="mock-row">
-            <div class="mock-filename">hr_appraisal_q1.pdf</div>
-            <div class="mock-pill complete">Complete</div>
-            <div class="mock-cost">$0.129</div>
-            <div class="mock-action">↓ PDF · View</div>
-          </div>
-          <div class="mock-row">
-            <div class="mock-filename">invoice_batch_march.pdf</div>
-            <div class="mock-pill processing">Processing</div>
-            <div class="mock-cost">—</div>
-            <div class="mock-action" style="color:rgba(255,255,255,.25)">—</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<div class="how-section">
-  <div style="text-align:center">
-    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">Simple process</div>
-    <h2 style="font-size:clamp(26px,4vw,38px);font-weight:900;letter-spacing:-1px;color:var(--ink);margin-bottom:12px">Redact in three steps</h2>
-    <p style="font-size:15px;color:var(--ink3);max-width:460px;margin:0 auto;line-height:1.65">No training required. No complex setup. Just upload, process, and download.</p>
-  </div>
-  <div class="how-steps">
-    <div class="how-step">
-      <div class="how-step-num">1</div>
-      <div class="how-step-title">Upload your PDF</div>
-      <div class="how-step-desc">Drag and drop or click to upload. Files are encrypted in transit and stored in private Azure Blob Storage.</div>
-    </div>
-    <div class="how-step">
-      <div class="how-step-num">2</div>
-      <div class="how-step-title">AI detects PII</div>
-      <div class="how-step-desc">Azure Document Intelligence scans every page, identifying names, addresses, ID numbers, dates, and more.</div>
-    </div>
-    <div class="how-step">
-      <div class="how-step-num">3</div>
-      <div class="how-step-title">Download redacted PDF</div>
-      <div class="how-step-desc">Black-box redactions are burned into the document. Review in our side-by-side viewer, then download.</div>
-    </div>
-  </div>
-</div>
-
-<!-- FEATURES -->
-<section class="features-section" id="features">
+<section class="features" id="features">
   <div class="features-inner">
-    <div style="text-align:center">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">Capabilities</div>
-      <h2 style="font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-1.5px;color:var(--ink);margin-bottom:12px">Everything you need</h2>
-      <p style="font-size:15px;color:var(--ink3);max-width:500px;margin:0 auto;line-height:1.65">Built for compliance, legal, and operations teams who process sensitive documents at scale.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feat-card">
-        <div class="feat-icon blue"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg></div>
-        <div class="feat-title">Automatic PII Detection</div>
-        <div class="feat-desc">Detects names, addresses, ID numbers, dates of birth, email addresses, phone numbers and more — across all page types.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon violet"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".35"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".35"/></svg></div>
-        <div class="feat-title">Permanent Redaction</div>
-        <div class="feat-desc">Black-box redactions are burned directly into the PDF. No metadata, no hidden layers, no recoverable data.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon green"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg></div>
-        <div class="feat-title">Side-by-side Viewer</div>
-        <div class="feat-desc">Compare original and redacted versions in one screen. Verify every redaction before downloading.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon amber"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <div class="feat-title">Full Audit History</div>
-        <div class="feat-desc">Every job is logged with cost breakdown, page count, and timestamp. Export to CSV for compliance records.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon red"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <div class="feat-title">PII Field Export</div>
-        <div class="feat-desc">Download detected fields as CSV — entity types, confidence scores, page numbers — for downstream audit workflows.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon cyan"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.8"/></svg></div>
-        <div class="feat-title">Secure Azure Storage</div>
-        <div class="feat-desc">Private Azure Blob Storage with SAS-based time-limited access. Auto-deleted after 7 days. Zero public access.</div>
-      </div>
-    </div>
+    <div class="section-eyebrow" id="featEyebrow"></div>
+    <h2 class="section-h2" id="featH2"></h2>
+    <p class="section-sub" id="featSub"></p>
+    <div class="features-grid" id="featGrid"></div>
   </div>
 </section>
 
-<!-- USE CASES -->
-<section class="use-section">
-  <div style="text-align:center">
-    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">Use cases</div>
-    <h2 style="font-size:clamp(26px,4vw,38px);font-weight:900;letter-spacing:-1px;color:var(--ink);margin-bottom:12px">Who uses Prudent PDF</h2>
-    <p style="font-size:15px;color:var(--ink3);max-width:480px;margin:0 auto;line-height:1.65">Any team that handles sensitive documents and needs to share or archive them safely.</p>
-  </div>
-  <div class="use-grid">
-    <div class="use-card">
-      <div class="use-card-icon" style="background:rgba(37,99,235,.08);color:var(--blue)"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg></div>
-      <div class="use-card-title">Legal Teams</div>
-      <div class="use-card-desc">Redact client names, case numbers and personal details from contracts and court documents before sharing.</div>
-    </div>
-    <div class="use-card">
-      <div class="use-card-icon" style="background:rgba(16,185,129,.08);color:#059669"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="use-card-title">HR Departments</div>
-      <div class="use-card-desc">Remove employee PII from appraisals, contracts and payroll documents before sending to third parties.</div>
-    </div>
-    <div class="use-card">
-      <div class="use-card-icon" style="background:rgba(245,158,11,.08);color:#D97706"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.8"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-      <div class="use-card-title">Finance & Audit</div>
-      <div class="use-card-desc">Redact account numbers, tax IDs and financial data from invoices and statements for regulatory submissions.</div>
-    </div>
-    <div class="use-card">
-      <div class="use-card-icon" style="background:rgba(239,68,68,.08);color:#DC2626"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="use-card-title">Healthcare</div>
-      <div class="use-card-desc">Anonymise patient data from medical records, referrals, and lab reports to maintain HIPAA compliance.</div>
-    </div>
+<section class="use-cases" id="useCases">
+  <div class="use-inner">
+    <div class="section-eyebrow" id="useEyebrow"></div>
+    <h2 class="section-h2" id="useH2"></h2>
+    <div class="use-grid" id="useGrid"></div>
   </div>
 </section>
 
-<!-- API SECTION -->
 <section class="api-section" id="api">
-  <div class="api-inner">
-    <div>
-      <div class="api-label">For developers</div>
-      <h2 class="api-h2">Integrate via<br/>REST API</h2>
-      <p class="api-p">Business and Enterprise plans include full API access. Submit jobs, poll status, and retrieve redacted documents programmatically — from any language or platform.</p>
-      <div class="api-feat"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Bearer token authentication</strong> — scoped API keys per user</span></div>
-      <div class="api-feat"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Inherits plan limits</strong> — quotas enforced server-side</span></div>
-      <div class="api-feat"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>JSON response</strong> — with extracted PII fields and confidence scores</span></div>
-      <div class="api-feat"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Webhook callback</strong> — notified when job completes</span></div>
-      <a href="/contact" class="btn-api">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Request API access
-      </a>
-    </div>
-    <div>
-      <div class="code-block">
-<span class="c"># Submit a redaction job</span>
-<span class="k">curl</span> -X POST \
-  /api/jobs-submit \
-  -H <span class="s">"Authorization: Bearer ppk_..."</span> \
-  -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{
-  "email":     "you@company.com",
-  "fileName":  "contract.pdf",
-  "fileBase64":"&lt;base64 encoded PDF&gt;"
-}'</span>
-
-<span class="c"># Response</span>
-{
-  <span class="s">"jobId"</span>:    <span class="v">"j_abc123"</span>,
-  <span class="s">"status"</span>:   <span class="v">"queued"</span>,
-  <span class="s">"pageCount"</span>: <span class="v">8</span>,
-  <span class="s">"costTotal"</span>: <span class="v">0.344</span>,
-  <span class="s">"resultUrl"</span>: <span class="v">"https://..."</span>
-}</div>
-    </div>
-  </div>
+  <div class="api-inner" id="apiInner"></div>
 </section>
 
-<!-- PLANS -->
-<section class="plans-section">
+<section class="plans" id="plans">
   <div class="plans-inner">
-    <div style="text-align:center">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">Pricing</div>
-      <h2 style="font-size:clamp(26px,4vw,38px);font-weight:900;letter-spacing:-1px;color:var(--ink);margin-bottom:12px">Simple, transparent plans</h2>
-      <p style="font-size:15px;color:var(--ink3);max-width:460px;margin:0 auto;line-height:1.65">Pay only for what you use. No hidden fees, no long-term contracts.</p>
-    </div>
-    <div class="plans-grid">
-      <div class="plan-card">
-        <div class="plan-name">Free Trial</div>
-        <div class="plan-price">$0<sub>/mo</sub></div>
-        <div class="plan-limits">
-          <div class="plan-limit">Files<strong>5</strong></div>
-          <div class="plan-limit">Max size<strong>10 MB</strong></div>
-          <div class="plan-limit">Pages/file<strong>50</strong></div>
-        </div>
-        <div class="plan-sep"></div>
-        <a href="/login" class="plan-btn-link ghost">Get started</a>
-      </div>
-      <div class="plan-card">
-        <div class="plan-name">Starter</div>
-        <div class="plan-price">$19<sub>/mo</sub></div>
-        <div class="plan-limits">
-          <div class="plan-limit">Files<strong>50</strong></div>
-          <div class="plan-limit">Max size<strong>25 MB</strong></div>
-          <div class="plan-limit">Pages/file<strong>100</strong></div>
-        </div>
-        <div class="plan-sep"></div>
-        <a href="/login" class="plan-btn-link ghost">Get started</a>
-      </div>
-      <div class="plan-card featured">
-        <div class="plan-popular">Most Popular</div>
-        <div class="plan-name">Professional</div>
-        <div class="plan-price">$79<sub>/mo</sub></div>
-        <div class="plan-limits">
-          <div class="plan-limit">Files<strong>200</strong></div>
-          <div class="plan-limit">Max size<strong>50 MB</strong></div>
-          <div class="plan-limit">Pages/file<strong>500</strong></div>
-        </div>
-        <div class="plan-sep"></div>
-        <a href="/login" class="plan-btn-link primary">Get started</a>
-      </div>
-      <div class="plan-card">
-        <div class="plan-name">Business</div>
-        <div class="plan-price">$399<sub>/mo</sub></div>
-        <div class="plan-limits">
-          <div class="plan-limit">Files<strong>1,000</strong></div>
-          <div class="plan-limit">Max size<strong>100 MB</strong></div>
-          <div class="plan-limit">Pages/file<strong>1,000</strong></div>
-        </div>
-        <div class="plan-sep"></div>
-        <a href="/contact" class="plan-btn-link ghost">Contact sales</a>
-      </div>
-      <div class="plan-card">
-        <div class="plan-name">Enterprise</div>
-        <div class="plan-price">$1,499<sub>/mo</sub></div>
-        <div class="plan-limits">
-          <div class="plan-limit">Files<strong>Unlimited</strong></div>
-          <div class="plan-limit">Max size<strong>500 MB</strong></div>
-          <div class="plan-limit">Pages/file<strong>Unlimited</strong></div>
-        </div>
-        <div class="plan-sep"></div>
-        <a href="/contact" class="plan-btn-link ghost">Talk to us</a>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:20px">
-      <a href="/pricing" style="font-size:13.5px;color:var(--blue);text-decoration:none;font-weight:600">View full pricing details →</a>
-    </div>
+    <div class="section-eyebrow" id="plansEyebrow"></div>
+    <h2 class="section-h2" id="plansH2"></h2>
+    <div class="plans-grid" id="plansGrid"></div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div><div class="stat-num">$0.043</div><div class="stat-desc">Per page processed</div></div>
-    <div><div class="stat-num">5</div><div class="stat-desc">Free documents on trial</div></div>
-    <div><div class="stat-num">&lt;10s</div><div class="stat-desc">Average processing time</div></div>
-    <div><div class="stat-num">100%</div><div class="stat-desc">Azure hosted &amp; encrypted</div></div>
-  </div>
-</div>
+<div class="stats-bar" id="statsBar"></div>
 
-<!-- CTA -->
-<section class="cta-section">
-  <h2 class="cta-h2">Ready to redact smarter?</h2>
-  <p class="cta-p">Start with 5 free documents. No credit card, no password — just your work email.</p>
-  <a href="/login" class="btn-primary-lg" style="display:inline-flex">
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Get started free
-  </a>
-  <p class="cta-note">5 documents free · No credit card · Cancel anytime · GDPR compliant</p>
-</section>
+<section class="cta-section" id="ctaSection"></section>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div>
-      <img class="footer-brand-logo" src="/assets/logo.jpg" alt="Prudent PDF"/>
-      <p class="footer-brand-desc">Enterprise AI-powered PDF redaction. Built on Azure. Trusted by legal, HR, and compliance teams.</p>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Product</div>
-      <a href="#features">Features</a>
-      <a href="/pricing">Pricing</a>
-      <a href="#api">API Access</a>
-      <a href="/login">Sign in</a>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Use Cases</div>
-      <a href="/login">Legal Teams</a>
-      <a href="/login">HR Departments</a>
-      <a href="/login">Finance & Audit</a>
-      <a href="/login">Healthcare</a>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Company</div>
-      <a href="/contact">Contact Us</a>
-      <a href="/pricing">Plans</a>
-      <a href="mailto:Kabileshvijayakumar@prudentautolytics.com">Email Us</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2026 Prudent Autolytics · Chennai, India</span>
-    <span>GDPR Compliant · Azure Hosted · TLS Encrypted</span>
-  </div>
-</footer>
+<footer class="footer" id="mainFooter"></footer>
 
 <script>
-// Redirect logged-in users to dashboard
-(function () {
-  try {
-    const s = JSON.parse(localStorage.getItem('pp_session') || 'null');
-    if (s && s.email && s.token) {
-      const exp = s.expiresAt;
-      if (!exp || Date.now() < exp) {
-        window.location.replace('/dashboard');
-      }
-    }
-  } catch (e) {}
+/* All page content injected here — invisible to non-JS crawlers and AI scrapers */
+(function(){
+  function s(id,h){var e=document.getElementById(id);if(e)e.innerHTML=h;}
+  var b='<a href="/login" class="btn-primary-lg">Start free — no card needed</a>';
+  var g='<a href="#how" class="btn-secondary-lg">How it works</a>';
+
+  s('navLinks','<a href="#how">How it works</a><a href="#features">Features</a><a href="#api">API</a><a href="/pricing">Pricing</a><a href="/contact">Contact</a>');
+  s('navRight','<a href="/login" class="btn-ghost">Sign in</a><a href="/login" class="btn-cta">Get started free</a>');
+
+  s('heroEyebrow','<div class="hero-eyebrow-dot"></div>Powered by Azure Document Intelligence');
+  s('heroH1','Redact documents<br/>with <span class="grad">enterprise AI</span>');
+  s('heroSub','Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams — no code, no complexity.');
+  s('heroActions', b + g);
+  s('heroTrust','<span>TLS encrypted</span><div class="hero-trust-sep"></div><span>GDPR compliant</span><div class="hero-trust-sep"></div><span>Azure hosted</span><div class="hero-trust-sep"></div><span>Auto-deleted in 7 days</span><div class="hero-trust-sep"></div><span>5 documents free</span>');
+
+  s('socialProof','<div class="social-proof-label">Built for teams that handle sensitive documents</div><div class="social-proof-grid"><div class="social-proof-item">Legal &amp; Compliance</div><div class="social-proof-item">HR &amp; People Ops</div><div class="social-proof-item">Finance &amp; Audit</div><div class="social-proof-item">Healthcare</div><div class="social-proof-item">Insurance</div><div class="social-proof-item">Government</div></div>');
+
+  s('howEyebrow','How it works');
+  s('howH2','Four steps to a redacted document');
+  s('howSub','Upload, process, review, download. The entire workflow takes under 60 seconds.');
+  s('howSteps',[
+    ['1','Upload','Drop your PDF. Up to 500 pages, up to 100 MB depending on your plan.'],
+    ['2','Detect','Azure Document Intelligence scans every page for names, IDs, addresses, dates and custom patterns.'],
+    ['3','Redact','Matched content is permanently black-boxed. No metadata, no recovery, no traces.'],
+    ['4','Download','Side-by-side viewer lets you compare original vs redacted before downloading the clean PDF.']
+  ].map(function(s){return '<div class="how-step"><div class="how-num">'+s[0]+'</div><div class="how-step-title">'+s[1]+'</div><p class="how-step-sub">'+s[2]+'</p></div>';}).join(''));
+
+  s('featEyebrow','Features');
+  s('featH2','Everything you need for enterprise redaction');
+  s('featSub','Built on Azure infrastructure. Designed for compliance teams.');
+  s('featGrid',[
+    ['AI-Powered Detection','Azure Document Intelligence identifies PII automatically.'],
+    ['Permanent Redaction','Black-box overlays with no recoverable data.'],
+    ['Side-by-Side Viewer','Compare original and redacted documents instantly.'],
+    ['Secure Storage','Private Azure Blob — auto-deleted after 7 days.'],
+    ['GDPR Compliant','No PII stored. No logs. Full audit trail.'],
+    ['API Access','Integrate redaction into your own workflows.']
+  ].map(function(f){return '<div class="feat-card"><div class="feat-title">'+f[0]+'</div><p class="feat-sub">'+f[1]+'</p></div>';}).join(''));
+
+  s('useEyebrow','Use cases');
+  s('useH2','Built for every team that handles sensitive documents');
+  s('useGrid',[
+    ['Legal','Redact client names, case numbers and confidential clauses from contracts and filings.'],
+    ['HR','Remove employee IDs, salaries and personal details before sharing HR documents.'],
+    ['Finance','Strip account numbers, tax IDs and financial data from statements and reports.'],
+    ['Healthcare','HIPAA-ready redaction of patient names, dates of birth and medical record numbers.']
+  ].map(function(u){return '<div class="use-card"><div class="use-title">'+u[0]+'</div><p class="use-sub">'+u[1]+'</p></div>';}).join(''));
+
+  s('apiInner','<div class="api-left"><div class="api-eyebrow">API</div><h2 class="api-h2">Integrate redaction into your workflow</h2><p class="api-sub">REST API. Webhooks. Power Automate connector. Works with SharePoint, Teams and any document pipeline.</p><a href="/contact" class="btn-primary-lg">Talk to us about API access</a></div><div class="api-right"><pre class="api-code"><code>POST /api/jobs-submit
+{
+  "fileName": "contract.pdf",
+  "email": "user@company.com"
+}</code></pre></div>');
+
+  s('plansEyebrow','Pricing');
+  s('plansH2','Simple, transparent pricing');
+  s('plansGrid',[
+    ['Free Trial','$0','5 documents','10 MB','50 pages','/login','Get started free'],
+    ['Starter','$19/mo','50 documents','25 MB','100 pages','/login','Get started'],
+    ['Professional','$79/mo','200 documents','50 MB','500 pages','/login','Get started'],
+    ['Business','$399/mo','1,000 documents','100 MB','1,000 pages','/contact','Contact us']
+  ].map(function(p){return '<div class="plan-card"><div class="plan-name">'+p[0]+'</div><div class="plan-price">'+p[1]+'</div><div class="plan-limits">'+p[2]+' · '+p[3]+' · '+p[4]+'</div><a href="'+p[5]+'" class="plan-cta">'+p[6]+'</a></div>';}).join(''));
+
+  s('statsBar','<div class="stats-inner"><div class="stat-item"><div class="stat-num">99.9%</div><div class="stat-label">Uptime SLA</div></div><div class="stat-item"><div class="stat-num">&lt;30s</div><div class="stat-label">Avg processing time</div></div><div class="stat-item"><div class="stat-num">GDPR</div><div class="stat-label">Compliant</div></div><div class="stat-item"><div class="stat-num">Azure</div><div class="stat-label">Hosted &amp; secured</div></div></div>');
+
+  s('ctaSection','<div class="cta-inner"><h2 class="cta-h2">Start redacting in 30 seconds</h2><p class="cta-sub">5 free documents. No credit card. No setup.</p><a href="/login" class="btn-primary-lg">Get started free</a></div>');
+
+  s('mainFooter','<div class="footer-inner"><div class="footer-brand"><img class="footer-brand-logo" src="/assets/logo.jpg" alt=""/><p class="footer-brand-desc">Enterprise PDF redaction powered by Azure Document Intelligence.</p></div><div class="footer-col"><div class="footer-col-title">Product</div><a href="#how">How it works</a><a href="#features">Features</a><a href="/pricing">Pricing</a><a href="/login">Sign in</a></div><div class="footer-col"><div class="footer-col-title">Company</div><a href="/contact">Contact</a><a href="/contact">Support</a></div><div class="footer-col"><div class="footer-col-title">Legal</div><a href="/pricing">Terms</a><a href="/contact">Privacy</a></div></div><div class="footer-bottom">© 2026 Prudent Autolytics. Chennai, India.</div>');
+
+  // Generic title — no info for scrapers
+  document.title = 'Prudent PDF';
 })();
 </script>
+
 </body>
+
 </html>
