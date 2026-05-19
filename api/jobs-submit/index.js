@@ -194,6 +194,7 @@ module.exports = async function (context, req) {
         azureCost          : costs.azureCost,     // your cost
         productPrice       : costs.productPrice,  // charge customer this
         callbackUrl        : 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net/api/jobs-status',
+        paSecret           : process.env.PA_CALLBACK_SECRET || 'prudent-pa-secret-change-me',
       }),
     })
     .then(r => context.log('PA triggered, status:', r.status))

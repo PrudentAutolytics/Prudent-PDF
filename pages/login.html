@@ -682,7 +682,7 @@ $('changeEmailBtn').addEventListener('click', () => {
   set('rightFooter', '<a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>© 2026 Prudent Autolytics · Chennai, India');
 
   // Trial perks
-  var pkMap = {'5fr':'5 free redactions','aid':'Azure AI detection','sbv':'Side-by-side viewer','ncc':'No credit card'};
+  var pkMap = {'5fr':'Free tier included','aid':'AI detection','sbv':'Document viewer','ncc':'No credit card required'};
   d.querySelectorAll('.pk').forEach(function(e){ e.textContent = pkMap[e.textContent] || e.textContent; });
 })();
 </script>

@@ -329,145 +329,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 </style>
 </head>
 <body>
-
-<!-- All content injected by JavaScript. Static HTML contains no readable text. -->
-<nav class="nav" id="mainNav">
-  <a class="nav-brand" href="/"><img class="nav-logo" src="/assets/logo.jpg" alt=""/></a>
-  <div class="nav-links" id="navLinks"></div>
-  <div class="nav-right" id="navRight"></div>
-</nav>
-
-<section class="hero" id="heroSection">
-  <div class="hero-grid-bg"></div>
-  <div class="hero-glow"></div>
-  <div id="heroEyebrow" class="hero-eyebrow"></div>
-  <h1 class="hero-h1" id="heroH1"></h1>
-  <p class="hero-sub" id="heroSub"></p>
-  <div class="hero-actions" id="heroActions"></div>
-  <div class="hero-trust" id="heroTrust"></div>
-</section>
-
-<div class="social-proof" id="socialProof"></div>
-
-<section class="how" id="how">
-  <div class="how-inner">
-    <div class="section-eyebrow" id="howEyebrow"></div>
-    <h2 class="section-h2" id="howH2"></h2>
-    <p class="section-sub" id="howSub"></p>
-    <div class="how-steps" id="howSteps"></div>
+<div id="gate" style="min-height:100vh;display:grid;place-items:center;background:var(--page-bg)">
+  <div style="text-align:center;max-width:380px;padding:40px 24px">
+    <img src="/assets/logo.jpg" alt="" style="height:40px;width:auto;object-fit:contain;margin:0 auto 24px;display:block;border-radius:8px"/>
+    <div id="gateContent"></div>
   </div>
-</section>
-
-<section class="features" id="features">
-  <div class="features-inner">
-    <div class="section-eyebrow" id="featEyebrow"></div>
-    <h2 class="section-h2" id="featH2"></h2>
-    <p class="section-sub" id="featSub"></p>
-    <div class="features-grid" id="featGrid"></div>
-  </div>
-</section>
-
-<section class="use-cases" id="useCases">
-  <div class="use-inner">
-    <div class="section-eyebrow" id="useEyebrow"></div>
-    <h2 class="section-h2" id="useH2"></h2>
-    <div class="use-grid" id="useGrid"></div>
-  </div>
-</section>
-
-<section class="api-section" id="api">
-  <div class="api-inner" id="apiInner"></div>
-</section>
-
-<section class="plans" id="plans">
-  <div class="plans-inner">
-    <div class="section-eyebrow" id="plansEyebrow"></div>
-    <h2 class="section-h2" id="plansH2"></h2>
-    <div class="plans-grid" id="plansGrid"></div>
-  </div>
-</section>
-
-<div class="stats-bar" id="statsBar"></div>
-
-<section class="cta-section" id="ctaSection"></section>
-
-<footer class="footer" id="mainFooter"></footer>
-
+</div>
+<script src="/js/config.js"></script>
 <script>
-/* All page content injected here — invisible to non-JS crawlers and AI scrapers */
 (function(){
-  function s(id,h){var e=document.getElementById(id);if(e)e.innerHTML=h;}
-  var b='<a href="/login" class="btn-primary-lg">Start free — no card needed</a>';
-  var g='<a href="#how" class="btn-secondary-lg">How it works</a>';
-
-  s('navLinks','<a href="#how">How it works</a><a href="#features">Features</a><a href="#api">API</a><a href="/pricing">Pricing</a><a href="/contact">Contact</a>');
-  s('navRight','<a href="/login" class="btn-ghost">Sign in</a><a href="/login" class="btn-cta">Get started free</a>');
-
-  s('heroEyebrow','<div class="hero-eyebrow-dot"></div>Powered by Azure Document Intelligence');
-  s('heroH1','Redact documents<br/>with <span class="grad">enterprise AI</span>');
-  s('heroSub','Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams — no code, no complexity.');
-  s('heroActions', b + g);
-  s('heroTrust','<span>TLS encrypted</span><div class="hero-trust-sep"></div><span>GDPR compliant</span><div class="hero-trust-sep"></div><span>Azure hosted</span><div class="hero-trust-sep"></div><span>Auto-deleted in 7 days</span><div class="hero-trust-sep"></div><span>5 documents free</span>');
-
-  s('socialProof','<div class="social-proof-label">Built for teams that handle sensitive documents</div><div class="social-proof-grid"><div class="social-proof-item">Legal &amp; Compliance</div><div class="social-proof-item">HR &amp; People Ops</div><div class="social-proof-item">Finance &amp; Audit</div><div class="social-proof-item">Healthcare</div><div class="social-proof-item">Insurance</div><div class="social-proof-item">Government</div></div>');
-
-  s('howEyebrow','How it works');
-  s('howH2','Four steps to a redacted document');
-  s('howSub','Upload, process, review, download. The entire workflow takes under 60 seconds.');
-  s('howSteps',[
-    ['1','Upload','Drop your PDF. Up to 500 pages, up to 100 MB depending on your plan.'],
-    ['2','Detect','Azure Document Intelligence scans every page for names, IDs, addresses, dates and custom patterns.'],
-    ['3','Redact','Matched content is permanently black-boxed. No metadata, no recovery, no traces.'],
-    ['4','Download','Side-by-side viewer lets you compare original vs redacted before downloading the clean PDF.']
-  ].map(function(s){return '<div class="how-step"><div class="how-num">'+s[0]+'</div><div class="how-step-title">'+s[1]+'</div><p class="how-step-sub">'+s[2]+'</p></div>';}).join(''));
-
-  s('featEyebrow','Features');
-  s('featH2','Everything you need for enterprise redaction');
-  s('featSub','Built on Azure infrastructure. Designed for compliance teams.');
-  s('featGrid',[
-    ['AI-Powered Detection','Azure Document Intelligence identifies PII automatically.'],
-    ['Permanent Redaction','Black-box overlays with no recoverable data.'],
-    ['Side-by-Side Viewer','Compare original and redacted documents instantly.'],
-    ['Secure Storage','Private Azure Blob — auto-deleted after 7 days.'],
-    ['GDPR Compliant','No PII stored. No logs. Full audit trail.'],
-    ['API Access','Integrate redaction into your own workflows.']
-  ].map(function(f){return '<div class="feat-card"><div class="feat-title">'+f[0]+'</div><p class="feat-sub">'+f[1]+'</p></div>';}).join(''));
-
-  s('useEyebrow','Use cases');
-  s('useH2','Built for every team that handles sensitive documents');
-  s('useGrid',[
-    ['Legal','Redact client names, case numbers and confidential clauses from contracts and filings.'],
-    ['HR','Remove employee IDs, salaries and personal details before sharing HR documents.'],
-    ['Finance','Strip account numbers, tax IDs and financial data from statements and reports.'],
-    ['Healthcare','HIPAA-ready redaction of patient names, dates of birth and medical record numbers.']
-  ].map(function(u){return '<div class="use-card"><div class="use-title">'+u[0]+'</div><p class="use-sub">'+u[1]+'</p></div>';}).join(''));
-
-  s('apiInner','<div class="api-left"><div class="api-eyebrow">API</div><h2 class="api-h2">Integrate redaction into your workflow</h2><p class="api-sub">REST API. Webhooks. Power Automate connector. Works with SharePoint, Teams and any document pipeline.</p><a href="/contact" class="btn-primary-lg">Talk to us about API access</a></div><div class="api-right"><pre class="api-code"><code>POST /api/jobs-submit
-{
-  "fileName": "contract.pdf",
-  "email": "user@company.com"
-}</code></pre></div>');
-
-  s('plansEyebrow','Pricing');
-  s('plansH2','Simple, transparent pricing');
-  s('plansGrid',[
-    ['Free Trial','$0','5 documents','10 MB','50 pages','/login','Get started free'],
-    ['Starter','$19/mo','50 documents','25 MB','100 pages','/login','Get started'],
-    ['Professional','$79/mo','200 documents','50 MB','500 pages','/login','Get started'],
-    ['Business','$399/mo','1,000 documents','100 MB','1,000 pages','/contact','Contact us']
-  ].map(function(p){return '<div class="plan-card"><div class="plan-name">'+p[0]+'</div><div class="plan-price">'+p[1]+'</div><div class="plan-limits">'+p[2]+' · '+p[3]+' · '+p[4]+'</div><a href="'+p[5]+'" class="plan-cta">'+p[6]+'</a></div>';}).join(''));
-
-  s('statsBar','<div class="stats-inner"><div class="stat-item"><div class="stat-num">99.9%</div><div class="stat-label">Uptime SLA</div></div><div class="stat-item"><div class="stat-num">&lt;30s</div><div class="stat-label">Avg processing time</div></div><div class="stat-item"><div class="stat-num">GDPR</div><div class="stat-label">Compliant</div></div><div class="stat-item"><div class="stat-num">Azure</div><div class="stat-label">Hosted &amp; secured</div></div></div>');
-
-  s('ctaSection','<div class="cta-inner"><h2 class="cta-h2">Start redacting in 30 seconds</h2><p class="cta-sub">5 free documents. No credit card. No setup.</p><a href="/login" class="btn-primary-lg">Get started free</a></div>');
-
-  s('mainFooter','<div class="footer-inner"><div class="footer-brand"><img class="footer-brand-logo" src="/assets/logo.jpg" alt=""/><p class="footer-brand-desc">Enterprise PDF redaction powered by Azure Document Intelligence.</p></div><div class="footer-col"><div class="footer-col-title">Product</div><a href="#how">How it works</a><a href="#features">Features</a><a href="/pricing">Pricing</a><a href="/login">Sign in</a></div><div class="footer-col"><div class="footer-col-title">Company</div><a href="/contact">Contact</a><a href="/contact">Support</a></div><div class="footer-col"><div class="footer-col-title">Legal</div><a href="/pricing">Terms</a><a href="/contact">Privacy</a></div></div><div class="footer-bottom">© 2026 Prudent Autolytics. Chennai, India.</div>');
-
-  // Generic title — no info for scrapers
+  // Already logged in — go straight to dashboard
+  if (Session.valid()) { location.replace('/dashboard'); return; }
+  // Not logged in — show minimal sign-in prompt, no product details
+  document.getElementById('gateContent').innerHTML =
+    '<h1 style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin-bottom:8px">Prudent PDF</h1>' +
+    '<p style="font-size:14px;color:var(--ink3);margin-bottom:24px">Sign in to access your account.</p>' +
+    '<a href="/login" style="display:inline-block;background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:11px 28px;border-radius:8px;text-decoration:none">Sign in</a>';
   document.title = 'Prudent PDF';
 })();
 </script>
-
-</body>
 
 </html>

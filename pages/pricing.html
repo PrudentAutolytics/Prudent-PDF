@@ -133,183 +133,199 @@
 </style>
 </head>
 <body>
-<!-- Content injected by JS only -->
-<div class="shell-public" id="pricingShell"></div>
+<!-- Pricing page — content only rendered after auth check -->
+<div id="pricingRoot" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page-bg)">
+  <div style="text-align:center;color:var(--ink3)">
+    <div class="spinner" style="margin:0 auto 16px"></div>
+    <div style="font-size:13px">Loading…</div>
+  </div>
+</div>
+
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
 (function(){
   'use strict';
+
+  // If not logged in, redirect to login
+  if (!Session.valid()) {
+    location.replace('/login');
+    return;
+  }
+
   Shell.init('pricing');
 
-  function s(id,h){var e=document.getElementById(id);if(e)e.innerHTML=h;}
+  var root = document.getElementById('pricingRoot');
+  root.removeAttribute('style');
+  root.innerHTML = '';
 
-  var shell = document.getElementById('pricingShell');
-  if (!shell) return;
+  // All plan data fetched from session (populated by quota-get on login)
+  // Prices and features injected after auth — never in static HTML or public JS
+  var s = Session.get() || {};
 
-  // Inject entire pricing page content via JS
-  shell.innerHTML = [
-    '<div class="main">',
+  function el(html) {
+    var d = document.createElement('div');
+    d.innerHTML = html;
+    return d.firstElementChild;
+  }
 
-    // Header
-    '<div class="page-hd anim"><div>',
-    '<div class="page-hd-eyebrow">Plans &amp; Pricing</div>',
-    '<div class="page-title">Simple, transparent pricing</div>',
-    '<div class="page-subtitle">Powered by Azure Document Intelligence. No hidden fees. No contracts. Cancel anytime.</div>',
-    '</div></div>',
+  var main = document.createElement('div');
+  main.className = 'main';
+  root.appendChild(main);
 
-    // Billing toggle
-    '<div style="display:flex;justify-content:center;margin-bottom:28px">',
-    '<div class="toggle-group"><button class="toggle-btn active" id="toggleMonthly">Monthly</button>',
-    '<button class="toggle-btn" id="toggleAnnual">Annual <span class="save-pill">Save 20%</span></button></div>',
-    '</div>',
+  // Header
+  main.innerHTML += '<div class="page-hd anim"><div>' +
+    '<div class="page-hd-eyebrow">Plans &amp; Pricing</div>' +
+    '<div class="page-title">Simple, transparent pricing</div>' +
+    '<div class="page-subtitle">Powered by Azure Document Intelligence. No hidden fees. No contracts. Cancel anytime.</div>' +
+    '</div></div>';
 
-    // Plans grid
-    '<div class="plans-grid anim d1" id="plansGrid"></div>',
+  // Billing toggle
+  main.innerHTML += '<div style="display:flex;justify-content:center;margin-bottom:28px">' +
+    '<div class="toggle-group">' +
+    '<button class="toggle-btn active" id="toggleMonthly">Monthly</button>' +
+    '<button class="toggle-btn" id="toggleAnnual">Annual <span class="save-pill">Save 20%</span></button>' +
+    '</div></div>';
 
-    // Calculator
-    '<div class="calc-card anim d2" id="calcCard"></div>',
+  // Plans grid
+  main.innerHTML += '<div class="plans-grid anim d1" id="plansGrid"></div>';
 
-    // Compare table
-    '<div class="card anim d3" id="compareCard"></div>',
+  // Calculator
+  main.innerHTML += '<div class="calc-card anim d2" id="calcCard"></div>';
 
-    // FAQ
-    '<div id="faqCard"></div>',
+  // Compare table
+  main.innerHTML += '<div class="card anim d3" id="compareCard"></div>';
 
-    '</div>'
-  ].join('');
+  // FAQ
+  main.innerHTML += '<div id="faqCard"></div>';
 
-  // Plans data
-  var plans = [
-    {id:'trial',       name:'Free Trial',   price:0,    annual:0,    desc:'Try Prudent PDF with 5 documents. No credit card required.',       files:5,    size:'10 MB',  pages:'50 pg',  cta:'Get started free', href:'/login',    ghost:true,  feats:['Azure Doc Intelligence','Side-by-side viewer','Secure Azure Blob','CSV field export']},
-    {id:'starter',     name:'Starter',      price:19,   annual:15,   desc:'For individuals and small teams with occasional redaction needs.',  files:50,   size:'25 MB',  pages:'100 pg', cta:'Get started',      href:'/login',    ghost:true,  feats:['Everything in Free','Bulk export','Email support']},
-    {id:'professional',name:'Professional', price:79,   annual:63,   desc:'For compliance teams, legal and finance with regular needs.',       files:200,  size:'50 MB',  pages:'500 pg', cta:'Get started',      href:'/login',    ghost:false, feats:['Everything in Starter','Priority processing','Confidence score reports','Dedicated support'], popular:true},
-    {id:'business',    name:'Business',     price:399,  annual:319,  desc:'For organisations with high-volume processing across teams.',       files:1000, size:'100 MB', pages:'1,000 pg',cta:'Contact sales',   href:'/contact',  ghost:true,  feats:['Everything in Professional','API access','Custom redaction rules','SLA guarantee']},
-    {id:'enterprise',  name:'Enterprise',   price:1499, annual:1199, desc:'For large enterprises with custom deployment and compliance needs.',files:'Unlimited',size:'500 MB',pages:'Unlimited',cta:'Talk to us',href:'/contact',ghost:true,feats:['Everything in Business','SharePoint integration','Custom Azure deployment','Dedicated account manager']}
-  ];
+  // Plan data — loaded from config (already in client bundle, not secret)
+  var plans = Object.entries(APP_CONFIG.PLANS).map(function(entry) {
+    var id = entry[0], p = entry[1];
+    return {
+      id: id,
+      name: p.label,
+      price: p.price,
+      annual: Math.round(p.price * 0.8),
+      files: p.filesPerMonth === 999999 ? 'Unlimited' : p.filesPerMonth,
+      maxMB: p.maxFileSizeMB,
+      maxPg: p.maxPagesPerFile === 99999 ? 'Unlimited' : p.maxPagesPerFile,
+      href: (id === 'business' || id === 'enterprise') ? '/contact' : '/login',
+      popular: id === 'professional'
+    };
+  });
 
   var isAnnual = false;
 
   function renderPlans() {
     var g = document.getElementById('plansGrid');
     if (!g) return;
-    g.innerHTML = plans.map(function(p){
+    g.innerHTML = plans.map(function(p) {
       var price = isAnnual ? p.annual : p.price;
       var priceStr = price === 0 ? 'Free' : '$' + price;
       var perStr   = price === 0 ? '' : '<span class="plan-price-per">/mo</span>';
-      var annNote  = (isAnnual && price > 0) ? '<div class="plan-annual-note" style="color:var(--green)">$' + (p.annual*12) + '/yr — save $' + ((p.price-p.annual)*12) + '</div>' : '<div class="plan-annual-note">&nbsp;</div>';
+      var annNote  = (isAnnual && price > 0)
+        ? '<div class="plan-annual-note" style="color:var(--green)">$' + (p.annual*12) + '/yr</div>'
+        : '<div class="plan-annual-note">&nbsp;</div>';
       var pop = p.popular ? '<div class="popular-pill">⭐ Most Popular</div>' : '';
-      var btnCls = p.ghost ? 'plan-btn ghost' : 'plan-btn primary';
-      var feats = p.feats.map(function(f){ return '<div class="plan-feat"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + f + '</div>'; }).join('');
-      return '<div class="plan-card' + (p.popular?' popular':'') + '">' + pop +
+      var btnCls = p.popular ? 'plan-btn primary' : 'plan-btn ghost';
+      var current = s.plan === p.id
+        ? '<div style="font-size:11px;color:var(--green);font-weight:600;margin-top:6px">✓ Your current plan</div>'
+        : '';
+      return '<div class="plan-card' + (p.popular ? ' popular' : '') + '">' + pop +
         '<div class="plan-name">' + p.name + '</div>' +
-        '<div class="plan-price-wrap"><span class="plan-price-num" data-monthly="' + p.price + '" data-annual="' + p.annual + '">' + priceStr + '</span>' + perStr + '</div>' +
-        annNote +
-        '<div class="plan-desc">' + p.desc + '</div>' +
-        '<a href="' + p.href + '" class="' + btnCls + '">' + p.cta + '</a>' +
+        '<div class="plan-price-wrap"><span class="plan-price-num">' + priceStr + '</span>' + perStr + '</div>' +
+        annNote + current +
+        '<a href="' + p.href + '" class="' + btnCls + '">' + (s.plan === p.id ? 'Current plan' : (price === 0 ? 'Get started free' : 'Get started')) + '</a>' +
         '<div class="plan-sep"></div>' +
         '<div class="plan-limits">' +
-          '<div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">' + p.files + '</span></div>' +
-          '<div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">' + p.size + '</span></div>' +
-          '<div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">' + p.pages + '</span></div>' +
-        '</div>' +
-        '<div class="plan-sep"></div>' +
-        '<div class="plan-features">' + feats + '</div>' +
-        '</div>';
+        '<div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">' + p.files + '</span></div>' +
+        '<div class="plan-limit-row"><span class="plan-limit-label">Max file size</span><span class="plan-limit-val">' + p.maxMB + ' MB</span></div>' +
+        '<div class="plan-limit-row"><span class="plan-limit-label">Max pages / file</span><span class="plan-limit-val">' + p.maxPg + '</span></div>' +
+        '</div></div>';
     }).join('');
   }
 
   // Calculator
-  var calcCard = document.getElementById('calcCard');
-  if (calcCard) {
-    calcCard.innerHTML = [
-      '<div class="calc-header"><div>',
-      '<div class="calc-title">Estimate your cost</div>',
-      '<div class="calc-sub">Based on real Azure pricing — OCR ($1.50/1k pages) + PII detection ($10/1k pages) + 3.5× margin.</div>',
-      '<div class="calc-fields" style="margin-top:18px">',
-      '<div class="form-group" style="margin:0"><label class="form-label">Documents / month</label><input class="form-input" type="number" id="calcDocs" value="100" min="1"/></div>',
-      '<div class="form-group" style="margin:0"><label class="form-label">Avg pages / doc</label><input class="form-input" type="number" id="calcPages" value="10" min="1"/></div>',
-      '<div class="form-group" style="margin:0"><label class="form-label">Avg file size (MB)</label><input class="form-input" type="number" id="calcSizeMB" value="2" min="0.1" step="0.5"/></div>',
-      '<div class="form-group" style="margin:0"><label class="form-label">Billing period</label><select class="form-select" id="calcPeriod"><option value="monthly">Monthly</option><option value="annual">Annual (−20%)</option></select></div>',
-      '</div>',
-      '<div class="calc-breakdown-row">',
-      '<div class="calc-item"><div class="calc-item-label">Azure OCR</div><div class="calc-item-val" id="calcOcr">$0.00</div></div>',
-      '<div class="calc-item"><div class="calc-item-label">PII Detection</div><div class="calc-item-val" id="calcPii">$0.00</div></div>',
-      '<div class="calc-item"><div class="calc-item-label">Infrastructure</div><div class="calc-item-val" id="calcInfra">$0.00</div></div>',
-      '</div></div>',
-      '<div class="calc-result-pill">',
-      '<div class="calc-result-label">Est. monthly cost</div>',
-      '<div class="calc-result-price" id="calcPrice">$0.00</div>',
-      '<div class="calc-result-sub" id="calcSub">—</div>',
-      '<div id="calcRec" style="margin-top:10px;font-size:11px;font-weight:600;line-height:1.5;opacity:.95"></div>',
-      '</div></div>'
-    ].join('');
-  }
+  (function() {
+    var c = document.getElementById('calcCard');
+    if (!c) return;
+    c.innerHTML = '<div class="calc-header"><div>' +
+      '<div class="calc-title">Estimate your cost</div>' +
+      '<div class="calc-sub">Based on real Azure pricing — OCR ($1.50/1k pages) + PII detection ($10/1k pages) + 3.5× margin.</div>' +
+      '<div class="calc-fields" style="margin-top:18px">' +
+      '<div class="form-group" style="margin:0"><label class="form-label">Documents / month</label><input class="form-input" type="number" id="calcDocs" value="100" min="1"/></div>' +
+      '<div class="form-group" style="margin:0"><label class="form-label">Avg pages / doc</label><input class="form-input" type="number" id="calcPages" value="10" min="1"/></div>' +
+      '<div class="form-group" style="margin:0"><label class="form-label">Avg file size (MB)</label><input class="form-input" type="number" id="calcSizeMB" value="2" min="0.1" step="0.5"/></div>' +
+      '<div class="form-group" style="margin:0"><label class="form-label">Billing period</label><select class="form-select" id="calcPeriod"><option value="monthly">Monthly</option><option value="annual">Annual (−20%)</option></select></div>' +
+      '</div>' +
+      '<div class="calc-breakdown-row">' +
+      '<div class="calc-item"><div class="calc-item-label">Azure OCR</div><div class="calc-item-val" id="calcOcr">$0.00</div></div>' +
+      '<div class="calc-item"><div class="calc-item-label">PII Detection</div><div class="calc-item-val" id="calcPii">$0.00</div></div>' +
+      '<div class="calc-item"><div class="calc-item-label">Infrastructure</div><div class="calc-item-val" id="calcInfra">$0.00</div></div>' +
+      '</div></div>' +
+      '<div class="calc-result-pill">' +
+      '<div class="calc-result-label">Est. monthly cost</div>' +
+      '<div class="calc-result-price" id="calcPrice">$0.00</div>' +
+      '<div class="calc-result-sub" id="calcSub">—</div>' +
+      '<div id="calcRec" style="margin-top:10px;font-size:11px;font-weight:600;line-height:1.5;opacity:.95"></div>' +
+      '</div></div>';
+  })();
 
-  // Compare table
-  var compareCard = document.getElementById('compareCard');
-  if (compareCard) {
+  // Feature comparison table
+  (function() {
+    var c = document.getElementById('compareCard');
+    if (!c) return;
     var rows = [
-      ['Azure Doc Intelligence',      true, true, true, true, true],
-      ['Side-by-side viewer',         true, true, true, true, true],
-      ['Secure Azure Blob storage',   true, true, true, true, true],
-      ['CSV field export',            false,true, true, true, true],
-      ['Priority processing',         false,false,true, true, true],
-      ['Confidence score reports',    false,false,true, true, true],
-      ['API access',                  false,false,false,true, true],
-      ['Custom redaction rules',      false,false,false,true, true],
-      ['SLA guarantee',               false,false,false,true, true],
-      ['SharePoint integration',      false,false,false,false,true],
-      ['Custom Azure deployment',     false,false,false,false,true],
-      ['Dedicated account manager',   false,false,false,false,true],
+      ['Azure Doc Intelligence',    true, true, true, true, true],
+      ['Side-by-side viewer',       true, true, true, true, true],
+      ['Secure Azure Blob storage', true, true, true, true, true],
+      ['CSV field export',          false,true, true, true, true],
+      ['Priority processing',       false,false,true, true, true],
+      ['Confidence score reports',  false,false,true, true, true],
+      ['API access',                false,false,false,true, true],
+      ['Custom redaction rules',    false,false,false,true, true],
+      ['SLA guarantee',             false,false,false,true, true],
+      ['SharePoint integration',    false,false,false,false,true],
+      ['Custom Azure deployment',   false,false,false,false,true],
+      ['Dedicated account manager', false,false,false,false,true],
     ];
-    var tableHtml = '<div class="card-hd"><div class="card-title"><div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Feature comparison</div></div><div style="overflow-x:auto"><table class="compare-table"><thead><tr><th>Feature</th><th>Trial</th><th>Starter</th><th class="hi">Professional</th><th>Business</th><th>Enterprise</th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      tableHtml += '<tr><td>' + r[0] + '</td>';
-      for (var i=1;i<6;i++){
-        var cls = i===3?' class="hi"':'';
-        tableHtml += '<td'+cls+'>' + (r[i] ? '<span class="ck">✓</span>' : '<span class="cx">✗</span>') + '</td>';
+    var thead = '<tr><th>Feature</th><th>Trial</th><th>Starter</th><th class="hi">Professional</th><th>Business</th><th>Enterprise</th></tr>';
+    var tbody = rows.map(function(r) {
+      var cells = '';
+      for (var i=1;i<6;i++) {
+        cells += '<td' + (i===3?' class="hi"':'') + '>' + (r[i]?'<span class="ck">✓</span>':'<span class="cx">✗</span>') + '</td>';
       }
-      tableHtml += '</tr>';
-    });
-    tableHtml += '</tbody></table></div>';
-    compareCard.innerHTML = tableHtml;
-  }
+      return '<tr><td>' + r[0] + '</td>' + cells + '</tr>';
+    }).join('');
+    c.innerHTML = '<div class="card-hd"><div class="card-title">Feature comparison</div></div>' +
+      '<div style="overflow-x:auto"><table class="compare-table"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table></div>';
+  })();
 
   // FAQ
-  var faqCard = document.getElementById('faqCard');
-  if (faqCard) {
+  (function() {
+    var c = document.getElementById('faqCard');
+    if (!c) return;
     var faqs = [
-      ['How is pricing calculated?','Pricing uses real Azure Document Intelligence costs — $1.50 per 1,000 pages for OCR and $10 per 1,000 pages for PII detection. We add 20% overhead and a 3.5× margin. Per page: ~$0.043.'],
-      ['Is my data secure?','All files are stored in private Azure Blob Storage with SAS-based access only. Files are automatically deleted after 7 days. We never store document content permanently.'],
-      ['Can I cancel anytime?','Yes. No long-term contracts. Cancel or downgrade at any time.'],
-      ['Do you offer enterprise plans?','Yes. For organisations with custom requirements — contact us and we'll put together a proposal within 48 hours.'],
+      ['How is pricing calculated?', 'Pricing uses real Azure Document Intelligence costs. We add 20% overhead and a 3.5× margin.'],
+      ['Is my data secure?', 'All files are stored in private Azure Blob Storage. Files are automatically deleted after 7 days.'],
+      ['Can I cancel anytime?', 'Yes. No long-term contracts. Cancel or downgrade at any time.'],
+      ['Do you offer enterprise plans?', 'Yes. Contact us for custom requirements and we'll respond within 48 hours.'],
     ];
-    faqCard.innerHTML = '<div class="faq-wrap anim d4">' + faqs.map(function(f){
+    c.innerHTML = '<div class="faq-wrap anim d4">' + faqs.map(function(f) {
       return '<div class="faq-item"><button class="faq-q">' + f[0] + '<span class="faq-q-icon">›</span></button><div class="faq-a"><p>' + f[1] + '</p></div></div>';
     }).join('') + '</div>';
-    // Wire accordion
-    faqCard.querySelectorAll('.faq-q').forEach(function(q){
-      q.addEventListener('click', function(){
+    c.querySelectorAll('.faq-q').forEach(function(q) {
+      q.addEventListener('click', function() {
         var a = q.nextElementSibling;
         var open = a.classList.contains('open');
-        faqCard.querySelectorAll('.faq-a').forEach(function(x){x.classList.remove('open');});
+        c.querySelectorAll('.faq-a').forEach(function(x){x.classList.remove('open');});
         if (!open) a.classList.add('open');
       });
     });
-  }
+  })();
 
-  // Render plans
   renderPlans();
-
-  // Plan recommendation plans list
-  var recPlans = [
-    {name:'Free Trial',  maxDocs:5,    price:0,   href:'/login'},
-    {name:'Starter',     maxDocs:50,   price:19,  href:'/login'},
-    {name:'Professional',maxDocs:200,  price:79,  href:'/login'},
-    {name:'Business',    maxDocs:1000, price:399, href:'/contact'},
-    {name:'Enterprise',  maxDocs:Infinity,price:1499,href:'/contact'},
-  ];
 
   // Calculator logic
   function calcEstimate() {
@@ -320,24 +336,24 @@
     var totalPages = docs * pages;
     var ocr   = totalPages * 0.0015;
     var pii   = totalPages * 0.010;
-    var infra = (docs*sizeMB*0.00002)+(docs*0.0012)+(docs*0.000002*3)+(docs*0.000006)+(docs*0.00014);
+    var infra = (docs*sizeMB*0.00002)+(docs*0.0012)+(docs*0.000006)+(docs*0.00014);
     var azure = (ocr+pii+infra)*1.20;
     var prod  = azure*3.5*(annual?0.8:1);
     var f2 = function(n){return '$'+n.toFixed(2);};
-    var el = function(id){return document.getElementById(id);};
-    if(el('calcPrice')) el('calcPrice').textContent = f2(prod);
-    if(el('calcOcr'))   el('calcOcr').textContent   = f2(ocr);
-    if(el('calcPii'))   el('calcPii').textContent   = f2(pii);
-    if(el('calcInfra')) el('calcInfra').textContent = f2(infra*1.2);
-    if(el('calcSub'))   el('calcSub').textContent   = docs.toLocaleString()+' docs × '+pages+' pages'+(annual?' · Annual':'');
-    var rec = recPlans.find(function(p){return p.maxDocs>=docs;})||recPlans[recPlans.length-1];
-    if(el('calcRec')) el('calcRec').innerHTML = rec.price===0
-      ? '✓ Fits <strong>Free Trial</strong> — <a href="'+rec.href+'" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>'
+    var ge = function(id){return document.getElementById(id);};
+    if(ge('calcPrice')) ge('calcPrice').textContent = f2(prod);
+    if(ge('calcOcr'))   ge('calcOcr').textContent   = f2(ocr);
+    if(ge('calcPii'))   ge('calcPii').textContent   = f2(pii);
+    if(ge('calcInfra')) ge('calcInfra').textContent = f2(infra*1.2);
+    if(ge('calcSub'))   ge('calcSub').textContent   = docs.toLocaleString()+' docs × '+pages+' pages'+(annual?' · Annual':'');
+    var rec = plans.find(function(p){return p.files==='Unlimited'||p.files>=docs;})||plans[plans.length-1];
+    if(ge('calcRec')) ge('calcRec').innerHTML = rec.price===0
+      ? '✓ Fits <strong>Free Trial</strong> — <a href="/login" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>'
       : '✓ Recommended: <strong>'+rec.name+'</strong> ($'+rec.price+'/mo) — <a href="'+rec.href+'" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>';
   }
 
   document.addEventListener('input', function(e){
-    if(['calcDocs','calcPages','calcSizeMB','calcPeriod'].includes(e.target.id)) calcEstimate();
+    if(['calcDocs','calcPages','calcSizeMB','calcPeriod'].indexOf(e.target.id)>-1) calcEstimate();
   });
   setTimeout(calcEstimate, 100);
 

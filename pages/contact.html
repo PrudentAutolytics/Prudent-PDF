@@ -10,50 +10,41 @@
 <link rel="stylesheet" href="/css/main.css"/>
 </head>
 <body>
-<!-- Content injected by JS only -->
-<div id="contactShell"></div>
+<div id="contactRoot" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page-bg)">
+  <div style="text-align:center;color:var(--ink3)">
+    <div class="spinner" style="margin:0 auto 16px"></div>
+    <div style="font-size:13px">Loading…</div>
+  </div>
+</div>
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
 (function(){
   'use strict';
+  if (!Session.valid()) { location.replace('/login'); return; }
   Shell.init('contact');
-  var shell = document.getElementById('contactShell');
-  if (!shell) return;
-  shell.innerHTML = [
-    '<div class="main">',
-    '<div class="page-hd anim"><div>',
-    '<div class="page-hd-eyebrow">Contact</div>',
-    '<div class="page-title">Get in touch</div>',
-    '<div class="page-subtitle">Questions about pricing, enterprise plans, or technical support — we respond within 24 hours.</div>',
-    '</div></div>',
-    '<div class="two-col anim d1">',
-    '<div class="card"><div class="card-hd"><div class="card-title">Send a message</div></div>',
-    '<div class="card-body" style="padding:20px">',
-    '<div id="contactFormContainer"></div>',
-    '</div></div>',
-    '<div>',
-    '<div class="card" style="margin-bottom:16px"><div class="card-body" style="padding:20px">',
-    '<div style="font-weight:700;margin-bottom:4px">Prudent Autolytics</div>',
-    '<div style="font-size:13px;color:var(--ink3);line-height:1.8">Chennai, India<br/>support@prudentautolytics.com</div>',
-    '</div></div>',
-    '</div></div>',
-    '</div>'
-  ].join('');
-
-  // Inject contact form
-  var fc = document.getElementById('contactFormContainer');
-  if (fc) {
-    fc.innerHTML = [
-      '<div class="form-group"><label class="form-label">Name</label><input class="form-input" id="cName" type="text" placeholder="Your name"/></div>',
-      '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cEmail" type="email" placeholder="you@company.com"/></div>',
-      '<div class="form-group"><label class="form-label">Subject</label><input class="form-input" id="cSubject" type="text" placeholder="How can we help?"/></div>',
-      '<div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="cMessage" rows="5" placeholder="Tell us more…" style="resize:vertical"></textarea></div>',
-      '<button class="btn btn-primary" id="cSubmit">Send message</button>',
-      '<div id="cResult" style="margin-top:12px;font-size:13px"></div>'
-    ].join('');
-  }
-
+  var root = document.getElementById('contactRoot');
+  root.removeAttribute('style');
+  root.innerHTML = '<div class="main">' +
+    '<div class="page-hd anim"><div>' +
+    '<div class="page-hd-eyebrow">Contact</div>' +
+    '<div class="page-title">Get in touch</div>' +
+    '<div class="page-subtitle">Questions about pricing, enterprise plans, or technical support — we respond within 24 hours.</div>' +
+    '</div></div>' +
+    '<div class="two-col anim d1">' +
+    '<div class="card"><div class="card-hd"><div class="card-title">Send a message</div></div>' +
+    '<div class="card-body" style="padding:20px">' +
+    '<div class="form-group"><label class="form-label">Name</label><input class="form-input" id="cName" type="text" placeholder="Your name"/></div>' +
+    '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cEmail" type="email" placeholder="you@company.com"/></div>' +
+    '<div class="form-group"><label class="form-label">Subject</label><input class="form-input" id="cSubject" type="text" placeholder="How can we help?"/></div>' +
+    '<div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="cMessage" rows="5" style="resize:vertical"></textarea></div>' +
+    '<button class="btn btn-primary" id="cSubmit">Send message</button>' +
+    '<div id="cResult" style="margin-top:12px;font-size:13px"></div>' +
+    '</div></div>' +
+    '<div><div class="card"><div class="card-body" style="padding:20px">' +
+    '<div style="font-weight:700;margin-bottom:4px">Prudent Autolytics</div>' +
+    '<div style="font-size:13px;color:var(--ink3);line-height:1.8">Chennai, India</div>' +
+    '</div></div></div></div></div>';
   document.title = 'Contact';
 })();
 </script>
