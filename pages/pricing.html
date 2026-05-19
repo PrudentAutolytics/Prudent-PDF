@@ -2,90 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="description" content="Prudent PDF pricing — transparent per-page pricing powered by Azure Document Intelligence"/>
 <title>Plans & Pricing — Prudent PDF</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
-/* ── Billing toggle ── */
-.toggle-wrap {
-  display:inline-flex; align-items:center; gap:4px;
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:999px; padding:4px;
-}
-.toggle-btn {
-  padding:7px 18px; border-radius:999px;
-  font-size:13px; font-weight:600; cursor:pointer;
-  border:none; background:transparent; color:var(--ink3);
-  font-family:var(--font); transition:all .15s;
-}
+.toggle-wrap { display:inline-flex; align-items:center; gap:4px; background:var(--surface2); border:1px solid var(--border); border-radius:999px; padding:4px; }
+.toggle-btn { padding:7px 18px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; border:none; background:transparent; color:var(--ink3); font-family:var(--font); transition:all .15s; }
 .toggle-btn.active { background:var(--blue); color:#fff; box-shadow:0 2px 8px rgba(37,99,235,.3); }
 .save-pill { background:var(--green); color:#fff; font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:999px; vertical-align:middle; margin-left:3px; }
-
-/* ── Plan cards ── */
-.plans-grid {
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:14px;
-  margin-bottom:32px;
-}
+.plans-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:32px; }
 @media(max-width:1100px){ .plans-grid { grid-template-columns:repeat(3,1fr); } }
-@media(max-width:720px) { .plans-grid { grid-template-columns:1fr 1fr; } }
-@media(max-width:480px) { .plans-grid { grid-template-columns:1fr; } }
-
-.plan-card {
-  background:var(--surface); border:1.5px solid var(--border);
-  border-radius:var(--r16); padding:22px 18px;
-  display:flex; flex-direction:column;
-  position:relative; transition:all .18s;
-}
+@media(max-width:720px)  { .plans-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:480px)  { .plans-grid { grid-template-columns:1fr; } }
+.plan-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r16); padding:22px 18px; display:flex; flex-direction:column; position:relative; transition:all .18s; }
 .plan-card:hover { border-color:var(--border2); box-shadow:var(--s3); transform:translateY(-2px); }
 .plan-card.popular { border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.10); }
-
-.popular-pill {
-  position:absolute; top:-12px; left:50%; transform:translateX(-50%);
-  background:linear-gradient(135deg,var(--blue),var(--violet));
-  color:#fff; font-size:10.5px; font-weight:700;
-  padding:3px 14px; border-radius:999px; white-space:nowrap;
-}
-
+.popular-pill { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,var(--blue),var(--violet)); color:#fff; font-size:10.5px; font-weight:700; padding:3px 14px; border-radius:999px; white-space:nowrap; }
 .plan-name { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:10px; }
 .plan-price-wrap { display:flex; align-items:baseline; gap:3px; margin-bottom:2px; }
 .plan-price-num { font-size:34px; font-weight:900; letter-spacing:-1.5px; color:var(--ink); font-family:var(--display); }
 .plan-price-per { font-size:12px; color:var(--ink3); }
 .plan-annual-note { font-size:11px; color:var(--green); font-weight:600; min-height:16px; margin-bottom:12px; }
 .plan-desc { font-size:12.5px; color:var(--ink3); line-height:1.6; margin-bottom:16px; flex:1; }
-
-.plan-btn {
-  display:block; text-align:center; padding:9px 14px;
-  border-radius:var(--r8); font-size:13px; font-weight:700;
-  text-decoration:none; transition:all .15s; margin-bottom:16px;
-  border:none; cursor:pointer; font-family:var(--font);
-}
-.plan-btn.primary {
-  background:linear-gradient(135deg,var(--blue),var(--violet));
-  color:#fff; box-shadow:0 3px 12px rgba(37,99,235,.35);
-}
+.plan-btn { display:block; text-align:center; padding:9px 14px; border-radius:var(--r8); font-size:13px; font-weight:700; text-decoration:none; transition:all .15s; margin-bottom:16px; border:none; cursor:pointer; font-family:var(--font); }
+.plan-btn.primary { background:linear-gradient(135deg,var(--blue),var(--violet)); color:#fff; box-shadow:0 3px 12px rgba(37,99,235,.35); }
 .plan-btn.primary:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(37,99,235,.45); }
-.plan-btn.ghost {
-  background:var(--surface2); border:1.5px solid var(--border2); color:var(--ink2);
-}
+.plan-btn.ghost { background:var(--surface2); border:1.5px solid var(--border2); color:var(--ink2); }
 .plan-btn.ghost:hover { border-color:var(--blue); color:var(--blue); }
-
 .plan-sep { height:1px; background:var(--border); margin:0 0 14px; }
-
 .plan-limits { display:flex; flex-direction:column; gap:7px; margin-bottom:14px; }
 .plan-limit-row { display:flex; justify-content:space-between; font-size:11.5px; }
 .plan-limit-label { color:var(--ink3); }
 .plan-limit-val { font-weight:700; color:var(--ink); font-family:var(--mono); font-size:11px; }
-
 .plan-features { display:flex; flex-direction:column; gap:6px; }
 .plan-feat { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink2); }
 .plan-feat svg { flex-shrink:0; }
 .plan-feat.off { color:var(--ink4); }
 .plan-feat.off svg { color:var(--border2); }
-
-/* ── Cost calculator ── */
+/* ── Calculator ── */
 .calc-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r16); padding:28px 32px; margin-bottom:32px; }
 .calc-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
 .calc-title { font-size:17px; font-weight:800; letter-spacing:-.3px; color:var(--ink); margin-bottom:4px; }
@@ -94,14 +50,15 @@
 .calc-result-label { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; opacity:.8; margin-bottom:4px; }
 .calc-result-price { font-size:32px; font-weight:900; letter-spacing:-1px; font-family:var(--display); }
 .calc-result-sub { font-size:11px; opacity:.75; margin-top:2px; }
+/* BUG-10: plan recommendation */
+.calc-rec { font-size:12px; margin-top:8px; background:rgba(255,255,255,.15); border-radius:6px; padding:6px 10px; line-height:1.5; }
 .calc-fields { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
 @media(max-width:720px){ .calc-fields { grid-template-columns:1fr 1fr; } }
 .calc-breakdown-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
 .calc-item { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r8); padding:10px 12px; text-align:center; }
 .calc-item-label { font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); margin-bottom:4px; }
 .calc-item-val { font-size:17px; font-weight:800; font-family:var(--display); color:var(--ink); }
-
-/* ── Comparison table ── */
+/* ── Compare table ── */
 .compare-wrap { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r16); overflow:hidden; margin-bottom:32px; }
 .compare-table { width:100%; border-collapse:collapse; }
 .compare-table th { font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); padding:12px 16px; border-bottom:2px solid var(--border); background:var(--surface2); text-align:left; }
@@ -111,9 +68,9 @@
 .compare-table tr:last-child td { border-bottom:none; }
 .compare-table tr:hover td { background:var(--surface2); }
 .compare-table .hi { background:rgba(37,99,235,.03); }
-.ck { color:var(--green); font-size:15px; }
-.cx { color:var(--border2); font-size:15px; }
-
+.ck  { color:var(--green); font-size:15px; }
+/* BUG-09 FIXED: ✗ instead of — for excluded features */
+.cx  { color:var(--red); font-size:13px; font-weight:700; opacity:.5; }
 /* ── FAQ ── */
 .faq-list { display:flex; flex-direction:column; }
 .faq-item { border-bottom:1px solid var(--border); }
@@ -132,7 +89,6 @@
 <div class="shell" id="appShell">
   <main class="main">
 
-    <!-- Page header -->
     <div class="page-hd anim">
       <div>
         <div class="page-hd-eyebrow">
@@ -153,7 +109,6 @@
     <!-- Plan cards -->
     <div class="plans-grid anim d1">
 
-      <!-- Free Trial -->
       <div class="plan-card">
         <div class="plan-name">Free Trial</div>
         <div class="plan-price-wrap"><span class="plan-price-num">$0</span><span class="plan-price-per">/mo</span></div>
@@ -177,12 +132,12 @@
         </div>
       </div>
 
-      <!-- Starter -->
       <div class="plan-card">
         <div class="plan-name">Starter</div>
         <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="19" data-annual="15">$19</span><span class="plan-price-per">/mo</span></div>
         <div class="plan-annual-note" id="ann-starter">&nbsp;</div>
         <div class="plan-desc">For individuals and small teams processing contracts and HR docs.</div>
+        <!-- BUG-07 FIXED: self-serve → /login -->
         <a href="/login" class="plan-btn ghost">Get started</a>
         <div class="plan-sep"></div>
         <div class="plan-limits">
@@ -201,14 +156,14 @@
         </div>
       </div>
 
-      <!-- Professional — Most Popular -->
+      <!-- BUG-07 FIXED: Professional now self-serve → /login -->
       <div class="plan-card popular">
         <div class="popular-pill">⭐ Most Popular</div>
         <div class="plan-name">Professional</div>
         <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="79" data-annual="63">$79</span><span class="plan-price-per">/mo</span></div>
         <div class="plan-annual-note" id="ann-professional">&nbsp;</div>
         <div class="plan-desc">For compliance teams, legal and finance with regular redaction needs.</div>
-        <a href="/contact" class="plan-btn primary">Contact sales</a>
+        <a href="/login" class="plan-btn primary">Get started</a>
         <div class="plan-sep"></div>
         <div class="plan-limits">
           <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">200</span></div>
@@ -226,13 +181,12 @@
         </div>
       </div>
 
-      <!-- Business -->
       <div class="plan-card">
         <div class="plan-name">Business</div>
         <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="399" data-annual="319">$399</span><span class="plan-price-per">/mo</span></div>
         <div class="plan-annual-note" id="ann-business">&nbsp;</div>
         <div class="plan-desc">For organisations with high-volume processing across multiple teams.</div>
-        <a href="/login" class="plan-btn ghost">Get started</a>
+        <a href="/contact" class="plan-btn ghost">Contact sales</a>
         <div class="plan-sep"></div>
         <div class="plan-limits">
           <div class="plan-limit-row"><span class="plan-limit-label">Files / month</span><span class="plan-limit-val">1,000</span></div>
@@ -250,7 +204,6 @@
         </div>
       </div>
 
-      <!-- Enterprise -->
       <div class="plan-card">
         <div class="plan-name">Enterprise</div>
         <div class="plan-price-wrap"><span class="plan-price-num" data-monthly="1499" data-annual="1199">$1,499</span><span class="plan-price-per">/mo</span></div>
@@ -274,9 +227,9 @@
         </div>
       </div>
 
-    </div><!-- /.plans-grid -->
+    </div>
 
-    <!-- Cost calculator -->
+    <!-- Cost calculator — BUG-10 FIXED: adds plan recommendation -->
     <div class="calc-card anim d2">
       <div class="calc-header">
         <div>
@@ -304,35 +257,26 @@
             </div>
           </div>
           <div class="calc-breakdown-row">
-            <div class="calc-item">
-              <div class="calc-item-label">Azure OCR</div>
-              <div class="calc-item-val" id="calcOcr">$0.00</div>
-            </div>
-            <div class="calc-item">
-              <div class="calc-item-label">PII Detection</div>
-              <div class="calc-item-val" id="calcPii">$0.00</div>
-            </div>
-            <div class="calc-item">
-              <div class="calc-item-label">Infrastructure</div>
-              <div class="calc-item-val" id="calcInfra">$0.00</div>
-            </div>
+            <div class="calc-item"><div class="calc-item-label">Azure OCR</div><div class="calc-item-val" id="calcOcr">$0.00</div></div>
+            <div class="calc-item"><div class="calc-item-label">PII Detection</div><div class="calc-item-val" id="calcPii">$0.00</div></div>
+            <div class="calc-item"><div class="calc-item-label">Infrastructure</div><div class="calc-item-val" id="calcInfra">$0.00</div></div>
           </div>
         </div>
         <div class="calc-result-pill">
           <div class="calc-result-label">Est. monthly cost</div>
           <div class="calc-result-price" id="calcPrice">$0.00</div>
-          <div class="calc-result-sub" id="calcSub">—</div>
+          <div class="calc-result-sub" id="calcVolume">—</div>
+          <!-- BUG-10: Plan recommendation -->
+          <div class="calc-rec" id="calcRec">—</div>
         </div>
       </div>
     </div>
 
-    <!-- Feature comparison table -->
+    <!-- Feature comparison — BUG-09 FIXED: ✗ instead of — -->
     <div class="card anim d3" style="margin-bottom:32px;overflow:hidden">
       <div class="card-hd">
         <div class="card-title">
-          <div class="card-title-icon">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
+          <div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           Feature comparison
         </div>
       </div>
@@ -349,18 +293,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>Azure Doc Intelligence</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Side-by-side viewer</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Secure Azure Blob storage</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>CSV field export</td><td><span class="cx">—</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Priority processing</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Confidence score reports</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>API access</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="cx">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Custom redaction rules</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="cx">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>SLA guarantee</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="cx">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>SharePoint integration</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="cx">—</span></td><td><span class="cx">—</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Custom Azure deployment</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="cx">—</span></td><td><span class="cx">—</span></td><td><span class="ck">✓</span></td></tr>
-            <tr><td>Dedicated account manager</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td><td class="hi"><span class="cx">—</span></td><td><span class="cx">—</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Azure Doc Intelligence</td>    <td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Side-by-side viewer</td>       <td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Secure Azure Blob storage</td> <td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>CSV field export</td>           <td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Priority processing</td>        <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Confidence score reports</td>   <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>API access</td>                 <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Custom redaction rules</td>     <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>SLA guarantee</td>              <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>SharePoint integration</td>     <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Custom Azure deployment</td>    <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Dedicated account manager</td>  <td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td class="hi"><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -370,63 +314,36 @@
     <div class="card anim d4">
       <div class="card-hd">
         <div class="card-title">
-          <div class="card-title-icon">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </div>
+          <div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
           Frequently asked questions
         </div>
       </div>
       <div class="card-body" style="padding:0 20px 8px">
         <div class="faq-list">
-
           <div class="faq-item">
-            <div class="faq-q" data-faq="0">
-              How is pricing calculated?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
+            <div class="faq-q">How is pricing calculated?<span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="faq-a">Pricing uses real Azure Document Intelligence costs — $1.50 per 1,000 pages for OCR (Read model) and $10 per 1,000 pages for PII detection (Custom/Prebuilt model). We add 20% overhead and apply a 3.5× margin. Per page: ~$0.043.</div>
           </div>
-
           <div class="faq-item">
-            <div class="faq-q" data-faq="1">
-              What happens if I exceed my page limit?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
+            <div class="faq-q">What happens if I exceed my page limit?<span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="faq-a">Files that exceed your plan's page or size limit are rejected before processing with a clear error message. Your credit is not consumed. You can upgrade your plan at any time to process larger documents.</div>
           </div>
-
           <div class="faq-item">
-            <div class="faq-q" data-faq="2">
-              Is my data secure?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
+            <div class="faq-q">Is my data secure?<span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="faq-a">Yes. All files are stored in private Azure Blob Storage with SAS-based access only — no public URLs. Files are automatically deleted after 7 days. All processing happens within Azure's infrastructure. We never store your document content permanently.</div>
           </div>
-
           <div class="faq-item">
-            <div class="faq-q" data-faq="3">
-              Can I cancel anytime?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
+            <div class="faq-q">Can I cancel anytime?<span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="faq-a">Yes — no long-term contracts. Cancel or downgrade at any time. Annual plans are non-refundable after the first 14 days.</div>
           </div>
-
           <div class="faq-item">
-            <div class="faq-q" data-faq="4">
-              Do you offer custom enterprise pricing?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
+            <div class="faq-q">Do you offer custom enterprise pricing?<span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="faq-a">Yes. For organisations with specific requirements — custom Azure deployment, SharePoint integration, volume discounts, or on-premise — contact us and we'll put together a custom proposal within 48 hours.</div>
           </div>
-
           <div class="faq-item">
-            <div class="faq-q" data-faq="5">
-              What Azure services does this use?
-              <span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
+            <div class="faq-q">What Azure services does this use?<span class="faq-q-icon"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="faq-a">Prudent PDF uses Azure Document Intelligence (Read + Prebuilt PII models), Azure Blob Storage, Azure Static Web Apps, Azure Functions, and Power Automate. All services run within a single Azure subscription in your chosen region.</div>
           </div>
-
         </div>
       </div>
     </div>
@@ -478,7 +395,15 @@
     updatePrices();
   });
 
-  /* ── Cost calculator ── */
+  /* ── Cost calculator + BUG-10: plan recommendation ── */
+  const PLAN_RECS = [
+    { maxDocs:5,    maxPages:50,    name:'Free Trial',   price:0,    href:'/login' },
+    { maxDocs:50,   maxPages:500,   name:'Starter',      price:19,   href:'/login' },
+    { maxDocs:200,  maxPages:2000,  name:'Professional', price:79,   href:'/login' },
+    { maxDocs:1000, maxPages:10000, name:'Business',     price:399,  href:'/contact' },
+    { maxDocs:99999,maxPages:50000, name:'Enterprise',   price:1499, href:'/contact' },
+  ];
+
   function calcEstimate() {
     const docs   = Math.max(1, +document.getElementById('calcDocs')?.value   || 100);
     const pages  = Math.max(1, +document.getElementById('calcPages')?.value  || 10);
@@ -493,12 +418,22 @@
     const product    = azure * 3.5 * (annual ? 0.8 : 1);
 
     const f2 = n => '$' + n.toFixed(2);
-    document.getElementById('calcPrice').textContent = f2(product);
-    document.getElementById('calcOcr').textContent   = f2(ocr);
-    document.getElementById('calcPii').textContent   = f2(pii);
-    document.getElementById('calcInfra').textContent = f2(infra * 1.2);
-    document.getElementById('calcSub').textContent   =
+    document.getElementById('calcPrice').textContent  = f2(product);
+    document.getElementById('calcOcr').textContent    = f2(ocr);
+    document.getElementById('calcPii').textContent    = f2(pii);
+    document.getElementById('calcInfra').textContent  = f2(infra * 1.2);
+    document.getElementById('calcVolume').textContent =
       `${docs.toLocaleString()} docs × ${pages} pages${annual ? ' · Annual' : ''}`;
+
+    // BUG-10: Recommend best-fit plan
+    const rec    = PLAN_RECS.find(p => docs <= p.maxDocs && totalPages <= p.maxPages) || PLAN_RECS[PLAN_RECS.length-1];
+    const recEl  = document.getElementById('calcRec');
+    if (recEl) {
+      const recPrice = annual && rec.price ? Math.round(rec.price * 0.8) : rec.price;
+      recEl.innerHTML = rec.price === 0
+        ? `✓ Fits <strong>Free Trial</strong> — <a href="${rec.href}" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>`
+        : `✓ Recommended: <strong>${rec.name}</strong> ($${recPrice}/mo) — <a href="${rec.href}" style="color:#fff;font-weight:700;text-decoration:underline">Get started →</a>`;
+    }
   }
 
   ['calcDocs','calcPages','calcSizeMB','calcPeriod'].forEach(id => {
@@ -510,21 +445,10 @@
   document.querySelectorAll('.faq-q').forEach(q => {
     q.addEventListener('click', () => {
       const a      = q.nextElementSibling;
-      const icon   = q.querySelector('.faq-q-icon');
       const isOpen = a.classList.contains('open');
-      // Close all
       document.querySelectorAll('.faq-a').forEach(el => el.classList.remove('open'));
-      document.querySelectorAll('.faq-q').forEach(el => {
-        el.classList.remove('open');
-        const i = el.querySelector('.faq-q-icon');
-        if (i) i.textContent = '+';
-      });
-      // Open this one if it was closed
-      if (!isOpen) {
-        a.classList.add('open');
-        q.classList.add('open');
-        if (icon) icon.textContent = '−';
-      }
+      document.querySelectorAll('.faq-q').forEach(el => el.classList.remove('open'));
+      if (!isOpen) { a.classList.add('open'); q.classList.add('open'); }
     });
   });
 
