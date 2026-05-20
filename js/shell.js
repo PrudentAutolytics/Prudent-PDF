@@ -1,14 +1,19 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRUDENT PDF — shell.js v7.2
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
+
 const Shell = (() => {
+
   const NAV = [
     {
       group : 'WORKSPACE',
       items : [
-        { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: '' },
-        { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: '' },
-        { id: 'history',   label: 'Job History',      href: '/history',   icon: 'clock',   desc: '', badge: '30d' },
-        { id: 'viewer',    label: 'Document Viewer',  href: '/viewer',    icon: 'eye',     desc: '' },
+        { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: 'Overview, stats, and quick upload' },
+        { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: 'Upload and process a PDF' },
+        { id: 'history',   label: 'Job History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs — last 30 days', badge: '30d' },
+        { id: 'viewer',    label: 'Document Viewer',  href: '/viewer',    icon: 'eye',     desc: 'Side-by-side original vs redacted' },
       ],
     },
     {
@@ -23,14 +28,15 @@ const Shell = (() => {
     {
       group : 'ACCOUNT',
       items : [
-        { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: '' },
-        { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: '' },
+        { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans and cost details' },
+        { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: 'Talk to our team' },
         ...(['kabileshvijayakumar@prudentautolytics.com'].includes((Session.get()?.email||'').toLowerCase())
-          ? [{ id: 'admin', label: 'Admin Panel', href: '/admin', icon: 'shield', desc: '' }]
+          ? [{ id: 'admin', label: 'Admin Panel', href: '/admin', icon: 'shield', desc: 'Manage users and API keys' }]
           : []),
       ],
     },
   ];
+
   const ICONS = {
     grid     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>`,
     upload   : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -52,6 +58,8 @@ const Shell = (() => {
     shield   : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7"/></svg>`,
     settings : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.7"/></svg>`,
   };
+
+  /* ── Helper: get display name from email ── */
   function getDisplayName(email) {
     if (!email) return 'User';
     const local = email.split('@')[0];
@@ -59,6 +67,7 @@ const Shell = (() => {
       .replace(/[._-]+/g, ' ')
       .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
   }
+
   function getInitials(email) {
     if (!email) return 'U';
     const name  = getDisplayName(email);
@@ -66,12 +75,15 @@ const Shell = (() => {
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
   }
+
+  /* ── Build topbar HTML ── */
   function buildTopbar(activeId) {
     const s        = Session.get() || {};
     const email    = s.email || '';
     const initials = getInitials(email);
     const display  = getDisplayName(email);
     const isDark   = document.documentElement.getAttribute('data-theme') !== 'light';
+
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
   <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
@@ -79,11 +91,13 @@ const Shell = (() => {
       <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:3px;box-sizing:border-box"/>
     </div>
   </a>
+
   <div class="topbar-search" role="search">
     <span class="topbar-search-icon" aria-hidden="true">${ICONS.search}</span>
     <input type="search" id="globalSearch" placeholder="Search jobs, files…" autocomplete="off" aria-label="Search jobs and files"/>
     <span class="topbar-search-kbd" aria-hidden="true">⌘K</span>
   </div>
+
   <div class="topbar-right">
     <div id="liveClock" class="topbar-clock hidden" aria-live="off"></div>
     <button class="topbar-icon-btn" id="themeBtn" aria-label="Toggle colour theme" title="Toggle theme">
@@ -100,6 +114,8 @@ const Shell = (() => {
   </div>
 </nav>`;
   }
+
+  /* ── Build sidebar HTML ── */
   function buildSidebar(activeId) {
     const s      = Session.get() || {};
     const used   = s.creditsUsed  ?? 0;
@@ -108,10 +124,12 @@ const Shell = (() => {
     const remain = Math.max(0, limit - used);
     const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
     const planLabel = s.planLabel || (s.plan && s.plan !== 'trial' ? s.plan.toUpperCase() : 'FREE TRIAL');
+
     let daysLeft = APP_CONFIG.TRIAL.DAYS;
     if (s.trialExpiryDate) {
       daysLeft = Math.max(0, Math.ceil((new Date(s.trialExpiryDate) - Date.now()) / 86_400_000));
     }
+
     const navHtml = NAV.map(group => {
       const items = group.items.map(item => {
         const isActive = item.id === activeId;
@@ -130,9 +148,11 @@ const Shell = (() => {
       }).join('');
       return `<div class="nav-section"><span class="nav-group-label">${group.group}</span>${items}</div><div class="nav-sep" role="separator"></div>`;
     }).join('');
+
     const upgradeBtn = s.plan !== 'paid'
       ? `<button class="btn-upgrade" onclick="location.href='/pricing'">${ICONS.bolt} Upgrade to Pro</button>`
       : `<div class="flex-between mt-8"><span class="pill-paid">● Pro Active</span><span class="text-xs text-subtle">Unlimited</span></div>`;
+
     return `
 <aside class="sidebar" role="navigation" aria-label="Main navigation">
   ${navHtml}
@@ -152,10 +172,12 @@ const Shell = (() => {
   </div>
 </aside>`;
   }
+
   function applyTheme() {
     const saved = localStorage.getItem('pp_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
   }
+
   function wireThemeBtn() {
     document.getElementById('themeBtn')?.addEventListener('click', () => {
       const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -164,6 +186,7 @@ const Shell = (() => {
       document.getElementById('themeBtn').innerHTML = next === 'dark' ? ICONS.sun : ICONS.moon;
     });
   }
+
   function startClock() {
     const el = document.getElementById('liveClock');
     if (!el || window.innerWidth < 1280) return;
@@ -174,9 +197,12 @@ const Shell = (() => {
     tick();
     setInterval(tick, 1000);
   }
+
   function wireSearch() {
     const input = document.getElementById('globalSearch');
     if (!input) return;
+
+    // Append dropdown to body — avoids topbar overflow clipping
     const dropdown = document.createElement('div');
     dropdown.id = 'searchDropdown';
     Object.assign(dropdown.style, {
@@ -192,13 +218,16 @@ const Shell = (() => {
       minWidth   : '320px',
     });
     document.body.appendChild(dropdown);
+
     function positionDropdown() {
       const rect = input.getBoundingClientRect();
       dropdown.style.top  = (rect.bottom + 6) + 'px';
       dropdown.style.left = rect.left + 'px';
       dropdown.style.width = Math.max(rect.width, 320) + 'px';
     }
+
     function closeDropdown() { dropdown.style.display = 'none'; }
+
     function showDropdown(results) {
       if (!results.length) { closeDropdown(); return; }
       dropdown.innerHTML = results.map(r => `
@@ -219,9 +248,12 @@ const Shell = (() => {
         el.addEventListener('click', () => { closeDropdown(); location.href = el.dataset.href; });
       });
     }
+
     function search(q) {
       if (!q || q.length < 1) { closeDropdown(); return; }
       const results = [];
+
+      // Search nav items
       const navItems = NAV.flatMap(g => g.items);
       navItems.filter(i => !i.soon && (i.label.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)))
         .slice(0, 3)
@@ -230,6 +262,8 @@ const Shell = (() => {
           icon: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
           color: 'var(--blue-bg)', iconColor: 'var(--blue)',
         }));
+
+      // Search recent jobs from localStorage / window cache
       try {
         const session = Session.get();
         const jobKey  = `pp_jobs_${session?.userId || session?.email || 'anon'}`;
@@ -251,6 +285,8 @@ const Shell = (() => {
             });
           });
       } catch {}
+
+      // Fallback — search all jobs in history
       if (!results.find(r => r.href?.includes('history'))) {
         results.push({
           href: `/history?q=${encodeURIComponent(q)}`,
@@ -260,13 +296,16 @@ const Shell = (() => {
           color: 'var(--surface2)', iconColor: 'var(--ink3)',
         });
       }
+
       showDropdown(results);
     }
+
     let searchTimer;
     input.addEventListener('input', () => {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => search(input.value.trim().toLowerCase()), 180);
     });
+
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         const q = input.value.trim();
@@ -275,13 +314,18 @@ const Shell = (() => {
       }
       if (e.key === 'Escape') { closeDropdown(); input.blur(); }
     });
+
+    // ⌘K / Ctrl+K to focus
     document.addEventListener('keydown', e => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); input.focus(); input.select(); }
     });
+
+    // Close when clicking outside
     document.addEventListener('click', e => {
       if (!dropdown.contains(e.target) && e.target !== input) closeDropdown();
     }, true);
   }
+
   function wireUserChip() {
     const chip = document.getElementById('userChip');
     if (!chip) return;
@@ -321,19 +365,23 @@ const Shell = (() => {
     });
     chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') chip.click(); });
   }
+
   function closeMenu(menu) {
     document.getElementById('userChip')?.setAttribute('aria-expanded', 'false');
     menu.remove();
   }
+
   function signOut() {
     if (confirm('Sign out of Prudent PDF?')) { Session.clear(); location.replace('/login'); }
   }
+
   function refreshQuota() {
     const s = Session.get();
     if (!s?.email || !APP_CONFIG.FLOWS.QUOTA_GET) return;
     paFetch(APP_CONFIG.FLOWS.QUOTA_GET, { email: s.email })
       .then(data => {
         if (!data) return;
+        // Store ALL plan limits in session so dashboard/upload modal can use them
         const updated = {
           ...s,
           creditsUsed      : data.creditsUsed      ?? s.creditsUsed,
@@ -348,23 +396,31 @@ const Shell = (() => {
           fullName         : data.fullName          ?? s.fullName,
         };
         Session.set(updated);
+
+        // Update greeting if fullName just arrived from Supabase
         const greetEl = document.getElementById('welcomeTitle');
         if (greetEl && updated.fullName) {
             greetEl.textContent = `${greeting()}, ${updated.fullName} 👋`;
         }
+
         const used    = updated.creditsUsed  ?? 0;
         const limit   = updated.creditsLimit ?? APP_CONFIG.TRIAL.MAX_FILES;
         const pct     = Math.min(100, limit > 0 ? Math.round(used / limit * 100) : 0);
         const remain  = Math.max(0, limit - used);
         const fillCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : '';
+
         const bar = document.getElementById('planBarFill');
         if (bar) { bar.style.width = pct + '%'; bar.className = 'plan-bar-fill ' + fillCls; bar.parentElement?.setAttribute('aria-valuenow', pct); }
+
         const usedEl   = document.getElementById('sidebarUsed');
         const remainEl = document.getElementById('sidebarRemain');
         if (usedEl)   usedEl.innerHTML    = `${used}<span> / ${limit} files</span>`;
         if (remainEl) remainEl.textContent = `${remain} remaining`;
+
+        // Update plan label in sidebar
         const planLabelEl = document.getElementById('sidebarPlanLabel');
         if (planLabelEl) planLabelEl.textContent = updated.planLabel || updated.plan || 'Free Trial';
+
         if (pct >= 90) {
           document.getElementById('notifDot')?.classList.remove('hidden');
           showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining — consider upgrading`, 'warn', 6000);
@@ -372,32 +428,47 @@ const Shell = (() => {
       })
       .catch(() => {});
   }
+
   function wireEscape() {
     document.addEventListener('keydown', e => {
+      // Skip if typing in an input
       const tag = document.activeElement?.tagName;
       const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
       if (e.key === 'Escape') {
         document.querySelectorAll('.modal-bg.open').forEach(m => { m.classList.remove('open'); document.body.style.overflow = ''; });
         const menu = document.getElementById('userMenu');
         if (menu) closeMenu(menu);
         return;
       }
+
       if (isInput) return;
+
+      // N → open New Redaction modal
       if (e.key === 'n' || e.key === 'N') {
         const btn = document.getElementById('openUploadBtn');
         if (btn) { e.preventDefault(); btn.click(); return; }
+        // If not on dashboard, navigate there
         if (!location.pathname.includes('dashboard')) location.href = '/dashboard';
         return;
       }
+
+      // H → go to history
       if (e.key === 'h' || e.key === 'H') { e.preventDefault(); location.href = '/history'; return; }
+
+      // V → go to viewer
       if (e.key === 'v' || e.key === 'V') { e.preventDefault(); location.href = '/viewer'; return; }
+
+      // D → go to dashboard
       if (e.key === 'd' || e.key === 'D') { e.preventDefault(); location.href = '/dashboard'; return; }
     });
   }
+
   return {
     init(activeId) {
       if (!requireAuth()) return;
       applyTheme();
+      // Inject favicon
       if (!document.querySelector('link[rel="icon"]')) {
         const link = document.createElement('link');
         link.rel = 'icon'; link.type = 'image/svg+xml'; link.href = '/favicon.svg';
@@ -421,4 +492,5 @@ const Shell = (() => {
     refreshQuota,
     NAV,
   };
+
 })();

@@ -5,24 +5,170 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Loading</title>
+<title>Viewer</title>
 <link rel="stylesheet" href="/css/main.css"/>
+<style>
+.main { padding:0!important; overflow:hidden!important; display:flex!important; flex-direction:column!important; height:calc(100vh - var(--topbar-h))!important; }
+.viewer-toolbar { height:52px; flex-shrink:0; display:flex; align-items:center; gap:10px; padding:0 18px; background:var(--surface); border-bottom:1px solid var(--border); overflow-x:auto; }
+.viewer-divider { width:1px; height:22px; background:var(--border2); flex-shrink:0; }
+.viewer-content { flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr 300px; overflow:hidden; }
+.viewer-pane { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; position:relative; }
+.viewer-pane:last-child { border-right:none; }
+.pane-hd { height:40px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 14px; background:var(--surface2); border-bottom:1px solid var(--border); }
+.pane-label { font-family:var(--display); font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
+.pane-label.orig { color:var(--ink3); } .pane-label.redacted { color:var(--red); } .pane-label.fields { color:var(--blue); }
+.zoom-group { display:flex; align-items:center; gap:4px; }
+.zoom-btn { width:24px; height:24px; border-radius:var(--r4); display:grid; place-items:center; background:var(--surface3); color:var(--ink2); font-size:16px; font-weight:600; cursor:pointer; border:1px solid var(--border2); }
+.zoom-btn:hover { background:var(--surface); color:var(--ink); }
+.zoom-val { font-family:var(--mono); font-size:11px; color:var(--ink3); min-width:38px; text-align:center; }
+.pane-body { flex:1; overflow:hidden; background:var(--bg3); position:relative; }
+.pane-body iframe { width:100%; height:100%; border:none; display:block; }
+.pane-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:var(--ink3); text-align:center; padding:40px 24px; }
+.pane-empty-icon { width:56px; height:56px; border-radius:var(--r14); background:var(--surface2); border:1px solid var(--border); display:grid; place-items:center; color:var(--ink4); }
+.pane-footer { height:36px; flex-shrink:0; display:flex; align-items:center; gap:8px; padding:0 14px; background:var(--surface2); border-top:1px solid var(--border); font-size:11.5px; color:var(--ink3); }
+.fields-panel { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:0; }
+.cost-summary { padding:10px 12px; background:var(--surface); border-top:1px solid var(--border); display:flex; flex-direction:column; gap:5px; }
+.cost-row { display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink3); }
+.cost-row.total { font-family:var(--display); font-weight:700; font-size:12.5px; color:var(--ink); padding-top:5px; border-top:1px solid var(--border); }
+.conf-high { color:var(--green); } .conf-medium { color:var(--amber); } .conf-low { color:var(--red); }
+/* PDF loading overlay */
+.pdf-loading {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:var(--bg3); gap:12px; color:var(--ink3); font-size:13px;
+  z-index:10;
+}
+.pdf-loading.hidden { display:none; }
+</style>
 </head>
 <body>
-<div class="shell" id="appShell" style="display:none"></div>
-<div id="bootScreen" style="min-height:100vh;display:grid;place-items:center;background:var(--page-bg)">
-  <div class="spinner" style="margin:auto"></div>
+<div class="shell" id="appShell">
+  <main class="main main-viewer">
+
+    <div class="viewer-toolbar" role="toolbar">
+      <a href="/history" class="btn btn-ghost btn-sm">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        History
+      </a>
+      <div class="viewer-divider"></div>
+      <div id="viewerFileName" style="font-family:var(--display);font-size:13.5px;font-weight:700;color:var(--ink);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">No document loaded</div>
+      <span class="pill hidden" id="viewerStatus"></span>
+      <span class="font-mono text-xs text-subtle hidden" id="viewerMeta"></span>
+      <div style="flex:1"></div>
+      <!-- Job selector dropdown -->
+      <select class="filter-select" id="jobSelector" style="max-width:260px;font-size:12px">
+        <option value="">Loading jobs…</option>
+      </select>
+      <div class="viewer-divider"></div>
+      <button class="btn btn-secondary btn-sm" id="dlOrigBtn" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Original
+      </button>
+      <button class="btn btn-primary btn-sm" id="dlRedactBtn" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Redacted PDF
+      </button>
+      <button class="btn btn-secondary btn-sm" id="exportFieldsBtn" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Fields CSV
+      </button>
+    </div>
+
+    <div class="viewer-content">
+
+      <!-- Original -->
+      <div class="viewer-pane">
+        <div class="pane-hd">
+          <div class="pane-label orig">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
+            Original
+          </div>
+          <div class="zoom-group">
+            <button class="zoom-btn" id="oZoomOut">−</button>
+            <span class="zoom-val" id="oZoomVal">100%</span>
+            <button class="zoom-btn" id="oZoomIn">+</button>
+          </div>
+        </div>
+        <div class="pane-body">
+          <div class="pdf-loading" id="origLoading">
+            <div class="spinner" style="width:24px;height:24px;border-width:2.5px;margin:0"></div>
+            <span>Loading original PDF…</span>
+          </div>
+          <div class="pane-empty hidden" id="origEmpty">
+            <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="font-size:13px;line-height:1.65" id="origEmptyMsg">Select a job from the toolbar above</div>
+          </div>
+          <iframe id="origFrame" class="hidden" title="Original PDF"></iframe>
+        </div>
+        <div class="pane-footer">
+          <span id="origSizeLabel"></span>
+          <div style="flex:1"></div>
+          <span id="oPage">—</span>
+        </div>
+      </div>
+
+      <!-- Redacted -->
+      <div class="viewer-pane">
+        <div class="pane-hd">
+          <div class="pane-label redacted">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
+            Redacted
+          </div>
+          <div class="zoom-group">
+            <button class="zoom-btn" id="rZoomOut">−</button>
+            <span class="zoom-val" id="rZoomVal">100%</span>
+            <button class="zoom-btn" id="rZoomIn">+</button>
+          </div>
+        </div>
+        <div class="pane-body">
+          <div class="pdf-loading" id="redLoading">
+            <div class="spinner" style="width:24px;height:24px;border-width:2.5px;margin:0"></div>
+            <span>Loading redacted PDF…</span>
+          </div>
+          <div class="pane-empty hidden" id="redEmpty">
+            <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/></svg></div>
+            <div style="font-size:13px;line-height:1.65" id="redEmptyMsg">Redacted document appears here after job completes</div>
+          </div>
+          <iframe id="redFrame" class="hidden" title="Redacted PDF"></iframe>
+        </div>
+        <div class="pane-footer">
+          <span id="redSizeLabel">Redacted</span>
+          <div style="flex:1"></div>
+          <span id="rPage">—</span>
+        </div>
+      </div>
+
+      <!-- Fields panel -->
+      <div class="viewer-pane">
+        <div class="pane-hd">
+          <div class="pane-label fields">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Extracted Fields
+          </div>
+          <span class="font-mono text-xs text-subtle" id="fieldCount">0 fields</span>
+        </div>
+        <div class="fields-panel" id="fieldsPanel">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;color:var(--ink3);text-align:center">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="font-size:13px;line-height:1.65">Extracted fields from<br/>Document Intelligence<br/>appear here</div>
+          </div>
+        </div>
+        <div class="cost-summary hidden" id="costSummary">
+          <div class="font-display font-bold text-xs" style="letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px">Job Cost Breakdown</div>
+          <div class="cost-row"><span>Document Intelligence</span><span id="csDocIntel">—</span></div>
+          <div class="cost-row"><span>Azure Blob storage</span><span id="csBlobStorage">—</span></div>
+          <div class="cost-row"><span>Power Automate flows</span><span id="csPaFlow">—</span></div>
+          <div class="cost-row"><span>Notifications</span><span id="csEmail">—</span></div>
+          <div class="cost-row total"><span>Total (Product Price)</span><span id="csTotal">—</span></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
 </div>
+
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
-<script>
-// Auth check runs before ANY content is shown
-if (!Session.valid()) { location.replace('/login'); }
-else {
-  document.getElementById('bootScreen').style.display = 'none';
-  document.getElementById('appShell').style.display = '';
-}
-</script>
 <script>
 (function () {
   'use strict';
