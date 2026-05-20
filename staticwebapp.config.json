@@ -9,6 +9,12 @@
       "rewrite": "/index.html"
     },
     {
+      "route": "/assets/*",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
       "route": "/robots.txt"
     },
     {
@@ -22,12 +28,6 @@
     },
     {
       "route": "/css/*",
-      "allowedRoles": [
-        "authenticated"
-      ]
-    },
-    {
-      "route": "/assets/*",
       "allowedRoles": [
         "authenticated"
       ]
