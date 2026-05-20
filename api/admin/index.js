@@ -116,6 +116,48 @@ module.exports = async function (context, req) {
       return;
     }
 
+    /* ── Add new user ── */
+    if (action === 'addUser') {
+      const { targetEmail, fullName, company, plan: newPlan } = req.body;
+      if (!targetEmail || !targetEmail.includes('@')) {
+        context.res = { status:400, headers:getCorsHeaders(req), body:{ error:'Valid email required.' } };
+        return;
+      }
+      const existing = await pool.query('SELECT id FROM users WHERE email=$1', [targetEmail]);
+      if (existing.rows.length) {
+        context.res = { status:409, headers:getCorsHeaders(req), body:{ error:'User already exists.' } };
+        return;
+      }
+      const PLAN_LIMITS = {
+        trial        : { credits_limit:5,    max_file_size_mb:10,  max_pages_per_file:50,   max_pages_per_month:50    },
+        starter      : { credits_limit:50,   max_file_size_mb:25,  max_pages_per_file:100,  max_pages_per_month:500   },
+        professional : { credits_limit:200,  max_file_size_mb:50,  max_pages_per_file:500,  max_pages_per_month:2000  },
+        business     : { credits_limit:1000, max_file_size_mb:100, max_pages_per_file:1000, max_pages_per_month:10000 },
+        enterprise   : { credits_limit:9999, max_file_size_mb:500, max_pages_per_file:9999, max_pages_per_month:50000 },
+      };
+      const p = newPlan || 'trial';
+      const lim = PLAN_LIMITS[p] || PLAN_LIMITS.trial;
+      await pool.query(`
+        INSERT INTO users (email, full_name, company, plan, credits_used, credits_limit,
+          max_file_size_mb, max_pages_per_file, max_pages_per_month, is_active)
+        VALUES ($1,$2,$3,$4,0,$5,$6,$7,$8,true)
+      `, [targetEmail, fullName||null, company||null, p, lim.credits_limit, lim.max_file_size_mb, lim.max_pages_per_file, lim.max_pages_per_month]);
+      context.res = { status:200, headers:getCorsHeaders(req), body:{ success:true } };
+      return;
+    }
+
+    /* ── Set credits (used + limit) ── */
+    if (action === 'setCredits') {
+      const { targetEmail, creditsUsed, creditsLimit } = req.body;
+      if (!targetEmail) { context.res = { status:400, headers:getCorsHeaders(req), body:{ error:'targetEmail required.' } }; return; }
+      await pool.query(
+        'UPDATE users SET credits_used=$1, credits_limit=$2 WHERE email=$3',
+        [creditsUsed ?? 0, creditsLimit ?? 5, targetEmail]
+      );
+      context.res = { status:200, headers:getCorsHeaders(req), body:{ success:true } };
+      return;
+    }
+
     context.res = { status:400, headers:getCorsHeaders(req), body:{ error:'Unknown action.' } };
 
   } catch (err) {

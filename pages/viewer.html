@@ -205,7 +205,7 @@
         }
       }
     } catch (err) {
-      console.error('fetchJobs:', err);
+      /* error handled silently */
       const sel = $('jobSelector');
       if (sel) sel.innerHTML = '<option value="">Failed to load — refresh</option>';
       showInitialEmpty();

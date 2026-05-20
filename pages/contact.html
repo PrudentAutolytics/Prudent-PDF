@@ -5,48 +5,286 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-
 <title>Contact</title>
 <link rel="stylesheet" href="/css/main.css"/>
+<style>
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+@media(max-width:860px){ .contact-grid { grid-template-columns:1fr; } }
+
+.contact-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r16);
+  overflow: hidden;
+  box-shadow: var(--s2);
+}
+.contact-form-head {
+  background: linear-gradient(130deg,#1E3A8A,#1D4ED8);
+  padding: 28px 32px;
+  color: #fff;
+}
+.contact-form-title { font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px; }
+.contact-form-sub   { font-size:13px;opacity:.8;line-height:1.6; }
+.contact-form-body  { padding: 28px 32px; }
+
+.contact-info-stack { display:flex;flex-direction:column;gap:16px; }
+
+.contact-info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r12);
+  padding: 20px 22px;
+  box-shadow: var(--s1);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.contact-info-icon {
+  width: 38px; height: 38px; border-radius: var(--r8);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.contact-info-icon.blue   { background:var(--blue-pale);  color:var(--blue);  border:1px solid var(--blue-bd);  }
+.contact-info-icon.green  { background:var(--green-pale); color:var(--green); border:1px solid var(--green-bd); }
+.contact-info-icon.violet { background:var(--violet-pale);color:var(--violet);border:1px solid var(--violet-bd);}
+.contact-info-label { font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:3px; }
+.contact-info-val   { font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:2px; }
+.contact-info-sub   { font-size:12px;color:var(--ink3);line-height:1.5; }
+
+.sla-card {
+  background: linear-gradient(135deg,var(--green-pale),var(--blue-pale));
+  border: 1px solid var(--green-bd);
+  border-radius: var(--r12);
+  padding: 18px 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.sla-dot { width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 0 3px rgba(5,150,105,.15); }
+.sla-text { font-size:13px;font-weight:600;color:var(--ink2);line-height:1.5; }
+.sla-text span { color:var(--green); }
+
+.char-count { font-size:11px;color:var(--ink4);text-align:right;margin-top:4px; }
+
+.success-banner {
+  display:none;
+  background:var(--green-pale);
+  border:1.5px solid var(--green-bd);
+  border-radius:var(--r10);
+  padding:18px 20px;
+  margin-bottom:20px;
+  align-items:center;
+  gap:12px;
+}
+.success-banner.show { display:flex; }
+</style>
 </head>
 <body>
-<div id="contactRoot" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page-bg)">
-  <div style="text-align:center;color:var(--ink3)">
-    <div class="spinner" style="margin:0 auto 16px"></div>
-    <div style="font-size:13px">Loading…</div>
-  </div>
+<div class="shell" id="appShell">
+  <main class="main">
+
+    <div class="page-hd anim">
+      <div>
+        <div class="page-hd-eyebrow">Contact</div>
+        <div class="page-title">Get in touch</div>
+        <div class="page-subtitle">Our team responds to every enquiry within 24 hours on business days.</div>
+      </div>
+    </div>
+
+    <div class="contact-grid anim d1">
+
+      <!-- LEFT — form -->
+      <div class="contact-form-card">
+        <div class="contact-form-head">
+          <div class="contact-form-title">Send us a message</div>
+          <div class="contact-form-sub">Tell us what you need — pricing, enterprise plans, technical support, or a custom demo.</div>
+        </div>
+        <div class="contact-form-body">
+
+          <div class="success-banner" id="successBanner">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="var(--green)" opacity=".15"/><path d="M8 12l3 3 5-5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <div style="font-weight:700;font-size:13.5px;color:var(--green)">Message sent!</div>
+              <div style="font-size:12.5px;color:var(--ink3);margin-top:2px">We'll get back to you within 24 hours.</div>
+            </div>
+          </div>
+
+          <div id="contactForm">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="form-group">
+                <label class="form-label">Full name <span style="color:var(--red)">*</span></label>
+                <input class="form-input" id="cName" type="text" placeholder="Jane Smith" autocomplete="name"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email <span style="color:var(--red)">*</span></label>
+                <input class="form-input" id="cEmail" type="email" placeholder="jane@company.com" autocomplete="email"/>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="form-group">
+                <label class="form-label">Company</label>
+                <input class="form-input" id="cCompany" type="text" placeholder="Acme Corp" autocomplete="organization"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Subject <span style="color:var(--red)">*</span></label>
+                <select class="form-input" id="cSubject" style="cursor:pointer">
+                  <option value="">Select a topic…</option>
+                  <option value="pricing">Pricing &amp; plans</option>
+                  <option value="demo">Request a demo</option>
+                  <option value="enterprise">Enterprise enquiry</option>
+                  <option value="technical">Technical support</option>
+                  <option value="billing">Billing</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Message <span style="color:var(--red)">*</span></label>
+              <textarea class="form-input" id="cMessage" rows="5" placeholder="Tell us more about your use case, team size, or specific requirements…" style="resize:vertical" maxlength="2000"></textarea>
+              <div class="char-count"><span id="charCount">0</span> / 2000</div>
+            </div>
+
+            <div id="cError" class="hidden" style="background:var(--red-pale);border:1px solid var(--red-bd);border-radius:var(--r8);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px"></div>
+
+            <button class="btn btn-primary" id="cSubmit" style="width:100%;justify-content:center;padding:13px">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Send message
+            </button>
+
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px;justify-content:center">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="var(--ink4)" stroke-width="2"/></svg>
+              <span style="font-size:11.5px;color:var(--ink4)">Your message is encrypted and never shared.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT — info -->
+      <div class="contact-info-stack">
+
+        <div class="sla-card">
+          <div class="sla-dot"></div>
+          <div class="sla-text">We respond to every enquiry<br/><span>within 24 hours</span> on business days.</div>
+        </div>
+
+        <div class="contact-info-card">
+          <div class="contact-info-icon blue">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="contact-info-label">Company</div>
+            <div class="contact-info-val">Prudent Autolytics</div>
+            <div class="contact-info-sub">Chennai, Tamil Nadu, India</div>
+          </div>
+        </div>
+
+        <div class="contact-info-card">
+          <div class="contact-info-icon green">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="contact-info-label">Email</div>
+            <div class="contact-info-val">Kabileshvijayakumar<br/>@prudentautolytics.com</div>
+            <div class="contact-info-sub">Support &amp; sales</div>
+          </div>
+        </div>
+
+        <div class="contact-info-card">
+          <div class="contact-info-icon violet">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="contact-info-label">Business hours</div>
+            <div class="contact-info-val">Mon – Fri, 9am – 6pm IST</div>
+            <div class="contact-info-sub">UTC +5:30 · Chennai, India</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:18px 20px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:12px">Enterprise &amp; custom plans</div>
+          <div style="font-size:13px;color:var(--ink2);line-height:1.65;margin-bottom:14px">Need a custom Azure deployment, SharePoint integration, or volume pricing? We'll put together a proposal within 48 hours.</div>
+          <a href="mailto:Kabileshvijayakumar@prudentautolytics.com?subject=Enterprise%20Enquiry%20%E2%80%94%20Prudent%20PDF" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6z" stroke="currentColor" stroke-width="1.8"/></svg>
+            Email us directly
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
 </div>
+
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
 <script>
 (function(){
   'use strict';
+
   if (!Session.valid()) { location.replace('/login'); return; }
   Shell.init('contact');
-  var root = document.getElementById('contactRoot');
-  root.removeAttribute('style');
-  root.innerHTML = '<div class="main">' +
-    '<div class="page-hd anim"><div>' +
-    '<div class="page-hd-eyebrow">Contact</div>' +
-    '<div class="page-title">Get in touch</div>' +
-    '<div class="page-subtitle">Questions about pricing, enterprise plans, or technical support — we respond within 24 hours.</div>' +
-    '</div></div>' +
-    '<div class="two-col anim d1">' +
-    '<div class="card"><div class="card-hd"><div class="card-title">Send a message</div></div>' +
-    '<div class="card-body" style="padding:20px">' +
-    '<div class="form-group"><label class="form-label">Name</label><input class="form-input" id="cName" type="text" placeholder="Your name"/></div>' +
-    '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cEmail" type="email" placeholder="you@company.com"/></div>' +
-    '<div class="form-group"><label class="form-label">Subject</label><input class="form-input" id="cSubject" type="text" placeholder="How can we help?"/></div>' +
-    '<div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="cMessage" rows="5" style="resize:vertical"></textarea></div>' +
-    '<button class="btn btn-primary" id="cSubmit">Send message</button>' +
-    '<div id="cResult" style="margin-top:12px;font-size:13px"></div>' +
-    '</div></div>' +
-    '<div><div class="card"><div class="card-body" style="padding:20px">' +
-    '<div style="font-weight:700;margin-bottom:4px">Prudent Autolytics</div>' +
-    '<div style="font-size:13px;color:var(--ink3);line-height:1.8">Chennai, India</div>' +
-    '</div></div></div></div></div>';
+
+  var s = Session.get() || {};
+
+  // Pre-fill email from session
+  var cEmail = document.getElementById('cEmail');
+  if (cEmail && s.email) cEmail.value = s.email;
+  var cName = document.getElementById('cName');
+  if (cName && s.fullName) cName.value = s.fullName;
+
+  // Character counter
+  var msg = document.getElementById('cMessage');
+  var cnt = document.getElementById('charCount');
+  if (msg && cnt) {
+    msg.addEventListener('input', function() {
+      cnt.textContent = msg.value.length;
+    });
+  }
+
+  // Submit
+  document.getElementById('cSubmit')?.addEventListener('click', async function() {
+    var name    = (document.getElementById('cName')?.value    || '').trim();
+    var email   = (document.getElementById('cEmail')?.value   || '').trim();
+    var company = (document.getElementById('cCompany')?.value || '').trim();
+    var subject = (document.getElementById('cSubject')?.value || '').trim();
+    var message = (document.getElementById('cMessage')?.value || '').trim();
+    var errEl   = document.getElementById('cError');
+
+    function showErr(m) {
+      errEl.textContent = m;
+      errEl.classList.remove('hidden');
+    }
+
+    errEl.classList.add('hidden');
+
+    if (!name)    return showErr('Please enter your name.');
+    if (!email || !email.includes('@')) return showErr('Please enter a valid email.');
+    if (!subject) return showErr('Please select a subject.');
+    if (!message || message.length < 10) return showErr('Please enter a message (at least 10 characters).');
+
+    var btn = document.getElementById('cSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0"></div> Sending…';
+
+    try {
+      await paFetch(APP_CONFIG.FLOWS.CONTACT_SEND, { name, email, company, subject, message });
+      document.getElementById('contactForm').style.opacity = '0.4';
+      document.getElementById('contactForm').style.pointerEvents = 'none';
+      document.getElementById('successBanner').classList.add('show');
+    } catch(err) {
+      showErr('Failed to send. Please try emailing us directly.');
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Send message';
+    }
+  });
+
   document.title = 'Contact';
 })();
 </script>
-
+</body>
 </html>

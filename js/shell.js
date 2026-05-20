@@ -475,7 +475,7 @@ const Shell = (() => {
         document.head.appendChild(link);
       }
       const wrap = document.getElementById('appShell');
-      if (!wrap) { console.error('[Shell] #appShell not found.'); return; }
+      if (!wrap) { return; }
       const tbEl = document.createElement('div');
       tbEl.innerHTML = buildTopbar(activeId);
       wrap.insertBefore(tbEl.firstElementChild, wrap.firstChild);

@@ -159,14 +159,9 @@ module.exports = async function (context, req) {
       status  : 200,
       headers : getCorsHeaders(req),
       body    : {
-        jobId          : finalJobId,
-        status         : 'queued',
-        blobUrl,
-        blobName       : actualBlobName,
-        outputBlobName,
-        outputBlobUrl,
-        costs,
-        message        : 'Job queued. Power Automate triggered.',
+        jobId   : finalJobId,
+        status  : 'queued',
+        message : 'Job queued.',
       },
     };
 
