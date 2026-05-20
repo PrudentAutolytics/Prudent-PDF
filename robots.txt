@@ -1,24 +1,6 @@
-# Prudent PDF — robots.txt
-# All authenticated application content is private and must not be indexed.
-
 User-agent: *
-Disallow: /dashboard
-Disallow: /history
-Disallow: /viewer
-Disallow: /admin
-Disallow: /api/
-Disallow: /pages/
-Disallow: /js/
-Disallow: /css/
-Disallow: /assets/
+Disallow: /
 
-# Landing page and pricing are intentionally public
-Allow: /
-Allow: /pricing
-Allow: /contact
-Allow: /login
-
-# Block all known AI crawlers and scrapers explicitly
 User-agent: GPTBot
 Disallow: /
 
@@ -70,4 +52,8 @@ Disallow: /
 User-agent: ia_archiver
 Disallow: /
 
-Sitemap: https://brave-cliff-0ceef0a00.4.azurestaticapps.net/sitemap.xml
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /

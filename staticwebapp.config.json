@@ -1,41 +1,128 @@
 {
   "routes": [
-    { "route": "/dashboard", "rewrite": "/pages/dashboard.html" },
-    { "route": "/history",   "rewrite": "/pages/history.html"   },
-    { "route": "/viewer",    "rewrite": "/pages/viewer.html"     },
-    { "route": "/pricing",   "rewrite": "/pages/pricing.html"   },
-    { "route": "/contact",   "rewrite": "/pages/contact.html"   },
-    { "route": "/admin",     "rewrite": "/pages/admin.html"      },
-    { "route": "/login",     "rewrite": "/pages/login.html"     },
-    { "route": "/",          "rewrite": "/index.html"           }
+    {
+      "route": "/login",
+      "rewrite": "/pages/login.html"
+    },
+    {
+      "route": "/",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/robots.txt"
+    },
+    {
+      "route": "/favicon.svg"
+    },
+    {
+      "route": "/js/*",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/css/*",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/assets/*",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/pages/*",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "rewrite": "/pages/dashboard.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/history",
+      "rewrite": "/pages/history.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/viewer",
+      "rewrite": "/pages/viewer.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/pricing",
+      "rewrite": "/pages/pricing.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/contact",
+      "rewrite": "/pages/contact.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/admin",
+      "rewrite": "/pages/admin.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    }
   ],
+  "auth": {
+    "identityProviders": {}
+  },
   "navigationFallback": {
     "rewrite": "/pages/login.html",
-    "exclude": ["/css/*", "/js/*", "/assets/*", "/*.json", "/*.ico", "/*.png", "/*.svg", "/robots.txt"]
+    "exclude": [
+      "/robots.txt",
+      "/favicon.svg",
+      "/*.ico"
+    ]
+  },
+  "responseOverrides": {
+    "401": {
+      "redirect": "/login",
+      "statusCode": 302
+    },
+    "403": {
+      "redirect": "/login",
+      "statusCode": 302
+    },
+    "404": {
+      "rewrite": "/pages/login.html",
+      "statusCode": 200
+    }
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "no-referrer",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
-    "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex",
+    "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex, noai",
     "Cache-Control": "no-store, no-cache, must-revalidate, private",
     "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-src https://docs.google.com; connect-src 'self' https://*.azure.com https://*.azurewebsites.net https://*.powerplatform.com https://*.powerautomate.com https://*.supabase.co https://*.blob.core.windows.net; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-src 'none'; connect-src 'self' https://*.azure.com https://*.azurewebsites.net https://*.powerplatform.com https://*.powerautomate.com https://*.supabase.co https://*.blob.core.windows.net; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';",
     "X-Permitted-Cross-Domain-Policies": "none",
     "Cross-Origin-Opener-Policy": "same-origin",
     "Cross-Origin-Resource-Policy": "same-origin"
   },
-  "responseOverrides": {
-    "404": {
-      "rewrite": "/pages/login.html",
-      "statusCode": 200
-    }
-  },
   "mimeTypes": {
     ".json": "application/json",
-    ".css":  "text/css",
-    ".js":   "application/javascript",
-    ".svg":  "image/svg+xml"
+    ".css": "text/css",
+    ".js": "application/javascript",
+    ".svg": "image/svg+xml"
   }
 }
