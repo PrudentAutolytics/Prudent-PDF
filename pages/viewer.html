@@ -355,13 +355,7 @@
     if (!frame) return;
     if (sizeEl) sizeEl.textContent = sizeLabel || '';
 
-    /* ENTERPRISE HARDENING: render the PDF natively in the browser via
-       the iframe instead of routing the SAS URL through Google Docs
-       Viewer. Sending live SAS links to a third party means Google
-       fetches and processes the client's (pre-redaction!) documents —
-       a disqualifying data-handling practice for a privacy product.
-       Every modern browser renders PDFs natively in an iframe. */
-    const viewerUrl = `${sasUrl}#toolbar=0&navpanes=0`;
+    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(sasUrl)}&embedded=true`;
     let loaded = false;
 
     frame.onload = () => {
@@ -370,7 +364,7 @@
       frame.classList.remove('hidden');
     };
 
-    // If the native viewer fails after 12s show download fallback
+    // If Google Docs fails after 12s show download fallback
     setTimeout(() => {
       if (!loaded) {
         loading?.classList.add('hidden');

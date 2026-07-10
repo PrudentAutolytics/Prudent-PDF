@@ -1,23 +1,10 @@
 'use strict';
-/**
- * cors.js — CORS headers, env-driven
- *
- * ENTERPRISE HARDENING: allowed origins come from the ALLOWED_ORIGINS
- * app setting (comma-separated) so promoting to a custom domain or a
- * staging slot never requires a code change. Falls back to the current
- * production SWA host + local dev.
- */
-const DEFAULT_ORIGINS = [
+
+const ALLOWED_ORIGINS = [
   'https://brave-cliff-0ceef0a00.4.azurestaticapps.net',
   'http://localhost:4280',
   'http://localhost:7071',
 ];
-
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
-  .split(',')
-  .map(o => o.trim())
-  .filter(Boolean)
-  .concat(DEFAULT_ORIGINS);
 
 function getCorsHeaders(req) {
   const origin        = (req?.headers?.origin || '').toString();

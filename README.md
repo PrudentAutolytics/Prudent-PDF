@@ -1,8 +1,4 @@
-# Prudent PDF — Azure Static Web App v7.1 Enterprise
-
-> Enterprise-grade PDF redaction platform built on Power Automate, Azure Document Intelligence, and Azure Blob Storage.
->
-> **v7.1**: security hardening (20 fixes — see `ENTERPRISE-HARDENING.md`) + enterprise design system v11 (Prudent brand navy/blue, Schibsted Grotesk display type, Fluent-calibrated components). Run `migration-enterprise-hardening.sql` on the database before deploying.
+# Prudent PDF — Azure Static Web App v7.0
 
 > Enterprise-grade PDF redaction platform built on Power Automate, Azure Document Intelligence, and Azure Blob Storage.
 

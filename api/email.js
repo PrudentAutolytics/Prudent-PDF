@@ -27,9 +27,9 @@ function otpEmailHtml(otp) {
         Use this code to sign in to <strong>Prudent PDF</strong>. It expires in 10 minutes.
       </p>
       <div style="font-size:40px;font-weight:800;letter-spacing:10px;
-                  color:#2E75B6;padding:24px;background:#EBF3FA;
+                  color:#2563EB;padding:24px;background:#EFF6FF;
                   border-radius:12px;text-align:center;
-                  border:1px solid #C7DCEE;font-family:monospace">
+                  border:1px solid #BFDBFE;font-family:monospace">
         ${otp}
       </div>
       <p style="color:#9CA3AF;font-size:12px;margin-top:24px;line-height:1.6">
