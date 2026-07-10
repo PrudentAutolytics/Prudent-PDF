@@ -1,6 +1,17 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
 const pool = require('../db');
+const { checkRateLimit } = require('../ratelimit');
+
+/** ENTERPRISE HARDENING: escape EVERY user-supplied value before it is
+ *  interpolated into the notification email HTML. Previously only the
+ *  message body was partially escaped; name/company could inject HTML
+ *  into the email VK receives (a phishing vector). */
+function esc(v) {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 const PLAN_LABELS = {
   trial        : 'Free Trial',
@@ -14,7 +25,7 @@ const PLAN_COLORS = {
   trial        : '#64748B',
   starter      : '#059669',
   professional : '#0891B2',
-  business     : '#2563EB',
+  business     : '#2E75B6',
   enterprise   : '#7C3AED',
 };
 
@@ -36,7 +47,9 @@ function row(label, value, highlight) {
 }
 
 function buildEmail({ name, email, subject, plan, message, submittedAt }) {
-  const subjectLabel = SUBJECT_LABELS[subject] || subject || 'General Enquiry';
+  name  = esc(name);
+  email = esc(email);
+  const subjectLabel = esc(SUBJECT_LABELS[subject] || subject || 'General Enquiry');
   const planLabel    = PLAN_LABELS[plan]    || (plan ? plan : null);
   const planColor    = PLAN_COLORS[plan]    || '#64748B';
   const dateStr      = submittedAt
@@ -47,7 +60,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
     ? `<span style="display:inline-block;background:${planColor};color:#fff;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:99px;letter-spacing:.04em">${planLabel}</span>`
     : `<span style="color:#94A3B8;font-style:italic">Not specified</span>`;
 
-  const safeMessage = (message || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
+  const safeMessage = esc(message).replace(/\n/g,'<br/>');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -59,7 +72,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
 <table width="580" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;width:100%">
 
   <!-- Header -->
-  <tr><td style="background:#1E3A8A;border-radius:16px 16px 0 0;padding:28px 32px 24px">
+  <tr><td style="background:#1F3864;border-radius:16px 16px 0 0;padding:28px 32px 24px">
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
         <td>
@@ -85,7 +98,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
       <tr><td style="padding:0 32px 20px">
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden">
           ${row('Full Name', name)}
-          ${row('Email', `<a href="mailto:${email}" style="color:#2563EB;text-decoration:none">${email}</a>`)}
+          ${row('Email', `<a href="mailto:${email}" style="color:#2E75B6;text-decoration:none">${email}</a>`)}
           ${row('Subject', subjectLabel)}
           <tr>
             <td style="padding:11px 16px;width:130px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8;border-bottom:1px solid #F1F5F9;white-space:nowrap;vertical-align:middle">Plan Interest</td>
@@ -109,7 +122,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #F1F5F9">
       <tr><td style="padding:20px 32px" align="left">
         <a href="mailto:${email}?subject=Re%3A%20${encodeURIComponent(subjectLabel)}%20%E2%80%94%20Prudent%20PDF"
-           style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;letter-spacing:.01em">
+           style="display:inline-block;background:#2E75B6;color:#fff;text-decoration:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;letter-spacing:.01em">
           ↩&nbsp; Reply to ${name}
         </a>
       </td></tr>
@@ -136,15 +149,35 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
 module.exports = async function (context, req) {
   if (handleCors(context, req)) return;
 
-  const name        = (req.body?.name        || '').trim();
-  const email       = (req.body?.email       || '').trim().toLowerCase();
-  const subject     = (req.body?.subject     || '').trim();
-  const plan        = (req.body?.plan        || '').trim();
-  const message     = (req.body?.message     || '').trim();
-  const submittedAt = req.body?.submittedAt  || new Date().toISOString();
+  const name        = (req.body?.name        || '').trim().slice(0, 120);
+  const email       = (req.body?.email       || '').trim().toLowerCase().slice(0, 254);
+  const subject     = (req.body?.subject     || '').trim().slice(0, 60);
+  const plan        = (req.body?.plan        || '').trim().slice(0, 30);
+  const message     = (req.body?.message     || '').trim().slice(0, 5000);
+  const submittedAt = new Date().toISOString(); // server time, never client-supplied
+  const honeypot    = (req.body?.website     || '').trim(); // hidden field bots fill in
 
-  if (!name || !email || !message) {
+  if (honeypot) {
+    // Silently accept so the bot learns nothing
+    context.res = { status: 200, headers: getCorsHeaders(req), body: { success: true, message: 'Message received.' } };
+    return;
+  }
+
+  if (!name || !email || !email.includes('@') || !message) {
     context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Name, email and message are required.' } };
+    return;
+  }
+
+  // ENTERPRISE HARDENING: PG-backed rate limit — 5 messages / hour per
+  // email and 10 / hour per IP. Public endpoint, so this is the only
+  // thing standing between the PA email flow and a spam loop.
+  const ip = (req.headers?.['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const [emailLimited, ipLimited] = await Promise.all([
+    checkRateLimit(`contact:email:${email}`, 5,  60 * 60 * 1000, context),
+    checkRateLimit(`contact:ip:${ip}`,       10, 60 * 60 * 1000, context),
+  ]);
+  if (emailLimited || ipLimited) {
+    context.res = { status: 429, headers: getCorsHeaders(req), body: { error: 'Too many messages. Please try again later or email us directly.' } };
     return;
   }
 
@@ -171,7 +204,7 @@ module.exports = async function (context, req) {
         body    : JSON.stringify({
           // Standard fields your PA email flow already uses
           to          : 'Kabileshvijayakumar@prudentautolytics.com',
-          subject     : `[Prudent PDF] ${subjectLabel} from ${name}`,
+          subject     : `[Prudent PDF] ${subjectLabel} from ${name.replace(/[\r\n]/g, ' ')}`,
           // HTML body — update PA flow body field to @{triggerBody()?['html']}
           html        : htmlBody,
           body        : htmlBody,
