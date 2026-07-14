@@ -1,4 +1,10 @@
-# Prudent PDF — Azure Static Web App v7.1 Enterprise
+# Prudent Redact v8.0 — Enterprise Redaction Review Workspace
+
+This build preserves the existing Power Automate payload contract and working compatibility path while adding secure preview, reviewer decision controls, release readiness, audit/integrity surfaces, manifest export, reviewer dossier export, and configuration health checks.
+
+See `ENTERPRISE-REDACTION-ARCHITECTURE.md` for implemented controls and the production hardening roadmap.
+
+# Prudent Redact — Azure Static Web App v7.1 Enterprise
 
 > Enterprise-grade PDF redaction platform built on Power Automate, Azure Document Intelligence, and Azure Blob Storage.
 >

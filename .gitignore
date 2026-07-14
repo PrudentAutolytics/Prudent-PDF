@@ -4,3 +4,4 @@ api/local.settings.json
 
 # Dependencies
 api/node_modules/
+*.local.settings.json

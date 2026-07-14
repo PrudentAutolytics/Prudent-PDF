@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Viewer</title>
+<title>Redaction Review Workspace · Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
 .main { padding:0!important; overflow:hidden!important; display:flex!important; flex-direction:column!important; height:calc(100vh - var(--topbar-h))!important; }
@@ -39,6 +39,24 @@
   z-index:10;
 }
 .pdf-loading.hidden { display:none; }
+
+/* Enterprise review workspace */
+.review-tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface2);position:sticky;top:0;z-index:3}
+.review-tab{flex:1;border:1px solid transparent;background:transparent;color:var(--ink3);font:700 10px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:7px 5px;border-radius:var(--r6);cursor:pointer}
+.review-tab.active{background:var(--surface);border-color:var(--border2);color:var(--ink);box-shadow:var(--shadow-xs)}
+.review-panel{display:none}.review-panel.active{display:block}
+.review-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px}
+.review-metric{padding:10px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r8)}
+.review-metric b{display:block;font:700 18px var(--display);color:var(--ink);margin-top:3px}.review-metric span{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-weight:700}
+.review-tools{padding:0 10px 10px;display:grid;grid-template-columns:1fr auto;gap:7px}.review-search{width:100%;border:1px solid var(--border2);background:var(--surface);color:var(--ink);padding:8px 10px;border-radius:var(--r6);font-size:11.5px}.review-filter{border:1px solid var(--border2);background:var(--surface);color:var(--ink2);border-radius:var(--r6);font-size:11px;padding:0 8px}
+.entity-list{padding:0 10px 12px;display:flex;flex-direction:column;gap:7px}.entity-card{border:1px solid var(--border);background:var(--surface);border-radius:var(--r8);padding:9px 10px}.entity-card.low{border-color:var(--red-bd);box-shadow:inset 3px 0 0 var(--red)}.entity-card.medium{box-shadow:inset 3px 0 0 var(--amber)}.entity-card.accepted{box-shadow:inset 3px 0 0 var(--green)}.entity-card.rejected{opacity:.62;box-shadow:inset 3px 0 0 var(--ink4)}
+.entity-top{display:flex;align-items:center;gap:7px}.entity-type{font:700 10.5px var(--display);color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.entity-content{font:500 11px var(--mono);color:var(--ink2);margin:6px 0;word-break:break-word;background:var(--surface2);padding:6px 7px;border-radius:var(--r4)}.entity-meta{font-size:10px;color:var(--ink3);display:flex;gap:8px;align-items:center}.entity-actions{display:flex;gap:5px;margin-top:8px}.entity-action{flex:1;border:1px solid var(--border2);background:var(--surface2);color:var(--ink3);padding:5px 6px;border-radius:var(--r4);font-size:10px;font-weight:700;cursor:pointer}.entity-action.accept:hover,.entity-action.accept.active{border-color:var(--green-bd);background:var(--green-pale);color:var(--green)}.entity-action.reject:hover,.entity-action.reject.active{border-color:var(--border2);background:var(--surface3);color:var(--ink)}
+.readiness{margin:10px;border:1px solid var(--border);border-radius:var(--r10);background:var(--surface);overflow:hidden}.readiness-hd{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}.readiness-score{font:800 18px var(--display);margin-left:auto}.readiness-list{padding:8px 12px;display:flex;flex-direction:column;gap:7px}.readiness-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink3)}.readiness-dot{width:7px;height:7px;border-radius:50%;background:var(--red)}.readiness-item.ok .readiness-dot{background:var(--green)}.readiness-item.ok{color:var(--ink2)}
+.audit-list,.integrity-list{padding:10px}.audit-item{display:grid;grid-template-columns:8px 1fr;gap:10px;padding-bottom:12px}.audit-line{width:8px;display:flex;justify-content:center;position:relative}.audit-line:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue);margin-top:4px;z-index:2}.audit-line:after{content:"";position:absolute;top:11px;bottom:-5px;width:1px;background:var(--border2)}.audit-item:last-child .audit-line:after{display:none}.audit-title{font-size:11.5px;color:var(--ink);font-weight:650}.audit-meta{font-size:10px;color:var(--ink3);margin-top:2px}.integrity-row{padding:9px 0;border-bottom:1px solid var(--border)}.integrity-row:last-child{border-bottom:0}.integrity-label{font-size:9.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;font-weight:700}.integrity-value{font:600 10.5px var(--mono);color:var(--ink2);margin-top:4px;word-break:break-all}
+.enterprise-strip{display:flex;align-items:center;gap:8px;padding:7px 14px;background:linear-gradient(90deg,var(--blue-pale),var(--surface));border-bottom:1px solid var(--blue-bd);font-size:10.5px;color:var(--ink2);flex-shrink:0}.enterprise-strip strong{color:var(--blue);font-family:var(--display);letter-spacing:.03em}.kbd{font:700 9px var(--mono);padding:2px 5px;border:1px solid var(--border2);border-bottom-width:2px;border-radius:4px;background:var(--surface);color:var(--ink3)}
+.dossier-actions{padding:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:7px;background:var(--surface2)}
+@media(max-width:1200px){.viewer-content{grid-template-columns:1fr 1fr 280px}}
+
 </style>
 </head>
 <body>
@@ -70,8 +88,11 @@
       </button>
       <button class="btn btn-secondary btn-sm" id="exportFieldsBtn" disabled>
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Fields CSV
+        Review CSV
       </button>
+    </div>
+    <div class="enterprise-strip">
+      <strong>PRUDENT REDACT · SECURE REVIEW</strong><span>Original and redacted outputs remain separate. Review AI-detected entities, verify document integrity, and export a reviewer dossier before release.</span><span style="margin-left:auto" class="kbd">/ search</span><span class="kbd">A accept</span><span class="kbd">R reject</span>
     </div>
 
     <div class="viewer-content">
@@ -143,23 +164,46 @@
         <div class="pane-hd">
           <div class="pane-label fields">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Extracted Fields
+            Redaction Review
           </div>
           <span class="font-mono text-xs text-subtle" id="fieldCount">0 fields</span>
         </div>
+        <div class="review-tabs" role="tablist" aria-label="Review workspace tabs">
+          <button class="review-tab active" data-review-tab="entities">Entities</button>
+          <button class="review-tab" data-review-tab="audit">Audit</button>
+          <button class="review-tab" data-review-tab="integrity">Integrity</button>
+        </div>
         <div class="fields-panel" id="fieldsPanel">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;color:var(--ink3);text-align:center">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div style="font-size:13px;line-height:1.65">Extracted fields from<br/>Document Intelligence<br/>appear here</div>
-          </div>
+          <section class="review-panel active" id="review-entities">
+            <div class="review-summary">
+              <div class="review-metric"><span>Detected</span><b id="metricDetected">0</b></div>
+              <div class="review-metric"><span>Low confidence</span><b id="metricLow">0</b></div>
+              <div class="review-metric"><span>Accepted</span><b id="metricAccepted">0</b></div>
+              <div class="review-metric"><span>Pending review</span><b id="metricPending">0</b></div>
+            </div>
+            <div class="review-tools">
+              <input id="entitySearch" class="review-search" type="search" placeholder="Search type, value or page…" aria-label="Search detected entities"/>
+              <select id="entityFilter" class="review-filter" aria-label="Filter entities"><option value="all">All</option><option value="pending">Pending</option><option value="low">Low confidence</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select>
+            </div>
+            <div class="entity-list" id="entityList"></div>
+            <div class="readiness" id="readinessCard">
+              <div class="readiness-hd"><div><div style="font:700 11px var(--display);color:var(--ink)">Release readiness</div><div style="font-size:9.5px;color:var(--ink3);margin-top:2px">Reviewer-side quality gate</div></div><div class="readiness-score" id="readinessScore">0%</div></div>
+              <div class="readiness-list" id="readinessList"></div>
+            </div>
+          </section>
+          <section class="review-panel" id="review-audit"><div class="audit-list" id="auditList"></div></section>
+          <section class="review-panel" id="review-integrity"><div class="integrity-list" id="integrityList"></div></section>
+        </div>
+        <div class="dossier-actions">
+          <button class="btn btn-secondary btn-sm" id="exportManifestBtn" disabled>Export manifest</button>
+          <button class="btn btn-primary btn-sm" id="exportDossierBtn" disabled>Review dossier</button>
         </div>
         <div class="cost-summary hidden" id="costSummary">
-          <div class="font-display font-bold text-xs" style="letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px">Job Cost Breakdown</div>
-          <div class="cost-row"><span>Document Intelligence</span><span id="csDocIntel">—</span></div>
-          <div class="cost-row"><span>Azure Blob storage</span><span id="csBlobStorage">—</span></div>
-          <div class="cost-row"><span>Power Automate flows</span><span id="csPaFlow">—</span></div>
-          <div class="cost-row"><span>Notifications</span><span id="csEmail">—</span></div>
-          <div class="cost-row total"><span>Total (Product Price)</span><span id="csTotal">—</span></div>
+          <div class="cost-row"><span>AI document analysis</span><span id="csDocIntel">—</span></div>
+          <div class="cost-row"><span>Secure storage</span><span id="csBlobStorage">—</span></div>
+          <div class="cost-row"><span>Workflow orchestration</span><span id="csPaFlow">—</span></div>
+          <div class="cost-row"><span>Notification</span><span id="csEmail">—</span></div>
+          <div class="cost-row total"><span>Processing cost</span><span id="csTotal">—</span></div>
         </div>
       </div>
 
@@ -182,6 +226,46 @@
   let currentJob = null;
   let origSasUrl = null;
   let redSasUrl  = null;
+  let currentEntities = [];
+  let currentFingerprints = { orig: '', red: '' };
+  let currentPdfBytes = { orig: 0, red: 0 };
+  const REVIEW_VERSION = '8.0-enterprise-review';
+
+  function reviewKey(jobId) { return `prudent-redact-review:${jobId}`; }
+  function getReviewState(jobId) {
+    try { return JSON.parse(localStorage.getItem(reviewKey(jobId)) || '{}'); } catch { return {}; }
+  }
+  function saveReviewState() {
+    if (!currentJob) return;
+    const state = getReviewState(currentJob.jobId);
+    state.updatedAt = new Date().toISOString();
+    state.reviewer = email;
+    localStorage.setItem(reviewKey(currentJob.jobId), JSON.stringify(state));
+  }
+  function downloadJson(name, data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function normalizeEntities(j) {
+    let fields=[];
+    try {
+      const raw=j?.extractedFields||j?.extracted_fields;
+      if (!raw) return [];
+      const parsed=typeof raw==='string'?JSON.parse(raw):raw;
+      fields=Array.isArray(parsed)?parsed:[parsed];
+    } catch { return []; }
+    return fields.map((f,i)=>({
+      id:String(f.id||`${j.jobId}:${i}`),
+      index:i,
+      type:String(f.key||f.name||f.type||f.category||`Entity ${i+1}`),
+      content:String(f.content??f.value??f.text??'—'),
+      page:f.page!=null?Number(f.page)+1:(f.pageNumber!=null?Number(f.pageNumber):null),
+      confidence:f.confidence!=null?Number(f.confidence):null,
+      raw:f
+    }));
+  }
 
   /* ── Fetch jobs from Supabase ── */
   async function fetchJobs() {
@@ -332,8 +416,16 @@
     setText('oPage', `${fmt.pages(j.pageCount||0)}`);
     setText('rPage', `${fmt.pages(j.pageCount||0)}`);
 
+    currentEntities = normalizeEntities(j);
+    currentFingerprints = { orig:'', red:'' };
+    currentPdfBytes = { orig:0, red:0 };
     renderFields(j);
+    renderReviewWorkspace();
+    renderAuditTrail();
+    renderIntegrity();
     renderCostSummary(j);
+    $('exportManifestBtn').disabled = false;
+    $('exportDossierBtn').disabled = false;
   }
 
   function setPaneLoading(which, isLoading) {
@@ -396,6 +488,10 @@
       if (magic !== '%PDF-') throw new Error('Output is not a valid PDF document');
 
       const fingerprint = await sha256Short(bytes);
+      currentFingerprints[which] = fingerprint;
+      currentPdfBytes[which] = bytes.byteLength;
+      renderIntegrity();
+      renderReadiness();
       const pdfBlob = new Blob([bytes], { type: 'application/pdf' });
 
       if (previewObjectUrls[which]) URL.revokeObjectURL(previewObjectUrls[which]);
@@ -491,71 +587,91 @@
     });
   });
 
-  /* ── Extracted fields table ── */
-  function renderFields(j) {
-    const panel = $('fieldsPanel');
-    const count = $('fieldCount');
-    if (!panel) return;
+  /* ── Enterprise redaction review workspace ── */
+  function renderFields() { renderEntityList(); }
 
-    // Parse fields from Supabase — could be object, array, or string
-    let fields = [];
-    try {
-      const raw = j.extractedFields || j.extracted_fields;
-      if (!raw) fields = [];
-      else if (typeof raw === 'string') fields = JSON.parse(raw);
-      else if (Array.isArray(raw)) fields = raw;
-      else if (typeof raw === 'object') fields = [raw];
-    } catch { fields = []; }
-
-    if (count) count.textContent = `${fields.length} field${fields.length!==1?'s':''}`;
-
-    if (!fields.length) {
-      panel.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;color:var(--ink3);text-align:center">
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div style="font-size:13px;line-height:1.65">No extracted fields<br/>returned for this job</div>
-      </div>`;
-      return;
-    }
-
-    const rows = fields.map((f, i) => {
-      // Handle both {key,value,confidence} and {content,page,polygon} formats from PA
-      const content = f.content || f.value || '—';
-      const page    = f.page != null ? `p.${f.page+1}` : (f.pageNumber!=null ? `p.${f.pageNumber}` : '—');
-      const conf    = f.confidence != null ? f.confidence : null;
-      const confHtml = conf != null
-        ? `<span style="font-family:var(--mono);font-size:10px;color:${conf>=0.9?'var(--green)':conf>=0.7?'var(--amber)':'var(--red)'}">${(conf*100).toFixed(0)}%</span>`
-        : '<span style="color:var(--ink4)">—</span>';
-      const label = f.key || f.name || f.type || `#${i+1}`;
-      const bg    = i%2===0 ? 'var(--surface)' : 'var(--surface2)';
-      return `<tr style="background:${bg};border-bottom:1px solid var(--border)">
-        <td style="padding:6px 8px;font-size:10.5px;font-weight:700;color:var(--ink3);white-space:nowrap;vertical-align:top;max-width:70px;overflow:hidden;text-overflow:ellipsis">${label}</td>
-        <td style="padding:6px 8px;font-size:11.5px;color:var(--ink);word-break:break-all;vertical-align:top">${content}</td>
-        <td style="padding:6px 8px;font-size:10px;color:var(--ink3);text-align:center;white-space:nowrap;vertical-align:top">${page}</td>
-        <td style="padding:6px 8px;text-align:center;vertical-align:top">${confHtml}</td>
-      </tr>`;
-    }).join('');
-
-    panel.innerHTML = `
-      <div style="padding:4px 2px 8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)">
-        ${fields.length} PII entit${fields.length!==1?'ies':'y'} detected
-      </div>
-      <div style="border:1px solid var(--border);border-radius:var(--r8);overflow:hidden;font-size:0">
-        <table style="width:100%;border-collapse:collapse">
-          <thead>
-            <tr style="background:var(--surface3);border-bottom:2px solid var(--border)">
-              <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Type</th>
-              <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left">Content (Redacted)</th>
-              <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center">Pg</th>
-              <th style="padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center">Conf</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-      <div style="padding:8px 2px 0;font-size:10.5px;color:var(--ink3);line-height:1.6">
-        ⚠ ${fields.length} entit${fields.length!==1?'ies':'y'} redacted from output document.
-      </div>`;
+  function decisionFor(entity) {
+    const state = currentJob ? getReviewState(currentJob.jobId) : {};
+    return state.decisions?.[entity.id] || 'pending';
   }
+
+  function setDecision(entityId, decision) {
+    if (!currentJob) return;
+    const state = getReviewState(currentJob.jobId);
+    state.decisions = state.decisions || {};
+    state.decisions[entityId] = decision;
+    state.events = state.events || [];
+    state.events.push({ at:new Date().toISOString(), actor:email, action:decision==='accepted'?'ENTITY_ACCEPTED':'ENTITY_REJECTED', entityId });
+    localStorage.setItem(reviewKey(currentJob.jobId), JSON.stringify(state));
+    renderReviewWorkspace(); renderAuditTrail();
+  }
+
+  function renderReviewWorkspace() {
+    renderEntityList(); renderReviewMetrics(); renderReadiness();
+  }
+
+  function renderReviewMetrics() {
+    const accepted=currentEntities.filter(e=>decisionFor(e)==='accepted').length;
+    const rejected=currentEntities.filter(e=>decisionFor(e)==='rejected').length;
+    const pending=currentEntities.length-accepted-rejected;
+    const low=currentEntities.filter(e=>e.confidence!=null&&e.confidence<.7).length;
+    setText('metricDetected', String(currentEntities.length)); setText('metricLow', String(low));
+    setText('metricAccepted', String(accepted)); setText('metricPending', String(pending));
+    setText('fieldCount', `${currentEntities.length} entities`);
+  }
+
+  function renderEntityList() {
+    const list=$('entityList'); if(!list) return;
+    const q=($('entitySearch')?.value||'').trim().toLowerCase(); const filter=$('entityFilter')?.value||'all';
+    let items=currentEntities.filter(e=>{
+      const d=decisionFor(e); const low=e.confidence!=null&&e.confidence<.7;
+      const matchFilter=filter==='all'||filter===d||(filter==='low'&&low);
+      const hay=`${e.type} ${e.content} ${e.page||''}`.toLowerCase(); return matchFilter&&(!q||hay.includes(q));
+    });
+    if(!items.length){ list.innerHTML=`<div style="padding:30px 16px;text-align:center;color:var(--ink3);font-size:12px">${currentEntities.length?'No entities match this review filter.':'No entity metadata was returned by the redaction workflow.'}</div>`; return; }
+    list.innerHTML=items.map(e=>{
+      const d=decisionFor(e); const conf=e.confidence; const band=conf==null?'unknown':conf<.7?'low':conf<.9?'medium':'high';
+      const confText=conf==null?'Confidence unavailable':`${Math.round(conf*100)}% confidence`;
+      return `<article class="entity-card ${band} ${d}" data-entity-id="${escAttr(e.id)}"><div class="entity-top"><div class="entity-type" title="${escAttr(e.type)}">${escHtml(e.type)}</div><span class="pill ${band==='low'?'pill-failed':band==='medium'?'pill-queued':'pill-complete'}" style="font-size:8.5px;padding:2px 6px">${escHtml(band.toUpperCase())}</span></div><div class="entity-content">${escHtml(maskSensitive(e.content))}</div><div class="entity-meta"><span>${e.page?`Page ${e.page}`:'Page —'}</span><span>•</span><span>${confText}</span></div><div class="entity-actions"><button class="entity-action accept ${d==='accepted'?'active':''}" data-decision="accepted" data-id="${escAttr(e.id)}">✓ Accept</button><button class="entity-action reject ${d==='rejected'?'active':''}" data-decision="rejected" data-id="${escAttr(e.id)}">✕ Reject</button></div></article>`;
+    }).join('');
+    list.querySelectorAll('[data-decision]').forEach(btn=>btn.addEventListener('click',()=>setDecision(btn.dataset.id,btn.dataset.decision)));
+  }
+
+  function escHtml(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escAttr(v){ return escHtml(v); }
+  function maskSensitive(v){ const s=String(v??''); if(s.length<=4)return '••••'; return `${s.slice(0,2)}${'•'.repeat(Math.min(12,Math.max(4,s.length-4)))}${s.slice(-2)}`; }
+
+  function readinessData(){
+    const decisions=currentEntities.map(decisionFor); const pending=decisions.filter(d=>d==='pending').length;
+    const lowPending=currentEntities.filter(e=>e.confidence!=null&&e.confidence<.7&&decisionFor(e)==='pending').length;
+    return [
+      {ok:!!currentJob, label:'Job identity and ownership verified'},
+      {ok:!!origSasUrl&&!!currentFingerprints.orig, label:'Original PDF fetched and fingerprinted'},
+      {ok:!!redSasUrl&&!!currentFingerprints.red, label:'Redacted PDF fetched and fingerprinted'},
+      {ok:currentEntities.length>0, label:'Entity metadata available for reviewer inspection'},
+      {ok:lowPending===0, label:'All low-confidence detections reviewed'},
+      {ok:pending===0&&currentEntities.length>0, label:'All detected entities have reviewer decisions'}
+    ];
+  }
+  function renderReadiness(){ const rows=readinessData(); const ok=rows.filter(x=>x.ok).length; const score=Math.round(ok/rows.length*100); setText('readinessScore',`${score}%`); const el=$('readinessList'); if(el)el.innerHTML=rows.map(x=>`<div class="readiness-item ${x.ok?'ok':''}"><span class="readiness-dot"></span><span>${escHtml(x.label)}</span></div>`).join(''); }
+
+  function renderAuditTrail(){
+    const el=$('auditList'); if(!el||!currentJob)return; const state=getReviewState(currentJob.jobId); const base=[
+      {at:currentJob.submittedAt,title:'Document submitted',meta:`${email} · ${currentJob.fileName}`},
+      {at:currentJob.submittedAt,title:'Automated redaction workflow initiated',meta:`Job ${currentJob.jobId.slice(0,12)} · ${currentJob.status}`},
+      ...(currentJob.completedAt?[{at:currentJob.completedAt,title:'Redacted output received',meta:`${currentJob.pageCount||'—'} pages · workflow callback recorded`}]:[]),
+      ...((state.events||[]).map(ev=>({at:ev.at,title:ev.action==='ENTITY_ACCEPTED'?'Reviewer accepted suggested redaction':'Reviewer rejected suggested redaction',meta:`${ev.actor} · entity ${String(ev.entityId).split(':').pop()}`})))
+    ].sort((a,b)=>new Date(a.at)-new Date(b.at));
+    el.innerHTML=base.map(x=>`<div class="audit-item"><div class="audit-line"></div><div><div class="audit-title">${escHtml(x.title)}</div><div class="audit-meta">${fmt.date(x.at)} · ${escHtml(x.meta)}</div></div></div>`).join('')+`<div style="padding:8px 2px;font-size:10px;color:var(--ink3);line-height:1.55">Reviewer events are retained in this browser workspace and included in exported dossiers. Server-side immutable audit retention requires the audit-event backend schema described in ENTERPRISE-HARDENING.md.</div>`;
+  }
+
+  function renderIntegrity(){
+    const el=$('integrityList'); if(!el||!currentJob)return; const rows=[
+      ['Job ID',currentJob.jobId],['Original SHA-256 fingerprint',currentFingerprints.orig||'Pending secure preview verification'],['Redacted SHA-256 fingerprint',currentFingerprints.red||'Pending secure preview verification'],['Original size',currentPdfBytes.orig?fmt.bytes(currentPdfBytes.orig):fmt.bytes(currentJob.fileSize)],['Redacted size',currentPdfBytes.red?fmt.bytes(currentPdfBytes.red):'Pending'],['Page count',String(currentJob.pageCount||'—')],['Processing status',String(currentJob.status||'—')],['Review workspace version',REVIEW_VERSION],['Reviewer',email]
+    ]; el.innerHTML=rows.map(([k,v])=>`<div class="integrity-row"><div class="integrity-label">${escHtml(k)}</div><div class="integrity-value">${escHtml(v)}</div></div>`).join('');
+  }
+
+  function buildManifest(){ const state=currentJob?getReviewState(currentJob.jobId):{}; return {schema:'prudent.redact.review-manifest.v1',generatedAt:new Date().toISOString(),workspaceVersion:REVIEW_VERSION,job:{jobId:currentJob?.jobId,fileName:currentJob?.fileName,status:currentJob?.status,submittedAt:currentJob?.submittedAt,completedAt:currentJob?.completedAt,pageCount:currentJob?.pageCount},integrity:{originalSha256Prefix:currentFingerprints.orig||null,redactedSha256Prefix:currentFingerprints.red||null,originalBytes:currentPdfBytes.orig||currentJob?.fileSize||null,redactedBytes:currentPdfBytes.red||null},review:{reviewer:email,updatedAt:state.updatedAt||null,releaseReadiness:Math.round(readinessData().filter(x=>x.ok).length/readinessData().length*100),entities:currentEntities.map(e=>({id:e.id,type:e.type,page:e.page,confidence:e.confidence,decision:decisionFor(e)})),events:state.events||[]},disclaimer:'This manifest records the browser review workspace state. It is not a server-side immutable approval record unless persisted by an enterprise audit backend.'}; }
 
   /* ── Cost summary ── */
   function renderCostSummary(j) {
@@ -595,6 +711,18 @@
 
   /* ── Job selector ── */
   $('jobSelector')?.addEventListener('change', e => { if(e.target.value) loadJob(e.target.value); });
+
+
+  /* ── Review workspace interactions ── */
+  document.querySelectorAll('[data-review-tab]').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('[data-review-tab]').forEach(x=>x.classList.toggle('active',x===btn));
+    document.querySelectorAll('.review-panel').forEach(x=>x.classList.toggle('active',x.id===`review-${btn.dataset.reviewTab}`));
+  }));
+  $('entitySearch')?.addEventListener('input', renderEntityList);
+  $('entityFilter')?.addEventListener('change', renderEntityList);
+  $('exportManifestBtn')?.addEventListener('click',()=>{ if(!currentJob)return; downloadJson(`redaction-manifest-${currentJob.jobId.slice(0,8)}.json`,buildManifest()); showToast('Redaction manifest exported','success'); });
+  $('exportDossierBtn')?.addEventListener('click',()=>{ if(!currentJob)return; const manifest=buildManifest(); const accepted=manifest.review.entities.filter(x=>x.decision==='accepted').length; const rejected=manifest.review.entities.filter(x=>x.decision==='rejected').length; const pending=manifest.review.entities.filter(x=>x.decision==='pending').length; downloadJson(`review-dossier-${currentJob.jobId.slice(0,8)}.json`,{...manifest,executiveSummary:{detected:manifest.review.entities.length,accepted,rejected,pending,lowConfidence:manifest.review.entities.filter(x=>x.confidence!=null&&x.confidence<.7).length,releaseRecommendation:manifest.review.releaseReadiness===100?'READY_FOR_CONTROLLED_RELEASE':'REVIEW_REQUIRED'}}); showToast('Reviewer dossier exported','success'); });
+  document.addEventListener('keydown',e=>{ if(e.target.matches('input,select,textarea'))return; if(e.key==='/'){e.preventDefault();$('entitySearch')?.focus();} const firstPending=currentEntities.find(x=>decisionFor(x)==='pending'); if(!firstPending)return; if(e.key.toLowerCase()==='a')setDecision(firstPending.id,'accepted'); if(e.key.toLowerCase()==='r')setDecision(firstPending.id,'rejected'); });
 
   /* ── Initial load ── */
   fetchJobs();

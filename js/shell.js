@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT PDF — shell.js v7.2
+   PRUDENT REDACT — shell.js v8.0
    ═══════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
@@ -12,17 +12,16 @@ const Shell = (() => {
       items : [
         { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: 'Overview, stats, and quick upload' },
         { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: 'Upload and process a PDF' },
-        { id: 'history',   label: 'Job History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs — last 30 days', badge: '30d' },
-        { id: 'viewer',    label: 'Document Viewer',  href: '/viewer',    icon: 'eye',     desc: 'Side-by-side original vs redacted' },
+        { id: 'history',   label: 'Processing History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs — last 30 days', badge: '30d' },
+        { id: 'viewer',    label: 'Review Workspace',  href: '/viewer',    icon: 'eye',     desc: 'Review entities, integrity, and release readiness' },
       ],
     },
     {
-      group : 'COMING SOON',
+      group : 'GOVERNANCE',
       items : [
-        { id: 'compress', label: 'Compress PDF',  href: '#', icon: 'compress', desc: 'Reduce file size',            soon: true },
-        { id: 'merge',    label: 'Merge PDFs',    href: '#', icon: 'merge',    desc: 'Combine multiple documents',  soon: true },
-        { id: 'sign',     label: 'Sign PDF',      href: '#', icon: 'sign',     desc: 'Add digital signatures',      soon: true },
-        { id: 'convert',  label: 'Convert PDF',   href: '#', icon: 'convert',  desc: 'PDF ↔ Word / Excel',         soon: true },
+        { id: 'review', label: 'Review & Release', href: '/viewer', icon: 'shield', desc: 'Human review and release-readiness controls' },
+        { id: 'evidence', label: 'Evidence & Audit', href: '/viewer', icon: 'clock', desc: 'Integrity fingerprints and review dossier' },
+        { id: 'controls', label: 'Security Controls', href: '/admin', icon: 'settings', desc: 'Administrative and tenant controls' },
       ],
     },
     {
@@ -86,7 +85,7 @@ const Shell = (() => {
 
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
-  <a class="topbar-brand" href="/dashboard" aria-label="Prudent PDF home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
+  <a class="topbar-brand" href="/dashboard" aria-label="Prudent Redact home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
     <div style="width:120px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);background:var(--surface2)">
       <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:3px;box-sizing:border-box"/>
     </div>
