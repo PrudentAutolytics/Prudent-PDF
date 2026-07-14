@@ -1,14 +1,14 @@
-# Prudent Redact v8.0 — Enterprise Redaction Review Workspace
+# Prudent Redact v8.0 - Enterprise Redaction Review Workspace
 
 This build preserves the existing Power Automate payload contract and working compatibility path while adding secure preview, reviewer decision controls, release readiness, audit/integrity surfaces, manifest export, reviewer dossier export, and configuration health checks.
 
 See `ENTERPRISE-REDACTION-ARCHITECTURE.md` for implemented controls and the production hardening roadmap.
 
-# Prudent Redact — Azure Static Web App v7.1 Enterprise
+# Prudent Redact - Azure Static Web App v7.1 Enterprise
 
 > Enterprise-grade PDF redaction platform built on Power Automate, Azure Document Intelligence, and Azure Blob Storage.
 >
-> **v7.1**: security hardening (20 fixes — see `ENTERPRISE-HARDENING.md`) + enterprise design system v11 (Prudent brand navy/blue, Schibsted Grotesk display type, Fluent-calibrated components). Run `migration-enterprise-hardening.sql` on the database before deploying.
+> **v7.1**: security hardening (20 fixes - see `ENTERPRISE-HARDENING.md`) + enterprise design system v11 (Prudent brand navy/blue, Schibsted Grotesk display type, Fluent-calibrated components). Run `migration-enterprise-hardening.sql` on the database before deploying.
 
 > Enterprise-grade PDF redaction platform built on Power Automate, Azure Document Intelligence, and Azure Blob Storage.
 
@@ -44,7 +44,7 @@ prudent-pdf/
 
 ---
 
-## Step 1 — Update PA Flow Endpoints
+## Step 1 - Update PA Flow Endpoints
 
 Open `js/config.js` and replace URLs in the `FLOWS` object:
 
@@ -70,7 +70,7 @@ BLOB: {
 
 ---
 
-## Step 2 — Deploy to Azure Static Web Apps
+## Step 2 - Deploy to Azure Static Web Apps
 
 ### Option A: GitHub Actions (recommended)
 
@@ -92,7 +92,7 @@ swa deploy . --deployment-token YOUR_TOKEN
 
 ---
 
-## Step 3 — Power Automate Flows to Build
+## Step 3 - Power Automate Flows to Build
 
 | Flow name       | Trigger input                              | Output                                    |
 |-----------------|-------------------------------------------|-------------------------------------------|
@@ -121,7 +121,7 @@ swa deploy . --deployment-token YOUR_TOKEN
 
 ---
 
-## Step 4 — SharePoint Lists
+## Step 4 - SharePoint Lists
 
 ### PrudentPDF_Users
 | Column          | Type     |
@@ -198,7 +198,7 @@ swa deploy . --deployment-token YOUR_TOKEN
 ## Support
 
 **Kabilesh VijayaKumar (VK)**  
-Prudent Autolytics — Power Platform & Automation Consultancy  
+Prudent Autolytics - Power Platform & Automation Consultancy  
 Service.Account@prudentautolytics.com  
 Chennai, Tamil Nadu, India
 

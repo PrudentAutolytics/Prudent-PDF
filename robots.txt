@@ -1,4 +1,4 @@
-# Prudent PDF — robots.txt
+# Prudent PDF - robots.txt
 # All authenticated application content is private and must not be indexed.
 
 User-agent: *

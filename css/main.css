@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT PDF — Design System v10.0
+   PRUDENT PDF - Design System v10.0
    Inspired by Encodian · Plumsail · Nintex
    Light-first. Clean. Professional. Generous whitespace.
    Font: Inter (body + display) · JetBrains Mono (data)
@@ -24,13 +24,13 @@
   --border2   : #CDD5E4;
   --border3   : #A9B6CC;
 
-  /* Text — navy-tinted neutral scale */
+  /* Text - navy-tinted neutral scale */
   --ink       : #16233B;
   --ink2      : #3B4A63;
   --ink3      : #64748B;
   --ink4      : #94A3B8;
 
-  /* Brand — Prudent Autolytics identity */
+  /* Brand - Prudent Autolytics identity */
   --navy      : #1F3864;
   --navy-d    : #16294B;
   --navy-pale : #EDF1F7;
@@ -69,7 +69,7 @@
   --r12:12px; --r14:14px; --r16:16px; --r20:20px;
   --r24:24px; --r-full:9999px;
 
-  /* Shadows — clean, minimal */
+  /* Shadows - clean, minimal */
   --s1 : 0 1px 3px rgba(17,24,39,0.06), 0 1px 2px rgba(17,24,39,0.04);
   --s2 : 0 4px 6px rgba(17,24,39,0.05), 0 2px 4px rgba(17,24,39,0.04);
   --s3 : 0 10px 15px rgba(17,24,39,0.07), 0 4px 6px rgba(17,24,39,0.04);
@@ -1054,11 +1054,11 @@ table { border-collapse: collapse; width: 100%; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ENTERPRISE THEME LAYER — v11.0
+   ENTERPRISE THEME LAYER - v11.0
    Fluent-calibrated refinement pass. Appended as an override layer so no
    markup or JS changes. Structure is carried by precise 1px borders;
    shadows are near-invisible; depth is earned, not decorated.
-   Signature motif: the brand "seal" — a navy→blue hairline that runs across
+   Signature motif: the brand "seal" - a navy→blue hairline that runs across
    the top of the product, under the page title, and beside the active nav
    item. One motif, carried through.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -1132,7 +1132,7 @@ body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
 .nav-link.active .nav-link-icon { color: var(--blue); }
 .nav-link-badge.blue { background: var(--blue-pale); color: var(--blue-d); }
 
-/* ── Buttons: Fluent depth — 1px definition, restrained motion ── */
+/* ── Buttons: Fluent depth - 1px definition, restrained motion ── */
 .btn {
   border-radius: var(--r8);
   font-weight: 600; font-size: 13.5px;

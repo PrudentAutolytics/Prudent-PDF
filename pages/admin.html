@@ -285,7 +285,7 @@ Content-Type: application/json
 
   const $ = id => document.getElementById(id);
 
-  /* ENTERPRISE HARDENING — output encoding.
+  /* ENTERPRISE HARDENING - output encoding.
      Every DB value rendered via innerHTML passes through esc() (HTML
      context) or jsArg() (inline event-handler argument context).
      Without this, a contact-form submission or signup name containing
@@ -340,7 +340,7 @@ Content-Type: application/json
     } catch (e) {
       if (!/Forbidden|Authentication required|Session|Account inactive/i.test(e.message || '')) {
         $('adminContent')?.classList.remove('hidden');
-        $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users — ' + esc(e.message||'error') + '</div><div style="font-size:12px;color:var(--ink3);margin-top:6px">The administration API is reachable, but the database schema or configuration needs attention.</div></div></td></tr>';
+        $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users - ' + esc(e.message||'error') + '</div><div style="font-size:12px;color:var(--ink3);margin-top:6px">The administration API is reachable, but the database schema or configuration needs attention.</div></div></td></tr>';
       }
     }
   }
@@ -368,7 +368,7 @@ Content-Type: application/json
 
       return `<tr class="user-row">
         <td>
-          <div style="font-weight:600;font-size:13px;color:var(--ink)">${esc(u.full_name) || '—'}</div>
+          <div style="font-weight:600;font-size:13px;color:var(--ink)">${esc(u.full_name) || '-'}</div>
           <div style="font-size:11.5px;color:var(--ink3)">${esc(u.email)}</div>
           ${u.company ? `<div style="font-size:11px;color:var(--ink4)">${esc(u.company)}</div>` : ''}
         </td>
@@ -531,10 +531,10 @@ Content-Type: application/json
       return `<div class="contact-card">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <div>
-            <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(c.name)||'—'}</div>
+            <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(c.name)||'-'}</div>
             <div style="font-size:12px;color:var(--ink3);margin-top:2px">${esc(c.email)} · ${subj}${c.company?' · '+esc(c.company):''} · ${fmt.relative(c.submitted_at)}</div>
           </div>
-          <a href="mailto:${esc(c.email)}?subject=Re: ${encodeURIComponent(subj)} — Prudent PDF" class="btn btn-sm btn-primary">Reply</a>
+          <a href="mailto:${esc(c.email)}?subject=Re: ${encodeURIComponent(subj)} - Prudent PDF" class="btn btn-sm btn-primary">Reply</a>
         </div>
         <div class="contact-msg">${esc(c.message).replace(/\n/g,'<br/>')}</div>
       </div>`;
@@ -578,7 +578,7 @@ Content-Type: application/json
     try {
       const res = await adminCall({ action:'generateApiKey', targetEmail });
       if (res?.apiKey) {
-        prompt('API key generated — copy now (shown only once):', res.apiKey);
+        prompt('API key generated - copy now (shown only once):', res.apiKey);
         await loadApiKeys();
       }
     } catch(e) { showToast('Failed: ' + e.message, 'error'); }

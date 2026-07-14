@@ -95,11 +95,11 @@
 
     <div class="contact-grid anim d1">
 
-      <!-- LEFT — form -->
+      <!-- LEFT - form -->
       <div class="contact-form-card">
         <div class="contact-form-head">
           <div class="contact-form-title">Send us a message</div>
-          <div class="contact-form-sub">Tell us what you need — pricing, enterprise plans, technical support, or a custom demo.</div>
+          <div class="contact-form-sub">Tell us what you need - pricing, enterprise plans, technical support, or a custom demo.</div>
         </div>
         <div class="contact-form-body">
 
@@ -115,11 +115,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="form-group">
                 <label class="form-label">Full name <span style="color:var(--red)">*</span></label>
-                <input class="form-input" id="cName" type="text" placeholder="Jane Smith" autocomplete="name"/>
+                <input class="form-input" id="cName" type="text" placeholder="Jane Smith" autocomplete="off" data-lpignore="true" data-1p-ignore="true"/>
               </div>
               <div class="form-group">
                 <label class="form-label">Email <span style="color:var(--red)">*</span></label>
-                <input class="form-input" id="cEmail" type="email" placeholder="jane@company.com" autocomplete="email"/>
+                <input class="form-input" id="cEmail" type="email" placeholder="jane@company.com" autocomplete="off" data-lpignore="true" data-1p-ignore="true"/>
               </div>
             </div>
 
@@ -164,7 +164,7 @@
         </div>
       </div>
 
-      <!-- RIGHT — info -->
+      <!-- RIGHT - info -->
       <div class="contact-info-stack">
 
         <div class="sla-card">
@@ -189,7 +189,7 @@
           </div>
           <div>
             <div class="contact-info-label">Business hours</div>
-            <div class="contact-info-val">Mon – Fri, 9am – 6pm IST</div>
+            <div class="contact-info-val">Mon - Fri, 9am - 6pm IST</div>
             <div class="contact-info-sub">UTC +5:30 · Bangalore, India</div>
           </div>
         </div>
@@ -218,13 +218,13 @@
   if (!Session.valid()) { location.replace('/login'); return; }
   Shell.init('contact');
 
-  var s = Session.get() || {};
-
-  // Pre-fill email from session
+  // Keep enquiry identity fields intentionally blank.
+  // The signed-in account can belong to an administrator or service operator,
+  // while the enquiry may be submitted on behalf of another contact.
   var cEmail = document.getElementById('cEmail');
-  if (cEmail && s.email) cEmail.value = s.email;
   var cName = document.getElementById('cName');
-  if (cName && s.fullName) cName.value = s.fullName;
+  if (cEmail) cEmail.value = '';
+  if (cName) cName.value = '';
 
   // Character counter
   var msg = document.getElementById('cMessage');

@@ -1,5 +1,5 @@
 -- ============================================================
--- Prudent PDF — Enterprise Hardening Migration
+-- Prudent PDF - Enterprise Hardening Migration
 -- Run once against the Supabase/Postgres database.
 -- Safe to re-run (IF NOT EXISTS everywhere).
 -- ============================================================
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 -- (run manually or via a scheduled PA flow / pg_cron)
 -- DELETE FROM rate_limits WHERE reset_at < NOW() - INTERVAL '1 day';
 
--- 3. Admin audit trail — every mutating admin action is recorded
+-- 3. Admin audit trail - every mutating admin action is recorded
 CREATE TABLE IF NOT EXISTS audit_log (
   id          BIGSERIAL PRIMARY KEY,
   admin_email TEXT NOT NULL,
@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log (created_at DESC);
 -- 4. Notes on existing data (no schema change required):
 --    * users.otp now stores a SHA-256 hex hash of the code, not the
 --      code itself. auth-verify handles legacy plaintext rows during
---      the transition, so no backfill is needed — old codes simply
+--      the transition, so no backfill is needed - old codes simply
 --      expire within 10 minutes.
 --    * api_keys.api_key now stores a SHA-256 hex hash of the key.
 --      Existing plaintext keys should be revoked and re-issued:

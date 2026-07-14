@@ -266,7 +266,7 @@ body {
 </head>
 <body>
 
-<!-- LEFT PANEL — content injected by JS to prevent scraping -->
+<!-- LEFT PANEL - content injected by JS to prevent scraping -->
 <div class="left-panel" id="leftPanel">
   <div class="left-grid"></div>
   <div class="left-glow"></div>
@@ -368,7 +368,7 @@ body {
         <p style="font-size:14px;color:#64748B;line-height:1.6">We sent a 6-digit code to</p>
         <div class="otp-email-badge">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span id="otpEmailShow">—</span>
+          <span id="otpEmailShow">-</span>
         </div>
       </div>
 
@@ -451,7 +451,7 @@ $('emailInput').addEventListener('input', () => {
   S.checked = false; S.isNew = false;
   $('regSlide').classList.remove('open');
   $('stepTitle').textContent = 'Welcome back';
-  $('stepSub').textContent = 'Enter your work email to continue — no password required.';
+  $('stepSub').textContent = 'Enter your work email to continue - no password required.';
   $('contBtnTxt').textContent = 'Continue';
   clearTimeout(checkDebounce);
   const em = ($('emailInput').value || '').trim();
@@ -467,13 +467,13 @@ async function doCheck(email) {
     if (d.exists) {
       S.isNew = false;
       $('stepTitle').textContent = 'Welcome back';
-      $('stepSub').textContent = "We'll send a 6-digit code to your inbox — no password needed.";
+      $('stepSub').textContent = "We'll send a 6-digit code to your inbox - no password needed.";
       $('contBtnTxt').textContent = 'Send verification code';
       $('regSlide').classList.remove('open');
     } else {
       S.isNew = true;
       $('stepTitle').textContent = 'Create your account';
-      $('stepSub').textContent = 'Start your 5-document free trial — no credit card required.';
+      $('stepSub').textContent = 'Start your 5-document free trial - no credit card required.';
       $('contBtnTxt').textContent = 'Create account & send code';
       $('regSlide').classList.add('open');
       setTimeout(() => $('regName')?.focus(), 360);
@@ -561,7 +561,7 @@ function startTimer(ms = 600000) {
     const r = Math.max(0, dl - Date.now());
     const el = $('timerTxt');
     if (el) el.textContent = Math.floor(r/60000) + ':' + String(Math.floor((r%60000)/1000)).padStart(2,'0');
-    if (r === 0) { clearInterval(tickTimer); $('otpErr').textContent = 'Code expired — please request a new one.'; $('verifyBtn').disabled = true; }
+    if (r === 0) { clearInterval(tickTimer); $('otpErr').textContent = 'Code expired - please request a new one.'; $('verifyBtn').disabled = true; }
   }, 1000);
 }
 
@@ -598,8 +598,8 @@ async function verifyOTP() {
   } catch(err) {
     shakeDigits();
     $('otpErr').textContent =
-      err.message?.includes('Invalid') ? 'Incorrect code — please check and try again.' :
-      err.message?.includes('expired') ? 'Code expired — request a new one.' :
+      err.message?.includes('Invalid') ? 'Incorrect code - please check and try again.' :
+      err.message?.includes('expired') ? 'Code expired - request a new one.' :
       'Verification failed. Please try again.';
     btn.disabled = false;
     btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verify &amp; sign in';
@@ -624,7 +624,7 @@ $('changeEmailBtn').addEventListener('click', () => {
   $('emailInput').value = '';
   $('regSlide').classList.remove('open');
   $('stepTitle').textContent = 'Welcome back';
-  $('stepSub').textContent = 'Enter your work email to continue — no password required.';
+  $('stepSub').textContent = 'Enter your work email to continue - no password required.';
   show('stepEmail');
   setTimeout(() => $('emailInput')?.focus(), 60);
 });
@@ -633,7 +633,7 @@ $('changeEmailBtn').addEventListener('click', () => {
 </script>
 
 <script>
-/* Content injection — runs after DOM ready, invisible to non-JS crawlers */
+/* Content injection - runs after DOM ready, invisible to non-JS crawlers */
 (function(){
   var d = document;
   function el(tag, cls, html) {
@@ -657,10 +657,10 @@ $('changeEmailBtn').addEventListener('click', () => {
       '<div class="left-features" id="lf"></div>'
     ].join('');
     var feats = [
-      ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z','Azure Document Intelligence — detects names, IDs, addresses and more'],
-      ['','Permanent black-box redaction — no metadata, no recovery'],
-      ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z','Side-by-side viewer — compare original vs redacted instantly'],
-      ['M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z','Private Azure Blob Storage — auto-deleted after 7 days']
+      ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z','Azure Document Intelligence - detects names, IDs, addresses and more'],
+      ['','Permanent black-box redaction - no metadata, no recovery'],
+      ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z','Side-by-side viewer - compare original vs redacted instantly'],
+      ['M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z','Private Azure Blob Storage - auto-deleted after 7 days']
     ];
     var lf = d.getElementById('lf');
     if (lf) feats.forEach(function(f){ lf.innerHTML += '<div class="left-feat"><div class="left-feat-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="'+f[0]+'" stroke="currentColor" stroke-width="1.8"/></svg></div>'+f[1]+'</div>'; });
@@ -677,8 +677,8 @@ $('changeEmailBtn').addEventListener('click', () => {
   set('rightTopHint', 'New to Prudent PDF? <a href="/">Learn more</a>');
   set('formEyebrow', 'Prudent PDF');
   set('stepTitle', 'Welcome back');
-  set('stepSub', 'Enter your work email to continue — no password required.');
-  set('newUserBannerTxt', 'New account — 5 free documents included');
+  set('stepSub', 'Enter your work email to continue - no password required.');
+  set('newUserBannerTxt', 'New account - 5 free documents included');
   set('rightFooter', '<a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>© 2026 PRUDENT AUTOLYTICS LLP · Bangalore, India');
 
   // Trial perks

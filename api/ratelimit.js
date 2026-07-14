@@ -1,6 +1,6 @@
 'use strict';
 /**
- * ratelimit.js — PostgreSQL-backed rate limiting
+ * ratelimit.js - PostgreSQL-backed rate limiting
  *
  * Azure Functions on the Consumption plan scale to multiple instances
  * and recycle on cold start, so in-memory Maps silently stop limiting.

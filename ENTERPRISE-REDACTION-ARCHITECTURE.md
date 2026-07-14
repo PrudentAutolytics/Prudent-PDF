@@ -1,4 +1,4 @@
-# Prudent Redact — Enterprise Review Architecture v8.0
+# Prudent Redact - Enterprise Review Architecture v8.0
 
 ## Product lifecycle
 UPLOAD → ANALYZE → REDACT → REVIEW → RELEASE READINESS → CONTROLLED EXPORT → AUDIT

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT REDACT — shell.js v8.0
+   PRUDENT REDACT - shell.js v8.0
    ═══════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
@@ -12,7 +12,7 @@ const Shell = (() => {
       items : [
         { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: 'Overview, stats, and quick upload' },
         { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: 'Upload and process a PDF' },
-        { id: 'history',   label: 'Processing History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs — last 30 days', badge: '30d' },
+        { id: 'history',   label: 'Processing History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs - last 30 days', badge: '30d' },
         { id: 'viewer',    label: 'Review Workspace',  href: '/viewer',    icon: 'eye',     desc: 'Review entities, integrity, and release readiness' },
       ],
     },
@@ -199,7 +199,7 @@ const Shell = (() => {
     const input = document.getElementById('globalSearch');
     if (!input) return;
 
-    // Append dropdown to body — avoids topbar overflow clipping
+    // Append dropdown to body - avoids topbar overflow clipping
     const dropdown = document.createElement('div');
     dropdown.id = 'searchDropdown';
     Object.assign(dropdown.style, {
@@ -283,7 +283,7 @@ const Shell = (() => {
           });
       } catch {}
 
-      // Fallback — search all jobs in history
+      // Fallback - search all jobs in history
       if (!results.find(r => r.href?.includes('history'))) {
         results.push({
           href: `/history?q=${encodeURIComponent(q)}`,
@@ -420,7 +420,7 @@ const Shell = (() => {
 
         if (pct >= 90) {
           document.getElementById('notifDot')?.classList.remove('hidden');
-          showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining — consider upgrading`, 'warn', 6000);
+          showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining - consider upgrading`, 'warn', 6000);
         }
       })
       .catch(() => {});

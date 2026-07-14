@@ -1,6 +1,6 @@
 'use strict';
 /**
- * cors.js — CORS headers, env-driven
+ * cors.js - CORS headers, env-driven
  *
  * ENTERPRISE HARDENING: allowed origins come from the ALLOWED_ORIGINS
  * app setting (comma-separated) so promoting to a custom domain or a

@@ -97,7 +97,7 @@
           <tbody id="recentBody"><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:180px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:110px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:210px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:130px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:150px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:95px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr></tbody>
           </table>
         </div>
-        <div class="card-footer"><span class="text-sm text-subtle" id="recentMeta">—</span><div style="flex:1"></div><button class="btn btn-ghost btn-sm" id="exportRecentBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Export CSV</button></div>
+        <div class="card-footer"><span class="text-sm text-subtle" id="recentMeta">-</span><div style="flex:1"></div><button class="btn btn-ghost btn-sm" id="exportRecentBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Export CSV</button></div>
       </div>
 
       <div class="right-col">
@@ -166,7 +166,7 @@
       </div>
       <div class="file-preview hidden" id="filePreview">
         <div class="file-preview-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/><path d="M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <div><div class="file-preview-name" id="filePreviewName">—</div><div class="file-preview-meta" id="filePreviewMeta">—</div></div>
+        <div><div class="file-preview-name" id="filePreviewName">-</div><div class="file-preview-meta" id="filePreviewMeta">-</div></div>
         <button class="file-preview-remove" id="fileRemoveBtn"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
       </div>
       <div id="uploadProgressWrap" class="hidden mt-12">
@@ -177,9 +177,9 @@
       <div id="costPreviewWrap" class="hidden mt-14">
         <div style="font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Estimated Cost</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;text-align:center"><div class="font-mono text-xs text-subtle mb-4">Doc Intelligence</div><div class="font-display font-bold text-ink" id="costDocIntel">—</div></div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;text-align:center"><div class="font-mono text-xs text-subtle mb-4">Storage + Flow</div><div class="font-display font-bold text-ink" id="costInfra">—</div></div>
-          <div style="background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:10px 12px;text-align:center"><div class="font-mono text-xs text-blue mb-4">Total (est.)</div><div class="font-display font-bold text-blue" id="costTotal">—</div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;text-align:center"><div class="font-mono text-xs text-subtle mb-4">Doc Intelligence</div><div class="font-display font-bold text-ink" id="costDocIntel">-</div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;text-align:center"><div class="font-mono text-xs text-subtle mb-4">Storage + Flow</div><div class="font-display font-bold text-ink" id="costInfra">-</div></div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:10px 12px;text-align:center"><div class="font-mono text-xs text-blue mb-4">Total (est.)</div><div class="font-display font-bold text-blue" id="costTotal">-</div></div>
         </div>
         <div class="text-xs text-subtle mt-6 text-center">Based on estimated page count. Actual cost may vary slightly.</div>
       </div>
@@ -207,7 +207,7 @@
   const $       = id => document.getElementById(id);
   const email   = session?.email || '';
 
-  /* ── Greeting — always prefer fullName from session ── */
+  /* ── Greeting - always prefer fullName from session ── */
   const greetEl = $('welcomeTitle');
   if (greetEl) {
     const s    = Session.get() || {};
@@ -229,7 +229,7 @@
   updateDropzoneConstraints();
 
   /* ══════════════════════════════════════════════════════
-     JOBS — driven entirely from Supabase via jobs-list API
+     JOBS - driven entirely from Supabase via jobs-list API
      ══════════════════════════════════════════════════════ */
   let allJobs = []; // in-memory cache from Supabase
   let jobsLoaded = false;
@@ -360,11 +360,11 @@
         ? `<div class="flex gap-6">${j.resultUrl ? `<a href="#" class="btn btn-sm btn-secondary" onclick="downloadJob('${j.jobId}');return false">↓ PDF</a>` : ''}<button class="btn btn-sm btn-ghost" onclick="viewJob('${j.jobId}')">View</button></div>`
         : isProc
           ? `<span class="text-xs text-subtle" style="display:flex;align-items:center;gap:5px"><div class="spinner" style="width:11px;height:11px;border-width:1.5px;margin:0"></div>Processing…</span>`
-          : `<span class="text-xs text-subtle">—</span>`;
+          : `<span class="text-xs text-subtle">-</span>`;
       return `<tr${rowCls}>
         <td><div class="tbl-filename">${fmt.trunc(j.fileName, 36)}</div><div class="tbl-meta">${fmt.bytes(j.fileSize)} · ${fmt.pages(j.pageCount || 0)} · ${fmt.relative(j.submittedAt)}</div></td>
         <td>${statusPill(j.status)}</td>
-        <td><span class="font-mono text-sm text-ink2">${j.costTotal != null ? fmt.usd(j.costTotal) : '—'}</span></td>
+        <td><span class="font-mono text-sm text-ink2">${j.costTotal != null ? fmt.usd(j.costTotal) : '-'}</span></td>
         <td>${actions}</td>
       </tr>`;
     }).join('');
@@ -386,7 +386,7 @@
     } catch { showToast('Download failed', 'error'); }
   };
 
-  /* ── Activity feed — BUG-12: "Ready" badge switches to "Live" on first real activity ── */
+  /* ── Activity feed - BUG-12: "Ready" badge switches to "Live" on first real activity ── */
   function addActivity(text, type = 'info') {
     const feed  = $('activityFeed');
     const badge = $('activityBadge');
@@ -404,7 +404,7 @@
   }
 
   /* ══════════════════════════════════════════════════════
-     POLLING — polls Supabase for job status updates
+     POLLING - polls Supabase for job status updates
      Runs every 5 seconds for any queued/processing job
      ══════════════════════════════════════════════════════ */
   const activePolls = new Map();
@@ -436,7 +436,7 @@
             showToast('Redaction complete! Your file is ready to download.', 'success', 8000);
             // Browser notification if tab not focused
             if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-              new Notification('Prudent PDF — Redaction Complete', {
+              new Notification('Prudent PDF - Redaction Complete', {
                 body : `${j?.fileName || 'Your file'} is ready to download.`,
                 icon : '/favicon.svg',
               });
@@ -452,7 +452,7 @@
   }
 
   /* ══════════════════════════════════════════════════════
-     AUTO-REFRESH — re-fetches all jobs from Supabase
+     AUTO-REFRESH - re-fetches all jobs from Supabase
      every 30 seconds to catch PA callbacks
      ══════════════════════════════════════════════════════ */
   setInterval(fetchJobsFromSupabase, 30_000);
@@ -491,7 +491,7 @@
     const hint    = $('quotaHint');
     if (!hint) return;
     if (rem <= 0) {
-      hint.innerHTML = `<span style="color:var(--red)">⚠ No files remaining — <a href="/pricing" style="color:var(--red)">upgrade</a></span>`;
+      hint.innerHTML = `<span style="color:var(--red)">⚠ No files remaining - <a href="/pricing" style="color:var(--red)">upgrade</a></span>`;
       $('submitBtn').disabled = true;
     } else {
       hint.innerHTML = `<span>${rem} file${rem!==1?'s':''} left</span> <span style="color:var(--ink3);margin:0 4px">·</span> <span style="color:var(--ink3)">Max ${maxMB} MB · ${maxPg} pages</span>`;
@@ -562,7 +562,7 @@
       let blobUrl  = null;
       let blobName = '';
 
-      // Get SAS URL from blob-sas — it defines the blob name
+      // Get SAS URL from blob-sas - it defines the blob name
       if (APP_CONFIG.FLOWS.BLOB_SAS) {
         setUploadProgress(45, 'Getting secure upload URL…');
         const sasRes = await paFetch(APP_CONFIG.FLOWS.BLOB_SAS, {
@@ -582,7 +582,7 @@
         }
       }
 
-      // Submit job — includes base64 for PA to process directly
+      // Submit job - includes base64 for PA to process directly
       const res = await paFetch(APP_CONFIG.FLOWS.JOB_SUBMIT, {
         jobId,
         email,
@@ -639,7 +639,7 @@
       $('uploadProgressWrap').classList.add('hidden');
       btn.disabled=false;
       btn.innerHTML=`<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Submit for redaction`;
-      // Sanitise — never expose internal DB/stack errors to user
+      // Sanitise - never expose internal DB/stack errors to user
       const raw = err.message || '';
       const userMsg = raw.includes('uuid') || raw.includes('syntax') || raw.includes('relation') || raw.includes('column')
         ? 'Something went wrong on our end. Please try again.'

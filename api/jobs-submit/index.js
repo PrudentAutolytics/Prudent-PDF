@@ -93,7 +93,7 @@ module.exports = async function (context, req) {
   }
   const email = auth.email; // trusted identity
 
-  // Fail closed if the backend flow is not configured — never fall back
+  // Fail closed if the backend flow is not configured - never fall back
   // to a URL baked into source code.
   const PA_JOB_FLOW_URL = process.env.PA_JOB_SUBMIT_FLOW || PA_FLOW_FALLBACK;
 
@@ -136,7 +136,7 @@ module.exports = async function (context, req) {
     if (!user)           { context.res = { status: 404, headers: getCorsHeaders(req), body: { error: 'User not found.' } }; return; }
     if (!user.is_active) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Account inactive.' } }; return; }
 
-    // Plan limits — from DB columns or PLAN_LIMITS defaults
+    // Plan limits - from DB columns or PLAN_LIMITS defaults
     const plan       = user.plan || 'trial';
     const planLimits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
     const maxSizeMB  = user.max_file_size_mb    || planLimits.maxFileSizeMB;
@@ -151,7 +151,7 @@ module.exports = async function (context, req) {
       return;
     }
 
-    // ── ATOMIC quota consume — eliminates the check/increment race ──
+    // ── ATOMIC quota consume - eliminates the check/increment race ──
     const consume = await pool.query(`
       UPDATE users SET credits_used = credits_used + 1
       WHERE id = $1 AND credits_used < credits_limit
@@ -186,7 +186,7 @@ module.exports = async function (context, req) {
     const inputSasUrl  = actualBlobName ? generateSasUrl(storageAccount, accountKey, uploadContainer,  actualBlobName, 'r',  4) : null;
     const outputSasUrl = generateSasUrl(storageAccount, accountKey, resultsContainer, outputBlobName, 'cw', 4);
 
-    // ── Trigger PA flow — AWAITED, with a 20s cap ──
+    // ── Trigger PA flow - AWAITED, with a 20s cap ──
     const ctrl  = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 20_000);
     let paOk = false;
@@ -227,7 +227,7 @@ module.exports = async function (context, req) {
     }
 
     if (!paOk) {
-      // Mark failed and refund the credit — no silent stuck-in-queued jobs
+      // Mark failed and refund the credit - no silent stuck-in-queued jobs
       await pool.query(`UPDATE jobs SET status = 'failed', error_message = 'Processing service unavailable.' WHERE id = $1`, [finalJobId]);
       await pool.query(`UPDATE users SET credits_used = GREATEST(0, credits_used - 1) WHERE id = $1`, [user.id]);
       context.res = { status: 502, headers: getCorsHeaders(req), body: { error: 'Processing service is temporarily unavailable. Your credit has not been used. Please try again.' } };

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT PDF — config.js v8.0
+   PRUDENT PDF - config.js v8.0
    ───────────────────────────────────────────────────────────────────────────
    Single source of truth for:
      · API endpoints
@@ -293,7 +293,7 @@ function requireAuth() {
   return true;
 }
 
-/* ── Global 401 handler — catches expired sessions mid-use ── */
+/* ── Global 401 handler - catches expired sessions mid-use ── */
 if (!window._prudentFetchPatched) {
   window._prudentFetchPatched = true;
   const _origFetch = window.fetch.bind(window);
@@ -316,19 +316,19 @@ if (!window._prudentFetchPatched) {
 /* ── FORMAT HELPERS ────────────────────────────────────────────────────────── */
 const fmt = {
   date(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     return new Date(iso).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
   },
   time(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     return new Date(iso).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
   },
   datetime(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     return `${fmt.date(iso)}, ${fmt.time(iso)}`;
   },
   relative(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     const diff = Date.now() - new Date(iso).getTime();
     if (diff < 10_000)    return 'just now';
     if (diff < 60_000)    return `${Math.floor(diff/1000)}s ago`;
@@ -337,22 +337,22 @@ const fmt = {
     return fmt.date(iso);
   },
   bytes(b) {
-    if (b == null) return '—';
+    if (b == null) return '-';
     if (b < 1024)      return `${b} B`;
     if (b < 1_048_576) return `${(b/1024).toFixed(1)} KB`;
     return `${(b/1_048_576).toFixed(2)} MB`;
   },
   mb(b)   { return b ? +(b/1_048_576).toFixed(3) : 0; },
   duration(ms) {
-    if (!ms) return '—';
+    if (!ms) return '-';
     if (ms < 1000)   return `${ms}ms`;
     if (ms < 60_000) return `${(ms/1000).toFixed(1)}s`;
     return `${Math.floor(ms/60_000)}m ${Math.floor((ms%60_000)/1000)}s`;
   },
   pages(n) { return n === 1 ? '1 page' : `${n || 0} pages`; },
-  usd(n)   { return n != null ? `$${Number(n).toFixed(2)}` : '—'; },
+  usd(n)   { return n != null ? `$${Number(n).toFixed(2)}` : '-'; },
   trunc(str, max=40) {
-    if (!str) return '—';
+    if (!str) return '-';
     return str.length > max ? str.slice(0, max-1) + '…' : str;
   },
 };

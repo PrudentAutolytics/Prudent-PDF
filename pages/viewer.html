@@ -124,7 +124,7 @@
         <div class="pane-footer">
           <span id="origSizeLabel"></span><span class="font-mono text-xs text-subtle" id="origIntegrity" title="SHA-256 integrity fingerprint"></span>
           <div style="flex:1"></div>
-          <span id="oPage">—</span>
+          <span id="oPage">-</span>
         </div>
       </div>
 
@@ -155,7 +155,7 @@
         <div class="pane-footer">
           <span id="redSizeLabel">Redacted</span><span class="font-mono text-xs text-subtle" id="redIntegrity" title="SHA-256 integrity fingerprint"></span>
           <div style="flex:1"></div>
-          <span id="rPage">—</span>
+          <span id="rPage">-</span>
         </div>
       </div>
 
@@ -199,11 +199,11 @@
           <button class="btn btn-primary btn-sm" id="exportDossierBtn" disabled>Review dossier</button>
         </div>
         <div class="cost-summary hidden" id="costSummary">
-          <div class="cost-row"><span>AI document analysis</span><span id="csDocIntel">—</span></div>
-          <div class="cost-row"><span>Secure storage</span><span id="csBlobStorage">—</span></div>
-          <div class="cost-row"><span>Workflow orchestration</span><span id="csPaFlow">—</span></div>
-          <div class="cost-row"><span>Notification</span><span id="csEmail">—</span></div>
-          <div class="cost-row total"><span>Processing cost</span><span id="csTotal">—</span></div>
+          <div class="cost-row"><span>AI document analysis</span><span id="csDocIntel">-</span></div>
+          <div class="cost-row"><span>Secure storage</span><span id="csBlobStorage">-</span></div>
+          <div class="cost-row"><span>Workflow orchestration</span><span id="csPaFlow">-</span></div>
+          <div class="cost-row"><span>Notification</span><span id="csEmail">-</span></div>
+          <div class="cost-row total"><span>Processing cost</span><span id="csTotal">-</span></div>
         </div>
       </div>
 
@@ -260,7 +260,7 @@
       id:String(f.id||`${j.jobId}:${i}`),
       index:i,
       type:String(f.key||f.name||f.type||f.category||`Entity ${i+1}`),
-      content:String(f.content??f.value??f.text??'—'),
+      content:String(f.content??f.value??f.text??'-'),
       page:f.page!=null?Number(f.page)+1:(f.pageNumber!=null?Number(f.pageNumber):null),
       confidence:f.confidence!=null?Number(f.confidence):null,
       raw:f
@@ -291,12 +291,12 @@
     } catch (err) {
       /* error handled silently */
       const sel = $('jobSelector');
-      if (sel) sel.innerHTML = '<option value="">Failed to load — refresh</option>';
+      if (sel) sel.innerHTML = '<option value="">Failed to load - refresh</option>';
       showInitialEmpty();
     }
   }
 
-  /* ── BUG-06: Empty state — shows CTA to upload when no jobs, otherwise prompts to select ── */
+  /* ── BUG-06: Empty state - shows CTA to upload when no jobs, otherwise prompts to select ── */
   function showInitialEmpty() {
     $('origLoading')?.classList.add('hidden');
     $('redLoading')?.classList.add('hidden');
@@ -306,7 +306,7 @@
     origEmpty?.classList.remove('hidden');
 
     if (!allJobs.length) {
-      // No jobs at all — guide user to dashboard
+      // No jobs at all - guide user to dashboard
       if (origMsg) origMsg.innerHTML = `
         <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:6px">No document loaded</div>
         <div style="font-size:12.5px;color:var(--ink3);line-height:1.65;margin-bottom:14px">Process your first file to view results here.</div>
@@ -329,9 +329,9 @@
     const opts = allJobs.map(j => {
       const s    = (j.status||'').toLowerCase();
       const icon = s==='complete'?'✓':s==='queued'?'⏳':s==='processing'?'⚙':'●';
-      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName,36)} — ${fmt.date(j.submittedAt)}</option>`;
+      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName,36)} - ${fmt.date(j.submittedAt)}</option>`;
     }).join('');
-    sel.innerHTML = '<option value="">— Select a job —</option>' + opts;
+    sel.innerHTML = '<option value="">- Select a job -</option>' + opts;
   }
 
   /* ── Get read SAS URL ── */
@@ -399,7 +399,7 @@
       setPaneEmpty('red',
         status==='complete'   ? 'Could not load redacted PDF' :
         status==='processing' ? 'Redaction in progress…' :
-        status==='queued'     ? 'Job is queued — check back soon' :
+        status==='queued'     ? 'Job is queued - check back soon' :
         'Redacted PDF appears after job completes'
       );
     }
@@ -632,7 +632,7 @@
     list.innerHTML=items.map(e=>{
       const d=decisionFor(e); const conf=e.confidence; const band=conf==null?'unknown':conf<.7?'low':conf<.9?'medium':'high';
       const confText=conf==null?'Confidence unavailable':`${Math.round(conf*100)}% confidence`;
-      return `<article class="entity-card ${band} ${d}" data-entity-id="${escAttr(e.id)}"><div class="entity-top"><div class="entity-type" title="${escAttr(e.type)}">${escHtml(e.type)}</div><span class="pill ${band==='low'?'pill-failed':band==='medium'?'pill-queued':'pill-complete'}" style="font-size:8.5px;padding:2px 6px">${escHtml(band.toUpperCase())}</span></div><div class="entity-content">${escHtml(maskSensitive(e.content))}</div><div class="entity-meta"><span>${e.page?`Page ${e.page}`:'Page —'}</span><span>•</span><span>${confText}</span></div><div class="entity-actions"><button class="entity-action accept ${d==='accepted'?'active':''}" data-decision="accepted" data-id="${escAttr(e.id)}">✓ Accept</button><button class="entity-action reject ${d==='rejected'?'active':''}" data-decision="rejected" data-id="${escAttr(e.id)}">✕ Reject</button></div></article>`;
+      return `<article class="entity-card ${band} ${d}" data-entity-id="${escAttr(e.id)}"><div class="entity-top"><div class="entity-type" title="${escAttr(e.type)}">${escHtml(e.type)}</div><span class="pill ${band==='low'?'pill-failed':band==='medium'?'pill-queued':'pill-complete'}" style="font-size:8.5px;padding:2px 6px">${escHtml(band.toUpperCase())}</span></div><div class="entity-content">${escHtml(maskSensitive(e.content))}</div><div class="entity-meta"><span>${e.page?`Page ${e.page}`:'Page -'}</span><span>•</span><span>${confText}</span></div><div class="entity-actions"><button class="entity-action accept ${d==='accepted'?'active':''}" data-decision="accepted" data-id="${escAttr(e.id)}">✓ Accept</button><button class="entity-action reject ${d==='rejected'?'active':''}" data-decision="rejected" data-id="${escAttr(e.id)}">✕ Reject</button></div></article>`;
     }).join('');
     list.querySelectorAll('[data-decision]').forEach(btn=>btn.addEventListener('click',()=>setDecision(btn.dataset.id,btn.dataset.decision)));
   }
@@ -659,7 +659,7 @@
     const el=$('auditList'); if(!el||!currentJob)return; const state=getReviewState(currentJob.jobId); const base=[
       {at:currentJob.submittedAt,title:'Document submitted',meta:`${email} · ${currentJob.fileName}`},
       {at:currentJob.submittedAt,title:'Automated redaction workflow initiated',meta:`Job ${currentJob.jobId.slice(0,12)} · ${currentJob.status}`},
-      ...(currentJob.completedAt?[{at:currentJob.completedAt,title:'Redacted output received',meta:`${currentJob.pageCount||'—'} pages · workflow callback recorded`}]:[]),
+      ...(currentJob.completedAt?[{at:currentJob.completedAt,title:'Redacted output received',meta:`${currentJob.pageCount||'-'} pages · workflow callback recorded`}]:[]),
       ...((state.events||[]).map(ev=>({at:ev.at,title:ev.action==='ENTITY_ACCEPTED'?'Reviewer accepted suggested redaction':'Reviewer rejected suggested redaction',meta:`${ev.actor} · entity ${String(ev.entityId).split(':').pop()}`})))
     ].sort((a,b)=>new Date(a.at)-new Date(b.at));
     el.innerHTML=base.map(x=>`<div class="audit-item"><div class="audit-line"></div><div><div class="audit-title">${escHtml(x.title)}</div><div class="audit-meta">${fmt.date(x.at)} · ${escHtml(x.meta)}</div></div></div>`).join('')+`<div style="padding:8px 2px;font-size:10px;color:var(--ink3);line-height:1.55">Reviewer events are retained in this browser workspace and included in exported dossiers. Server-side immutable audit retention requires the audit-event backend schema described in ENTERPRISE-HARDENING.md.</div>`;
@@ -667,7 +667,7 @@
 
   function renderIntegrity(){
     const el=$('integrityList'); if(!el||!currentJob)return; const rows=[
-      ['Job ID',currentJob.jobId],['Original SHA-256 fingerprint',currentFingerprints.orig||'Pending secure preview verification'],['Redacted SHA-256 fingerprint',currentFingerprints.red||'Pending secure preview verification'],['Original size',currentPdfBytes.orig?fmt.bytes(currentPdfBytes.orig):fmt.bytes(currentJob.fileSize)],['Redacted size',currentPdfBytes.red?fmt.bytes(currentPdfBytes.red):'Pending'],['Page count',String(currentJob.pageCount||'—')],['Processing status',String(currentJob.status||'—')],['Review workspace version',REVIEW_VERSION],['Reviewer',email]
+      ['Job ID',currentJob.jobId],['Original SHA-256 fingerprint',currentFingerprints.orig||'Pending secure preview verification'],['Redacted SHA-256 fingerprint',currentFingerprints.red||'Pending secure preview verification'],['Original size',currentPdfBytes.orig?fmt.bytes(currentPdfBytes.orig):fmt.bytes(currentJob.fileSize)],['Redacted size',currentPdfBytes.red?fmt.bytes(currentPdfBytes.red):'Pending'],['Page count',String(currentJob.pageCount||'-')],['Processing status',String(currentJob.status||'-')],['Review workspace version',REVIEW_VERSION],['Reviewer',email]
     ]; el.innerHTML=rows.map(([k,v])=>`<div class="integrity-row"><div class="integrity-label">${escHtml(k)}</div><div class="integrity-value">${escHtml(v)}</div></div>`).join('');
   }
 

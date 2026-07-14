@@ -44,7 +44,7 @@
           Workspace
         </div>
         <div class="page-title">Job History</div>
-        <div class="page-subtitle">All redaction jobs — search, filter, and export with full cost breakdowns.</div>
+        <div class="page-subtitle">All redaction jobs - search, filter, and export with full cost breakdowns.</div>
       </div>
       <div class="page-hd-actions">
         <button class="btn btn-secondary" id="refreshBtn">
@@ -165,7 +165,7 @@
       </div>
 
       <div class="card-footer">
-        <span class="text-sm text-subtle" id="tableFootMeta">—</span>
+        <span class="text-sm text-subtle" id="tableFootMeta">-</span>
         <div style="flex:1"></div>
         <button class="btn btn-ghost btn-sm" id="exportFilteredBtn">↓ Export filtered CSV</button>
       </div>
@@ -297,7 +297,7 @@
     set('stSuccessNote', done.length ? `${done.length} of ${total} succeeded` : 'No completed jobs');
     set('stCost',        '$'+cost.toFixed(2));
     set('stCostNote',    `${done.length} completed job${done.length!==1?'s':''}`);
-    set('stAvg',         done.length ? fmt.usd(avg) : '—');
+    set('stAvg',         done.length ? fmt.usd(avg) : '-');
   }
 
   /* ── Render table ── */
@@ -314,12 +314,12 @@
     renderStats(allJobs);
 
     if (!dataLoaded) {
-      // Keep skeleton rows showing — don't replace with spinner
+      // Keep skeleton rows showing - don't replace with spinner
       return;
     }
 
     if (!allJobs.length) {
-      // BUG-02: New user — zero jobs ever. Show CTA with link to dashboard.
+      // BUG-02: New user - zero jobs ever. Show CTA with link to dashboard.
       tbody.innerHTML = `<tr><td colspan="7"><div class="tbl-empty" style="padding:48px 24px">
         <svg width="80" height="68" viewBox="0 0 120 100" fill="none" style="margin-bottom:14px;opacity:.6">
           <rect x="20" y="10" width="52" height="66" rx="6" fill="var(--surface2)" stroke="var(--border2)" stroke-width="1.5"/>
@@ -352,7 +352,7 @@
       const isProc = s === 'queued' || s === 'processing';
       const dur  = (j.submittedAt && j.completedAt)
         ? fmt.duration(new Date(j.completedAt) - new Date(j.submittedAt))
-        : '—';
+        : '-';
 
       const actions = s === 'complete'
         ? `<div class="flex gap-5">
@@ -367,12 +367,12 @@
       return `<tr id="row-${j.jobId}">
         <td><input type="checkbox" class="cb row-cb" data-id="${j.jobId}" ${chk}/></td>
         <td>
-          <div class="tbl-filename">${fmt.trunc(j.fileName||'—',40)}</div>
-          <div class="tbl-meta">${fmt.bytes(j.fileSize)} · ${j.blobUrl ? 'Blob stored' : '—'}</div>
+          <div class="tbl-filename">${fmt.trunc(j.fileName||'-',40)}</div>
+          <div class="tbl-meta">${fmt.bytes(j.fileSize)} · ${j.blobUrl ? 'Blob stored' : '-'}</div>
         </td>
         <td>${pill(j.status)}</td>
-        <td><span class="font-mono text-sm">${j.pageCount||'—'}</span></td>
-        <td><span class="font-mono text-sm">${j.costTotal!=null ? fmt.usd(j.costTotal) : '—'}</span></td>
+        <td><span class="font-mono text-sm">${j.pageCount||'-'}</span></td>
+        <td><span class="font-mono text-sm">${j.costTotal!=null ? fmt.usd(j.costTotal) : '-'}</span></td>
         <td>
           <div class="text-sm text-ink2">${fmt.date(j.submittedAt)}</div>
           <div class="tbl-meta">${fmt.time(j.submittedAt)} · ${dur}</div>
@@ -381,7 +381,7 @@
       </tr>`;
     }).join('');
 
-    // Wire download buttons — generate SAS URL on demand
+    // Wire download buttons - generate SAS URL on demand
     tbody.querySelectorAll('.dl-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const j = allJobs.find(x => x.jobId === btn.dataset.id);
@@ -434,7 +434,7 @@
           <div class="detail-key" style="margin-bottom:8px">Extracted Fields (${fields.length})</div>
           <table class="fields-table">
             <thead><tr><th>Field</th><th>Value</th><th>Confidence</th></tr></thead>
-            <tbody>${fields.map(f=>`<tr><td>${f.key||f.name||'—'}</td><td>${f.value||'—'}</td><td><span class="font-mono text-sm">${f.confidence!=null?(f.confidence*100).toFixed(1)+'%':'—'}</span></td></tr>`).join('')}</tbody>
+            <tbody>${fields.map(f=>`<tr><td>${f.key||f.name||'-'}</td><td>${f.value||'-'}</td><td><span class="font-mono text-sm">${f.confidence!=null?(f.confidence*100).toFixed(1)+'%':'-'}</span></td></tr>`).join('')}</tbody>
           </table>
         </div>` : '';
 
@@ -446,10 +446,10 @@
     <div class="detail-inner">
       <div class="detail-field"><div class="detail-key">Job ID</div><div class="detail-val mono">${j.jobId}</div></div>
       <div class="detail-field"><div class="detail-key">Submitted</div><div class="detail-val">${fmt.datetime(j.submittedAt)}</div></div>
-      <div class="detail-field"><div class="detail-key">Completed</div><div class="detail-val">${j.completedAt ? fmt.datetime(j.completedAt) : '—'}</div></div>
+      <div class="detail-field"><div class="detail-key">Completed</div><div class="detail-val">${j.completedAt ? fmt.datetime(j.completedAt) : '-'}</div></div>
       <div class="detail-field"><div class="detail-key">File Size</div><div class="detail-val mono">${fmt.bytes(j.fileSize)}</div></div>
-      <div class="detail-field"><div class="detail-key">Pages</div><div class="detail-val mono">${j.pageCount||'—'}</div></div>
-      <div class="detail-field"><div class="detail-key">Total Cost</div><div class="detail-val mono">${j.costTotal!=null?fmt.usd(j.costTotal):'—'}</div></div>
+      <div class="detail-field"><div class="detail-key">Pages</div><div class="detail-val mono">${j.pageCount||'-'}</div></div>
+      <div class="detail-field"><div class="detail-key">Total Cost</div><div class="detail-val mono">${j.costTotal!=null?fmt.usd(j.costTotal):'-'}</div></div>
       ${j.errorMessage?`<div class="detail-field" style="grid-column:1/-1"><div class="detail-key" style="color:var(--red)">Error</div><div class="detail-val" style="color:var(--red)">${j.errorMessage}</div></div>`:''}
       ${j.blobUrl?`<div class="detail-field"><div class="detail-key">Input Blob</div><div class="detail-val mono" style="font-size:11px;word-break:break-all"><a href="${j.blobUrl}" target="_blank" style="color:var(--blue)">${j.blobUrl}</a></div></div>`:''}
       ${j.resultUrl?`<div class="detail-field"><div class="detail-key">Result Blob</div><div class="detail-val mono" style="font-size:11px;word-break:break-all"><a href="${j.resultUrl}" target="_blank" style="color:var(--green)">${j.resultUrl}</a></div></div>`:''}

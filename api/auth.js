@@ -1,6 +1,6 @@
 'use strict';
 /**
- * auth.js — Shared session token verification middleware
+ * auth.js - Shared session token verification middleware
  *
  * Every protected API endpoint calls verifySession(req) before
  * touching any data. Returns { ok, email, userId, error, status }.

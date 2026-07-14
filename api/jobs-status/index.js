@@ -7,10 +7,10 @@ const pool                           = require('../db');
 /**
  * jobs-status serves two callers:
  *
- * 1. BROWSER (polling) — sends { jobId, email, token }
+ * 1. BROWSER (polling) - sends { jobId, email, token }
  *    Verified via HMAC session token. Returns job row.
  *
- * 2. POWER AUTOMATE (callback) — sends { jobId, status, paSecret, ... }
+ * 2. POWER AUTOMATE (callback) - sends { jobId, status, paSecret, ... }
  *    Verified via PA_CALLBACK_SECRET shared secret.
  *
  * ENTERPRISE HARDENING:
@@ -92,7 +92,7 @@ module.exports = async function (context, req) {
     return;
   }
 
-  // ── Browser poll — requires valid session token ───────────────────────
+  // ── Browser poll - requires valid session token ───────────────────────
   const auth = await verifySession(req);
   if (!auth.ok) {
     context.res = { status: auth.status, headers: getCorsHeaders(req), body: { error: auth.error } };

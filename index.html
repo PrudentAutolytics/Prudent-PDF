@@ -338,9 +338,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 <script src="/js/config.js"></script>
 <script>
 (function(){
-  // Already logged in — go straight to dashboard
+  // Already logged in - go straight to dashboard
   if (Session.valid()) { location.replace('/dashboard'); return; }
-  // Not logged in — show minimal sign-in prompt, no product details
+  // Not logged in - show minimal sign-in prompt, no product details
   document.getElementById('gateContent').innerHTML =
     '<h1 style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin-bottom:8px">Prudent PDF</h1>' +
     '<p style="font-size:14px;color:var(--ink3);margin-bottom:24px">Sign in to access your account.</p>' +

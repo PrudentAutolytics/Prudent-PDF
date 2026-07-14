@@ -15,10 +15,10 @@ function esc(v) {
 
 const PLAN_LABELS = {
   trial        : 'Free Trial',
-  starter      : 'Starter — $19/mo',
-  professional : 'Professional — $79/mo',
-  business     : 'Business — $399/mo',
-  enterprise   : 'Enterprise — $1,499/mo',
+  starter      : 'Starter - $19/mo',
+  professional : 'Professional - $79/mo',
+  business     : 'Business - $399/mo',
+  enterprise   : 'Enterprise - $1,499/mo',
 };
 
 const PLAN_COLORS = {
@@ -168,7 +168,7 @@ module.exports = async function (context, req) {
     return;
   }
 
-  // ENTERPRISE HARDENING: PG-backed rate limit — 5 messages / hour per
+  // ENTERPRISE HARDENING: PG-backed rate limit - 5 messages / hour per
   // email and 10 / hour per IP. Public endpoint, so this is the only
   // thing standing between the PA email flow and a spam loop.
   const ip = (req.headers?.['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
@@ -205,7 +205,7 @@ module.exports = async function (context, req) {
           // Standard fields your PA email flow already uses
           to          : 'Service.Account@prudentautolytics.com',
           subject     : `[Prudent PDF] ${subjectLabel} from ${name.replace(/[\r\n]/g, ' ')}`,
-          // HTML body — update PA flow body field to @{triggerBody()?['html']}
+          // HTML body - update PA flow body field to @{triggerBody()?['html']}
           html        : htmlBody,
           body        : htmlBody,
           // Structured fields as fallback if PA builds plain text

@@ -1,10 +1,10 @@
-# Prudent PDF — Enterprise Hardening Report (v7.1)
+# Prudent PDF - Enterprise Hardening Report (v7.1)
 
 Scope: same stack, same tools (Azure Static Web Apps, Azure Functions, Supabase Postgres, Azure Blob, Power Automate). No architecture or feature changes. Every fix is a hardening of what already exists.
 
 ---
 
-## CRITICAL — do these BEFORE the next deploy
+## CRITICAL - do these BEFORE the next deploy
 
 ### 1. Rotate every exposed credential (secrets were in the repo folder)
 The zip contained live secrets in `api/.env` and `api/local.settings.json`, and a live PA flow SAS URL was hardcoded in `jobs-submit/index.js` source (that one WAS in git history). Treat all of the following as compromised and rotate:
@@ -61,7 +61,7 @@ Also update the PA job flow to read `paSecret` from the trigger body and send it
 | 12 | Medium | No audit trail for admin actions. | `audit_log` table; every mutating admin action (plan change, credits, activate, add user, key generate/revoke) is recorded. Non-blocking. |
 | 13 | Medium | `jobs-list` / `quota-get` / `blob-sas` / `jobs-submit` read identity from the request body. | All now use `auth.email` from the verified session. |
 | 14 | Medium | Malformed session token crashed `timingSafeEqual` with a RangeError (500 instead of clean 401). | HMAC shape validated before comparison. |
-| 15 | Medium | `db.js` used `ssl: { rejectUnauthorized: false }` — accepts any certificate (MITM exposure). | Verification ON by default; explicit `PG_SSL_REJECT_UNAUTHORIZED=false` opt-out for debugging only. |
+| 15 | Medium | `db.js` used `ssl: { rejectUnauthorized: false }` - accepts any certificate (MITM exposure). | Verification ON by default; explicit `PG_SSL_REJECT_UNAUTHORIZED=false` opt-out for debugging only. |
 | 16 | Medium | `auth-request` returned raw internal error messages (DB errors) to the client. | Generic 500 message; details go to logs only. |
 | 17 | Low | PA callback stamped `completed_at` even for "processing"; status unvalidated. | Terminal-state-only stamping; status whitelist; error message length-capped. |
 | 18 | Low | `fileBase64` was forwarded to PA alongside the SAS URL (double handling, oversized payloads). | Dropped; the flow reads via `inputSasUrl`. If your current flow still uses `fileBase64`, switch its source action to the SAS URL. |

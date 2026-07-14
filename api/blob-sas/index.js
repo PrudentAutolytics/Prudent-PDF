@@ -62,7 +62,7 @@ module.exports = async function (context, req) {
         return;
       }
 
-      // OWNERSHIP CHECK — the blob must belong to one of this user's jobs
+      // OWNERSHIP CHECK - the blob must belong to one of this user's jobs
       const requestedUrl = `https://${account}.blob.core.windows.net/${targetContainer}/${blobName}`;
       const owned = await pool.query(`
         SELECT j.id
@@ -83,7 +83,7 @@ module.exports = async function (context, req) {
       expiryMinutes  = 30;
 
     } else {
-      // Write SAS — enforce file size limit
+      // Write SAS - enforce file size limit
       if (fileSizeBytes > 0) {
         const userResult = await pool.query(
           `SELECT plan, max_file_size_mb FROM users WHERE email = $1`, [email]

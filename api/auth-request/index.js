@@ -4,7 +4,7 @@ const pool   = require('../db');
 const { sendEmail, otpEmailHtml } = require('../email');
 const { getCorsHeaders, handleCors } = require('../cors');
 
-// In-memory rate limiting — per email and per IP
+// In-memory rate limiting - per email and per IP
 const pendingRequests = new Set();
 const rateLimitMap    = new Map(); // email -> { count, resetAt }
 const OTP_RATE_LIMIT  = 5;        // max requests per window
