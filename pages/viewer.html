@@ -101,7 +101,7 @@
           <iframe id="origFrame" class="hidden" title="Original PDF"></iframe>
         </div>
         <div class="pane-footer">
-          <span id="origSizeLabel"></span>
+          <span id="origSizeLabel"></span><span class="font-mono text-xs text-subtle" id="origIntegrity" title="SHA-256 integrity fingerprint"></span>
           <div style="flex:1"></div>
           <span id="oPage">—</span>
         </div>
@@ -132,7 +132,7 @@
           <iframe id="redFrame" class="hidden" title="Redacted PDF"></iframe>
         </div>
         <div class="pane-footer">
-          <span id="redSizeLabel">Redacted</span>
+          <span id="redSizeLabel">Redacted</span><span class="font-mono text-xs text-subtle" id="redIntegrity" title="SHA-256 integrity fingerprint"></span>
           <div style="flex:1"></div>
           <span id="rPage">—</span>
         </div>
@@ -347,52 +347,119 @@
     }
   }
 
-  function loadPdfFrame(which, sasUrl, sizeLabel) {
-    const loading = $(`${which}Loading`);
-    const empty   = $(`${which}Empty`);
-    const frame   = $(`${which}Frame`);
-    const sizeEl  = $(`${which}SizeLabel`);
+  const previewObjectUrls = { orig: null, red: null };
+  const previewControllers = { orig: null, red: null };
+
+  async function sha256Short(arrayBuffer) {
+    if (!window.crypto?.subtle) return '';
+    const digest = await window.crypto.subtle.digest('SHA-256', arrayBuffer);
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16).toUpperCase();
+  }
+
+  async function loadPdfFrame(which, sasUrl, sizeLabel) {
+    const loading     = $(`${which}Loading`);
+    const empty       = $(`${which}Empty`);
+    const frame       = $(`${which}Frame`);
+    const sizeEl      = $(`${which}SizeLabel`);
+    const integrityEl = $(`${which}Integrity`);
     if (!frame) return;
     if (sizeEl) sizeEl.textContent = sizeLabel || '';
+    if (integrityEl) integrityEl.textContent = 'Verifying…';
 
-    /* ENTERPRISE HARDENING: render the PDF natively in the browser via
-       the iframe instead of routing the SAS URL through Google Docs
-       Viewer. Sending live SAS links to a third party means Google
-       fetches and processes the client's (pre-redaction!) documents —
-       a disqualifying data-handling practice for a privacy product.
-       Every modern browser renders PDFs natively in an iframe. */
-    const viewerUrl = `${sasUrl}#toolbar=0&navpanes=0`;
-    let loaded = false;
+    // Cancel a stale preview request when the reviewer switches jobs.
+    previewControllers[which]?.abort();
+    const controller = new AbortController();
+    previewControllers[which] = controller;
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    frame.onload = () => {
-      loaded = true;
-      loading?.classList.add('hidden');
-      frame.classList.remove('hidden');
-    };
+    try {
+      /* ENTERPRISE PREVIEW PIPELINE
+         Fetch the time-limited Azure SAS resource directly, normalize the
+         response as application/pdf, and render a browser-memory Blob URL.
+         The SAS URL is never assigned to the iframe and no third-party PDF
+         viewer receives the original or redacted document. */
+      const response = await fetch(sasUrl, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer',
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`Secure preview fetch failed (${response.status})`);
 
-    // If the native viewer fails after 12s show download fallback
-    setTimeout(() => {
-      if (!loaded) {
+      const bytes = await response.arrayBuffer();
+      if (!bytes.byteLength) throw new Error('PDF is empty');
+
+      const signature = new Uint8Array(bytes.slice(0, 5));
+      const magic = String.fromCharCode(...signature);
+      if (magic !== '%PDF-') throw new Error('Output is not a valid PDF document');
+
+      const fingerprint = await sha256Short(bytes);
+      const pdfBlob = new Blob([bytes], { type: 'application/pdf' });
+
+      if (previewObjectUrls[which]) URL.revokeObjectURL(previewObjectUrls[which]);
+      const objectUrl = URL.createObjectURL(pdfBlob);
+      previewObjectUrls[which] = objectUrl;
+
+      let rendered = false;
+      frame.onload = () => {
+        rendered = true;
         loading?.classList.add('hidden');
-        frame.classList.add('hidden');
-        const emptyEl = $(`${which}Empty`);
-        const msgEl   = $(`${which}EmptyMsg`);
-        emptyEl?.classList.remove('hidden');
-        if (msgEl) msgEl.innerHTML = `
-          <div style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">
-            Preview unavailable — viewer timed out.<br/>
-            <span style="font-size:11.5px">Your file is ready to download.</span>
-          </div>
-          <a href="${sasUrl}" target="_blank" class="btn btn-primary btn-sm" download>
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Download PDF
-          </a>`;
-      }
-    }, 12000);
+        empty?.classList.add('hidden');
+        frame.classList.remove('hidden');
+        if (integrityEl) integrityEl.textContent = fingerprint ? `SHA-256 ${fingerprint}` : 'PDF verified';
+      };
+      frame.onerror = () => showPreviewFailure(which, sasUrl, 'Browser PDF renderer could not display this document.');
+      frame.src = `${objectUrl}#toolbar=0&navpanes=0`;
+      empty?.classList.add('hidden');
 
-    frame.src = viewerUrl;
-    empty?.classList.add('hidden');
+      setTimeout(() => {
+        if (!rendered && frame.src === `${objectUrl}#toolbar=0&navpanes=0`) {
+          showPreviewFailure(which, sasUrl, 'Browser PDF renderer timed out.');
+        }
+      }, 12000);
+    } catch (err) {
+      if (err.name !== 'AbortError' || previewControllers[which] === controller) {
+        showPreviewFailure(which, sasUrl, err.name === 'AbortError' ? 'Secure preview request timed out.' : err.message);
+      }
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
+
+  function showPreviewFailure(which, sasUrl, reason) {
+    const loading     = $(`${which}Loading`);
+    const frame       = $(`${which}Frame`);
+    const emptyEl     = $(`${which}Empty`);
+    const msgEl       = $(`${which}EmptyMsg`);
+    const integrityEl = $(`${which}Integrity`);
+    loading?.classList.add('hidden');
+    frame?.classList.add('hidden');
+    emptyEl?.classList.remove('hidden');
+    if (integrityEl) integrityEl.textContent = 'Preview unavailable';
+    if (msgEl) {
+      msgEl.textContent = '';
+      const text = document.createElement('div');
+      text.style.cssText = 'font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6';
+      text.textContent = reason || 'Preview unavailable.';
+      const sub = document.createElement('div');
+      sub.style.cssText = 'font-size:11.5px;margin-top:4px';
+      sub.textContent = 'The document remains protected. Open the time-limited file directly to review it.';
+      text.appendChild(sub);
+      const openBtn = document.createElement('button');
+      openBtn.className = 'btn btn-primary btn-sm';
+      openBtn.type = 'button';
+      openBtn.textContent = 'Open PDF securely';
+      openBtn.addEventListener('click', () => window.open(sasUrl, '_blank', 'noopener,noreferrer'));
+      msgEl.append(text, openBtn);
+    }
+  }
+
+  window.addEventListener('beforeunload', () => {
+    Object.values(previewObjectUrls).forEach(url => { if (url) URL.revokeObjectURL(url); });
+    Object.values(previewControllers).forEach(controller => controller?.abort());
+  });
 
   function setPaneEmpty(which, msg) {
     $(`${which}Loading`)?.classList.add('hidden');

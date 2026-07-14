@@ -21,7 +21,7 @@
     "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex",
     "Cache-Control": "no-store, no-cache, must-revalidate, private",
     "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-src https://*.blob.core.windows.net; connect-src 'self' https://*.azure.com https://*.azurewebsites.net https://*.powerplatform.com https://*.powerautomate.com https://*.supabase.co https://*.blob.core.windows.net; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-src 'self' blob:; connect-src 'self' https://*.azure.com https://*.azurewebsites.net https://*.powerplatform.com https://*.powerautomate.com https://*.supabase.co https://*.blob.core.windows.net; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';",
     "X-Permitted-Cross-Domain-Policies": "none",
     "Cross-Origin-Opener-Policy": "same-origin",
     "Cross-Origin-Resource-Policy": "same-origin"
