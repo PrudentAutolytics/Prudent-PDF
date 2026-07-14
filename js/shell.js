@@ -84,8 +84,8 @@ const Shell = (() => {
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
   <a class="topbar-brand" href="/dashboard" aria-label="Prudent Redact home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
-    <div style="width:120px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);background:var(--surface2)">
-      <img src="/assets/logo.jpg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:3px;box-sizing:border-box"/>
+    <div style="width:120px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid rgba(255,255,255,.10);background:#07111f">
+      <img src="/assets/pa-logo.svg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:3px;box-sizing:border-box"/>
     </div>
   </a>
 
@@ -464,6 +464,97 @@ const Shell = (() => {
     });
   }
 
+
+  /* ── Contextual information buttons ───────────────────────────────────── */
+  const INFO_COPY = {
+    'dashboard':'A live operational summary of redaction activity, usage, processing health, and your quickest next actions.',
+    'new redaction':'Upload a PDF for the existing Power Automate redaction workflow. File and page limits follow the active plan.',
+    'processing history':'Search and investigate recent redaction jobs, their state, duration, output, and failure context.',
+    'review workspace':'Inspect the original and redacted outputs, detected entities, document integrity, and reviewer evidence.',
+    'governance command':'Prioritises failures, stuck jobs, SLA exposure, configuration health, and operational concentration from live platform data.',
+    'administration':'Restricted administration for users, access, plans, credits, API keys, and enterprise configuration capabilities.',
+    'success rate':'Percentage of completed jobs that finished successfully within the selected governance window.',
+    'critical failures':'Jobs in a failed state that require operator investigation or workflow remediation.',
+    'stuck processing':'Queued or processing jobs that have exceeded the governance age threshold and may need intervention.',
+    'p95 turnaround':'95% of measured jobs complete at or below this duration. Useful for detecting tail-latency degradation.',
+    'sla exposure':'Jobs that exceeded the current operational processing target. This is an internal control indicator, not a contractual SLA unless separately agreed.',
+    'priority risk queue':'A ranked work queue built from failed, stuck, and slow jobs so operators can focus on the highest operational risk first.',
+    'control posture':'Configuration-presence checks for critical platform dependencies. Secrets are never displayed by the health endpoint.',
+    'administrative evidence':'Privileged administrative actions recorded in the available audit store. Coverage depends on backend audit persistence.',
+    'release readiness':'Reviewer-side quality checks across document availability, integrity, entity metadata, and review decisions.',
+    'sha-256':'A cryptographic fingerprint calculated from the loaded PDF bytes to help identify unexpected document changes.',
+    'confidence':'The model-provided confidence for a detected entity. Lower-confidence detections deserve additional human scrutiny.',
+    'credits':'Processing allowance tracked for the current account or plan.',
+    'api key':'A credential for approved programmatic access. Plaintext keys should be shown once and stored securely.',
+    'plan':'Controls commercial limits and available processing capacity for the user.',
+    'active users':'Users whose account is not explicitly disabled.',
+    'contact requests':'Secure enquiries submitted through the product contact workflow.',
+    'page count':'Estimated or recorded PDF page volume associated with a redaction job.',
+    'cost':'Processing cost context derived from available job cost fields; use it for operational analysis rather than formal invoicing without reconciliation.'
+  };
+
+  function helpText(label) {
+    const key=(label||'').toLowerCase().replace(/\s+/g,' ').trim();
+    if (INFO_COPY[key]) return INFO_COPY[key];
+    for (const [k,v] of Object.entries(INFO_COPY)) if (key.includes(k)) return v;
+    if (key.includes('email')) return 'The work email associated with the account or request. Sensitive recipient routing is handled by the backend and is not exposed here.';
+    if (key.includes('status')) return 'The current operational state recorded for this item. Use the surrounding page to investigate transitions and exceptions.';
+    if (key.includes('risk')) return 'An operational prioritisation signal used to surface items that need attention. It is not a legal or regulatory determination.';
+    if (key.includes('audit') || key.includes('evidence')) return 'Evidence intended to support investigation and internal control review. Immutable audit guarantees require persistent server-side audit storage.';
+    if (key.includes('security') || key.includes('control')) return 'A platform control or configuration indicator. The interface avoids exposing secret values.';
+    if (key.includes('upload') || key.includes('file')) return 'Document input handled by the secure processing workflow. Only supported PDF files within plan limits should be submitted.';
+    return `Information about “${label}”. This control or metric is part of the Prudent Redact operating workspace and should be interpreted in the context of the current page.`;
+  }
+
+  function showHelp(btn) {
+    let tip=document.getElementById('globalInfoTooltip');
+    if (!tip) { tip=document.createElement('div'); tip.id='globalInfoTooltip'; tip.className='info-help-tooltip'; document.body.appendChild(tip); }
+    const label=btn.dataset.infoLabel||'Information';
+    tip.innerHTML=`<strong>${label}</strong>${btn.dataset.infoText||helpText(label)}`;
+    const r=btn.getBoundingClientRect();
+    tip.style.left=Math.max(16,Math.min(window.innerWidth-346,r.left-150+r.width/2))+'px';
+    tip.style.top=Math.min(window.innerHeight-tip.offsetHeight-18,r.bottom+9)+'px';
+    requestAnimationFrame(()=>tip.classList.add('show'));
+  }
+  function hideHelp(){ document.getElementById('globalInfoTooltip')?.classList.remove('show'); }
+
+  function injectInfoHelp(root=document) {
+    const selectors=[
+      '.page-title','.page-subtitle','.section-title','.card-title','.panel-title','.modal-title',
+      '.stat-label','.metric-label','.kpi-label','.contact-info-label','.nav-group-label',
+      'label:not(.switch):not(.checkbox-label)','th','.tab-btn','.viewer-tab','.gov-label',
+      '.control-title','.risk-title','.admin-kpi-label','.sla-label'
+    ];
+    root.querySelectorAll(selectors.join(',')).forEach(el=>{
+      if (el.dataset.infoEnhanced==='1' || el.closest('.topbar-search') || el.closest('.info-help-tooltip')) return;
+      const label=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if (!label || label.length>85 || /^[\d\W]+$/.test(label)) return;
+      el.dataset.infoEnhanced='1';
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='info-help-btn'; btn.textContent='i';
+      btn.dataset.infoLabel=label; btn.dataset.infoText=helpText(label);
+      btn.setAttribute('aria-label',`Information about ${label}`);
+      btn.addEventListener('mouseenter',()=>showHelp(btn));
+      btn.addEventListener('mouseleave',hideHelp);
+      btn.addEventListener('focus',()=>showHelp(btn));
+      btn.addEventListener('blur',hideHelp);
+      btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();showHelp(btn);});
+      el.appendChild(btn);
+    });
+  }
+
+  function startInfoObserver() {
+    injectInfoHelp();
+    let queued=false;
+    const observer=new MutationObserver(()=>{
+      if (queued) return; queued=true;
+      requestAnimationFrame(()=>{queued=false;injectInfoHelp();});
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+    document.addEventListener('scroll',hideHelp,true);
+    window.addEventListener('resize',hideHelp);
+  }
+
   return {
     init(activeId) {
       if (!requireAuth()) return;
@@ -487,7 +578,7 @@ const Shell = (() => {
       wireSearch();
       wireUserChip();
       wireEscape();
-      requestAnimationFrame(() => { startClock(); setTimeout(refreshQuota, 1200); });
+      requestAnimationFrame(() => { startClock(); startInfoObserver(); setTimeout(refreshQuota, 1200); });
     },
     refreshQuota,
     NAV,

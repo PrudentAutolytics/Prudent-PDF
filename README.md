@@ -199,7 +199,7 @@ swa deploy . --deployment-token YOUR_TOKEN
 
 **Kabilesh VijayaKumar (VK)**  
 Prudent Autolytics — Power Platform & Automation Consultancy  
-Kabileshvijayakumar@prudentautolytics.com  
+Service.Account@prudentautolytics.com  
 Chennai, Tamil Nadu, India
 
 

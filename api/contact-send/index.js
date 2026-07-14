@@ -177,7 +177,7 @@ module.exports = async function (context, req) {
     checkRateLimit(`contact:ip:${ip}`,       10, 60 * 60 * 1000, context),
   ]);
   if (emailLimited || ipLimited) {
-    context.res = { status: 429, headers: getCorsHeaders(req), body: { error: 'Too many messages. Please try again later or email us directly.' } };
+    context.res = { status: 429, headers: getCorsHeaders(req), body: { error: 'Too many messages. Please try again later or use the secure support form.' } };
     return;
   }
 
@@ -203,7 +203,7 @@ module.exports = async function (context, req) {
         headers : { 'Content-Type': 'application/json' },
         body    : JSON.stringify({
           // Standard fields your PA email flow already uses
-          to          : 'Kabileshvijayakumar@prudentautolytics.com',
+          to          : 'Service.Account@prudentautolytics.com',
           subject     : `[Prudent PDF] ${subjectLabel} from ${name.replace(/[\r\n]/g, ' ')}`,
           // HTML body — update PA flow body field to @{triggerBody()?['html']}
           html        : htmlBody,
@@ -233,7 +233,7 @@ module.exports = async function (context, req) {
     context.res = {
       status  : 500,
       headers : getCorsHeaders(req),
-      body    : { error: 'Failed to send message. Please email us directly.' },
+      body    : { error: 'Failed to send message. Please retry the secure support form.' },
     };
   }
 };

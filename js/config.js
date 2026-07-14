@@ -111,10 +111,12 @@ const APP_CONFIG = Object.freeze({
 
   /* ── App constants ─────────────────────────────────────────────────────── */
   APP: {
-    NAME             : 'Prudent PDF',
+    NAME             : 'Prudent Redact',
     COMPANY          : 'Prudent Autolytics',
     TAGLINE          : 'AI-Powered Document Redaction',
-    SUPPORT_EMAIL    : 'Kabileshvijayakumar@prudentautolytics.com',
+    SUPPORT_EMAIL    : 'Service.Account@prudentautolytics.com',
+    LEGAL_NAME       : 'PRUDENT AUTOLYTICS LLP',
+    OFFICE_ADDRESS   : 'JAL 1403, 14-Floor, Unicca Emporis, Madhuranagara Sorahunase, Vartur, Bangalore South, Bangalore, Karnataka, India - 560087',
     POLL_INTERVAL_MS : 5000,
     HISTORY_DAYS     : 30,
     MAX_JOB_HISTORY  : 50,
