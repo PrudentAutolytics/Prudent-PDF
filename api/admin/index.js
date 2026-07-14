@@ -45,6 +45,87 @@ module.exports = async function (context, req) {
 
   try {
 
+    /* ── Governance command center ── */
+    if (type === 'governance') {
+      const metrics = await pool.query(`
+        SELECT
+          COUNT(*)::int AS total_jobs,
+          COUNT(*) FILTER (WHERE LOWER(status) IN ('complete','completed'))::int AS completed_jobs,
+          COUNT(*) FILTER (WHERE LOWER(status) IN ('failed','error'))::int AS failed_jobs,
+          COUNT(*) FILTER (WHERE LOWER(status) IN ('queued','processing','pending'))::int AS active_jobs,
+          COUNT(*) FILTER (WHERE LOWER(status) IN ('queued','processing','pending') AND submitted_at < NOW() - INTERVAL '15 minutes')::int AS stuck_jobs,
+          COUNT(*) FILTER (WHERE completed_at IS NOT NULL AND completed_at - submitted_at > INTERVAL '15 minutes')::int AS sla_breaches,
+          COALESCE(SUM(page_count),0)::int AS total_pages,
+          COALESCE(SUM(cost_total),0)::float AS total_cost,
+          COALESCE(AVG(EXTRACT(EPOCH FROM (completed_at - submitted_at))/60) FILTER (WHERE completed_at IS NOT NULL),0)::float AS avg_minutes,
+          COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (completed_at - submitted_at))/60) FILTER (WHERE completed_at IS NOT NULL),0)::float AS p95_minutes
+        FROM jobs
+        WHERE submitted_at > NOW() - INTERVAL '30 days'
+      `);
+
+      const queue = await pool.query(`
+        SELECT j.id AS "jobId", j.file_name AS "fileName", j.status,
+               j.page_count AS "pageCount", j.cost_total AS "costTotal",
+               j.submitted_at AS "submittedAt", j.completed_at AS "completedAt",
+               j.error_message AS "errorMessage", u.email
+        FROM jobs j
+        INNER JOIN users u ON u.id = j.user_id
+        WHERE j.submitted_at > NOW() - INTERVAL '30 days'
+          AND (
+            LOWER(j.status) IN ('failed','error')
+            OR (LOWER(j.status) IN ('queued','processing','pending') AND j.submitted_at < NOW() - INTERVAL '15 minutes')
+            OR (j.completed_at IS NOT NULL AND j.completed_at - j.submitted_at > INTERVAL '15 minutes')
+          )
+        ORDER BY
+          CASE WHEN LOWER(j.status) IN ('failed','error') THEN 0
+               WHEN LOWER(j.status) IN ('queued','processing','pending') THEN 1 ELSE 2 END,
+          j.submitted_at ASC
+        LIMIT 50
+      `);
+
+      const volume = await pool.query(`
+        SELECT TO_CHAR(DATE_TRUNC('day', submitted_at), 'YYYY-MM-DD') AS day,
+               COUNT(*)::int AS jobs,
+               COUNT(*) FILTER (WHERE LOWER(status) IN ('failed','error'))::int AS failed,
+               COALESCE(SUM(page_count),0)::int AS pages
+        FROM jobs
+        WHERE submitted_at > NOW() - INTERVAL '14 days'
+        GROUP BY DATE_TRUNC('day', submitted_at)
+        ORDER BY DATE_TRUNC('day', submitted_at) ASC
+      `);
+
+      const users = await pool.query(`
+        SELECT u.email, u.full_name AS "fullName", u.company, u.plan, u.is_active AS "isActive",
+               COUNT(j.id)::int AS jobs,
+               COUNT(j.id) FILTER (WHERE LOWER(j.status) IN ('failed','error'))::int AS failed,
+               COALESCE(SUM(j.page_count),0)::int AS pages
+        FROM users u
+        LEFT JOIN jobs j ON j.user_id=u.id AND j.submitted_at > NOW() - INTERVAL '30 days'
+        GROUP BY u.id
+        ORDER BY COUNT(j.id) DESC
+        LIMIT 25
+      `);
+
+      let auditRows = [];
+      try {
+        const a = await pool.query(`SELECT admin_email AS "actor", action, target, details, created_at AS "createdAt" FROM audit_log ORDER BY created_at DESC LIMIT 30`);
+        auditRows = a.rows;
+      } catch (e) {
+        context.log('governance audit query unavailable:', e.message);
+      }
+
+      context.res = { status:200, headers:getCorsHeaders(req), body:{
+        metrics: metrics.rows[0],
+        riskQueue: queue.rows,
+        dailyVolume: volume.rows,
+        userRisk: users.rows,
+        audit: auditRows,
+        policy: { slaMinutes:15, stuckMinutes:15, reviewRequired:true, callbackProtection:Boolean(process.env.PA_CALLBACK_SECRET), appUrlConfigured:Boolean(process.env.APP_URL) },
+        generatedAt: new Date().toISOString()
+      }};
+      return;
+    }
+
     /* ── List users ── */
     if (action === 'list' || !action || req.body?.adminMode) {
 

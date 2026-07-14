@@ -19,9 +19,9 @@ const Shell = (() => {
     {
       group : 'GOVERNANCE',
       items : [
-        { id: 'review', label: 'Review & Release', href: '/viewer', icon: 'shield', desc: 'Human review and release-readiness controls' },
-        { id: 'evidence', label: 'Evidence & Audit', href: '/viewer', icon: 'clock', desc: 'Integrity fingerprints and review dossier' },
-        { id: 'controls', label: 'Security Controls', href: '/admin', icon: 'settings', desc: 'Administrative and tenant controls' },
+        { id: 'governance', label: 'Governance Command', href: '/governance', icon: 'shield', desc: 'Risk queue, SLA, policy health, and operator actions' },
+        { id: 'review', label: 'Review & Release', href: '/viewer', icon: 'eye', desc: 'Human review and release-readiness controls' },
+        { id: 'controls', label: 'Tenant Administration', href: '/admin', icon: 'settings', desc: 'Users, plans, and API access' },
       ],
     },
     {
@@ -457,6 +457,9 @@ const Shell = (() => {
 
       // V → go to viewer
       if (e.key === 'v' || e.key === 'V') { e.preventDefault(); location.href = '/viewer'; return; }
+
+      // G → governance command center
+      if (e.key === 'g' || e.key === 'G') { e.preventDefault(); location.href = '/governance'; return; }
 
       // D → go to dashboard
       if (e.key === 'd' || e.key === 'D') { e.preventDefault(); location.href = '/dashboard'; return; }

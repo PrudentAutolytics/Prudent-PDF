@@ -39,3 +39,10 @@ The current browser review state is clearly labelled and exported in the reviewe
 6. Store secrets in Azure Key Vault and access downstream Azure services with Managed Identity where supported.
 7. Add retention, deletion and legal-hold policies by tenant.
 8. Add Azure Monitor / Application Insights alerts and a dead-letter/retry path for failed Power Automate callbacks.
+
+
+## v9 operational governance layer
+
+The Governance Command Center converts governance from a documentation surface into an operator workflow. It computes operational controls from live job data: failed states, active jobs older than 15 minutes, completed jobs outside the 15-minute control target, P95 processing time, throughput, cost, page volume, and risk concentration by user/tenant. Administrators can drill directly into the relevant review job and export a point-in-time JSON governance evidence snapshot.
+
+The 15-minute threshold is currently an application control target used by the command center; it is not represented as a contractual SLA unless separately agreed with a customer.

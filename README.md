@@ -201,3 +201,8 @@ swa deploy . --deployment-token YOUR_TOKEN
 Prudent Autolytics — Power Platform & Automation Consultancy  
 Kabileshvijayakumar@prudentautolytics.com  
 Chennai, Tamil Nadu, India
+
+
+## Governance Command Center (v9)
+
+The `/governance` workspace is an administrator-only operational control plane backed by the existing `jobs`, `users`, health, and `audit_log` data. It provides a 30-day control window, priority exception queue, stuck-job detection, 15-minute SLA exposure, success rate, P95 turnaround, processing flow distribution, user/tenant concentration, privileged-action evidence, configuration posture, and exportable governance snapshots. It does not modify the Power Automate submission payload.

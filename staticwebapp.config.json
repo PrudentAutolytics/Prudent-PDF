@@ -20,6 +20,10 @@
       "rewrite": "/pages/viewer.html"
     },
     {
+      "route": "/governance",
+      "rewrite": "/pages/governance.html"
+    },
+    {
       "route": "/pricing",
       "rewrite": "/pages/pricing.html"
     },
