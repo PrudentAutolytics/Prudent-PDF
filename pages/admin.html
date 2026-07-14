@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Admin</title>
+<title>Administration · Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <style>
 /* ── Admin stats ── */
@@ -94,9 +94,9 @@
       <div>
         <div class="page-hd-eyebrow">
           <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg>
-          Admin
+          Administration
         </div>
-        <div class="page-title">Admin Panel</div>
+        <div class="page-title">Administration</div>
         <div class="page-subtitle">Manage users, plans, credits, and contact requests. Restricted to Prudent Autolytics only.</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
@@ -308,8 +308,15 @@ Content-Type: application/json
 
   /* ── Admin API helper ── */
   async function adminCall(body) {
-    const res = await paFetch(APP_CONFIG.FLOWS.ADMIN_USERS, { ...body, email });
-    return res;
+    try {
+      return await paFetch(APP_CONFIG.FLOWS.ADMIN_USERS, { ...body, email });
+    } catch (err) {
+      if (/Forbidden|Authentication required|Session|Account inactive/i.test(err.message || '')) {
+        $('adminContent')?.classList.add('hidden');
+        $('adminGate')?.classList.remove('hidden');
+      }
+      throw err;
+    }
   }
 
   /* ── Load everything ── */
@@ -321,22 +328,20 @@ Content-Type: application/json
   async function loadUsers() {
     try {
       const res = await adminCall({ action: 'list', type: 'users' });
-      if (res?.error === 'Forbidden.' || res?.error === 'Authentication required.') {
-        $('adminContent').classList.add('hidden');
-        $('adminGate').classList.remove('hidden');
-        return;
-      }
       $('adminContent').classList.remove('hidden');
       if (res?.users) {
         allUsers = res.users;
         renderUsers(allUsers);
         setText('aTotal',   String(allUsers.length));
-        setText('aActive',  String(allUsers.filter(u => (u.credits_used||0) > 0).length));
+        setText('aActive',  String(allUsers.filter(u => u.is_active !== false).length));
         setText('aJobs',    String(res.totalJobs || 0));
         setText('aRevenue', '$' + (res.totalCost || 0).toFixed(2));
       }
     } catch (e) {
-      $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users — ' + (e.message||'error') + '</div></div></td></tr>';
+      if (!/Forbidden|Authentication required|Session|Account inactive/i.test(e.message || '')) {
+        $('adminContent')?.classList.remove('hidden');
+        $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users — ' + esc(e.message||'error') + '</div><div style="font-size:12px;color:var(--ink3);margin-top:6px">The administration API is reachable, but the database schema or configuration needs attention.</div></div></td></tr>';
+      }
     }
   }
 

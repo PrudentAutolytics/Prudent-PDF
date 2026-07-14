@@ -20,8 +20,6 @@ const Shell = (() => {
       group : 'GOVERNANCE',
       items : [
         { id: 'governance', label: 'Governance Command', href: '/governance', icon: 'shield', desc: 'Risk queue, SLA, policy health, and operator actions' },
-        { id: 'review', label: 'Review & Release', href: '/viewer', icon: 'eye', desc: 'Human review and release-readiness controls' },
-        { id: 'controls', label: 'Tenant Administration', href: '/admin', icon: 'settings', desc: 'Users, plans, and API access' },
       ],
     },
     {
@@ -30,7 +28,7 @@ const Shell = (() => {
         { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans and cost details' },
         { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: 'Talk to our team' },
         ...(['kabileshvijayakumar@prudentautolytics.com'].includes((Session.get()?.email||'').toLowerCase())
-          ? [{ id: 'admin', label: 'Admin Panel', href: '/admin', icon: 'shield', desc: 'Manage users and API keys' }]
+          ? [{ id: 'admin', label: 'Administration', href: '/admin', icon: 'settings', desc: 'Users, tenant access, plans, credits, and API keys' }]
           : []),
       ],
     },
