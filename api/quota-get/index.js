@@ -1,7 +1,6 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession }              = require('../auth');
-'use strict';
 const pool = require('../db');
 
 const PLAN_LIMITS = {
@@ -22,12 +21,8 @@ module.exports = async function (context, req) {
     return;
   }
 
-  const email = (req.body?.email || '').trim().toLowerCase();
-
-  if (!email) {
-    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Email required.' } };
-    return;
-  }
+  // ENTERPRISE HARDENING: identity comes from the verified session.
+  const email = auth.email;
 
   try {
     const result = await pool.query(`

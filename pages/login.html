@@ -20,7 +20,7 @@ body {
 
 /* ── Left panel ── */
 .left-panel {
-  background: linear-gradient(145deg, #0F172A 0%, #1E3A8A 45%, #1D4ED8 100%);
+  background: linear-gradient(145deg, #101E38 0%, #1F3864 45%, #25619A 100%);
   display: flex; flex-direction: column;
   padding: 48px 56px;
   position: relative; overflow: hidden;
@@ -98,7 +98,7 @@ body {
   width: 100%; max-width: 360px; text-align: right;
   font-size: 13px; color: #64748B; margin-bottom: 32px; flex-shrink: 0;
 }
-.right-top a { color: #2563EB; font-weight: 600; text-decoration: none; }
+.right-top a { color: #2E75B6; font-weight: 600; text-decoration: none; }
 .right-top a:hover { text-decoration: underline; }
 
 .form-wrap { width: 100%; max-width: 360px; }
@@ -106,11 +106,11 @@ body {
 .form-header { margin-bottom: 32px; }
 .form-eyebrow {
   font-size: 11px; font-weight: 700; letter-spacing: .1em;
-  text-transform: uppercase; color: #2563EB; margin-bottom: 8px;
+  text-transform: uppercase; color: #2E75B6; margin-bottom: 8px;
 }
 .form-h1 {
   font-size: 26px; font-weight: 900; letter-spacing: -.6px;
-  color: #0F172A; margin-bottom: 6px; line-height: 1.15;
+  color: #101E38; margin-bottom: 6px; line-height: 1.15;
 }
 .form-sub { font-size: 14px; color: #64748B; line-height: 1.6; }
 
@@ -118,10 +118,10 @@ body {
 .login-input {
   width: 100%; padding: 11px 14px;
   border: 1.5px solid #E2E8F0; border-radius: 10px;
-  font-size: 14px; font-family: inherit; color: #0F172A;
+  font-size: 14px; font-family: inherit; color: #101E38;
   background: #fff; transition: all .15s; outline: none;
 }
-.login-input:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.login-input:focus { border-color: #2E75B6; box-shadow: 0 0 0 3px rgba(46,117,182,.12); }
 .login-input.invalid { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.1); }
 .login-input::placeholder { color: #94A3B8; }
 
@@ -139,7 +139,7 @@ body {
 .btn-main {
   width: 100%; padding: 12px 20px; border-radius: 10px;
   font-size: 14px; font-weight: 700; color: #fff; font-family: inherit;
-  background: linear-gradient(135deg, #2563EB, #4F46E5);
+  background: linear-gradient(135deg, #2E75B6, #25619A);
   border: none; cursor: pointer;
   box-shadow: 0 4px 14px rgba(37,99,235,.35);
   transition: all .18s; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -168,9 +168,9 @@ body {
 .reg-slide.open { max-height: 580px; opacity: 1; margin-top: 0; }
 .new-user-banner {
   display: flex; align-items: center; gap: 10px;
-  background: #EFF6FF; border: 1px solid #BFDBFE;
+  background: #EBF3FA; border: 1px solid #C7DCEE;
   border-radius: 10px; padding: 10px 14px;
-  font-size: 13px; font-weight: 600; color: #1D4ED8;
+  font-size: 13px; font-weight: 600; color: #25619A;
   margin-bottom: 16px;
 }
 .trial-perks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; }
@@ -186,13 +186,13 @@ body {
 .otp-header { text-align: center; margin-bottom: 24px; }
 .otp-lock {
   width: 60px; height: 60px; border-radius: 50%;
-  background: #EFF6FF; border: 1.5px solid #BFDBFE;
+  background: #EBF3FA; border: 1.5px solid #C7DCEE;
   display: grid; place-items: center; margin: 0 auto 16px;
-  color: #2563EB; position: relative;
+  color: #2E75B6; position: relative;
 }
 .otp-lock::after {
   content: ''; position: absolute; inset: -5px; border-radius: 50%;
-  border: 1.5px dashed #BFDBFE; animation: spin 12s linear infinite;
+  border: 1.5px dashed #C7DCEE; animation: spin 12s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .otp-email-badge {
@@ -206,13 +206,13 @@ body {
 .otp-digit {
   width: 48px; height: 56px; border: 1.5px solid #E2E8F0;
   border-radius: 10px; background: #fff;
-  font-size: 22px; font-weight: 800; color: #0F172A;
+  font-size: 22px; font-weight: 800; color: #101E38;
   text-align: center; outline: none;
   transition: all .15s; box-shadow: 0 1px 3px rgba(0,0,0,.06);
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
-.otp-digit:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.1); transform: translateY(-1px); }
-.otp-digit.filled { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
+.otp-digit:focus { border-color: #2E75B6; box-shadow: 0 0 0 3px rgba(46,117,182,.12); transform: translateY(-1px); }
+.otp-digit.filled { border-color: #2E75B6; background: #EBF3FA; color: #2E75B6; }
 .otp-digit.bad { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.1); animation: shake .35s ease; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
 .otp-err { text-align: center; font-size: 13px; color: #EF4444; min-height: 20px; font-weight: 500; margin-top: 8px; }
@@ -227,7 +227,7 @@ body {
   gap: 6px; margin-top: 16px; font-size: 13px; color: #64748B;
 }
 .otp-link {
-  color: #2563EB; background: none; border: none; padding: 0;
+  color: #2E75B6; background: none; border: none; padding: 0;
   font-size: 13px; font-family: inherit; font-weight: 600;
   cursor: pointer; transition: opacity .15s;
 }
@@ -243,7 +243,7 @@ body {
   animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
-.success-title { font-size: 22px; font-weight: 900; color: #0F172A; margin-bottom: 8px; letter-spacing: -.4px; }
+.success-title { font-size: 22px; font-weight: 900; color: #101E38; margin-bottom: 8px; letter-spacing: -.4px; }
 .success-sub { font-size: 14px; color: #64748B; line-height: 1.6; margin-bottom: 20px; }
 
 /* Footer */
@@ -364,7 +364,7 @@ body {
             <circle cx="12" cy="14.5" r="1.8" fill="currentColor"/>
           </svg>
         </div>
-        <h2 style="font-size:22px;font-weight:900;color:#0F172A;letter-spacing:-.4px;margin-bottom:6px">Check your inbox</h2>
+        <h2 style="font-size:22px;font-weight:900;color:#101E38;letter-spacing:-.4px;margin-bottom:6px">Check your inbox</h2>
         <p style="font-size:14px;color:#64748B;line-height:1.6">We sent a 6-digit code to</p>
         <div class="otp-email-badge">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zM22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>

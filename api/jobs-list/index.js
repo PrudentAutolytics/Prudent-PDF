@@ -1,7 +1,6 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession } = require('../auth');
-'use strict';
 const pool = require('../db');
 
 module.exports = async function (context, req) {
@@ -13,13 +12,10 @@ module.exports = async function (context, req) {
     context.res = { status: auth.status, headers: getCorsHeaders(req), body: { error: auth.error } };
     return;
   }
-  const email = (req.body?.email || '').trim().toLowerCase();
-  const days  = parseInt(req.body?.days || '30', 10);
-
-  if (!email) {
-    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Email required.' } };
-    return;
-  }
+  // ENTERPRISE HARDENING: identity comes from the verified session,
+  // never from a caller-supplied field.
+  const email = auth.email;
+  const days  = Math.min(365, Math.max(1, parseInt(req.body?.days || '30', 10) || 30));
 
   try {
     const result = await pool.query(`

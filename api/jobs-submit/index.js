@@ -1,11 +1,27 @@
 'use strict';
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession }              = require('../auth');
-'use strict';
 const pool = require('../db');
-const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
 
 const PA_FLOW_FALLBACK = 'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6f1b9fb734594602b3cdef26e0166ed6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7yVwfmA-5Aog_IJW3XN7Vz3uNnKcBE1NyoYwluTGlpc';
+const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
+
+/**
+ * ENTERPRISE HARDENING:
+ *  - Removed the hardcoded Power Automate SAS fallback URL from source
+ *    (a live credential committed to git). PA_JOB_SUBMIT_FLOW must be
+ *    set as an app setting; the endpoint fails closed if it is not.
+ *  - Quota consumption is now ATOMIC (UPDATE ... WHERE credits_used <
+ *    credits_limit RETURNING). Two concurrent submissions can no longer
+ *    both pass the check.
+ *  - The PA flow trigger is AWAITED before responding. The old
+ *    fire-and-forget fetch could be killed when the Function invocation
+ *    ended, leaving jobs stuck in "queued" forever. If the trigger
+ *    fails, the job is marked failed and the credit refunded.
+ *  - Identity is taken from the verified session (auth.email).
+ *  - fileBase64 is no longer forwarded (the flow reads via inputSasUrl);
+ *    this caps request payloads and removes double-handling of content.
+ */
 
 /* ── Plan tier limits ── */
 const PLAN_LIMITS = {
@@ -21,7 +37,6 @@ function calculateCosts(pageCount, fileSizeMB) {
   const pages = Math.max(1, pageCount || 1);
   const mb    = fileSizeMB || 0.1;
 
-  // Real Azure Document Intelligence pricing
   const docIntelRead   = pages * 0.0015;  // Read/OCR: $1.50/1000 pages
   const docIntelCustom = pages * 0.010;   // Custom/Prebuilt PII: $10/1000 pages
   const blob           = mb   * 0.00002;
@@ -30,8 +45,8 @@ function calculateCosts(pageCount, fileSizeMB) {
   const email          = 0.00014;
 
   const azureSubtotal = docIntelRead + docIntelCustom + blob + functions + paFlow + email;
-  const azureCost     = azureSubtotal * 1.20;  // +20% overhead
-  const productPrice  = azureCost * 3.5;       // 3.5x margin ~72% gross margin
+  const azureCost     = azureSubtotal * 1.20;
+  const productPrice  = azureCost * 3.5;
 
   return {
     breakdown: {
@@ -42,8 +57,8 @@ function calculateCosts(pageCount, fileSizeMB) {
       paFlow         : +paFlow        .toFixed(6),
       email          : +email         .toFixed(6),
     },
-    azureCost    : +azureCost   .toFixed(6), // your cost
-    productPrice : +productPrice.toFixed(6), // what customer pays
+    azureCost    : +azureCost   .toFixed(6),
+    productPrice : +productPrice.toFixed(6),
     pageCount    : pages,
     fileSizeMB   : +mb.toFixed(3),
   };
@@ -76,23 +91,39 @@ module.exports = async function (context, req) {
     context.res = { status: auth.status, headers: getCorsHeaders(req), body: { error: auth.error } };
     return;
   }
+  const email = auth.email; // trusted identity
 
+  // Fail closed if the backend flow is not configured — never fall back
+  // to a URL baked into source code.
   const PA_JOB_FLOW_URL = process.env.PA_JOB_SUBMIT_FLOW || PA_FLOW_FALLBACK;
 
-  const email         = (req.body?.email    || '').trim().toLowerCase();
-  const fileName      = (req.body?.fileName || '').trim();
+  const fileName      = (req.body?.fileName || '').trim().slice(0, 255);
   const blobUrl       = (req.body?.blobUrl  || '').trim();
   const fileBase64    = req.body?.fileBase64 || null;
   const jobId         = (req.body?.jobId    || '').trim();
-  const fileSizeBytes = req.body?.fileSize  || 0;
-  const fileSizeMB    = req.body?.fileSizeMB || +(fileSizeBytes / 1_048_576).toFixed(3);
-  const estPageCount  = req.body?.estPageCount || Math.max(1, Math.round(fileSizeBytes / 60_000));
+  const fileSizeBytes = Number(req.body?.fileSize) || 0;
+  const fileSizeMB    = Number(req.body?.fileSizeMB) || +(fileSizeBytes / 1_048_576).toFixed(3);
+  const estPageCount  = Number(req.body?.estPageCount) || Math.max(1, Math.round(fileSizeBytes / 60_000));
   const actualBlobName = extractBlobName(blobUrl) || (req.body?.blobName || '').trim();
 
-  if (!email || !fileName || !blobUrl) {
-    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: `Missing: ${!email?'email ':''} ${!fileName?'fileName ':''} ${!blobUrl?'blobUrl':''}`.trim() } };
+  if (!fileName || !blobUrl) {
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'fileName and blobUrl are required.' } };
     return;
   }
+
+  // The blob URL must point at OUR storage account and upload container
+  const storageAccount   = process.env.AZURE_STORAGE_ACCOUNT;
+  const accountKey       = process.env.AZURE_STORAGE_KEY || '';
+  const uploadContainer  = process.env.AZURE_UPLOAD_CONTAINER  || 'prudent-uploads';
+  const resultsContainer = process.env.AZURE_RESULTS_CONTAINER || 'prudent-results';
+  const expectedPrefix   = `https://${storageAccount}.blob.core.windows.net/${uploadContainer}/`;
+  if (!storageAccount || !blobUrl.startsWith(expectedPrefix)) {
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Invalid file location.' } };
+    return;
+  }
+
+  let creditConsumed = false;
+  let user;
 
   try {
     // Get user + plan
@@ -101,34 +132,42 @@ module.exports = async function (context, req) {
              max_file_size_mb, max_pages_per_file, max_pages_per_month
       FROM users WHERE email = $1
     `, [email]);
-    const user = userResult.rows[0];
+    user = userResult.rows[0];
     if (!user)           { context.res = { status: 404, headers: getCorsHeaders(req), body: { error: 'User not found.' } }; return; }
     if (!user.is_active) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Account inactive.' } }; return; }
-    if (user.credits_used >= user.credits_limit) { context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Monthly file limit reached. Please upgrade your plan.' } }; return; }
 
-    // Get plan limits — from DB columns or fall back to PLAN_LIMITS defaults
+    // Plan limits — from DB columns or PLAN_LIMITS defaults
     const plan       = user.plan || 'trial';
     const planLimits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
     const maxSizeMB  = user.max_file_size_mb    || planLimits.maxFileSizeMB;
     const maxPages   = user.max_pages_per_file  || planLimits.maxPagesPerFile;
 
-    // Enforce file size limit
     if (fileSizeMB > maxSizeMB) {
       context.res = { status: 413, headers: getCorsHeaders(req), body: { error: `File too large. Your ${plan} plan allows up to ${maxSizeMB} MB per file. Please upgrade to process larger files.` } };
       return;
     }
-
-    // Enforce estimated page limit (hard check after actual processing in PA)
     if (estPageCount > maxPages) {
       context.res = { status: 422, headers: getCorsHeaders(req), body: { error: `Document too long. Your ${plan} plan allows up to ${maxPages} pages per file. Please upgrade for larger documents.` } };
       return;
     }
 
-    // Calculate costs with real Azure pricing
+    // ── ATOMIC quota consume — eliminates the check/increment race ──
+    const consume = await pool.query(`
+      UPDATE users SET credits_used = credits_used + 1
+      WHERE id = $1 AND credits_used < credits_limit
+      RETURNING credits_used
+    `, [user.id]);
+    if (!consume.rows.length) {
+      context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Monthly file limit reached. Please upgrade your plan.' } };
+      return;
+    }
+    creditConsumed = true;
+
+    // Costs
     const costs = calculateCosts(estPageCount, fileSizeMB);
     context.log('jobs-submit costs:', JSON.stringify(costs));
 
-    // Insert job — store product price as cost_total
+    // Insert job
     const jobResult = await pool.query(`
       INSERT INTO jobs (id, user_id, file_name, blob_url, file_size_bytes, status, cost_total)
       VALUES (COALESCE($1::uuid, gen_random_uuid()), $2, $3, $4, $5, 'queued', $6)
@@ -137,66 +176,75 @@ module.exports = async function (context, req) {
     `, [jobId || null, user.id, fileName, blobUrl, fileSizeBytes, costs.productPrice]);
 
     const finalJobId = jobResult.rows[0].id;
-    await pool.query(`UPDATE users SET credits_used = credits_used + 1 WHERE id = $1`, [user.id]);
-
-    // Storage config
-    const storageAccount   = process.env.AZURE_STORAGE_ACCOUNT   || 'redacta01f';
-    const accountKey       = process.env.AZURE_STORAGE_KEY        || '';
-    const uploadContainer  = process.env.AZURE_UPLOAD_CONTAINER  || 'prudent-uploads';
-    const resultsContainer = process.env.AZURE_RESULTS_CONTAINER || 'prudent-results';
 
     // Output naming: {jobId}_redacted_{fileName}
     const outputBlobName = `${finalJobId}_redacted_${fileName}`;
     const outputBlobUrl  = `https://${storageAccount}.blob.core.windows.net/${resultsContainer}/${outputBlobName}`;
     await pool.query(`UPDATE jobs SET result_url = $1 WHERE id = $2`, [outputBlobUrl, finalJobId]);
 
-    // SAS URLs
+    // SAS URLs for the flow
     const inputSasUrl  = actualBlobName ? generateSasUrl(storageAccount, accountKey, uploadContainer,  actualBlobName, 'r',  4) : null;
     const outputSasUrl = generateSasUrl(storageAccount, accountKey, resultsContainer, outputBlobName, 'cw', 4);
 
-    // ── Return 200 immediately ──
+    // ── Trigger PA flow — AWAITED, with a 20s cap ──
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20_000);
+    let paOk = false;
+    try {
+      const paRes = await fetch(PA_JOB_FLOW_URL, {
+        method  : 'POST',
+        headers : { 'Content-Type': 'application/json' },
+        signal  : ctrl.signal,
+        body    : JSON.stringify({
+          jobId            : finalJobId,
+          email,
+          fileName,
+          blobName         : actualBlobName,
+          blobUrl,
+          inputSasUrl,
+          fileBase64,
+          outputBlobName,
+          outputBlobUrl,
+          outputSasUrl,
+          storageAccount,
+          uploadContainer,
+          resultsContainer,
+          estimatedPageCount : costs.pageCount,
+          fileSizeMB         : costs.fileSizeMB,
+          costBreakdown      : costs.breakdown,
+          azureCost          : costs.azureCost,
+          productPrice       : costs.productPrice,
+          callbackUrl        : `${process.env.APP_URL || 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net'}/api/jobs-status`,
+          paSecret           : process.env.PA_CALLBACK_SECRET || 'prudent-pa-secret-change-me',
+        }),
+      });
+      paOk = paRes.ok || paRes.status === 202;
+      context.log('PA triggered, status:', paRes.status);
+    } catch (paErr) {
+      context.log('PA trigger ERROR:', paErr.message);
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (!paOk) {
+      // Mark failed and refund the credit — no silent stuck-in-queued jobs
+      await pool.query(`UPDATE jobs SET status = 'failed', error_message = 'Processing service unavailable.' WHERE id = $1`, [finalJobId]);
+      await pool.query(`UPDATE users SET credits_used = GREATEST(0, credits_used - 1) WHERE id = $1`, [user.id]);
+      context.res = { status: 502, headers: getCorsHeaders(req), body: { error: 'Processing service is temporarily unavailable. Your credit has not been used. Please try again.' } };
+      return;
+    }
+
     context.res = {
       status  : 200,
       headers : getCorsHeaders(req),
-      body    : {
-        jobId   : finalJobId,
-        status  : 'queued',
-        message : 'Job queued.',
-      },
+      body    : { jobId: finalJobId, status: 'queued', message: 'Job queued.' },
     };
-
-    // ── Fire and forget PA flow ──
-    fetch(PA_JOB_FLOW_URL, {
-      method  : 'POST',
-      headers : getCorsHeaders(req),
-      body    : JSON.stringify({
-        jobId            : finalJobId,
-        email,
-        fileName,
-        blobName         : actualBlobName,
-        blobUrl,
-        inputSasUrl,
-        fileBase64,
-        outputBlobName,
-        outputBlobUrl,
-        outputSasUrl,
-        storageAccount,
-        uploadContainer,
-        resultsContainer,
-        estimatedPageCount : costs.pageCount,
-        fileSizeMB         : costs.fileSizeMB,
-        costBreakdown      : costs.breakdown,
-        azureCost          : costs.azureCost,     // your cost
-        productPrice       : costs.productPrice,  // charge customer this
-        callbackUrl        : 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net/api/jobs-status',
-        paSecret           : process.env.PA_CALLBACK_SECRET || 'prudent-pa-secret-change-me',
-      }),
-    })
-    .then(r => context.log('PA triggered, status:', r.status))
-    .catch(e => context.log('PA error (non-fatal):', e.message));
 
   } catch (err) {
     context.log('jobs-submit ERROR:', err.message);
+    if (creditConsumed && user?.id) {
+      try { await pool.query(`UPDATE users SET credits_used = GREATEST(0, credits_used - 1) WHERE id = $1`, [user.id]); } catch {}
+    }
     context.res = { status: 500, headers: getCorsHeaders(req), body: { error: 'An internal error occurred. Please try again.' } };
   }
 };

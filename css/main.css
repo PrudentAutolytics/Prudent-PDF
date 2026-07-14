@@ -5,13 +5,13 @@
    Font: Inter (body + display) · JetBrains Mono (data)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Schibsted+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ── TOKENS ───────────────────────────────────────────────────────────────── */
 :root {
   /* Page */
-  --page-bg   : #F4F6FA;
-  --page-bg2  : #EEF1F8;
+  --page-bg   : #F3F5F9;
+  --page-bg2  : #EDF0F6;
 
   /* Surfaces */
   --surface   : #FFFFFF;
@@ -20,22 +20,25 @@
   --surface4  : #E8EBF5;
 
   /* Borders */
-  --border    : #E2E5F0;
-  --border2   : #CBD0E5;
-  --border3   : #A8B0D0;
+  --border    : #E3E8F0;
+  --border2   : #CDD5E4;
+  --border3   : #A9B6CC;
 
-  /* Text */
-  --ink       : #111827;
-  --ink2      : #374151;
-  --ink3      : #6B7280;
-  --ink4      : #9CA3AF;
+  /* Text — navy-tinted neutral scale */
+  --ink       : #16233B;
+  --ink2      : #3B4A63;
+  --ink3      : #64748B;
+  --ink4      : #94A3B8;
 
-  /* Brand */
-  --blue      : #2563EB;
-  --blue-d    : #1D4ED8;
-  --blue-l    : #3B82F6;
-  --blue-pale : #EFF6FF;
-  --blue-bd   : #BFDBFE;
+  /* Brand — Prudent Autolytics identity */
+  --navy      : #1F3864;
+  --navy-d    : #16294B;
+  --navy-pale : #EDF1F7;
+  --blue      : #2E75B6;
+  --blue-d    : #25619A;
+  --blue-l    : #4A8CC7;
+  --blue-pale : #EBF3FA;
+  --blue-bd   : #C7DCEE;
 
   /* Green */
   --green     : #059669;
@@ -72,12 +75,13 @@
   --s3 : 0 10px 15px rgba(17,24,39,0.07), 0 4px 6px rgba(17,24,39,0.04);
   --s4 : 0 20px 40px rgba(17,24,39,0.10), 0 8px 16px rgba(17,24,39,0.06);
   --s5 : 0 40px 80px rgba(17,24,39,0.14), 0 16px 32px rgba(17,24,39,0.08);
-  --s-glow   : 0 0 0 3px rgba(37,99,235,0.18);
+  --s-glow   : 0 0 0 3px rgba(46,117,182,0.20);
   --s-danger  : 0 0 0 3px rgba(220,38,38,0.18);
 
   /* Type */
-  --font   : 'Inter', system-ui, -apple-system, sans-serif;
-  --mono   : 'JetBrains Mono', 'Fira Code', monospace;
+  --font    : 'Inter', system-ui, -apple-system, sans-serif;
+  --font-d  : 'Schibsted Grotesk', 'Inter', system-ui, sans-serif;
+  --mono    : 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Motion */
   --ease  : cubic-bezier(0.4,0,0.2,1);
@@ -100,8 +104,9 @@
   --ink2      : #94A3C0;
   --ink3      : #5A6E94;
   --ink4      : #374060;
-  --blue-pale : rgba(37,99,235,0.12);
-  --blue-bd   : rgba(37,99,235,0.30);
+  --navy-pale : rgba(46,117,182,0.10);
+  --blue-pale : rgba(46,117,182,0.14);
+  --blue-bd   : rgba(46,117,182,0.34);
   --green-pale: rgba(5,150,105,0.12);
   --green-bd  : rgba(5,150,105,0.30);
   --amber-pale: rgba(217,119,6,0.12);
@@ -616,7 +621,7 @@ table { border-collapse: collapse; width: 100%; }
 
 /* ── WELCOME BANNER ───────────────────────────────────────────────────────── */
 .welcome-banner {
-  background: linear-gradient(130deg, #1E3A8A 0%, #1E40AF 35%, #1D4ED8 65%, #2563EB 100%);
+  background: linear-gradient(130deg, #1F3864 0%, #25498A 35%, #25619A 65%, #2E75B6 100%);
   border-radius: var(--r20);
   padding: 36px 44px;
   margin-bottom: 40px;
@@ -1045,4 +1050,195 @@ table { border-collapse: collapse; width: 100%; }
   .pricing-grid   { grid-template-columns: 1fr; }
   .card-hd        { padding: 18px 20px 14px; }
   .card-body      { padding: 20px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENTERPRISE THEME LAYER — v11.0
+   Fluent-calibrated refinement pass. Appended as an override layer so no
+   markup or JS changes. Structure is carried by precise 1px borders;
+   shadows are near-invisible; depth is earned, not decorated.
+   Signature motif: the brand "seal" — a navy→blue hairline that runs across
+   the top of the product, under the page title, and beside the active nav
+   item. One motif, carried through.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The seal ── */
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px; z-index: 1000;
+  background: linear-gradient(90deg, var(--navy) 0%, var(--blue) 45%, var(--blue-l) 70%, var(--navy) 100%);
+  pointer-events: none;
+}
+::selection { background: var(--navy); color: #fff; }
+
+/* ── Typography ── */
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.page-title {
+  font-family: var(--font-d);
+  font-size: 24px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--ink);
+  position: relative; padding-bottom: 12px;
+}
+.page-title::after {
+  content: '';
+  position: absolute; left: 0; bottom: 0;
+  width: 44px; height: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--navy), var(--blue));
+}
+.page-subtitle { font-size: 14px; max-width: 62ch; }
+.card-title, .modal-title, .form-h1 { font-family: var(--font-d); letter-spacing: -0.01em; }
+.stat-val { font-family: var(--font-d); font-weight: 700; letter-spacing: -0.02em; }
+.topbar-brand { font-family: var(--font-d); }
+
+/* ── Topbar: quieter, frosted, precise ── */
+.topbar {
+  background: rgba(255,255,255,0.86);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+}
+[data-theme="dark"] .topbar { background: rgba(26,32,48,0.86); }
+.topbar-search input {
+  border-radius: var(--r8);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.topbar-search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-pale); }
+.topbar-icon-btn { border-radius: var(--r8); }
+
+/* ── Sidebar: navy-anchored navigation ── */
+.sidebar { background: var(--surface); }
+.nav-group-label { color: var(--ink4); font-size: 10px; letter-spacing: .12em; }
+.nav-link {
+  font-size: 13px; font-weight: 500;
+  border-radius: var(--r8);
+  padding: 9px 12px;
+}
+.nav-link.active {
+  background: var(--navy-pale);
+  color: var(--navy);
+  font-weight: 600;
+}
+.nav-link.active::before {
+  background: linear-gradient(180deg, var(--navy), var(--blue));
+  top: 15%; bottom: 15%;
+  border-radius: 0 3px 3px 0;
+}
+.nav-link.active .nav-link-icon { color: var(--blue); }
+.nav-link-badge.blue { background: var(--blue-pale); color: var(--blue-d); }
+
+/* ── Buttons: Fluent depth — 1px definition, restrained motion ── */
+.btn {
+  border-radius: var(--r8);
+  font-weight: 600; font-size: 13.5px;
+  letter-spacing: 0;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease), color var(--dur) var(--ease),
+              transform var(--dur) var(--ease);
+}
+.btn-primary {
+  background: var(--blue);
+  border: 1px solid var(--blue-d);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 1px 2px rgba(31,56,100,0.18);
+}
+.btn-primary:hover {
+  background: var(--blue-d);
+  transform: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 6px rgba(31,56,100,0.24);
+}
+.btn-primary:active { transform: scale(.985); }
+.btn-secondary { border-radius: var(--r8); }
+.btn-secondary:hover { border-color: var(--blue-bd); color: var(--navy); }
+
+/* ── Cards: structure by border, elevation only when interactive ── */
+.card {
+  border-radius: var(--r12);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(22,35,59,0.04);
+}
+.card:hover { box-shadow: 0 1px 2px rgba(22,35,59,0.04); border-color: var(--border); }
+.card-hd { border-bottom: 1px solid var(--border); }
+.card-title-icon { color: var(--blue); }
+
+/* ── Stat cards: seal accents, calm hover ── */
+.stat-card { border-radius: var(--r12); }
+.stat-card::after { height: 3px; }
+.stat-card.blue::after   { background: linear-gradient(90deg, var(--navy), var(--blue)); }
+.stat-card.violet::after { background: linear-gradient(90deg, var(--blue), var(--violet)); }
+.stat-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,35,59,0.08); }
+.stat-label { font-size: 11px; letter-spacing: .10em; text-transform: uppercase; font-weight: 600; color: var(--ink3); }
+
+/* ── Tables: 44px density, editorial headers ── */
+.tbl th {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink3);
+  padding-top: 12px; padding-bottom: 12px;
+}
+.tbl td { padding-top: 13px; padding-bottom: 13px; font-size: 13px; }
+.tbl tbody tr:hover td { background: var(--navy-pale); }
+
+/* ── Pills: crisper, dot-led ── */
+.pill { border-radius: var(--r-full); font-weight: 600; font-size: 11.5px; letter-spacing: .01em; }
+.pill-processing { background: var(--blue-pale); border-color: var(--blue-bd); color: var(--blue-d); }
+
+/* ── Forms ── */
+input, select, textarea { border-radius: var(--r8); }
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px var(--blue-pale) !important;
+}
+
+/* ── Dropzone: quiet until engaged ── */
+.dropzone { border-radius: var(--r12); }
+.dropzone.drag-over { border-color: var(--blue); background: var(--blue-pale); box-shadow: 0 0 0 4px var(--blue-pale); }
+.dropzone-title { font-family: var(--font-d); }
+
+/* ── Modal & stepper ── */
+.modal { border-radius: var(--r14); border: 1px solid var(--border); box-shadow: var(--s5); }
+.modal-header { border-bottom: 1px solid var(--border); }
+.step.active .step-num { background: var(--blue); box-shadow: 0 0 0 4px var(--blue-pale); }
+.step.active span { color: var(--blue-d); }
+
+/* ── Progress ── */
+.progress-fill { background: linear-gradient(90deg, var(--blue), var(--blue-l)); }
+
+/* ── Empty states: an invitation to act ── */
+.tbl-empty-title { color: var(--ink2); font-family: var(--font-d); }
+
+/* ── Scrollbars (WebKit + Firefox) ── */
+* { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 5px; border: 2px solid var(--page-bg); }
+*::-webkit-scrollbar-thumb:hover { background: var(--border3); }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Keyboard focus: always visible, brand-consistent ── */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: var(--r6);
+}
+
+/* ── Motion discipline ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Print: job records should print cleanly ── */
+@media print {
+  body::before, .sidebar, .topbar, .btn, .modal-bg { display: none !important; }
+  .main { margin: 0 !important; padding: 0 !important; }
+  .card { box-shadow: none !important; border: 1px solid #ccc !important; }
 }

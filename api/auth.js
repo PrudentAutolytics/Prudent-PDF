@@ -52,6 +52,9 @@ async function verifySession(req) {
   // 3. HMAC signature must be valid
   const payload  = `${tokEmail}:${tokUserId}:${tokIssuedAt}`;
   const expected = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+  if (!/^[0-9a-f]{64}$/i.test(tokHmac)) {
+    return { ok: false, status: 401, error: 'Invalid session signature.' };
+  }
   const valid    = crypto.timingSafeEqual(
     Buffer.from(tokHmac,   'hex'),
     Buffer.from(expected,  'hex')
