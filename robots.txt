@@ -70,4 +70,4 @@ Disallow: /
 User-agent: ia_archiver
 Disallow: /
 
-Sitemap: https://brave-cliff-0ceef0a00.4.azurestaticapps.net/sitemap.xml
+

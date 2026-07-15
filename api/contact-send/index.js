@@ -2,6 +2,7 @@
 const { getCorsHeaders, handleCors } = require('../cors');
 const pool = require('../db');
 const { checkRateLimit } = require('../ratelimit');
+const { validEmail, getClientId } = require('../security');
 
 /** ENTERPRISE HARDENING: escape EVERY user-supplied value before it is
  *  interpolated into the notification email HTML. Previously only the
@@ -76,7 +77,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
         <td>
-          <p style="margin:0 0 4px;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ffffff">PRUDENT PDF · PRUDENT AUTOLYTICS</p>
+          <p style="margin:0 0 4px;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ffffff">PRUDENT REDACT · PRUDENT AUTOLYTICS LLP</p>
           <h1 style="margin:0 0 6px;font-size:22px;font-weight:900;color:#FFFFFF;letter-spacing:-.5px">New Contact Message</h1>
           <p style="margin:0;font-size:12.5px;color:#e0e7ff">${dateStr}</p>
         </td>
@@ -121,7 +122,7 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
     <!-- Reply CTA -->
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #F1F5F9">
       <tr><td style="padding:20px 32px" align="left">
-        <a href="mailto:${email}?subject=Re%3A%20${encodeURIComponent(subjectLabel)}%20%E2%80%94%20Prudent%20PDF"
+        <a href="mailto:${email}?subject=Re%3A%20${encodeURIComponent(subjectLabel)}%20-%20Prudent%20Redact"
            style="display:inline-block;background:#2E75B6;color:#fff;text-decoration:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;letter-spacing:.01em">
           ↩&nbsp; Reply to ${name}
         </a>
@@ -133,8 +134,9 @@ function buildEmail({ name, email, subject, plan, message, submittedAt }) {
   <!-- Footer -->
   <tr><td style="background:#F1F5F9;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 16px 16px;padding:16px 32px">
     <p style="margin:0;font-size:11.5px;color:#94A3B8;line-height:1.6">
-      Submitted via <strong style="color:#64748B">Prudent PDF</strong> contact form &nbsp;·&nbsp;
-      <strong style="color:#64748B">Prudent Autolytics</strong> &nbsp;·&nbsp; Chennai, Tamil Nadu, India
+      Submitted via <strong style="color:#64748B">Prudent Redact</strong> contact form &nbsp;·&nbsp;
+      <strong style="color:#64748B">PRUDENT AUTOLYTICS LLP</strong><br/>
+      JAL 1403, 14-Floor, Unicca Emporis, Madhuranagara Sorahunase, Vartur, Bangalore South, Bangalore, Karnataka, India - 560087
     </p>
   </td></tr>
 
@@ -163,7 +165,7 @@ module.exports = async function (context, req) {
     return;
   }
 
-  if (!name || !email || !email.includes('@') || !message) {
+  if (!name || name.length < 2 || !validEmail(email) || !message || message.length < 10 || !Object.prototype.hasOwnProperty.call(SUBJECT_LABELS, subject)) {
     context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Name, email and message are required.' } };
     return;
   }
@@ -171,7 +173,7 @@ module.exports = async function (context, req) {
   // ENTERPRISE HARDENING: PG-backed rate limit - 5 messages / hour per
   // email and 10 / hour per IP. Public endpoint, so this is the only
   // thing standing between the PA email flow and a spam loop.
-  const ip = (req.headers?.['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const ip = getClientId(req);
   const [emailLimited, ipLimited] = await Promise.all([
     checkRateLimit(`contact:email:${email}`, 5,  60 * 60 * 1000, context),
     checkRateLimit(`contact:ip:${ip}`,       10, 60 * 60 * 1000, context),
@@ -204,7 +206,7 @@ module.exports = async function (context, req) {
         body    : JSON.stringify({
           // Standard fields your PA email flow already uses
           to          : 'Service.Account@prudentautolytics.com',
-          subject     : `[Prudent PDF] ${subjectLabel} from ${name.replace(/[\r\n]/g, ' ')}`,
+          subject     : `[Prudent Redact] ${subjectLabel} from ${name.replace(/[\r\n]/g, ' ')}`,
           // HTML body - update PA flow body field to @{triggerBody()?['html']}
           html        : htmlBody,
           body        : htmlBody,

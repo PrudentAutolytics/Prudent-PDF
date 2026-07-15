@@ -8,6 +8,7 @@
 
 <title>History</title>
 <link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
 <style>
 .filter-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .filter-input { background:var(--surface); border:1.5px solid var(--border2); border-radius:var(--r8); padding:7px 12px 7px 32px; font-size:13px; color:var(--ink); transition:all var(--dur2) var(--ease); flex:1; min-width:180px; font-family:var(--font); }
@@ -30,6 +31,8 @@
 .fields-table tr:hover td { background:var(--surface2); }
 .loading-row td { text-align:center; padding:40px!important; color:var(--ink3); }
 </style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
 </head>
 <body>
 
@@ -115,7 +118,7 @@
         <div class="filter-bar">
           <div class="filter-input-wrap">
             <span class="filter-input-icon"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="1.7"/><path d="M21 21l-4.5-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
-            <input class="filter-input" id="searchFilter" type="search" placeholder="Search filename…"/>
+            <input class="filter-input" id="searchFilter" type="search" placeholder="Search filename..."/>
           </div>
           <select class="filter-select" id="statusFilter">
             <option value="">All Status</option>
@@ -176,6 +179,7 @@
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
+<script src="/js/enterprise-runtime.js"></script>
 <script>
 (function () {
   'use strict';
@@ -361,7 +365,7 @@
             <button class="btn btn-sm btn-ghost detail-toggle" data-id="${j.jobId}">···</button>
           </div>`
         : isProc
-          ? `<div class="flex gap-5"><span class="text-xs text-subtle" style="display:flex;align-items:center;gap:5px"><div class="spinner" style="width:11px;height:11px;border-width:1.5px;margin:0"></div>Processing…</span><button class="btn btn-sm btn-ghost detail-toggle" data-id="${j.jobId}">···</button></div>`
+          ? `<div class="flex gap-5"><span class="text-xs text-subtle" style="display:flex;align-items:center;gap:5px"><div class="spinner" style="width:11px;height:11px;border-width:1.5px;margin:0"></div>Processing...</span><button class="btn btn-sm btn-ghost detail-toggle" data-id="${j.jobId}">···</button></div>`
           : `<button class="btn btn-sm btn-ghost detail-toggle" data-id="${j.jobId}">···</button>`;
 
       return `<tr id="row-${j.jobId}">
@@ -387,7 +391,7 @@
         const j = allJobs.find(x => x.jobId === btn.dataset.id);
         if (!j?.resultUrl) { showToast('Result not available','warn'); return; }
         btn.disabled = true;
-        btn.textContent = '…';
+        btn.textContent = '...';
         try {
           const parts     = j.resultUrl.split('/');
           const blobName  = parts[parts.length-1].split('?')[0];

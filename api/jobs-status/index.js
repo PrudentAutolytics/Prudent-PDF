@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession }              = require('../auth');
 const pool                           = require('../db');
+const { validUuid, timingSafeSecret } = require('../security');
 
 /**
  * jobs-status serves two callers:
@@ -23,12 +24,7 @@ const pool                           = require('../db');
 const VALID_STATUSES    = ['queued', 'processing', 'complete', 'completed', 'failed'];
 const TERMINAL_STATUSES = ['complete', 'completed', 'failed'];
 
-function secretsMatch(provided, expected) {
-  const a = Buffer.from(String(provided));
-  const b = Buffer.from(String(expected));
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
+function secretsMatch(provided, expected) { return timingSafeSecret(provided, expected); }
 
 module.exports = async function (context, req) {
   if (handleCors(context, req)) return;
@@ -36,15 +32,17 @@ module.exports = async function (context, req) {
   const jobId  = (req.body?.jobId  || '').trim();
   const status = (req.body?.status || '').trim().toLowerCase();
 
-  if (!jobId) {
+  if (!validUuid(jobId)) {
     context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'jobId required.' } };
     return;
   }
 
   // ── Detect Power Automate callback ──────────────────────────────────────
   const paSecret         = (req.body?.paSecret || '').trim();
-  const expectedPaSecret = process.env.PA_CALLBACK_SECRET || 'prudent-pa-secret-change-me';
-  const secretConfigured = expectedPaSecret.length >= 16 && !expectedPaSecret.startsWith('CHANGE_ME');
+  const expectedPaSecret = process.env.PA_CALLBACK_SECRET || '';
+  // Accept the exact configured callback secret for backward compatibility.
+  // The health endpoint separately flags short or placeholder secrets as weak.
+  const secretConfigured = expectedPaSecret.length > 0;
   const isCallback       = !!paSecret && secretConfigured && secretsMatch(paSecret, expectedPaSecret);
 
   if (paSecret && !isCallback) {
@@ -61,8 +59,14 @@ module.exports = async function (context, req) {
     }
 
     const resultUrl       = req.body?.resultUrl       || req.body?.result_url       || null;
-    const pageCount       = req.body?.pageCount       || req.body?.page_count       || null;
-    const costTotal       = req.body?.costTotal       || req.body?.cost_total       || null;
+    const pageCountRaw    = req.body?.pageCount       ?? req.body?.page_count       ?? null;
+    const costTotalRaw    = req.body?.costTotal       ?? req.body?.cost_total       ?? null;
+    const pageCount       = pageCountRaw == null ? null : Number(pageCountRaw);
+    const costTotal       = costTotalRaw == null ? null : Number(costTotalRaw);
+    if ((pageCount != null && (!Number.isInteger(pageCount) || pageCount < 0 || pageCount > 1000000)) || (costTotal != null && (!Number.isFinite(costTotal) || costTotal < 0 || costTotal > 10000000))) {
+      context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Invalid callback values.' } };
+      return;
+    }
     const errorMessage    = req.body?.errorMessage    || req.body?.error_message    || null;
     const extractedFields = req.body?.extractedFields || req.body?.extracted_fields || null;
 
@@ -73,12 +77,12 @@ module.exports = async function (context, req) {
 
       if (TERMINAL_STATUSES.includes(status)) updates.push('completed_at = NOW()');
 
-      if (resultUrl)        { updates.push(`result_url = $${idx++}`);       params.push(resultUrl); }
+      if (resultUrl && String(resultUrl).length <= 2048)        { updates.push(`result_url = $${idx++}`);       params.push(resultUrl); }
       if (pageCount != null){ updates.push(`page_count = $${idx++}`);       params.push(pageCount); }
       if (costTotal != null){ updates.push(`cost_total = $${idx++}`);       params.push(costTotal); }
       if (errorMessage)     { updates.push(`error_message = $${idx++}`);    params.push(String(errorMessage).slice(0, 2000)); }
       if (extractedFields)  { updates.push(`extracted_fields = $${idx++}`); params.push(
-        typeof extractedFields === 'string' ? extractedFields : JSON.stringify(extractedFields)
+        (typeof extractedFields === 'string' ? extractedFields : JSON.stringify(extractedFields)).slice(0, 1000000)
       ); }
 
       await pool.query(`UPDATE jobs SET ${updates.join(', ')} WHERE id = $1`, params);

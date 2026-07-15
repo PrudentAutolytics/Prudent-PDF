@@ -1,7 +1,11 @@
 'use strict';
+const crypto = require('crypto');
 const pool                              = require('../db');
 const { getCorsHeaders, handleCors }    = require('../cors');
 const { generateSessionToken }          = require('../auth');
+const { checkRateLimit }                  = require('../ratelimit');
+const { validEmail, getClientId }         = require('../security');
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'kabileshvijayakumar@prudentautolytics.com').split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
 
 module.exports = async function (context, req) {
   if (handleCors(context, req)) return;
@@ -9,8 +13,18 @@ module.exports = async function (context, req) {
   const email = (req.body?.email || '').trim().toLowerCase();
   const otp   = (req.body?.otp   || '').trim();
 
-  if (!email || !otp) {
+  if (!validEmail(email) || !/^\d{6}$/.test(otp)) {
     context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Email and code required.' } };
+    return;
+  }
+
+  const clientId = getClientId(req);
+  const [emailLimited, clientLimited] = await Promise.all([
+    checkRateLimit(`otp:verify:email:${email}`, 10, 15 * 60 * 1000, context),
+    checkRateLimit(`otp:verify:client:${clientId}`, 30, 15 * 60 * 1000, context),
+  ]);
+  if (emailLimited || clientLimited) {
+    context.res = { status: 429, headers: getCorsHeaders(req), body: { error: 'Too many verification attempts. Please request a new code later.' } };
     return;
   }
 
@@ -31,7 +45,13 @@ module.exports = async function (context, req) {
       context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Code expired. Please request a new one.' } };
       return;
     }
-    if (user.otp !== otp) {
+    const storedOtp = String(user.otp || '');
+    const providedHash = crypto.createHash('sha256').update(otp).digest('hex');
+    const storedHash = storedOtp.startsWith('sha256:') ? storedOtp.slice(7) : '';
+    const otpMatches = /^[0-9a-f]{64}$/i.test(storedHash)
+      ? crypto.timingSafeEqual(Buffer.from(storedHash, 'hex'), Buffer.from(providedHash, 'hex'))
+      : storedOtp.length === otp.length && crypto.timingSafeEqual(Buffer.from(storedOtp), Buffer.from(otp));
+    if (!otpMatches) {
       context.res = { status: 401, headers: getCorsHeaders(req), body: { error: 'Invalid code. Please check and try again.' } };
       return;
     }
@@ -42,7 +62,7 @@ module.exports = async function (context, req) {
     // Issue a signed session token
     const token = generateSessionToken(user.email, user.id);
 
-    context.log('auth-verify: SUCCESS for', email);
+    context.log('auth-verify: verification succeeded');
 
     context.res = {
       status  : 200,
@@ -59,6 +79,7 @@ module.exports = async function (context, req) {
         fullName        : user.full_name  || null,
         company         : user.company    || null,
         useCase         : user.use_case   || null,
+        isAdmin         : ADMIN_EMAILS.includes(String(user.email).toLowerCase()),
       },
     };
 

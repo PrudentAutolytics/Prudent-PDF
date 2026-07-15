@@ -1,0 +1,21 @@
+'use strict';
+const assert = require('assert');
+const path = require('path');
+const root = path.resolve(__dirname, '..');
+const sec = require(path.join(root,'api/security.js'));
+
+assert.equal(sec.validEmail('user@example.com'), true);
+assert.equal(sec.validEmail('bad@@example.com'), false);
+assert.equal(sec.validEmail('x'.repeat(250)+'@x.com'), false);
+assert.equal(sec.validUuid('550e8400-e29b-41d4-a716-446655440000'), true);
+assert.equal(sec.validUuid('../bad'), false);
+assert.equal(sec.safeFileName('document.pdf'), true);
+assert.equal(sec.safeFileName('../document.pdf'), false);
+assert.equal(sec.safeFileName('bad\u0000.pdf'), false);
+assert.equal(sec.timingSafeSecret('same','same'), true);
+assert.equal(sec.timingSafeSecret('same','different'), false);
+assert.equal(sec.safeUrlForLog('https://account.blob.core.windows.net/c/file.pdf?sig=SECRET'), 'https://account.blob.core.windows.net/c/file.pdf');
+const h=sec.noStore({'X-Test':'1'});
+assert.match(h['Cache-Control'],/no-store/);
+assert.equal(h['X-Content-Type-Options'],'nosniff');
+console.log('Security helper unit tests passed.');

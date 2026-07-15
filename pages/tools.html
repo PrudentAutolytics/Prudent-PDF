@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<title>Document Operations</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<style>
+.ops-band { display:grid; grid-template-columns:170px 1fr; gap:20px; padding:20px 0; border-bottom:1px solid var(--border); }
+.ops-band:last-of-type { border-bottom:0; }
+@media(max-width:820px){ .ops-band { grid-template-columns:1fr; gap:12px; } }
+.ops-band-hd { position:sticky; top:0; }
+.ops-band-name { font-size:12px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink); }
+.ops-band-desc { font-size:12px; color:var(--ink3); margin-top:5px; line-height:1.6; }
+
+.ops-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(268px,1fr)); gap:12px; }
+.ops-tool { display:flex; flex-direction:column; gap:8px; padding:15px 16px; border:1px solid var(--border); border-radius:var(--r10); background:var(--surface); transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.ops-tool:hover, .ops-tool:focus-within { border-color:var(--blue-bd); box-shadow:0 2px 8px rgba(22,35,59,.06); }
+.ops-tool-hd { display:flex; align-items:center; gap:9px; }
+.ops-tool-ico { width:28px; height:28px; flex:none; display:grid; place-items:center; border-radius:var(--r6); background:var(--blue-bg,var(--surface2)); color:var(--blue); }
+.ops-tool-name { font-size:13.5px; font-weight:650; color:var(--ink); }
+.ops-tool-what { font-size:12.5px; color:var(--ink2); line-height:1.6; }
+.ops-tool-when { font-size:11.5px; color:var(--ink3); line-height:1.6; }
+.ops-tool-when b { color:var(--ink2); font-weight:600; display:block; margin-bottom:2px; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; }
+.ops-tool-act { margin-top:auto; padding-top:4px; }
+
+.rec-tbl { width:100%; border-collapse:collapse; }
+.rec-tbl th { font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); }
+.rec-tbl td { font-size:12.5px; color:var(--ink2); padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+.rec-tbl tr:last-child td { border-bottom:0; }
+.rec-mono { font-family:var(--mono); font-size:11px; color:var(--ink3); }
+.local-note { display:flex; gap:9px; align-items:flex-start; padding:11px 13px; border:1px solid var(--border2); border-radius:var(--r8); background:var(--surface2); font-size:12px; color:var(--ink2); line-height:1.6; margin-bottom:14px; }
+.local-note svg { flex:none; margin-top:1px; color:var(--ink3); }
+</style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
+</head>
+<body>
+
+<div class="shell" id="appShell">
+  <main class="main">
+
+    <div class="page-hd anim">
+      <div>
+        <h1 class="page-title">Document Operations</h1>
+        <p class="page-subtitle">
+          Controlled PDF preparation, transformation, and validation. Every operation runs inside your browser,
+          produces a new output document, and leaves the source document unchanged.
+        </p>
+      </div>
+    </div>
+
+    <div class="card anim" style="margin-bottom:18px">
+      <div class="card-bd" style="padding:16px 20px">
+        <div class="local-note" style="margin:0">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div>
+            <b style="color:var(--ink)">Local processing.</b>
+            Documents opened in these workspaces are processed by the redaction engine running in this browser tab.
+            They are not uploaded to Prudent Redact, not written to Azure Blob Storage, and not sent to any external
+            viewer or conversion service. Redaction remains a separate, server-side controlled process.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card anim">
+      <div class="card-bd" style="padding:4px 22px 8px">
+        <div id="bands"></div>
+      </div>
+    </div>
+
+    <div class="card anim" style="margin-top:18px">
+      <div class="card-hd">
+        <div class="card-title">Recent operations</div>
+        <button class="btn btn-ghost btn-sm" id="clearRecs">Clear records</button>
+      </div>
+      <div class="card-bd" style="padding:16px 20px">
+        <div class="local-note">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v5M12 16.5v.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <div>
+            <b style="color:var(--ink)">Local operation records.</b>
+            These are stored in this browser only. They are a working history for your own reference, not a
+            server-side audit trail, and they can be cleared by anyone with access to this browser profile.
+            Administrative audit evidence is held separately in Governance.
+          </div>
+        </div>
+        <div id="recWrap"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script src="/js/enterprise-runtime.js"></script>
+<script src="/js/tools-catalog.js"></script>
+<script>
+(function () {
+  'use strict';
+  Shell.init('tools');
+
+  const $ = id => document.getElementById(id);
+  const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  /* ── Tool directory ── */
+  $('bands').innerHTML = TOOL_BANDS.map(band => `
+    <section class="ops-band">
+      <div class="ops-band-hd">
+        <div class="ops-band-name">${esc(band.name)}</div>
+        <div class="ops-band-desc">${esc(band.desc)}</div>
+      </div>
+      <div class="ops-grid">
+        ${band.tools.map(id => {
+          const t = TOOLS[id];
+          return `
+          <article class="ops-tool">
+            <div class="ops-tool-hd">
+              <span class="ops-tool-ico" aria-hidden="true">${t.icon}</span>
+              <h2 class="ops-tool-name">${esc(t.name)}</h2>
+            </div>
+            <p class="ops-tool-what">${esc(t.what)}</p>
+            <div class="ops-tool-when"><b>Use for</b>${esc(t.when.join(', '))}</div>
+            <div class="ops-tool-act">
+              <a class="btn btn-secondary btn-sm" href="/tool?op=${t.id}">Open ${esc(t.name)}</a>
+            </div>
+          </article>`;
+        }).join('')}
+      </div>
+    </section>
+  `).join('');
+
+  /* ── Recent local operation records ── */
+  function renderRecords() {
+    const recs = PDFOpsRecords();
+    const wrap = $('recWrap');
+    if (!recs.length) {
+      wrap.innerHTML = `
+        <div style="text-align:center;padding:34px 20px">
+          <div style="font-size:13.5px;font-weight:600;color:var(--ink2);margin-bottom:5px">No document operations yet</div>
+          <div style="font-size:12.5px;color:var(--ink3);margin-bottom:16px">Operations you run in these workspaces will be recorded here for this browser.</div>
+          <a class="btn btn-primary btn-sm" href="/tool?op=split">Open Split PDF</a>
+        </div>`;
+      $('clearRecs').style.display = 'none';
+      return;
+    }
+    $('clearRecs').style.display = '';
+    wrap.innerHTML = `
+      <div style="overflow-x:auto">
+      <table class="rec-tbl">
+        <thead><tr>
+          <th>Operation</th><th>Source</th><th>Rule</th><th>Outputs</th><th>Pages</th><th>When</th>
+        </tr></thead>
+        <tbody>
+          ${recs.slice(0, 12).map(r => `
+            <tr>
+              <td style="font-weight:600;color:var(--ink);white-space:nowrap">${esc(OP_LABEL(r.operation))}</td>
+              <td>
+                ${r.sources.map(s => `<div>${esc(s.name)}</div>`).join('')}
+                <div class="rec-mono">${esc(shortSha(r.sources[0]?.sha256))}</div>
+              </td>
+              <td style="max-width:230px">${esc(ruleText(r))}</td>
+              <td>
+                ${r.outputs.slice(0,3).map(o => `<div>${esc(o.name)}</div>`).join('')}
+                ${r.outputs.length > 3 ? `<div class="rec-mono">and ${r.outputs.length - 3} more</div>` : ''}
+              </td>
+              <td style="white-space:nowrap">${r.pagesBefore ?? '?'} to ${r.pagesAfter ?? '?'}</td>
+              <td style="white-space:nowrap;color:var(--ink3)">${esc(when(r.timestamp))}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+  }
+
+  function shortSha(h) { return h ? h.slice(0,8) + '...' + h.slice(-8) : 'Fingerprint unavailable'; }
+  function OP_LABEL(op) { return OPERATION_LABELS[op] || op; }
+
+  function ruleText(r) {
+    const p = r.parameters || {};
+    switch (r.operation) {
+      case 'PDF_SPLIT':         return `${p.outputs} output documents`;
+      case 'PDF_MERGE':         return `${p.documents} source documents merged in order`;
+      case 'PAGE_EXTRACTION':   return `Pages ${(p.pages||[]).join(', ')} (${p.order})`;
+      case 'PAGE_REMOVAL':      return `Removed pages ${(p.removed||[]).join(', ')}`;
+      case 'PAGE_ROTATION':     return `${p.pageCount} pages rotated ${p.degrees} degrees`;
+      case 'PAGE_ORGANIZATION': return `Reordered, ${(p.removed||[]).length} removed, ${(p.rotated||[]).length} rotated`;
+      case 'METADATA_CLEAN':    return `Cleared: ${(p.fieldsCleared||[]).join(', ') || 'no populated fields'}`;
+      default:                  return '';
+    }
+  }
+
+  function when(iso) {
+    const d = new Date(iso), diff = (Date.now() - d) / 1000;
+    if (diff < 60)    return 'Just now';
+    if (diff < 3600)  return Math.floor(diff/60) + ' min ago';
+    if (diff < 86400) return Math.floor(diff/3600) + ' hr ago';
+    return d.toLocaleDateString(undefined, { day:'numeric', month:'short' });
+  }
+
+  /* Records live in PDFOps, but this page does not load the full engine.
+     Read them directly so the home page stays light. */
+  function PDFOpsRecords() {
+    try { return JSON.parse(localStorage.getItem('prudent.opRecords') || '[]'); } catch { return []; }
+  }
+  const OPERATION_LABELS = {
+    PDF_SPLIT:'PDF split', PDF_MERGE:'PDF merge', PAGE_EXTRACTION:'Page extraction',
+    PAGE_REMOVAL:'Page removal', PAGE_ROTATION:'Page rotation',
+    PAGE_ORGANIZATION:'Page organization', METADATA_CLEAN:'Metadata cleaning',
+  };
+
+  $('clearRecs').addEventListener('click', () => {
+    if (!confirm('Clear all local operation records from this browser?')) return;
+    localStorage.removeItem('prudent.opRecords');
+    renderRecords();
+    showToast('Local operation records cleared.', 'info');
+  });
+
+  renderRecords();
+})();
+</script>
+</body>
+</html>

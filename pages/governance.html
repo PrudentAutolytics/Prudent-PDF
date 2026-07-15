@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Governance Command Center · Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
 <style>
 .gov-page{padding:28px 30px 44px;max-width:1680px;margin:0 auto;width:100%}
 .gov-hero{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:20px;background:linear-gradient(135deg,var(--navy-d),#203b6b 54%,#2e75b6);color:#fff;padding:28px 30px;box-shadow:var(--s3);margin-bottom:20px}
@@ -27,6 +28,8 @@
 @media(max-width:1450px){.metric-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:1100px){.gov-grid{grid-template-columns:1fr}.command-strip{grid-template-columns:1fr 1fr}}
 </style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
 </head>
 <body>
 <div class="shell" id="appShell">
@@ -37,7 +40,7 @@
       <div><div class="gov-eyebrow">Operational Governance · 30-day control window</div><div class="gov-title">Governance Command Center</div><div class="gov-sub">One operating view for redaction risk, processing health, SLA exposure, operational exceptions, user concentration, and administrative evidence. Built for operators who need to decide what to do next-not just read reports.</div></div>
       <div class="hero-actions"><button class="hero-btn" id="exportBtn">Export evidence snapshot</button><button class="hero-btn" id="refreshBtn">Refresh controls</button><button class="hero-btn primary" onclick="location.href='/viewer'">Open review workspace</button></div>
     </div>
-    <div class="gov-health"><div class="health-chip"><span class="health-dot" id="serviceDot"></span><span id="serviceHealth">Checking service health…</span></div><div class="health-chip"><span class="health-dot" id="callbackDot"></span><span id="callbackHealth">Checking callback protection…</span></div><div class="health-chip"><span class="health-dot" id="appUrlDot"></span><span id="appUrlHealth">Checking deployment identity…</span></div><div class="health-chip"><span>Generated <strong id="generatedAt">-</strong></span></div></div>
+    <div class="gov-health"><div class="health-chip"><span class="health-dot" id="serviceDot"></span><span id="serviceHealth">Checking service health...</span></div><div class="health-chip"><span class="health-dot" id="callbackDot"></span><span id="callbackHealth">Checking callback protection...</span></div><div class="health-chip"><span class="health-dot" id="appUrlDot"></span><span id="appUrlHealth">Checking deployment identity...</span></div><div class="health-chip"><span>Generated <strong id="generatedAt">-</strong></span></div></div>
   </section>
 
   <section class="metric-grid">
@@ -50,7 +53,7 @@
   </section>
 
   <div class="gov-grid">
-    <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">!</span>Priority risk queue</div><div class="gov-card-sub">Failures, stuck jobs, and SLA breaches ranked for intervention.</div></div><span class="pill" id="riskCount">0 open</span></div><div style="overflow:auto"><table class="risk-table"><thead><tr><th>Document</th><th>Owner</th><th>Risk</th><th>Age</th><th>Action</th></tr></thead><tbody id="riskBody"><tr><td colspan="5" class="empty pulse">Loading operational risk…</td></tr></tbody></table></div></section>
+    <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">!</span>Priority risk queue</div><div class="gov-card-sub">Failures, stuck jobs, and SLA breaches ranked for intervention.</div></div><span class="pill" id="riskCount">0 open</span></div><div style="overflow:auto"><table class="risk-table"><thead><tr><th>Document</th><th>Owner</th><th>Risk</th><th>Age</th><th>Action</th></tr></thead><tbody id="riskBody"><tr><td colspan="5" class="empty pulse">Loading operational risk...</td></tr></tbody></table></div></section>
     <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">◆</span>Control posture</div><div class="gov-card-sub">Live deployment and workflow control checks.</div></div></div><div class="gov-card-body"><div class="policy-stack" id="policyStack"></div></div></section>
   </div>
 
@@ -61,11 +64,11 @@
 
   <div class="gov-grid">
     <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">▦</span>14-day processing volume</div><div class="gov-card-sub">Daily jobs with failure share embedded in each bar.</div></div></div><div class="gov-card-body"><div class="chart" id="volumeChart"></div></div></section>
-    <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">◎</span>User & tenant concentration</div><div class="gov-card-sub">Highest-volume users and operational risk concentration.</div></div></div><div class="gov-card-body"><div class="tenant-list" id="tenantList"><div class="empty pulse">Loading concentration view…</div></div></div></section>
+    <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">◎</span>User & tenant concentration</div><div class="gov-card-sub">Highest-volume users and operational risk concentration.</div></div></div><div class="gov-card-body"><div class="tenant-list" id="tenantList"><div class="empty pulse">Loading concentration view...</div></div></div></section>
   </div>
 
   <div class="gov-grid">
-    <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">↺</span>Administrative evidence feed</div><div class="gov-card-sub">Recent privileged actions recorded by the admin audit trail.</div></div></div><div class="gov-card-body"><div class="audit-feed" id="auditFeed"><div class="empty pulse">Loading audit evidence…</div></div></div></section>
+    <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">↺</span>Administrative evidence feed</div><div class="gov-card-sub">Recent privileged actions recorded by the admin audit trail.</div></div></div><div class="gov-card-body"><div class="audit-feed" id="auditFeed"><div class="empty pulse">Loading audit evidence...</div></div></div></section>
     <section class="gov-card"><div class="gov-card-hd"><div><div class="gov-card-title"><span class="section-icon">$</span>Cost & throughput</div><div class="gov-card-sub">Operational context for capacity and margin review.</div></div></div><div class="gov-card-body"><div class="policy-stack"><div class="policy-row"><div class="policy-state">$</div><div><div class="policy-name">30-day processing cost</div><div class="policy-desc">Aggregate recorded workflow cost.</div></div><div class="policy-badge" id="costTotal">-</div></div><div class="policy-row"><div class="policy-state">#</div><div><div class="policy-name">Average turnaround</div><div class="policy-desc">Completed jobs only.</div></div><div class="policy-badge" id="avgMinutes">-</div></div><div class="policy-row"><div class="policy-state">▤</div><div><div class="policy-name">Pages processed</div><div class="policy-desc">Recorded page count in the control window.</div></div><div class="policy-badge" id="pagesTotal">-</div></div></div></div></section>
   </div>
 </div>
@@ -73,6 +76,7 @@
 </div>
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
+<script src="/js/enterprise-runtime.js"></script>
 <script>
 'use strict';
 Shell.init('governance');
@@ -84,9 +88,9 @@ const pct=(a,b)=>b?Math.round(a/b*100):0;
 function setDot(id,state){const el=$(id); el.className='health-dot'+(state==='warn'?' warn':state==='bad'?' bad':'');}
 async function api(body){const r=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`); return d;}
 async function load(){
-  $('refreshBtn').disabled=true; $('refreshBtn').textContent='Refreshing…';
+  $('refreshBtn').disabled=true; $('refreshBtn').textContent='Refreshing...';
   try{
-    const [d,h]=await Promise.all([api({type:'governance',action:'list'}),fetch('/api/health',{credentials:'include'}).then(async r=>({ok:r.ok,data:await r.json().catch(()=>({}))}))]);
+    const [d,healthData]=await Promise.all([api({type:'governance',action:'list'}),paFetch('/api/health',{})]); const h={ok:healthData?.status==='ready',data:healthData};
     snapshot=d; render(d,h); showToast('Governance controls refreshed','success',1800);
   }catch(e){console.error(e); showToast(e.message==='Forbidden.'?'Governance Command is restricted to administrators.':e.message,'error',6000); if(e.message==='Forbidden.') setTimeout(()=>location.href='/dashboard',1300);}
   finally{$('refreshBtn').disabled=false;$('refreshBtn').textContent='Refresh controls';}

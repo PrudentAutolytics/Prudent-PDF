@@ -215,7 +215,11 @@ const Session = (() => {
       try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; }
     },
     clear() {
-      try { localStorage.removeItem(KEY); } catch {}
+      try {
+        const s = this.get();
+        localStorage.removeItem(KEY);
+        if (s?.userId || s?.email) localStorage.removeItem(`pp_jobs_${s.userId || s.email}`);
+      } catch {}
     },
     valid() {
       const s = this.get();
@@ -247,7 +251,10 @@ async function paFetch(url, body = {}, timeoutMs = 55_000) {
   try {
     const res = await fetch(url, {
       method  : 'POST',
-      headers : { 'Content-Type': 'application/json' },
+      headers : {
+        'Content-Type': 'application/json',
+        ...(session?.token ? { 'Authorization': `Bearer ${session.token}` } : {}),
+      },
       body    : JSON.stringify(body),
       signal  : ctrl.signal,
     });
@@ -301,8 +308,14 @@ if (!window._prudentFetchPatched) {
     const res = await _origFetch(...args);
     if (res.status === 401) {
       // Only redirect if it's an API call to our own domain
-      const url = (args[0] || '').toString();
-      if (url.includes(window.location.hostname) || url.includes('azurewebsites') || url.includes('azure.com') || url.includes('powerplatform')) {
+      const rawUrl = (args[0] || '').toString();
+      let isProtectedApi = false;
+      try {
+        const u = new URL(rawUrl, window.location.origin);
+        const publicAuthPaths = new Set(['/api/auth-request', '/api/auth-verify', '/api/auth-check']);
+        isProtectedApi = u.origin === window.location.origin && u.pathname.startsWith('/api/') && !publicAuthPaths.has(u.pathname);
+      } catch {}
+      if (isProtectedApi) {
         Session.clear();
         try { sessionStorage.setItem('pp_expired', '1'); } catch {}
         window.location.replace('/login');
@@ -353,7 +366,7 @@ const fmt = {
   usd(n)   { return n != null ? `$${Number(n).toFixed(2)}` : '-'; },
   trunc(str, max=40) {
     if (!str) return '-';
-    return str.length > max ? str.slice(0, max-1) + '…' : str;
+    return str.length > max ? str.slice(0, max-1) + '...' : str;
   },
 };
 
@@ -384,7 +397,12 @@ function showToast(message, type = 'info', duration = 3800) {
     fontSize:'13px', color:'var(--ink)', animation:'toastIn .22s ease both',
     maxWidth:'380px', lineHeight:'1.55', wordBreak:'break-word',
   });
-  toast.innerHTML = `<span style="color:${color};font-size:14px;flex-shrink:0;margin-top:1px">${ICONS[type]}</span><span>${message}</span>`;
+  const toastIcon = document.createElement('span');
+  toastIcon.style.cssText = `color:${color};font-size:14px;flex-shrink:0;margin-top:1px`;
+  toastIcon.textContent = ICONS[type];
+  const toastMessage = document.createElement('span');
+  toastMessage.textContent = String(message ?? '');
+  toast.append(toastIcon, toastMessage);
 
   if (!document.getElementById('toast-style')) {
     const s = document.createElement('style');

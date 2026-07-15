@@ -206,3 +206,14 @@ Chennai, Tamil Nadu, India
 ## Governance Command Center (v9)
 
 The `/governance` workspace is an administrator-only operational control plane backed by the existing `jobs`, `users`, health, and `audit_log` data. It provides a 30-day control window, priority exception queue, stuck-job detection, 15-minute SLA exposure, success rate, P95 turnaround, processing flow distribution, user/tenant concentration, privileged-action evidence, configuration posture, and exportable governance snapshots. It does not modify the Power Automate submission payload.
+
+
+## v11 responsive and security hardening
+
+- Adds an adaptive desktop, tablet, and mobile application shell with an accessible navigation drawer and desktop sidebar collapse.
+- Adds mobile table card behaviour, bottom-sheet dialogs, touch targets, safe-area support, reduced-motion support, and responsive viewer/tool layouts.
+- Adds a conservative PWA manifest only. Sensitive PDFs, SAS URLs, API responses, and admin data are not service-worker cached.
+- Tightens CORS origin handling, callback input validation, OTP throttling, contact validation, safe toast/help rendering, security headers, and inactivity cleanup.
+- The Power Automate job submission body remains backward compatible and retains every existing contract field.
+
+For production, set strong unique `SESSION_SECRET` and `PA_CALLBACK_SECRET` values in Azure application settings. A future HttpOnly cookie session migration should be completed as one coordinated API and client change rather than a partial migration.

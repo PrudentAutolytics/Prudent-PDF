@@ -2,6 +2,7 @@
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession }              = require('../auth');
 const pool = require('../db');
+const { validUuid, safeFileName } = require('../security');
 
 const PA_FLOW_FALLBACK = 'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6f1b9fb734594602b3cdef26e0166ed6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7yVwfmA-5Aog_IJW3XN7Vz3uNnKcBE1NyoYwluTGlpc';
 const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
@@ -82,6 +83,20 @@ function extractBlobName(blobUrl) {
   catch { return null; }
 }
 
+/**
+ * Resolve the deployment origin for the Power Automate callback.
+ * Prefers the APP_URL app setting, then the origin the request actually
+ * arrived on. A deployment URL is not hardcoded in source, so promoting to a
+ * custom domain or a staging slot needs no code change.
+ */
+function appOrigin(req) {
+  const configured = (process.env.APP_URL || '').trim().replace(/\/$/, '');
+  if (configured) return configured;
+  const host = req.headers?.['x-forwarded-host'] || req.headers?.host;
+  const proto = req.headers?.['x-forwarded-proto'] || 'https';
+  return host ? `${proto}://${host}` : '';
+}
+
 module.exports = async function (context, req) {
   if (handleCors(context, req)) return;
 
@@ -106,8 +121,8 @@ module.exports = async function (context, req) {
   const estPageCount  = Number(req.body?.estPageCount) || Math.max(1, Math.round(fileSizeBytes / 60_000));
   const actualBlobName = extractBlobName(blobUrl) || (req.body?.blobName || '').trim();
 
-  if (!fileName || !blobUrl) {
-    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'fileName and blobUrl are required.' } };
+  if (!safeFileName(fileName) || !blobUrl || (jobId && !validUuid(jobId)) || !Number.isFinite(fileSizeMB) || fileSizeMB < 0 || !Number.isFinite(estPageCount) || estPageCount < 1 || estPageCount > 1000000) {
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Invalid document submission parameters.' } };
     return;
   }
 
@@ -214,8 +229,8 @@ module.exports = async function (context, req) {
           costBreakdown      : costs.breakdown,
           azureCost          : costs.azureCost,
           productPrice       : costs.productPrice,
-          callbackUrl        : `${process.env.APP_URL || 'https://brave-cliff-0ceef0a00.4.azurestaticapps.net'}/api/jobs-status`,
-          paSecret           : process.env.PA_CALLBACK_SECRET || 'prudent-pa-secret-change-me',
+          callbackUrl        : `${appOrigin(req)}/api/jobs-status`,
+          paSecret           : process.env.PA_CALLBACK_SECRET || '',
         }),
       });
       paOk = paRes.ok || paRes.status === 202;

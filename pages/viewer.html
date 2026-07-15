@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Redaction Review Workspace · Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
 <style>
 .main { padding:0!important; overflow:hidden!important; display:flex!important; flex-direction:column!important; height:calc(100vh - var(--topbar-h))!important; }
 .viewer-toolbar { height:52px; flex-shrink:0; display:flex; align-items:center; gap:10px; padding:0 18px; background:var(--surface); border-bottom:1px solid var(--border); overflow-x:auto; }
@@ -58,6 +59,8 @@
 @media(max-width:1200px){.viewer-content{grid-template-columns:1fr 1fr 280px}}
 
 </style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
 </head>
 <body>
 <div class="shell" id="appShell">
@@ -75,7 +78,7 @@
       <div style="flex:1"></div>
       <!-- Job selector dropdown -->
       <select class="filter-select" id="jobSelector" style="max-width:260px;font-size:12px">
-        <option value="">Loading jobs…</option>
+        <option value="">Loading jobs...</option>
       </select>
       <div class="viewer-divider"></div>
       <button class="btn btn-secondary btn-sm" id="dlOrigBtn" disabled>
@@ -113,7 +116,7 @@
         <div class="pane-body">
           <div class="pdf-loading" id="origLoading">
             <div class="spinner" style="width:24px;height:24px;border-width:2.5px;margin:0"></div>
-            <span>Loading original PDF…</span>
+            <span>Loading original PDF...</span>
           </div>
           <div class="pane-empty hidden" id="origEmpty">
             <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg></div>
@@ -144,7 +147,7 @@
         <div class="pane-body">
           <div class="pdf-loading" id="redLoading">
             <div class="spinner" style="width:24px;height:24px;border-width:2.5px;margin:0"></div>
-            <span>Loading redacted PDF…</span>
+            <span>Loading redacted PDF...</span>
           </div>
           <div class="pane-empty hidden" id="redEmpty">
             <div class="pane-empty-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/></svg></div>
@@ -182,7 +185,7 @@
               <div class="review-metric"><span>Pending review</span><b id="metricPending">0</b></div>
             </div>
             <div class="review-tools">
-              <input id="entitySearch" class="review-search" type="search" placeholder="Search type, value or page…" aria-label="Search detected entities"/>
+              <input id="entitySearch" class="review-search" type="search" placeholder="Search type, value or page..." aria-label="Search detected entities"/>
               <select id="entityFilter" class="review-filter" aria-label="Filter entities"><option value="all">All</option><option value="pending">Pending</option><option value="low">Low confidence</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select>
             </div>
             <div class="entity-list" id="entityList"></div>
@@ -213,6 +216,7 @@
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
+<script src="/js/enterprise-runtime.js"></script>
 <script>
 (function () {
   'use strict';
@@ -398,7 +402,7 @@
     } else {
       setPaneEmpty('red',
         status==='complete'   ? 'Could not load redacted PDF' :
-        status==='processing' ? 'Redaction in progress…' :
+        status==='processing' ? 'Redaction in progress...' :
         status==='queued'     ? 'Job is queued - check back soon' :
         'Redacted PDF appears after job completes'
       );
@@ -456,7 +460,7 @@
     const integrityEl = $(`${which}Integrity`);
     if (!frame) return;
     if (sizeEl) sizeEl.textContent = sizeLabel || '';
-    if (integrityEl) integrityEl.textContent = 'Verifying…';
+    if (integrityEl) integrityEl.textContent = 'Verifying...';
 
     // Cancel a stale preview request when the reviewer switches jobs.
     previewControllers[which]?.abort();

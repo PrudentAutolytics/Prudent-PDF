@@ -13,13 +13,19 @@ const Shell = (() => {
         { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: 'Overview, stats, and quick upload' },
         { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: 'Upload and process a PDF' },
         { id: 'history',   label: 'Processing History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs - last 30 days', badge: '30d' },
-        { id: 'viewer',    label: 'Review Workspace',  href: '/viewer',    icon: 'eye',     desc: 'Review entities, integrity, and release readiness' },
+        { id: 'viewer',    label: 'Document Viewer',  href: '/viewer',    icon: 'eye',     desc: 'Secure original and redacted PDF preview with integrity details' },
       ],
     },
     {
-      group : 'GOVERNANCE',
+      group : 'DOCUMENT TOOLS',
       items : [
-        { id: 'governance', label: 'Governance Command', href: '/governance', icon: 'shield', desc: 'Risk queue, SLA, policy health, and operator actions' },
+        { id: 'tools', label: 'Document Operations', href: '/tools', icon: 'tools', desc: 'Split, merge, organize, validate, and inspect PDF documents' },
+      ],
+    },
+    {
+      group : 'OPERATIONS',
+      items : [
+        { id: 'governance', label: 'Governance', href: '/governance', icon: 'shield', desc: 'Risk queue, SLA, policy health, and operator actions' },
       ],
     },
     {
@@ -27,7 +33,11 @@ const Shell = (() => {
       items : [
         { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans and cost details' },
         { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: 'Talk to our team' },
-        ...(['kabileshvijayakumar@prudentautolytics.com'].includes((Session.get()?.email||'').toLowerCase())
+        // Administration is shown only when the session was issued with the
+        // administrator flag, which is set server-side from ADMIN_EMAILS at
+        // OTP verification. The admin API independently enforces access, so
+        // this controls visibility, not authorization.
+        ...(Session.get()?.isAdmin === true
           ? [{ id: 'admin', label: 'Administration', href: '/admin', icon: 'settings', desc: 'Users, tenant access, plans, credits, and API keys' }]
           : []),
       ],
@@ -53,6 +63,7 @@ const Shell = (() => {
     logout   : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     star2    : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" stroke-width="1.7"/></svg>`,
     shield   : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7"/></svg>`,
+    tools    : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 015.3 4.9l-1.6-1.6-2.1.5-.5 2.1 1.6 1.6a4 4 0 01-4.9-5.3M11 13l-6.5 6.5a2.1 2.1 0 01-3-3L8 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     settings : `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.7"/></svg>`,
   };
 
@@ -91,7 +102,7 @@ const Shell = (() => {
 
   <div class="topbar-search" role="search">
     <span class="topbar-search-icon" aria-hidden="true">${ICONS.search}</span>
-    <input type="search" id="globalSearch" placeholder="Search jobs, files…" autocomplete="off" aria-label="Search jobs and files"/>
+    <input type="search" id="globalSearch" placeholder="Search jobs, files..." autocomplete="off" aria-label="Search jobs and files"/>
     <span class="topbar-search-kbd" aria-hidden="true">⌘K</span>
   </div>
 
@@ -470,7 +481,7 @@ const Shell = (() => {
     'dashboard':'A live operational summary of redaction activity, usage, processing health, and your quickest next actions.',
     'new redaction':'Upload a PDF for the existing Power Automate redaction workflow. File and page limits follow the active plan.',
     'processing history':'Search and investigate recent redaction jobs, their state, duration, output, and failure context.',
-    'review workspace':'Inspect the original and redacted outputs, detected entities, document integrity, and reviewer evidence.',
+    'document viewer':'Inspect original and redacted outputs using the protected in-browser PDF preview and document integrity details.',
     'governance command':'Prioritises failures, stuck jobs, SLA exposure, configuration health, and operational concentration from live platform data.',
     'administration':'Restricted administration for users, access, plans, credits, API keys, and enterprise configuration capabilities.',
     'success rate':'Percentage of completed jobs that finished successfully within the selected governance window.',
@@ -510,7 +521,7 @@ const Shell = (() => {
     let tip=document.getElementById('globalInfoTooltip');
     if (!tip) { tip=document.createElement('div'); tip.id='globalInfoTooltip'; tip.className='info-help-tooltip'; document.body.appendChild(tip); }
     const label=btn.dataset.infoLabel||'Information';
-    tip.innerHTML=`<strong>${label}</strong>${btn.dataset.infoText||helpText(label)}`;
+    tip.replaceChildren(); const strong=document.createElement('strong'); strong.textContent=label; const copy=document.createElement('span'); copy.textContent=btn.dataset.infoText||helpText(label); tip.append(strong,copy);
     const r=btn.getBoundingClientRect();
     tip.style.left=Math.max(16,Math.min(window.innerWidth-346,r.left-150+r.width/2))+'px';
     tip.style.top=Math.min(window.innerHeight-tip.offsetHeight-18,r.bottom+9)+'px';

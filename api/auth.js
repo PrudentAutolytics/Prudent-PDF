@@ -5,9 +5,9 @@
  * Every protected API endpoint calls verifySession(req) before
  * touching any data. Returns { ok, email, userId, error, status }.
  *
- * The session token is a HMAC-SHA256 hex of "email:userId:issuedAt"
- * signed with SESSION_SECRET. It is stored in localStorage on the
- * client and sent in the request body as { token }.
+ * The session token is a HMAC-SHA256 signature over "email:userId:issuedAt".
+ * Protected endpoints accept the existing request-body token contract and a
+ * standard Authorization: Bearer token for hardened callers.
  *
  * Endpoints that are intentionally public (auth-request, auth-verify,
  * auth-check) do NOT call this helper.
@@ -23,10 +23,12 @@ const TOKEN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
  * Returns { ok: true, email, userId } or { ok: false, status, error }.
  */
 async function verifySession(req) {
-  const token  = (req.body?.token  || '').trim();
-  const email  = (req.body?.email  || '').trim().toLowerCase();
+  const authHeader = String(req.headers?.authorization || req.headers?.Authorization || '');
+  const bearer = authHeader.match(/^Bearer\s+(.+)$/i)?.[1] || '';
+  const token = String(req.body?.token || bearer || '').trim();
+  const suppliedEmail = String(req.body?.email || '').trim().toLowerCase();
 
-  if (!token || !email) {
+  if (!token) {
     return { ok: false, status: 401, error: 'Authentication required.' };
   }
 
@@ -38,8 +40,11 @@ async function verifySession(req) {
 
   const [tokEmail, tokUserId, tokIssuedAt, tokHmac] = parts;
 
-  // 1. Email must match
-  if (tokEmail.toLowerCase() !== email) {
+  const email = tokEmail.toLowerCase();
+
+  // 1. Preserve backward compatibility with callers that still send email,
+  // but never trust that field as the source of identity.
+  if (suppliedEmail && suppliedEmail !== email) {
     return { ok: false, status: 401, error: 'Session mismatch.' };
   }
 

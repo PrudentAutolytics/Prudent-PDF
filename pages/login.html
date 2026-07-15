@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Sign In</title>
 <link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
 <style>
 /* ── Layout ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -263,6 +264,8 @@ body {
   .right-footer { text-align: center; }
 }
 </style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
 </head>
 <body>
 
@@ -326,7 +329,7 @@ body {
         <div class="input-group" style="margin-top:10px">
           <label class="input-label" for="regUseCase">Primary use case</label>
           <select class="login-input" id="regUseCase" style="cursor:pointer">
-            <option value="">Select one…</option>
+            <option value="">Select one...</option>
             <option value="legal">Legal document redaction</option>
             <option value="hr">HR / employee records</option>
             <option value="finance">Financial statements</option>
@@ -410,7 +413,7 @@ body {
           <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="success-title" id="successTitle">Signed in!</div>
-        <p class="success-sub" id="successSub">Redirecting to your dashboard…</p>
+        <p class="success-sub" id="successSub">Redirecting to your dashboard...</p>
         <div class="spinner" style="margin:0 auto" role="status"></div>
       </div>
     </div>
@@ -495,7 +498,7 @@ async function handleContinue() {
   function setLoading(txt) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ' + txt; }
   function resetBtn()      { btn.disabled = false; btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span id="contBtnTxt">' + (S.isNew ? 'Create account & send code' : S.checked ? 'Send verification code' : 'Continue') + '</span>'; }
 
-  if (!S.checked) { setLoading('Checking…'); await doCheck(email); resetBtn(); }
+  if (!S.checked) { setLoading('Checking...'); await doCheck(email); resetBtn(); }
 
   if (S.isNew) {
     const name = ($('regName')?.value || '').trim();
@@ -512,7 +515,7 @@ async function handleContinue() {
   }
 
   S.otpSent = true;
-  setLoading('Sending code…');
+  setLoading('Sending code...');
   try {
     await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email });
     $('otpEmailShow').textContent = email;
@@ -571,7 +574,7 @@ async function verifyOTP() {
   if (code.length !== 6) return;
   const btn = $('verifyBtn');
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> Verifying…';
+  btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> Verifying...';
   try {
     const d = await paFetch(APP_CONFIG.FLOWS.AUTH_VERIFY, { email: S.email, otp: code });
     if (d?.status === 'approved') {
@@ -591,7 +594,7 @@ async function verifyOTP() {
       const fn = d.fullName || S.name;
       const firstName = fn ? fn.split(' ')[0] : null;
       $('successTitle').textContent = S.isNew && firstName ? 'Welcome, ' + firstName + '!' : 'Signed in!';
-      $('successSub').textContent   = S.isNew ? 'Your free trial is active. Redirecting…' : 'Redirecting to your dashboard…';
+      $('successSub').textContent   = S.isNew ? 'Your free trial is active. Redirecting...' : 'Redirecting to your dashboard...';
       show('stepDone');
       setTimeout(() => location.replace('/dashboard'), 1200);
     } else { throw new Error('Verification failed.'); }
@@ -609,7 +612,7 @@ async function verifyOTP() {
 
 $('resendBtn').addEventListener('click', async () => {
   $('otpErr').textContent = ''; clearDigits();
-  $('resendBtn').disabled = true; $('resendBtn').textContent = 'Sending…';
+  $('resendBtn').disabled = true; $('resendBtn').textContent = 'Sending...';
   try {
     await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email: S.email });
     startTimer();

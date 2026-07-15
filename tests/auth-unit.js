@@ -1,0 +1,31 @@
+'use strict';
+const assert = require('assert');
+const path = require('path');
+const crypto = require('crypto');
+const root = path.resolve(__dirname,'..');
+process.env.SESSION_SECRET='0123456789abcdef0123456789abcdef';
+const dbPath=require.resolve(path.join(root,'api/db.js'));
+require.cache[dbPath]={id:dbPath,filename:dbPath,loaded:true,exports:{query:async()=>({rows:[{id:'user-1',is_active:true}]})}};
+const authPath=require.resolve(path.join(root,'api/auth.js'));
+delete require.cache[authPath];
+const {generateSessionToken,verifySession}=require(authPath);
+
+(async()=>{
+  const token=generateSessionToken('User@Example.com','user-1');
+  let r=await verifySession({body:{token},headers:{}});
+  assert.equal(r.ok,true);
+  assert.equal(r.email,'user@example.com');
+  r=await verifySession({body:{token,email:'other@example.com'},headers:{}});
+  assert.equal(r.status,401);
+  r=await verifySession({body:{},headers:{authorization:`Bearer ${token}`}});
+  assert.equal(r.ok,true);
+  const parts=token.split(':'); parts[3]='0'.repeat(64);
+  r=await verifySession({body:{token:parts.join(':')},headers:{}});
+  assert.equal(r.status,401);
+  const issued=String(Date.now()-31*24*60*60*1000);
+  const payload=`user@example.com:user-1:${issued}`;
+  const h=crypto.createHmac('sha256',process.env.SESSION_SECRET).update(payload).digest('hex');
+  r=await verifySession({body:{token:`user@example.com:user-1:${issued}:${h}`},headers:{}});
+  assert.equal(r.status,401);
+  console.log('Authentication unit tests passed.');
+})().catch(e=>{console.error(e);process.exit(1)});

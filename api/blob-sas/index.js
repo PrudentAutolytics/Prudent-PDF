@@ -2,6 +2,7 @@
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession }              = require('../auth');
 const pool                           = require('../db');
+const { validUuid, safeFileName }     = require('../security');
 const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = require('@azure/storage-blob');
 
 /**
@@ -39,7 +40,20 @@ module.exports = async function (context, req) {
   const blobName  = (req.body?.blobName  || '').trim();
   const container = (req.body?.container || '').trim();
   const mode      = (req.body?.mode      || 'write').trim();
-  const fileSizeBytes = req.body?.fileSize || 0;
+  const fileSizeBytes = Number(req.body?.fileSize || 0);
+
+  if (!['read', 'write'].includes(mode) || !Number.isFinite(fileSizeBytes) || fileSizeBytes < 0 || fileSizeBytes > 1024 * 1024 * 1024) {
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Invalid storage request.' } };
+    return;
+  }
+  if (mode === 'write' && (!safeFileName(fileName || 'file.pdf') || (jobId && !validUuid(jobId)))) {
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Invalid document metadata.' } };
+    return;
+  }
+  if (mode === 'read' && (blobName.length > 1024 || /[\x00-\x1f\x7f]/.test(blobName))) {
+    context.res = { status: 400, headers: getCorsHeaders(req), body: { error: 'Invalid file reference.' } };
+    return;
+  }
 
   try {
     const account    = process.env.AZURE_STORAGE_ACCOUNT;
@@ -73,7 +87,7 @@ module.exports = async function (context, req) {
       `, [email, requestedUrl]);
 
       if (!owned.rows.length) {
-        context.log(`blob-sas DENIED read: ${email} requested ${targetContainer}/${blobName}`);
+        context.log('blob-sas DENIED read', { userId: auth.userId, container: targetContainer });
         context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'You do not have access to this file.' } };
         return;
       }
@@ -124,7 +138,7 @@ module.exports = async function (context, req) {
     const sasUrl  = `https://${account}.blob.core.windows.net/${targetContainer}/${targetBlobName}?${sasToken}`;
     const blobUrl = `https://${account}.blob.core.windows.net/${targetContainer}/${targetBlobName}`;
 
-    context.log(`blob-sas: ${mode} SAS for ${targetBlobName} (${email})`);
+    context.log('blob-sas issued', { mode, userId: auth.userId, container: targetContainer });
 
     context.res = {
       status  : 200,

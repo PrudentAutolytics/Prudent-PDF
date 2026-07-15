@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<title>Document Operation</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<style>
+.wk { display:grid; grid-template-columns:minmax(0,1fr) 344px; gap:18px; align-items:start; }
+@media(max-width:1080px){ .wk { grid-template-columns:1fr; } }
+
+.drop { border:1.5px dashed var(--border2); border-radius:var(--r10); padding:30px 20px; text-align:center; background:var(--surface2); transition:border-color var(--dur) var(--ease), background var(--dur) var(--ease); cursor:pointer; }
+.drop:hover, .drop.over { border-color:var(--blue); background:var(--blue-bg,var(--surface3)); }
+.drop:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.drop-t { font-size:13.5px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+.drop-s { font-size:12px; color:var(--ink3); line-height:1.6; }
+
+.srcrow { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:var(--r8); background:var(--surface); }
+.srcrow + .srcrow { margin-top:8px; }
+.srcrow.bad { border-color:var(--red-bd,var(--border2)); }
+.src-ico { width:30px; height:30px; flex:none; display:grid; place-items:center; border-radius:var(--r6); background:var(--surface3); color:var(--ink3); }
+.src-main { flex:1; min-width:0; }
+.src-name { font-size:13px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.src-meta { font-size:11.5px; color:var(--ink3); margin-top:2px; }
+.src-sha { font-family:var(--mono); font-size:10.5px; color:var(--ink4); margin-top:2px; }
+.src-ord { display:flex; flex-direction:column; gap:2px; }
+.ordbtn { width:22px; height:18px; display:grid; place-items:center; border:1px solid var(--border2); border-radius:4px; background:var(--surface); color:var(--ink3); cursor:pointer; font-size:9px; line-height:1; }
+.ordbtn:hover:not(:disabled) { border-color:var(--blue); color:var(--blue); }
+.ordbtn:disabled { opacity:.35; cursor:not-allowed; }
+
+.fld { margin-bottom:14px; }
+.fld-l { display:block; font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink3); margin-bottom:6px; }
+.fld-h { font-size:11.5px; color:var(--ink3); margin-top:5px; line-height:1.6; }
+.inp { width:100%; padding:8px 11px; border:1.5px solid var(--border2); border-radius:var(--r8); background:var(--surface); color:var(--ink); font-size:13px; font-family:var(--font); }
+.inp:focus { outline:none; border-color:var(--blue); box-shadow:var(--s-glow); }
+.inp.mono { font-family:var(--mono); }
+.inp.err { border-color:#DC2626; }
+
+.segs { display:flex; flex-wrap:wrap; gap:6px; }
+.seg { padding:6px 11px; border:1.5px solid var(--border2); border-radius:var(--r8); background:var(--surface); color:var(--ink2); font-size:12.5px; font-weight:500; cursor:pointer; font-family:var(--font); }
+.seg:hover { border-color:var(--blue-bd); }
+.seg.on { border-color:var(--blue); background:var(--blue-bg,var(--surface2)); color:var(--blue); font-weight:600; }
+.seg:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+
+.grp { display:grid; grid-template-columns:1fr 110px 30px; gap:7px; margin-bottom:7px; align-items:center; }
+.grp .inp { padding:7px 10px; font-size:12.5px; }
+.xbtn { width:28px; height:28px; display:grid; place-items:center; border:1px solid var(--border2); border-radius:var(--r6); background:var(--surface); color:var(--ink3); cursor:pointer; }
+.xbtn:hover { border-color:#DC2626; color:#DC2626; }
+
+.sum { border:1px solid var(--border); border-radius:var(--r10); background:var(--surface2); padding:14px 16px; }
+.sum-r { display:flex; justify-content:space-between; gap:14px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+.sum-r:last-child { border-bottom:0; }
+.sum-k { color:var(--ink3); flex:none; }
+.sum-v { color:var(--ink); font-weight:600; text-align:right; word-break:break-word; }
+.sum-v.mono { font-family:var(--mono); font-size:11px; font-weight:500; }
+
+.warn { display:flex; gap:8px; padding:10px 12px; border-radius:var(--r8); font-size:12.5px; line-height:1.6; margin-top:10px; }
+.warn svg { flex:none; margin-top:2px; }
+.warn-e { background:#FEF2F2; border:1px solid #FECACA; color:#991B1B; }
+.warn-a { background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; }
+.warn-i { background:var(--surface2); border:1px solid var(--border2); color:var(--ink2); }
+[data-theme="dark"] .warn-e { background:rgba(220,38,38,.12); border-color:rgba(220,38,38,.3); color:#FCA5A5; }
+[data-theme="dark"] .warn-a { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.3); color:#FCD34D; }
+
+.chk-r { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.chk-r:last-child { border-bottom:0; }
+.chk-l { font-size:12.5px; color:var(--ink); font-weight:600; }
+.chk-d { font-size:11.5px; color:var(--ink3); margin-top:2px; line-height:1.55; }
+.st { font-size:10.5px; font-weight:700; letter-spacing:.06em; padding:3px 8px; border-radius:var(--r-full,20px); white-space:nowrap; flex:none; }
+.st-pass { background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; }
+.st-att  { background:#FFFBEB; color:#92400E; border:1px solid #FDE68A; }
+.st-bad  { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; }
+[data-theme="dark"] .st-pass { background:rgba(16,185,129,.14); color:#6EE7B7; border-color:rgba(16,185,129,.3); }
+[data-theme="dark"] .st-att  { background:rgba(245,158,11,.14); color:#FCD34D; border-color:rgba(245,158,11,.3); }
+[data-theme="dark"] .st-bad  { background:rgba(220,38,38,.14); color:#FCA5A5; border-color:rgba(220,38,38,.3); }
+
+.out-r { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:var(--r8); background:var(--surface); }
+.out-r + .out-r { margin-top:8px; }
+.out-act { display:flex; gap:6px; flex:none; }
+
+.pgs { display:grid; grid-template-columns:repeat(auto-fill,minmax(74px,1fr)); gap:8px; max-height:340px; overflow-y:auto; padding:3px; }
+.pg { position:relative; aspect-ratio:.72; border:1.5px solid var(--border2); border-radius:var(--r6); background:var(--surface); display:grid; place-items:center; cursor:pointer; user-select:none; }
+.pg:hover { border-color:var(--blue-bd); }
+.pg.sel { border-color:var(--blue); background:var(--blue-bg,var(--surface2)); box-shadow:var(--s-glow); }
+.pg:focus-visible { outline:2px solid var(--blue); outline-offset:1px; }
+.pg-n { font-size:14px; font-weight:700; color:var(--ink2); }
+.pg-r { position:absolute; bottom:3px; right:4px; font-family:var(--mono); font-size:9px; color:var(--ink4); }
+.pg-s { position:absolute; top:3px; left:4px; font-size:9px; color:var(--ink4); }
+
+.spin { width:16px; height:16px; border:2px solid var(--border2); border-top-color:var(--blue); border-radius:50%; animation:sp .7s linear infinite; display:inline-block; vertical-align:-3px; }
+@keyframes sp { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce){ .spin { animation:none; } }
+
+.prev { width:100%; height:520px; border:1px solid var(--border); border-radius:var(--r8); background:var(--surface2); }
+.hint { display:inline-grid; place-items:center; width:14px; height:14px; border-radius:50%; border:1px solid var(--border2); color:var(--ink3); font-size:9px; font-weight:700; cursor:help; vertical-align:1px; margin-left:4px; background:var(--surface); }
+</style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
+</head>
+<body>
+
+<div class="shell" id="appShell">
+  <main class="main">
+
+    <div class="page-hd anim">
+      <div>
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">
+          <a href="/tools" style="color:inherit;text-decoration:none">Document Operations</a>
+        </div>
+        <h1 class="page-title" id="tTitle">Document Operation</h1>
+        <p class="page-subtitle" id="tIntro"></p>
+      </div>
+      <a class="btn btn-ghost btn-sm" href="/tools">All operations</a>
+    </div>
+
+    <div class="wk">
+
+      <!-- LEFT: source + configuration -->
+      <div>
+        <div class="card anim">
+          <div class="card-hd">
+            <div class="card-title">1. Source document<span id="srcPlural"></span></div>
+            <button class="btn btn-ghost btn-sm" id="resetBtn" style="display:none">Start over</button>
+          </div>
+          <div class="card-bd" style="padding:18px 20px">
+            <div id="dropWrap">
+              <div class="drop" id="drop" tabindex="0" role="button" aria-label="Select a PDF document">
+                <div class="drop-t" id="dropT">Select a PDF document</div>
+                <div class="drop-s" id="dropS">Drag a file here, or click to browse. Maximum 100 MB per document.</div>
+              </div>
+              <input type="file" id="file" accept="application/pdf,.pdf" multiple style="display:none"/>
+            </div>
+            <div id="srcList" style="margin-top:12px"></div>
+            <div id="srcIssues"></div>
+          </div>
+        </div>
+
+        <div class="card anim" id="cfgCard" style="margin-top:16px;display:none">
+          <div class="card-hd"><div class="card-title">2. Configure operation</div></div>
+          <div class="card-bd" style="padding:18px 20px">
+            <div id="presetWrap" style="display:none;margin-bottom:16px">
+              <span class="fld-l" style="margin-bottom:6px">Presets</span>
+              <div class="segs" id="presets"></div>
+            </div>
+            <div id="cfg"></div>
+          </div>
+        </div>
+
+        <div class="card anim" id="outCard" style="margin-top:16px;display:none">
+          <div class="card-hd">
+            <div class="card-title">Output</div>
+            <div style="display:flex;gap:7px">
+              <button class="btn btn-ghost btn-sm" id="zipBtn" style="display:none">Download all as ZIP</button>
+              <button class="btn btn-secondary btn-sm" id="againBtn">Start another operation</button>
+            </div>
+          </div>
+          <div class="card-bd" style="padding:18px 20px">
+            <div class="warn warn-i" style="margin:0 0 14px">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>
+              <div>Your source document remains unchanged. Each operation produces a new output document.</div>
+            </div>
+            <div id="outList"></div>
+            <div id="prevWrap" style="margin-top:14px;display:none">
+              <iframe class="prev" id="prev" title="Output document preview"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: summary + action -->
+      <div class="card anim" id="sumCard" style="position:sticky;top:76px">
+        <div class="card-hd"><div class="card-title">Operation summary</div></div>
+        <div class="card-bd" style="padding:18px 20px">
+          <div id="sumBody">
+            <div style="text-align:center;padding:26px 6px;color:var(--ink3);font-size:12.5px;line-height:1.6">
+              Select a document to see the operation summary.
+            </div>
+          </div>
+          <div id="runIssues"></div>
+          <button class="btn btn-primary" id="runBtn" style="width:100%;margin-top:14px" disabled>Select a document</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="/vendor/pdf-lib.min.js"></script>
+<script src="/vendor/jszip.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script src="/js/enterprise-runtime.js"></script>
+<script src="/js/tools-catalog.js"></script>
+<script src="/js/pdfops.js"></script>
+<script>
+(function () {
+  'use strict';
+  Shell.init('tools');
+
+  const $   = id => document.getElementById(id);
+  const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  /* ── Which tool are we? ── */
+  const op   = new URLSearchParams(location.search).get('op') || 'split';
+  const TOOL = TOOLS[op];
+  if (!TOOL) { location.replace('/tools'); return; }
+
+  document.title      = TOOL.title;
+  $('tTitle').textContent = TOOL.title;
+  $('tIntro').textContent = TOOL.intro;
+
+  const MULTI = TOOL.inputs === 'many' || TOOL.inputs === 2;
+  $('file').multiple = MULTI;
+  if (TOOL.inputs === 2) {
+    $('srcPlural').textContent = 's';
+    $('dropT').textContent = 'Select the base document, then the revised document';
+    $('dropS').textContent = 'Select two PDF documents. The first is treated as the base document.';
+  } else if (MULTI) {
+    $('srcPlural').textContent = 's';
+    $('dropT').textContent = 'Select PDF documents';
+    $('dropS').textContent = `Drag files here, or click to browse. Up to ${PDFOps.LIMITS.MAX_BATCH_FILES} documents, 100 MB each.`;
+  }
+
+  /* ── State ── */
+  let sources  = [];      // loaded source documents
+  let outputs  = [];      // produced outputs
+  let objUrl   = null;    // live preview object URL
+  const cfg    = {        // configuration, per operation
+    strategy: 'everyN', n: 5, ranges: '', pages: '', groups: [{ label:'', range:'' }],
+    order: 'source', scope: 'all', selection: '', degrees: 90,
+    outName: '', model: null, undo: [],
+  };
+
+  /* ═══ SOURCE INTAKE ═══════════════════════════════════════════════════ */
+
+  $('drop').addEventListener('click', () => $('file').click());
+  $('drop').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } });
+  $('drop').addEventListener('dragover', e => { e.preventDefault(); $('drop').classList.add('over'); });
+  $('drop').addEventListener('dragleave', () => $('drop').classList.remove('over'));
+  $('drop').addEventListener('drop', e => {
+    e.preventDefault(); $('drop').classList.remove('over');
+    intake([...e.dataTransfer.files]);
+  });
+  $('file').addEventListener('change', e => { intake([...e.target.files]); e.target.value = ''; });
+
+  async function intake(files) {
+    const pdfs = files.filter(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+    if (!pdfs.length) { showToast('Select a PDF document.', 'warn'); return; }
+
+    let incoming = pdfs;
+    if (!MULTI) incoming = [pdfs[0]];
+    if (TOOL.inputs === 2) incoming = pdfs.slice(0, 2 - sources.length);
+
+    const room = PDFOps.LIMITS.MAX_BATCH_FILES - sources.length;
+    if (MULTI && incoming.length > room) {
+      showToast(`Up to ${PDFOps.LIMITS.MAX_BATCH_FILES} documents can be held in one operation.`, 'warn');
+      incoming = incoming.slice(0, Math.max(0, room));
+    }
+    if (!incoming.length) return;
+
+    $('drop').style.opacity = '.55';
+    $('dropT').textContent  = 'Reading and validating...';
+
+    for (const f of incoming) {
+      const src = await PDFOps.loadSource(f);
+      if (!MULTI) sources = [src]; else sources.push(src);
+    }
+
+    $('drop').style.opacity = '';
+    resetDropCopy();
+
+    /* The organizer builds its page model from the source. */
+    if (op === 'organize' && sources[0]?.valid) {
+      cfg.model = PDFOps.initPageModel(sources[0]);
+      cfg.undo  = [];
+    }
+    if (op === 'merge' && !cfg.outName && sources.length) {
+      cfg.outName = PDFOps.baseName(sources[0].name) + '-merged';
+    }
+
+    renderSources();
+    renderConfig();
+    renderSummary();
+  }
+
+  function resetDropCopy() {
+    if (TOOL.inputs === 2)      { $('dropT').textContent = sources.length === 0 ? 'Select the base document' : 'Select the revised document'; }
+    else if (MULTI)             { $('dropT').textContent = 'Add more PDF documents'; }
+    else                        { $('dropT').textContent = 'Select a PDF document'; }
+  }
+
+  function renderSources() {
+    $('resetBtn').style.display = sources.length ? '' : 'none';
+
+    /* Hide the drop zone once a single-input tool has its document, or once
+       Compare has both. Leaving it open invites the wrong mental model. */
+    const full = (!MULTI && sources.length >= 1) || (TOOL.inputs === 2 && sources.length >= 2);
+    $('dropWrap').style.display = full ? 'none' : '';
+
+    $('srcList').innerHTML = sources.map((s, i) => {
+      const role = TOOL.inputs === 2 ? (i === 0 ? 'Base document' : 'Revised document') : null;
+      const canOrder = op === 'merge' && sources.length > 1;
+      return `
+      <div class="srcrow${s.valid ? '' : ' bad'}">
+        ${canOrder ? `
+          <div class="src-ord">
+            <button class="ordbtn" data-up="${i}" ${i===0?'disabled':''} aria-label="Move ${esc(s.name)} up">&#9650;</button>
+            <button class="ordbtn" data-dn="${i}" ${i===sources.length-1?'disabled':''} aria-label="Move ${esc(s.name)} down">&#9660;</button>
+          </div>` : `
+          <span class="src-ico" aria-hidden="true">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          </span>`}
+        <div class="src-main">
+          ${role ? `<div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px">${role}</div>` : ''}
+          <div class="src-name">${esc(s.name)}</div>
+          <div class="src-meta">${s.valid ? `${s.pageCount} page${s.pageCount===1?'':'s'} &middot; ${esc(s.sizeLabel)}${s.pdfVersion?` &middot; PDF ${esc(s.pdfVersion)}`:''}` : 'Cannot be processed'}</div>
+          <div class="src-sha">SHA-256 ${esc(PDFOps.shortHash(s.sha256))}</div>
+        </div>
+        <span class="st ${s.validation.overall==='VALID'?'st-pass':s.validation.overall==='ATTENTION'?'st-att':'st-bad'}">${s.validation.overall}</span>
+        <button class="xbtn" data-rm="${i}" aria-label="Remove ${esc(s.name)}">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+
+    /* Explain any document that cannot be processed, right where it sits. */
+    const broken = sources.filter(s => !s.valid);
+    $('srcIssues').innerHTML = broken.map(s => {
+      const reason = s.validation.checks.find(c => c.status === 'INVALID');
+      return `<div class="warn warn-e">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v6M12 16.5v.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <div><b>${esc(s.name)}</b><br/>${esc(reason?.detail || 'This document cannot be processed.')}</div>
+      </div>`;
+    }).join('');
+
+    const enc = sources.filter(s => s.valid && s.encrypted);
+    if (enc.length) {
+      $('srcIssues').innerHTML += `<div class="warn warn-a">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.7"/></svg>
+        <div>${enc.length===1?'This document is':'These documents are'} encrypted or password protected. The operation may fail, or the output may be unusable.</div>
+      </div>`;
+    }
+
+    $('srcList').querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
+      sources.splice(+b.dataset.rm, 1);
+      if (op === 'organize') { cfg.model = sources[0]?.valid ? PDFOps.initPageModel(sources[0]) : null; cfg.undo = []; }
+      resetDropCopy(); renderSources(); renderConfig(); renderSummary();
+    }));
+    $('srcList').querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => move(+b.dataset.up, -1)));
+    $('srcList').querySelectorAll('[data-dn]').forEach(b => b.addEventListener('click', () => move(+b.dataset.dn,  1)));
+  }
+
+  function move(i, d) {
+    const j = i + d;
+    if (j < 0 || j >= sources.length) return;
+    [sources[i], sources[j]] = [sources[j], sources[i]];
+    renderSources(); renderSummary();
+  }
+
+  $('resetBtn').addEventListener('click', reset);
+  $('againBtn').addEventListener('click', reset);
+
+  function reset() {
+    if (objUrl) { URL.revokeObjectURL(objUrl); objUrl = null; }
+    sources = []; outputs = [];
+    cfg.model = null; cfg.undo = []; cfg.outName = '';
+    $('outCard').style.display = 'none';
+    $('prevWrap').style.display = 'none';
+    $('prev').src = 'about:blank';
+    resetDropCopy();
+    renderSources(); renderConfig(); renderSummary();
+  }
+
+  /* ═══ CONFIGURATION ═══════════════════════════════════════════════════ */
+
+  function usable() { return sources.filter(s => s.valid); }
+  function primary() { return usable()[0] || null; }
+
+  function renderConfig() {
+    const ready = usable().length > 0;
+    $('cfgCard').style.display = (ready && CONFIG_HTML[op]) ? '' : 'none';
+    if (!ready || !CONFIG_HTML[op]) return;
+
+    /* Presets */
+    const presets = TOOL_PRESETS[op] || [];
+    $('presetWrap').style.display = presets.length ? '' : 'none';
+    if (presets.length) {
+      $('presets').innerHTML = presets.map(p =>
+        `<button class="seg" data-preset="${esc(p.id)}" title="${esc(p.desc)}">${esc(p.name)}</button>`
+      ).join('');
+      $('presets').querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+        const p = presets.find(x => x.id === b.dataset.preset);
+        Object.assign(cfg, p.apply);
+        showToast(`Preset applied: ${p.name}. Review the configuration before running.`, 'info');
+        renderConfig(); renderSummary();
+      }));
+    }
+
+    $('cfg').innerHTML = CONFIG_HTML[op]();
+    if (CONFIG_BIND[op]) CONFIG_BIND[op]();
+  }
+
+  /* Wire an input to a cfg key and re-render the summary on every keystroke,
+     which is what makes the validation feel live rather than on-submit. */
+  function bind(id, key, transform) {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', () => { cfg[key] = transform ? transform(el.value) : el.value; renderSummary(); });
+  }
+  function bindSegs(sel, key, after) {
+    document.querySelectorAll(sel).forEach(b => b.addEventListener('click', () => {
+      cfg[key] = b.dataset.val;
+      if (after) after();
+      renderConfig(); renderSummary();
+    }));
+  }
+
+  const CONFIG_HTML = {
+
+    split: () => `
+      <div class="fld">
+        <span class="fld-l">Split strategy</span>
+        <div class="segs">
+          <button class="seg${cfg.strategy==='everyN'?' on':''}"     data-sv="everyN">Every N pages</button>
+          <button class="seg${cfg.strategy==='ranges'?' on':''}"     data-sv="ranges">Page ranges</button>
+          <button class="seg${cfg.strategy==='individual'?' on':''}" data-sv="individual">Individual pages</button>
+          <button class="seg${cfg.strategy==='groups'?' on':''}"     data-sv="groups">Custom groups</button>
+        </div>
+      </div>
+      ${cfg.strategy==='everyN' ? `
+        <div class="fld">
+          <label class="fld-l" for="cN">Pages per output document</label>
+          <input class="inp" id="cN" type="number" min="1" max="${primary().pageCount-1}" value="${esc(cfg.n)}"/>
+          <div class="fld-h">The final output document holds the remaining pages if the total does not divide evenly.</div>
+        </div>` : ''}
+      ${cfg.strategy==='ranges' ? `
+        <div class="fld">
+          <label class="fld-l" for="cR">Page ranges</label>
+          <input class="inp mono" id="cR" placeholder="1-5, 6-10, 11-20" value="${esc(cfg.ranges)}"/>
+          <div class="fld-h">One output document per range. Separate ranges with commas.</div>
+        </div>` : ''}
+      ${cfg.strategy==='individual' ? `
+        <div class="fld">
+          <label class="fld-l" for="cI">Pages</label>
+          <input class="inp mono" id="cI" placeholder="1, 4, 8" value="${esc(cfg.pages)}"/>
+          <div class="fld-h">Each page becomes its own single-page output document.</div>
+        </div>` : ''}
+      ${cfg.strategy==='groups' ? `
+        <div class="fld">
+          <span class="fld-l">Document groups</span>
+          <div id="grps">
+            ${cfg.groups.map((g,i) => `
+              <div class="grp">
+                <input class="inp" data-gl="${i}" placeholder="Invoice 001" value="${esc(g.label)}"/>
+                <input class="inp mono" data-gr="${i}" placeholder="1-3" value="${esc(g.range)}"/>
+                <button class="xbtn" data-gx="${i}" aria-label="Remove group ${i+1}" ${cfg.groups.length===1?'disabled':''}>
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>`).join('')}
+          </div>
+          <button class="btn btn-ghost btn-sm" id="addGrp" style="margin-top:4px">Add group</button>
+          <div class="fld-h">Each group produces one named output document.</div>
+        </div>` : ''}`,
+
+    merge: () => `
+      <div class="fld">
+        <label class="fld-l" for="cName">Output document name</label>
+        <input class="inp" id="cName" placeholder="Employee-Case-2026-0042" value="${esc(cfg.outName)}"/>
+        <div class="fld-h">Documents are merged in the order shown above. Use the arrows to reorder.</div>
+      </div>`,
+
+    extract: () => `
+      <div class="fld">
+        <label class="fld-l" for="cP">Pages to extract</label>
+        <input class="inp mono" id="cP" placeholder="1, 3-7, 10" value="${esc(cfg.pages)}"/>
+        <div class="fld-h">Enter single pages, ranges, or a mix. The document has ${primary().pageCount} pages.</div>
+      </div>
+      <div class="fld">
+        <span class="fld-l">Page order</span>
+        <div class="segs">
+          <button class="seg${cfg.order==='source'?' on':''}" data-ov="source">Preserve source order</button>
+          <button class="seg${cfg.order==='custom'?' on':''}" data-ov="custom">Use the order I entered</button>
+        </div>
+        <div class="fld-h">${cfg.order==='custom'
+          ? 'Pages appear in the output in exactly the order you typed them. Entering 10, 1, 5 produces that sequence.'
+          : 'Pages appear in the output in ascending document order, whatever order you type them in.'}</div>
+      </div>`,
+
+    remove: () => `
+      <div class="fld">
+        <label class="fld-l" for="cP">Pages to remove</label>
+        <input class="inp mono" id="cP" placeholder="2, 8-10" value="${esc(cfg.pages)}"/>
+        <div class="fld-h">Every page not listed is kept. The document has ${primary().pageCount} pages.</div>
+      </div>`,
+
+    rotate: () => `
+      <div class="fld">
+        <span class="fld-l">Apply to</span>
+        <div class="segs">
+          <button class="seg${cfg.scope==='all'?' on':''}"       data-cv="all">All pages</button>
+          <button class="seg${cfg.scope==='odd'?' on':''}"       data-cv="odd">Odd pages</button>
+          <button class="seg${cfg.scope==='even'?' on':''}"      data-cv="even">Even pages</button>
+          <button class="seg${cfg.scope==='selection'?' on':''}" data-cv="selection">Selected pages</button>
+        </div>
+      </div>
+      ${cfg.scope==='selection' ? `
+        <div class="fld">
+          <label class="fld-l" for="cS">Pages</label>
+          <input class="inp mono" id="cS" placeholder="2-12" value="${esc(cfg.selection)}"/>
+        </div>` : ''}
+      <div class="fld">
+        <span class="fld-l">Rotation</span>
+        <div class="segs">
+          <button class="seg${cfg.degrees===90?' on':''}"  data-dv="90">90 degrees clockwise</button>
+          <button class="seg${cfg.degrees===-90?' on':''}" data-dv="-90">90 degrees counterclockwise</button>
+          <button class="seg${cfg.degrees===180?' on':''}" data-dv="180">180 degrees</button>
+        </div>
+        <div class="fld-h">Rotation is applied relative to each page's current orientation.</div>
+      </div>`,
+
+    organize: () => {
+      const m = cfg.model || [];
+      return `
+      <div class="fld">
+        <span class="fld-l">Pages (${m.length} of ${primary().pageCount})</span>
+        <div class="segs" style="margin-bottom:10px">
+          <button class="seg" id="oRotL">Rotate left</button>
+          <button class="seg" id="oRotR">Rotate right</button>
+          <button class="seg" id="oUp">Move earlier</button>
+          <button class="seg" id="oDn">Move later</button>
+          <button class="seg" id="oDel">Remove selected</button>
+          <button class="seg" id="oUndo" ${cfg.undo.length?'':'disabled'}>Undo</button>
+          <button class="seg" id="oReset">Reset</button>
+        </div>
+        <div class="pgs" id="pgs">
+          ${m.map((p,i) => `
+            <div class="pg${p._sel?' sel':''}" data-i="${i}" tabindex="0" role="button"
+                 aria-pressed="${!!p._sel}" aria-label="Page ${p.srcPage}, position ${i+1}">
+              <span class="pg-s">${i+1}</span>
+              <span class="pg-n">${p.srcPage}</span>
+              ${p.rotation ? `<span class="pg-r">${p.rotation}&deg;</span>` : ''}
+            </div>`).join('')}
+        </div>
+        <div class="fld-h">Click a page to select it. The large number is the source page. The small number is its position in the revised document.</div>
+      </div>`;
+    },
+
+    validate : () => `<div class="warn warn-i" style="margin:0">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v5M12 16.5v.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <div>Validation runs on selection. The report for each document is shown in the summary panel, and can be exported as JSON.</div>
+      </div>`,
+
+    metadata : () => '',
+    compare  : () => '',
+  };
+
+  const CONFIG_BIND = {
+    split: () => {
+      document.querySelectorAll('[data-sv]').forEach(b => b.dataset.val = b.dataset.sv);
+      bindSegs('[data-sv]', 'strategy');
+      bind('cN', 'n', v => parseInt(v, 10) || '');
+      bind('cR', 'ranges');
+      bind('cI', 'pages');
+      document.querySelectorAll('[data-gl]').forEach(el => el.addEventListener('input', () => { cfg.groups[+el.dataset.gl].label = el.value; renderSummary(); }));
+      document.querySelectorAll('[data-gr]').forEach(el => el.addEventListener('input', () => { cfg.groups[+el.dataset.gr].range = el.value; renderSummary(); }));
+      document.querySelectorAll('[data-gx]').forEach(el => el.addEventListener('click', () => { cfg.groups.splice(+el.dataset.gx, 1); renderConfig(); renderSummary(); }));
+      $('addGrp')?.addEventListener('click', () => { cfg.groups.push({ label:'', range:'' }); renderConfig(); renderSummary(); });
+    },
+    merge   : () => bind('cName', 'outName'),
+    extract : () => { bind('cP', 'pages'); document.querySelectorAll('[data-ov]').forEach(b => b.dataset.val = b.dataset.ov); bindSegs('[data-ov]', 'order'); },
+    remove  : () => bind('cP', 'pages'),
+    rotate  : () => {
+      document.querySelectorAll('[data-cv]').forEach(b => b.dataset.val = b.dataset.cv);
+      bindSegs('[data-cv]', 'scope');
+      document.querySelectorAll('[data-dv]').forEach(b => b.addEventListener('click', () => { cfg.degrees = parseInt(b.dataset.dv, 10); renderConfig(); renderSummary(); }));
+      bind('cS', 'selection');
+    },
+    organize: () => {
+      const m = cfg.model;
+      const snap = () => { cfg.undo.push(JSON.parse(JSON.stringify(m))); if (cfg.undo.length > 25) cfg.undo.shift(); };
+      const sel  = () => m.map((p,i) => p._sel ? i : -1).filter(i => i >= 0);
+      const need = () => { if (!sel().length) { showToast('Select one or more pages first.', 'warn'); return false; } return true; };
+
+      document.querySelectorAll('.pg').forEach(el => {
+        const toggle = () => { m[+el.dataset.i]._sel = !m[+el.dataset.i]._sel; renderConfig(); renderSummary(); };
+        el.addEventListener('click', toggle);
+        el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      });
+
+      $('oRotL').addEventListener('click', () => { if (!need()) return; snap(); sel().forEach(i => m[i].rotation = ((m[i].rotation - 90) % 360 + 360) % 360); renderConfig(); renderSummary(); });
+      $('oRotR').addEventListener('click', () => { if (!need()) return; snap(); sel().forEach(i => m[i].rotation = ((m[i].rotation + 90) % 360 + 360) % 360); renderConfig(); renderSummary(); });
+      $('oDel').addEventListener('click',  () => {
+        if (!need()) return;
+        if (sel().length === m.length) { showToast('Removing every page would leave no document.', 'warn'); return; }
+        snap(); cfg.model = m.filter(p => !p._sel); renderConfig(); renderSummary();
+      });
+      $('oUp').addEventListener('click', () => {
+        if (!need()) return; snap();
+        sel().forEach(i => { if (i > 0 && !m[i-1]._sel) { [m[i-1], m[i]] = [m[i], m[i-1]]; } });
+        renderConfig(); renderSummary();
+      });
+      $('oDn').addEventListener('click', () => {
+        if (!need()) return; snap();
+        sel().slice().reverse().forEach(i => { if (i < m.length-1 && !m[i+1]._sel) { [m[i+1], m[i]] = [m[i], m[i+1]]; } });
+        renderConfig(); renderSummary();
+      });
+      $('oUndo').addEventListener('click', () => { if (!cfg.undo.length) return; cfg.model = cfg.undo.pop(); renderConfig(); renderSummary(); });
+      $('oReset').addEventListener('click', () => { snap(); cfg.model = PDFOps.initPageModel(primary()); renderConfig(); renderSummary(); });
+    },
+  };
+
+  /* ═══ SUMMARY, VALIDATION, AND THE PRIMARY ACTION ═════════════════════ */
+
+  function row(k, v, mono) { return `<div class="sum-r"><span class="sum-k">${esc(k)}</span><span class="sum-v${mono?' mono':''}">${esc(v)}</span></div>`; }
+
+  function renderSummary() {
+    const btn = $('runBtn');
+    const use = usable();
+
+    if (!sources.length) {
+      $('sumBody').innerHTML = `<div style="text-align:center;padding:26px 6px;color:var(--ink3);font-size:12.5px;line-height:1.6">Select a document to see the operation summary.</div>`;
+      $('runIssues').innerHTML = '';
+      btn.disabled = true; btn.textContent = MULTI ? 'Select documents' : 'Select a document';
+      return;
+    }
+    if (!use.length) {
+      $('sumBody').innerHTML = `<div style="text-align:center;padding:26px 6px;color:var(--ink3);font-size:12.5px;line-height:1.6">No selected document can be processed.</div>`;
+      $('runIssues').innerHTML = '';
+      btn.disabled = true; btn.textContent = 'Cannot process';
+      return;
+    }
+
+    const s = SUMMARY[op]();
+    $('sumBody').innerHTML  = s.html;
+    $('runIssues').innerHTML = (s.issues || []).map(msg =>
+      `<div class="warn warn-a"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 8v5M12 16.5v.01M10.3 3.9L2.6 17.3A1.6 1.6 0 004 19.7h16a1.6 1.6 0 001.4-2.4L13.7 3.9a1.6 1.6 0 00-2.8 0z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div>${esc(msg)}</div></div>`
+    ).join('');
+
+    btn.disabled    = !s.ready;
+    btn.textContent = s.action;
+  }
+
+  const SUMMARY = {
+
+    split: () => {
+      const src = primary();
+      const { plan, errors } = PDFOps.planSplit(src, {
+        type: cfg.strategy, n: cfg.n, ranges: cfg.ranges, pages: cfg.pages, groups: cfg.groups,
+      });
+      const stratLabel = { everyN:`Every ${cfg.n||'?'} pages`, ranges:'Page ranges', individual:'Individual pages', groups:'Custom groups' }[cfg.strategy];
+      return {
+        html: [
+          row('Source document', src.name),
+          row('Total pages', src.pageCount),
+          row('File size', src.sizeLabel),
+          row('Split strategy', stratLabel),
+          row('Expected output', plan.length ? `${plan.length} PDF document${plan.length===1?'':'s'}` : 'Not yet defined'),
+        ].join(''),
+        issues : errors,
+        ready  : plan.length > 0 && !errors.length,
+        action : plan.length ? `Split into ${plan.length} document${plan.length===1?'':'s'}` : 'Split PDF',
+        plan,
+      };
+    },
+
+    merge: () => {
+      const use    = usable();
+      const pages  = use.reduce((a, s) => a + s.pageCount, 0);
+      const bytes  = use.reduce((a, s) => a + s.size, 0);
+      const issues = [];
+      if (use.length < 2) issues.push('Select at least two documents to merge.');
+      if (use.length > PDFOps.LIMITS.MAX_MERGE_FILES) issues.push(`A single merge operation holds up to ${PDFOps.LIMITS.MAX_MERGE_FILES} documents.`);
+      if (!String(cfg.outName || '').trim()) issues.push('Give the output document a name.');
+      return {
+        html: [
+          row('Source documents', use.length),
+          row('Total pages', pages),
+          row('Combined source size', PDFOps.formatBytes(bytes)),
+          row('Estimated output size', `About ${PDFOps.formatBytes(bytes)}`),
+          row('Output name', PDFOps.ensurePdfExt(cfg.outName || 'merged-document')),
+        ].join(''),
+        issues,
+        ready  : use.length >= 2 && !!String(cfg.outName || '').trim(),
+        action : `Merge ${use.length} document${use.length===1?'':'s'}`,
+      };
+    },
+
+    extract: () => {
+      const src = primary();
+      const sel = PDFOps.parsePageSelection(cfg.pages, src.pageCount, cfg.order === 'source');
+      const issues = [];
+      if (cfg.pages && !sel.valid) issues.push(sel.summary);
+      if (sel.duplicates.length && sel.valid) issues.push(`Duplicate page references were ignored: ${sel.duplicates.join(', ')}.`);
+      return {
+        html: [
+          row('Source document', src.name),
+          row('Total pages', src.pageCount),
+          row('Pages to extract', sel.pages.length ? (cfg.order==='custom' ? sel.pages.join(', ') : PDFOps.describePages(sel.pages)) : 'None selected'),
+          row('Page order', cfg.order === 'custom' ? 'As entered' : 'Source order'),
+          row('Expected output', sel.pages.length ? `1 PDF document, ${sel.pages.length} page${sel.pages.length===1?'':'s'}` : 'Not yet defined'),
+        ].join(''),
+        issues,
+        ready  : sel.pages.length > 0 && !sel.invalid.length && !sel.outOfRange.length,
+        action : sel.pages.length ? `Extract ${sel.pages.length} page${sel.pages.length===1?'':'s'}` : 'Extract pages',
+        sel,
+      };
+    },
+
+    remove: () => {
+      const src = primary();
+      const sel = PDFOps.parsePageSelection(cfg.pages, src.pageCount, true);
+      const after = src.pageCount - sel.pages.length;
+      const issues = [];
+      if (cfg.pages && !sel.valid) issues.push(sel.summary);
+      if (sel.pages.length && after === 0) issues.push('This selection removes every page. The output document would contain no pages.');
+      return {
+        html: [
+          row('Source document', src.name),
+          row('Original pages', src.pageCount),
+          row('Pages removed', sel.pages.length ? `${sel.pages.length} (${PDFOps.describePages(sel.pages)})` : 'None selected'),
+          row('Output pages', sel.pages.length ? after : src.pageCount),
+        ].join(''),
+        issues,
+        ready  : sel.pages.length > 0 && sel.valid && after > 0,
+        action : sel.pages.length ? `Create revised PDF without ${sel.pages.length} page${sel.pages.length===1?'':'s'}` : 'Create revised PDF',
+        sel,
+      };
+    },
+
+    rotate: () => {
+      const src   = primary();
+      const scope = PDFOps.resolveRotationScope({ type: cfg.scope, selection: cfg.selection }, src.pageCount);
+      const dLabel = { 90:'90 degrees clockwise', '-90':'90 degrees counterclockwise', 180:'180 degrees' }[String(cfg.degrees)];
+      const issues = [];
+      if (cfg.scope === 'selection' && cfg.selection && !scope.valid) issues.push(scope.summary);
+      return {
+        html: [
+          row('Source document', src.name),
+          row('Total pages', src.pageCount),
+          row('Pages affected', scope.valid && scope.pages.length ? `${scope.pages.length} (${PDFOps.describePages(scope.pages)})` : 'None selected'),
+          row('Rotation', dLabel),
+        ].join(''),
+        issues,
+        ready  : scope.valid && scope.pages.length > 0,
+        action : scope.pages.length ? `Rotate ${scope.pages.length} page${scope.pages.length===1?'':'s'}` : 'Create rotated PDF',
+        scope,
+      };
+    },
+
+    organize: () => {
+      const src = primary();
+      const m   = cfg.model || [];
+      const base = PDFOps.initPageModel(src);
+      const kept    = new Set(m.map(p => p.srcPage));
+      const removed = base.filter(p => !kept.has(p.srcPage)).map(p => p.srcPage);
+      const rotated = m.filter(p => p.rotation !== (base[p.srcPage-1]?.rotation ?? 0)).map(p => p.srcPage);
+      const reordered = m.some((p, i) => p.srcPage !== base[i]?.srcPage);
+      const changed = removed.length || rotated.length || reordered;
+      return {
+        html: [
+          row('Source document', src.name),
+          row('Original pages', src.pageCount),
+          row('Pages after changes', m.length),
+          row('Pages removed', removed.length ? `${removed.length} (${PDFOps.describePages(removed)})` : 'None'),
+          row('Pages rotated', rotated.length ? `${rotated.length} (${PDFOps.describePages(rotated)})` : 'None'),
+          row('Order changed', reordered ? 'Yes' : 'No'),
+        ].join(''),
+        issues : changed ? [] : ['No changes have been made yet. Select pages and apply an action.'],
+        ready  : !!changed && m.length > 0,
+        action : 'Create revised PDF',
+      };
+    },
+
+    validate: () => {
+      const use = usable();
+      const all = sources;
+      const counts = { VALID:0, ATTENTION:0, INVALID:0 };
+      all.forEach(s => counts[s.validation.overall]++);
+      return {
+        html: [
+          row('Documents checked', all.length),
+          row('Valid', counts.VALID),
+          row('Attention', counts.ATTENTION),
+          row('Invalid', counts.INVALID),
+        ].join('') + (all.length === 1 ? `
+          <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:6px">
+            ${all[0].validation.checks.map(c => `
+              <div class="chk-r">
+                <div><div class="chk-l">${esc(c.label)}</div><div class="chk-d">${esc(c.detail)}</div></div>
+                <span class="st ${c.status==='PASS'?'st-pass':c.status==='ATTENTION'?'st-att':'st-bad'}">${c.status}</span>
+              </div>`).join('')}
+            <div class="chk-r" style="border-top:2px solid var(--border);margin-top:4px">
+              <div class="chk-l">Overall status</div>
+              <span class="st ${all[0].validation.overall==='VALID'?'st-pass':all[0].validation.overall==='ATTENTION'?'st-att':'st-bad'}">${all[0].validation.overall}</span>
+            </div>
+          </div>` : ''),
+        issues : [],
+        ready  : all.length > 0,
+        action : `Export validation report${all.length>1?`s (${all.length})`:''}`,
+      };
+    },
+
+    metadata: () => {
+      const src  = primary();
+      const meta = PDFOps.readMetadata(src);
+      return {
+        html: meta.fields.map(f => row(f.label, f.value || 'Not set')).join('')
+          + row('PDF version', meta.pdfVersion || 'Unknown')
+          + row('Page count', meta.pageCount)
+          + row('File size', PDFOps.formatBytes(meta.size))
+          + row('SHA-256', PDFOps.shortHash(meta.sha256), true),
+        issues : meta.populated.length
+          ? [`${meta.populated.length} metadata field${meta.populated.length===1?' is':'s are'} populated: ${meta.populated.map(f => f.label).join(', ')}. PDF metadata can carry author names, internal file paths, and software details. Create a cleaned copy before releasing this document externally.`]
+          : ['No document metadata fields are populated. A cleaned copy would still reset the creator and producer values.'],
+        ready  : true,
+        action : 'Create metadata-cleaned copy',
+        meta,
+      };
+    },
+
+    compare: () => {
+      const use = usable();
+      if (use.length < 2) {
+        return {
+          html   : row('Base document', use[0]?.name || 'Not selected') + row('Revised document', 'Not selected'),
+          issues : ['Select a second document to compare against the base document.'],
+          ready  : false,
+          action : 'Select two documents',
+        };
+      }
+      const [b, r] = use;
+      const cmp = PDFOps.compareDocuments(b, r);
+      const pd  = cmp.pageCountDelta, sd = cmp.sizeDelta;
+      return {
+        html: [
+          row('Page count', `${b.pageCount} to ${r.pageCount}${pd ? ` (${pd>0?'+':''}${pd})` : ' (no change)'}`),
+          row('File size', `${b.sizeLabel} to ${r.sizeLabel}${sd ? ` (${sd>0?'+':'-'}${PDFOps.formatBytes(Math.abs(sd))})` : ' (no change)'}`),
+          row('SHA-256', cmp.fingerprintMatch ? 'Identical' : 'Different'),
+          row('Metadata differences', cmp.metadataDiffs.length ? `${cmp.metadataDiffs.length} field${cmp.metadataDiffs.length===1?'':'s'} changed` : 'None'),
+          row('Text comparison', 'Not available'),
+        ].join('') + (cmp.metadataDiffs.length ? `
+          <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:6px">
+            ${cmp.metadataDiffs.map(d => `
+              <div class="chk-r">
+                <div>
+                  <div class="chk-l">${esc(d.label)}</div>
+                  <div class="chk-d">${esc(d.base || 'Not set')} to ${esc(d.revised || 'Not set')}</div>
+                </div>
+              </div>`).join('')}
+          </div>` : ''),
+        issues: [
+          ...(cmp.fingerprintMatch
+            ? ['The two documents have identical SHA-256 fingerprints. They are byte-for-byte the same file. If one of these is meant to be a redacted or revised output, verify that the process actually produced a modified document.']
+            : []),
+          cmp.textComparison.note,
+        ],
+        ready  : true,
+        action : 'Export comparison report',
+        cmp,
+      };
+    },
+  };
+
+  /* ═══ EXECUTION ═══════════════════════════════════════════════════════ */
+
+  $('runBtn').addEventListener('click', run);
+
+  async function run() {
+    const btn = $('runBtn');
+    const s   = SUMMARY[op]();
+    if (!s.ready) return;
+
+    /* Removing pages is destructive to the user's intent even though the
+       source file is safe. Confirm it explicitly. */
+    if (op === 'remove') {
+      const n = s.sel.pages.length;
+      if (!confirm(`Create a new PDF without ${n} selected page${n===1?'':'s'}?\n\nThe source document will remain unchanged.`)) return;
+    }
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spin"></span> &nbsp;Processing`;
+
+    try {
+      const src = primary();
+      outputs = [];
+
+      switch (op) {
+        case 'split':
+          outputs = await PDFOps.executeSplit(src, s.plan);
+          break;
+        case 'merge':
+          outputs = [await PDFOps.executeMerge(usable(), cfg.outName)];
+          break;
+        case 'extract':
+          outputs = [await PDFOps.executeExtract(src, s.sel.pages, { customOrder: cfg.order === 'custom' })];
+          break;
+        case 'remove':
+          outputs = [await PDFOps.executeRemove(src, s.sel.pages)];
+          break;
+        case 'rotate':
+          outputs = [await PDFOps.executeRotate(src, s.scope.pages, cfg.degrees)];
+          break;
+        case 'organize':
+          outputs = [await PDFOps.executeOrganize(src, cfg.model)];
+          break;
+        case 'metadata':
+          outputs = [await PDFOps.executeMetadataClean(src)];
+          break;
+        case 'validate': {
+          const report = sources.length === 1
+            ? sources[0].validation
+            : { schema:'prudent.pdf.validation.batch/1', generatedAt:new Date().toISOString(),
+                documentCount:sources.length, documents:sources.map(x => x.validation) };
+          PDFOps.downloadJson(report, `validation-report-${Date.now()}.json`);
+          showToast('Validation report exported.', 'success');
+          btn.disabled = false; btn.textContent = original;
+          return;
+        }
+        case 'compare':
+          PDFOps.downloadJson(s.cmp, `comparison-report-${Date.now()}.json`);
+          showToast('Comparison report exported.', 'success');
+          btn.disabled = false; btn.textContent = original;
+          return;
+      }
+
+      renderOutputs();
+      showToast(`${TOOL.name} complete. ${outputs.length} output document${outputs.length===1?'':'s'} created.`, 'success');
+      $('outCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (err) {
+      showToast(err.message || 'The operation could not be completed.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+      renderSummary();
+    }
+  }
+
+  function renderOutputs() {
+    $('outCard').style.display = '';
+    $('zipBtn').style.display  = outputs.length > 1 ? '' : 'none';
+
+    $('outList').innerHTML = outputs.map((o, i) => `
+      <div class="out-r">
+        <span class="src-ico" aria-hidden="true">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </span>
+        <div class="src-main">
+          <div class="src-name" id="on${i}">${esc(o.name)}</div>
+          <div class="src-meta">${o.label ? esc(o.label) + ' &middot; ' : ''}${o.pageCount} page${o.pageCount===1?'':'s'} &middot; ${esc(o.sizeLabel)}</div>
+          <div class="src-sha">SHA-256 ${esc(PDFOps.shortHash(o.sha256))}</div>
+        </div>
+        <div class="out-act">
+          <button class="btn btn-ghost btn-sm" data-pv="${i}">Preview</button>
+          <button class="btn btn-ghost btn-sm" data-rn="${i}">Rename</button>
+          <button class="btn btn-secondary btn-sm" data-dl="${i}">Download</button>
+        </div>
+      </div>`).join('');
+
+    $('outList').querySelectorAll('[data-dl]').forEach(b => b.addEventListener('click', () => {
+      const o = outputs[+b.dataset.dl];
+      PDFOps.downloadBytes(o.bytes, o.name);
+    }));
+
+    $('outList').querySelectorAll('[data-rn]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.rn;
+      const next = prompt('Output document name', outputs[i].name);
+      if (!next) return;
+      outputs[i].name = PDFOps.ensurePdfExt(next);
+      renderOutputs();
+    }));
+
+    $('outList').querySelectorAll('[data-pv]').forEach(b => b.addEventListener('click', () => {
+      const o = outputs[+b.dataset.pv];
+      /* Preview is a same-origin blob URL built from bytes already in memory.
+         No document URL is ever handed to an external viewer. */
+      if (objUrl) URL.revokeObjectURL(objUrl);
+      objUrl = PDFOps.previewUrl(o.bytes);
+      $('prev').src = objUrl;
+      $('prevWrap').style.display = '';
+      $('prevWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }));
+  }
+
+  $('zipBtn').addEventListener('click', async () => {
+    try {
+      const base = PDFOps.baseName(primary()?.name || 'documents');
+      await PDFOps.downloadZip(outputs, `${base}-outputs`);
+      showToast('Archive downloaded.', 'success');
+    } catch (err) {
+      showToast(err.message || 'The archive could not be created.', 'error');
+    }
+  });
+
+  /* Release the preview object URL when leaving the page so document bytes
+     are not left reachable. */
+  window.addEventListener('pagehide', () => { if (objUrl) URL.revokeObjectURL(objUrl); });
+
+  renderSummary();
+})();
+</script>
+</body>
+</html>

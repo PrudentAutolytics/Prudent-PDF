@@ -1,0 +1,18 @@
+{
+  "name": "Prudent Redact",
+  "short_name": "Redact",
+  "description": "Enterprise document operations and AI redaction workspace",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#173967",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

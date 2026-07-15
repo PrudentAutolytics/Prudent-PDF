@@ -19,10 +19,26 @@
  *   const limited = await checkRateLimit(`otp:${email}`, 5, 15 * 60 * 1000);
  *   if (limited) { ...429... }
  *
- * Fails OPEN on DB error by design: an outage of the rate-limit table
- * should not lock every user out of the product. The error is logged.
+ * If the database-backed limiter is unavailable, an instance-local fallback
+ * remains active so authentication and contact endpoints do not become fully
+ * unthrottled. The database limiter is still preferred for scale-out safety.
  */
 const pool = require('./db');
+const memoryFallback = new Map();
+
+function memoryLimited(key, maxCount, windowMs) {
+  const now = Date.now();
+  const current = memoryFallback.get(key);
+  if (!current || current.resetAt <= now) {
+    memoryFallback.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  current.count += 1;
+  if (memoryFallback.size > 5000) {
+    for (const [k, v] of memoryFallback) { if (v.resetAt <= now) memoryFallback.delete(k); }
+  }
+  return current.count > maxCount;
+}
 
 async function checkRateLimit(key, maxCount, windowMs, context) {
   try {
@@ -37,8 +53,8 @@ async function checkRateLimit(key, maxCount, windowMs, context) {
     );
     return result.rows[0].count > maxCount;
   } catch (err) {
-    if (context?.log) context.log('ratelimit ERROR (failing open):', err.message);
-    return false;
+    if (context?.log) context.log('ratelimit database unavailable; using instance fallback');
+    return memoryLimited(key, maxCount, windowMs);
   }
 }
 
