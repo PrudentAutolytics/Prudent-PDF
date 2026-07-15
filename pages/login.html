@@ -263,6 +263,23 @@ body {
   .right-top { text-align: center; }
   .right-footer { text-align: center; }
 }
+
+/* v20 enterprise access theme */
+body{grid-template-columns:minmax(0,1.12fr) minmax(430px,.88fr);background:#07111f}
+.left-panel{background:#07111f;padding:54px clamp(40px,5vw,76px);border-right:1px solid rgba(148,163,184,.14)}
+.left-grid{background-image:linear-gradient(rgba(125,211,252,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(125,211,252,.035) 1px,transparent 1px);background-size:52px 52px}
+.left-glow{background:radial-gradient(circle,rgba(46,117,182,.24),transparent 68%);width:680px;height:680px}
+.left-logo-img{height:42px;width:140px;background:#0b1728;border:1px solid rgba(148,163,184,.16);padding:5px}
+.left-tagline{font-size:clamp(38px,4.5vw,64px);line-height:1.02;letter-spacing:-.045em;max-width:680px}
+.left-tagline span{background:linear-gradient(135deg,#7dd3fc,#93c5fd);background-clip:text;-webkit-background-clip:text}
+.left-sub{max-width:520px;color:#94a3b8;font-size:15px}
+.left-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:620px}.left-feat{padding:13px;border:1px solid rgba(148,163,184,.12);border-radius:10px;background:rgba(255,255,255,.025);font-size:12px}.left-feat-icon{background:#102743;border-color:rgba(96,165,250,.18);color:#7dd3fc}
+.right-panel{background:#f8fafc;border-left:0;padding:48px clamp(32px,4vw,64px)}
+.form-wrap{max-width:410px;background:#fff;border:1px solid #dbe4ef;border-radius:18px;padding:34px;box-shadow:0 24px 70px rgba(15,23,42,.12)}
+.form-eyebrow{color:#25619a}.form-h1{font-size:30px;color:#0f1f36}.form-sub{color:#64748b}.login-input{min-height:48px;border-radius:9px;border-color:#cbd5e1}.btn-main{min-height:48px;background:#25619a;border-radius:9px;box-shadow:0 8px 22px rgba(37,97,154,.24)}.btn-main:hover:not(:disabled){background:#1f5689;box-shadow:0 10px 28px rgba(37,97,154,.3)}
+.sec-badge{background:#f8fafc}.right-footer{color:#94a3b8}
+@media(max-width:900px){body{display:block;overflow:auto;background:#f8fafc}.left-panel{min-height:auto;padding:28px 22px}.left-brand{margin:0}.left-logo{margin-bottom:26px}.left-tagline{font-size:36px}.left-sub{margin-bottom:24px}.left-bottom{display:none}.right-panel{min-height:60dvh;padding:34px 18px}.right-top{display:none}.form-wrap{max-width:520px;padding:28px 22px}.left-features{grid-template-columns:1fr 1fr}}@media(max-width:520px){.left-features{grid-template-columns:1fr}.left-feat:nth-child(n+3){display:none}.left-tagline{font-size:32px}.form-wrap{border-radius:14px}.otp-digit{width:42px;height:52px}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>

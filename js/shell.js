@@ -91,8 +91,9 @@ const Shell = (() => {
   function buildTopbar(activeId) {
     const s        = Session.get() || {};
     const email    = s.email || '';
-    const initials = getInitials(email);
-    const display  = getDisplayName(email);
+    const profileName = String(s.fullName || '').trim();
+    const initials = getInitials(profileName || email);
+    const display  = profileName || getDisplayName(email);
     const isDark   = document.documentElement.getAttribute('data-theme') !== 'light';
 
     return `
@@ -386,6 +387,25 @@ const Shell = (() => {
     if (confirm('Sign out of Prudent PDF?')) { Session.clear(); location.replace('/login'); }
   }
 
+  function syncProfileIdentity(session = Session.get() || {}) {
+    const email = session.email || '';
+    const name = String(session.fullName || '').trim();
+    const display = name || getDisplayName(email);
+    const chip = document.getElementById('userChip');
+    const nameEl = chip?.querySelector('.user-name');
+    const avatar = chip?.querySelector('.user-avatar');
+    if (nameEl) nameEl.textContent = display;
+    if (avatar) {
+      avatar.textContent = '';
+      if (session.profilePicture) {
+        const img = document.createElement('img');
+        img.src = session.profilePicture; img.alt = ''; img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit';
+        avatar.appendChild(img);
+      } else avatar.textContent = getInitials(name || email);
+    }
+    if (chip) chip.title = email;
+  }
+
   function refreshQuota() {
     const s = Session.get();
     if (!s?.email || !APP_CONFIG.FLOWS.QUOTA_GET) return;
@@ -407,6 +427,7 @@ const Shell = (() => {
           fullName         : data.fullName          ?? s.fullName,
         };
         Session.set(updated);
+        syncProfileIdentity(updated);
 
         // Update greeting if fullName just arrived from Supabase
         const greetEl = document.getElementById('welcomeTitle');
@@ -595,6 +616,7 @@ const Shell = (() => {
       requestAnimationFrame(() => { startClock(); startInfoObserver(); setTimeout(refreshQuota, 1200); });
     },
     refreshQuota,
+    syncProfileIdentity,
     NAV,
   };
 

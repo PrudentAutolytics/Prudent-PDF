@@ -38,6 +38,20 @@
 
 .catalog-command{display:flex;gap:12px;align-items:center;padding:18px 0 14px;flex-wrap:wrap}.catalog-command .inp{max-width:360px}.tool-state{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}.tool-badge{font-size:9px;padding:2px 5px;border-radius:999px;background:var(--blue-bg);color:var(--blue);font-weight:700}.tool-glyph{font:700 10px var(--mono)}.info-btn{margin-left:auto;width:32px;height:32px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--blue);font-weight:800;cursor:pointer}.info-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}.help-dialog{max-width:560px;width:calc(100% - 32px);border:0;border-radius:14px;padding:0;box-shadow:0 24px 70px rgba(0,0,0,.28)}.help-dialog::backdrop{background:rgba(10,20,35,.5)}.help-body{padding:20px;line-height:1.7;color:var(--ink2)}
 @media(max-width:600px){.catalog-command{align-items:stretch}.catalog-command .inp{max-width:none;width:100%}.segs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}.ops-grid{grid-template-columns:1fr}.ops-tool{padding:16px}.ops-band{padding:16px 0}}
+
+.ops-availability-tabs{display:flex;gap:8px;padding:18px 0 0;border-bottom:1px solid var(--border)}
+.availability-tab{border:0;border-bottom:3px solid transparent;background:transparent;color:var(--ink3);padding:12px 15px;font:700 12px var(--font);cursor:pointer}
+.availability-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.availability-tab span{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 6px;margin-left:5px;border-radius:999px;background:var(--surface3);font-size:10px}
+.availability-tab.on span{background:var(--blue-bg)}
+.availability-note{margin:2px 0 14px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:11.5px;line-height:1.55;color:var(--ink2)}
+.ops-tool.locked{opacity:.78;background:linear-gradient(145deg,var(--surface),var(--surface2))}
+.ops-tool.locked .ops-tool-ico{filter:grayscale(1);opacity:.65}
+.coming-lock{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.coming-lock:before{content:'LOCKED';font-size:8px;padding:3px 5px;border-radius:5px;background:var(--surface3);color:var(--ink3)}
+.btn-disabled{pointer-events:none;opacity:.55;cursor:not-allowed}
+@media(max-width:600px){.ops-availability-tabs{overflow-x:auto}.availability-tab{white-space:nowrap;flex:1}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
@@ -72,7 +86,11 @@
 
     <div class="card anim">
       <div class="card-bd" style="padding:4px 22px 8px">
-        <div class="catalog-command"><input id="toolSearch" class="inp" type="search" placeholder="Search document workflows" aria-label="Search document workflows"><div id="catFilters" class="segs" aria-label="Workflow categories"></div></div><div id="bands"></div>
+        <div class="ops-availability-tabs" role="tablist" aria-label="Workflow availability">
+<button class="availability-tab on" id="availableTab" type="button" role="tab" aria-selected="true">Available now <span id="availableCount"></span></button>
+<button class="availability-tab" id="upcomingTab" type="button" role="tab" aria-selected="false">Coming soon <span id="upcomingCount"></span></button>
+</div>
+<div class="catalog-command"><input id="toolSearch" class="inp" type="search" placeholder="Search available document workflows" aria-label="Search document workflows"><div id="catFilters" class="segs" aria-label="Workflow categories"></div></div><div id="availabilityNote" class="availability-note"></div><div id="bands"></div>
       </div>
     </div>
 
@@ -113,14 +131,33 @@
 
   /* Tool directory */
   let activeCategory = 'All';
+  let availability = 'available';
   const search = $('toolSearch');
+  const isAvailable = t => t.engine !== 'controlled';
+  const availableTotal = Object.values(TOOLS).filter(isAvailable).length;
+  const upcomingTotal = Object.values(TOOLS).filter(t=>!isAvailable(t)).length;
+  $('availableCount').textContent = availableTotal;
+  $('upcomingCount').textContent = upcomingTotal;
   $('catFilters').innerHTML = ['All', ...CATEGORY_ORDER].map((c,i)=>`<button class="seg${i===0?' on':''}" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
   $('catFilters').addEventListener('click', e=>{ const b=e.target.closest('[data-cat]'); if(!b)return; activeCategory=b.dataset.cat; document.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('on',x===b)); renderDirectory(); });
+  $('availableTab').onclick=()=>setAvailability('available');
+  $('upcomingTab').onclick=()=>setAvailability('upcoming');
+  function setAvailability(value){
+    availability=value;
+    $('availableTab').classList.toggle('on',value==='available'); $('upcomingTab').classList.toggle('on',value==='upcoming');
+    $('availableTab').setAttribute('aria-selected',String(value==='available')); $('upcomingTab').setAttribute('aria-selected',String(value==='upcoming'));
+    search.placeholder=value==='available'?'Search available document workflows':'Search upcoming workflows';
+    renderDirectory();
+  }
   search.addEventListener('input', renderDirectory);
   function renderDirectory(){
     const q=search.value.trim().toLowerCase();
-    const bands=TOOL_BANDS.map(b=>({...b,tools:b.tools.filter(id=>{const t=TOOLS[id]; return (activeCategory==='All'||t.category===activeCategory)&&(!q||[t.name,t.what,...t.when].join(' ').toLowerCase().includes(q));})})).filter(b=>b.tools.length);
-    $('bands').innerHTML = bands.length ? bands.map(band => `<section class="ops-band"><div class="ops-band-hd"><div class="ops-band-name">${esc(band.name)}</div><div class="ops-band-desc">${esc(band.desc)}</div></div><div class="ops-grid">${band.tools.map(id=>{const t=TOOLS[id]; const href=t.route||`${t.engine==='core'?'/tool':'/advanced-tool'}?op=${encodeURIComponent(t.id)}`; const state=t.engine==='controlled'?'Connector required':t.engine==='route'?'Controlled workflow':'Available now'; return `<article class="ops-tool"><div class="ops-tool-hd"><span class="ops-tool-ico">${t.icon}</span><h2 class="ops-tool-name">${esc(t.name)}</h2>${t.badge?`<span class="tool-badge">${esc(t.badge)}</span>`:''}<button class="info-btn" type="button" data-tool-help="${esc(t.id)}" aria-label="About ${esc(t.name)}" title="About ${esc(t.name)}">i</button></div><div class="tool-state">${state}</div><p class="ops-tool-what">${esc(t.what)}</p><div class="ops-tool-when"><b>Use for</b>${esc(t.when.join(', '))}</div><div class="ops-tool-act"><a class="btn btn-secondary btn-sm" href="${href}">Open ${esc(t.name)}</a></div></article>`;}).join('')}</div></section>`).join('') : '<div style="padding:40px;text-align:center;color:var(--ink3)">No workflows match your search.</div>';
+    const wanted=t=>availability==='available'?isAvailable(t):!isAvailable(t);
+    const bands=TOOL_BANDS.map(b=>({...b,tools:b.tools.filter(id=>{const t=TOOLS[id]; return wanted(t)&&(activeCategory==='All'||t.category===activeCategory)&&(!q||[t.name,t.what,...t.when].join(' ').toLowerCase().includes(q));})})).filter(b=>b.tools.length);
+    $('availabilityNote').innerHTML=availability==='available'
+      ? `<strong>Ready to use.</strong> Only workflows implemented in the current application are shown here. Successful operations remain metered through the configured usage flow.`
+      : `<strong>Coming soon.</strong> These capabilities are intentionally locked because the required enterprise engine or approved connector is not implemented in this build. They are visible for roadmap clarity and cannot be opened.`;
+    $('bands').innerHTML = bands.length ? bands.map(band => `<section class="ops-band"><div class="ops-band-hd"><div class="ops-band-name">${esc(band.name)}</div><div class="ops-band-desc">${esc(band.desc)}</div></div><div class="ops-grid">${band.tools.map(id=>{const t=TOOLS[id]; const available=isAvailable(t); const href=t.route||`${t.engine==='core'?'/tool':'/advanced-tool'}?op=${encodeURIComponent(t.id)}`; return `<article class="ops-tool${available?'':' locked'}"><div class="ops-tool-hd"><span class="ops-tool-ico">${t.icon}</span><h2 class="ops-tool-name">${esc(t.name)}</h2>${t.badge?`<span class="tool-badge">${esc(t.badge)}</span>`:''}<button class="info-btn" type="button" data-tool-help="${esc(t.id)}" aria-label="About ${esc(t.name)}" title="About ${esc(t.name)}">i</button></div><div class="${available?'tool-state':'coming-lock'}">${available?(t.engine==='route'?'Controlled workflow':'Available now'):'Enterprise engine required'}</div><p class="ops-tool-what">${esc(t.what)}</p><div class="ops-tool-when"><b>Use for</b>${esc(t.when.join(', '))}</div><div class="ops-tool-act">${available?`<a class="btn btn-secondary btn-sm" href="${href}">Open ${esc(t.name)}</a>`:`<span class="btn btn-secondary btn-sm btn-disabled" aria-disabled="true">Coming soon</span>`}</div></article>`;}).join('')}</div></section>`).join('') : '<div style="padding:40px;text-align:center;color:var(--ink3)">No workflows match your search.</div>';
   }
   renderDirectory();
   const helpDialog = $('toolHelp');

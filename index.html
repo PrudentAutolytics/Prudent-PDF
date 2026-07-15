@@ -326,15 +326,55 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   .plans-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; }
 }
+
+.access-home{min-height:100dvh;background:#07111f;color:#f8fafc;padding:22px;display:grid;place-items:center;position:relative;overflow:hidden}
+.access-home:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 78% 18%,rgba(46,117,182,.22),transparent 32%),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:auto,48px 48px,48px 48px}
+.access-shell{position:relative;width:min(1240px,100%);min-height:min(760px,calc(100dvh - 44px));border:1px solid rgba(148,163,184,.18);border-radius:22px;background:rgba(9,20,36,.88);box-shadow:0 30px 100px rgba(0,0,0,.38);display:flex;flex-direction:column;overflow:hidden}
+.access-header,.access-footer{display:flex;align-items:center;justify-content:space-between;padding:20px 26px;border-bottom:1px solid rgba(148,163,184,.14)}
+.access-logo{width:138px;height:42px;object-fit:contain}.access-status{font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:8px}.access-status span{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.1)}
+.access-main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,.9fr);gap:60px;align-items:center;padding:64px clamp(34px,6vw,82px)}
+.access-eyebrow{font-size:11px;font-weight:800;letter-spacing:.16em;color:#7dd3fc;margin-bottom:18px}.access-copy h1{font-size:clamp(38px,5vw,68px);line-height:1.02;letter-spacing:-.045em;max-width:720px;margin:0 0 22px;color:#fff}.access-copy>p{font-size:16px;line-height:1.75;color:#94a3b8;max-width:650px;margin:0 0 30px}
+.access-actions{display:flex;align-items:center;gap:14px;margin-bottom:42px}.access-signin{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:9px;background:#2e75b6;color:#fff;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 10px 28px rgba(46,117,182,.28)}.access-signin:hover{background:#3b82c4}.access-caption{font-size:11px;color:#64748b}
+.access-assurance{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.access-assurance div{padding:14px;border-left:2px solid rgba(125,211,252,.35);background:rgba(255,255,255,.025)}.access-assurance strong,.access-assurance span{display:block}.access-assurance strong{font-size:11px;color:#e2e8f0;margin-bottom:5px}.access-assurance span{font-size:10px;line-height:1.45;color:#64748b}
+.access-console{border:1px solid rgba(148,163,184,.18);border-radius:16px;background:#0b1728;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}.console-top,.console-footer{display:flex;justify-content:space-between;gap:10px;padding:13px 16px;font:700 9px var(--mono);letter-spacing:.08em;color:#64748b;border-bottom:1px solid rgba(148,163,184,.12)}.console-live{color:#4ade80}.console-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(148,163,184,.12)}.console-card{min-height:145px;padding:22px;background:#0b1728;display:flex;flex-direction:column}.console-card.primary{background:linear-gradient(145deg,#102743,#0b1728)}.console-card small{font:700 9px var(--mono);color:#60a5fa;letter-spacing:.08em}.console-card strong{font-size:16px;color:#f8fafc;margin:auto 0 7px}.console-card span{font-size:10.5px;line-height:1.5;color:#64748b}.console-footer{border-top:1px solid rgba(148,163,184,.12);border-bottom:0;justify-content:flex-start;gap:20px;flex-wrap:wrap}
+.access-footer{border-top:1px solid rgba(148,163,184,.14);border-bottom:0;font-size:10px;color:#475569;letter-spacing:.06em}
+@media(max-width:900px){.access-home{padding:0}.access-shell{min-height:100dvh;border:0;border-radius:0}.access-main{grid-template-columns:1fr;padding:46px 26px;gap:42px}.access-console{max-width:650px}.access-assurance{grid-template-columns:1fr}.access-copy h1{font-size:clamp(36px,10vw,54px)}}@media(max-width:520px){.access-header{padding:16px 18px}.access-status{display:none}.access-main{padding:38px 18px}.console-grid{grid-template-columns:1fr}.console-card{min-height:115px}.access-actions{align-items:flex-start;flex-direction:column}.access-signin{width:100%}.access-footer{padding:16px 18px;align-items:flex-start;flex-direction:column;gap:6px}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
 </head>
 <body>
-<div id="gate" style="min-height:100vh;display:grid;place-items:center;background:var(--page-bg)">
-  <div style="text-align:center;max-width:380px;padding:40px 24px">
-    <img src="/assets/pa-logo.svg" alt="" style="height:40px;width:auto;object-fit:contain;margin:0 auto 24px;display:block;border-radius:8px"/>
-    <div id="gateContent"></div>
+<div id="gate" class="access-home">
+  <div class="access-shell">
+    <header class="access-header">
+      <img src="/assets/pa-logo.svg" alt="Prudent Autolytics" class="access-logo"/>
+      <div class="access-status"><span></span> Secure document workspace</div>
+    </header>
+    <main class="access-main">
+      <section class="access-copy">
+        <div class="access-eyebrow">PRUDENT REDACT</div>
+        <h1>Document privacy operations in one controlled workspace.</h1>
+        <p>Redact PDFs and media, organize document pages, validate outputs, and manage controlled processing from a focused enterprise portal.</p>
+        <div class="access-actions" id="gateContent"></div>
+        <div class="access-assurance">
+          <div><strong>Controlled access</strong><span>Passwordless email verification</span></div>
+          <div><strong>Usage governance</strong><span>Metered operations and evidence</span></div>
+          <div><strong>Privacy focused</strong><span>Clear local and server processing boundaries</span></div>
+        </div>
+      </section>
+      <aside class="access-console" aria-label="Platform capabilities">
+        <div class="console-top"><span>PRUDENT REDACT CONTROL PLANE</span><span class="console-live">READY</span></div>
+        <div class="console-grid">
+          <div class="console-card primary"><small>CORE WORKFLOW</small><strong>PDF Redaction</strong><span>Controlled submission and processing</span></div>
+          <div class="console-card"><small>DOCUMENT OPS</small><strong>Split, merge, rotate</strong><span>Browser based controlled outputs</span></div>
+          <div class="console-card"><small>MEDIA PRIVACY</small><strong>Image and video</strong><span>Face privacy and batch evidence</span></div>
+          <div class="console-card"><small>GOVERNANCE</small><strong>Operational visibility</strong><span>Usage, history, and risk controls</span></div>
+        </div>
+        <div class="console-footer"><span>Azure hosted</span><span>SHA 256 evidence</span><span>Power Automate metering</span></div>
+      </aside>
+    </main>
+    <footer class="access-footer"><span>PRUDENT AUTOLYTICS LLP</span><span>Enterprise document privacy platform</span></footer>
   </div>
 </div>
 <script src="/js/config.js"></script>
@@ -344,10 +384,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   if (Session.valid()) { location.replace('/dashboard'); return; }
   // Not logged in - show minimal sign-in prompt, no product details
   document.getElementById('gateContent').innerHTML =
-    '<h1 style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin-bottom:8px">Prudent PDF</h1>' +
-    '<p style="font-size:14px;color:var(--ink3);margin-bottom:24px">Sign in to access your account.</p>' +
-    '<a href="/login" style="display:inline-block;background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:11px 28px;border-radius:8px;text-decoration:none">Sign in</a>';
-  document.title = 'Prudent PDF';
+    '<a href="/login" class="access-signin">Access secure workspace</a>' +
+    '<span class="access-caption">Email verification required</span>';
+  document.title = 'Prudent Redact | Secure Document Privacy';
 })();
 </script>
 
