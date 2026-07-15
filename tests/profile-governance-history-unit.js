@@ -14,6 +14,6 @@ ok(history.includes('information_schema.columns')&&history.includes('stable core
 const gov=read('pages/governance.html');
 ok(gov.includes('APP_CONFIG.FLOWS.GOVERNANCE')&&!gov.includes("api({type:'governance'"),'governance uses user-scoped API');
 const govApi=read('api/governance/index.js');
-ok(govApi.includes('j.user_id=$1'),'governance data is scoped to authenticated user');
+ok(/j\.user_id\s*=\s*\$1/.test(govApi),'governance data is scoped to authenticated user');
 if(process.exitCode)process.exit(process.exitCode);
 console.log('Profile, history, and governance regression tests passed.');

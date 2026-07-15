@@ -14,7 +14,6 @@ module.exports = async function (context, req) {
   }
   // ENTERPRISE HARDENING: identity comes from the verified session,
   // never from a caller-supplied field.
-  const email = auth.email;
   const days  = Math.min(365, Math.max(1, parseInt(req.body?.days || '30', 10) || 30));
 
   try {
@@ -40,12 +39,11 @@ module.exports = async function (context, req) {
     const result = await pool.query(`
       SELECT ${fields}
       FROM jobs j
-      INNER JOIN users u ON u.id = j.user_id
-      WHERE u.email = $1
+      WHERE j.user_id = $1
         AND j.submitted_at > NOW() - INTERVAL '1 day' * $2
       ORDER BY j.submitted_at DESC
       LIMIT 250
-    `, [email, days || 365]);
+    `, [auth.userId, days || 365]);
 
     context.res = {
       status  : 200,
