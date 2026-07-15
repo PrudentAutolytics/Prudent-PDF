@@ -24,7 +24,7 @@ function otpEmailHtml(otp) {
     <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px">
       <h2 style="color:#111827;font-size:22px;font-weight:800;margin:0 0 8px">Your login code</h2>
       <p style="color:#6B7280;font-size:14px;margin:0 0 24px;line-height:1.6">
-        Use this code to sign in to <strong>Prudent PDF</strong>. It expires in 10 minutes.
+        Use this code to sign in to <strong>Prudent Redact</strong>. It expires in 10 minutes.
       </p>
       <div style="font-size:40px;font-weight:800;letter-spacing:10px;
                   color:#2E75B6;padding:24px;background:#EBF3FA;

@@ -4,8 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Dashboard | Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/enterprise-responsive.css"/>
 <style>
@@ -50,11 +50,11 @@
     <div class="welcome-banner anim" id="welcomeBanner">
       <div class="welcome-banner-left">
         <div class="welcome-title" id="welcomeTitle">Loading... 👋</div>
-        <div class="welcome-sub">Your documents are processed with <strong>protected Azure processing</strong> and automatically deleted after 7 days. Documents are submitted to the configured Azure and Power Automate redaction workflow.</div>
+        <div class="welcome-sub">Submit PDFs to the configured Azure and Power Automate redaction workflow, review processing status, and inspect controlled outputs from one workspace.</div>
         <div class="quick-actions-row">
-          <a href="/history" class="quick-action"><div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><div class="quick-action-label">Job History</div><div class="quick-action-sub">View all processed files</div></div></a>
-          <a href="/viewer" class="quick-action"><div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.8"/></svg></div><div><div class="quick-action-label">Document Viewer</div><div class="quick-action-sub">Side-by-side comparison</div></div></a>
-          <a href="/pricing" class="quick-action"><div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="#fff" stroke-width="1.8"/></svg></div><div><div class="quick-action-label">Upgrade Plan</div><div class="quick-action-sub">Unlock unlimited files</div></div></a>
+          <a href="/history" class="quick-action"><div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><div class="quick-action-label">Processing History</div><div class="quick-action-sub">View all processed files</div></div></a>
+          <a href="/viewer" class="quick-action"><div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.8"/></svg></div><div><div class="quick-action-label">Document Viewer</div><div class="quick-action-sub">Side by side comparison</div></div></a>
+          <a href="/pricing" class="quick-action"><div class="quick-action-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="#fff" stroke-width="1.8"/></svg></div><div><div class="quick-action-label">Upgrade Plan</div><div class="quick-action-sub">Compare plan capacity</div></div></a>
         </div>
       </div>
       <div class="welcome-actions">
@@ -71,11 +71,11 @@
         <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div style="flex:1">
-        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px">Welcome to Prudent PDF 👋</div>
-        <div style="font-size:13px;color:var(--ink3)">Upload your first document to get started with AI-powered redaction. It takes less than 30 seconds.</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px">Welcome to Prudent Redact</div>
+        <div style="font-size:13px;color:var(--ink3)">Upload your first document to get started with automated redaction. Processing time depends on document size and workflow load.</div>
       </div>
       <button class="btn btn-primary btn-sm" onclick="document.getElementById('openUploadBtn').click();document.getElementById('onboardingBanner').classList.add('hidden')">
-        Upload first document &rarr;
+        Upload first document
       </button>
     </div>
 
@@ -257,7 +257,7 @@
   let jobsLoaded = false;
   let operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
 
-  async function fetchJobsFromSupabase() {
+  async function fetchJobsFromdatabase() {
     try {
       const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 30 });
       if (Array.isArray(res)) {
@@ -402,7 +402,7 @@
           <path d="M78 55l7-7 7 7M85 48v16" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <div class="tbl-empty-title" style="font-size:15px;font-weight:700;margin-bottom:6px">No jobs yet</div>
-        <div class="tbl-empty-sub" style="margin-bottom:16px">Upload your first PDF to get started with AI-powered redaction</div>
+        <div class="tbl-empty-sub" style="margin-bottom:16px">Upload your first PDF to get started with automated redaction</div>
         <button class="btn btn-primary btn-sm" onclick="document.getElementById('openUploadBtn')?.click()">
           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Upload your first PDF
@@ -466,7 +466,7 @@
   }
 
   /* ══════════════════════════════════════════════════════
-     POLLING - polls Supabase for job status updates
+     POLLING - polls database for job status updates
      Runs every 5 seconds for any queued/processing job
      ══════════════════════════════════════════════════════ */
   const activePolls = new Map();
@@ -498,7 +498,7 @@
             showToast('Redaction complete! Your file is ready to download.', 'success', 8000);
             // Browser notification if tab not focused
             if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-              new Notification('Prudent PDF - Redaction Complete', {
+              new Notification('Prudent Redact - Redaction Complete', {
                 body : `${j?.fileName || 'Your file'} is ready to download.`,
                 icon : '/favicon.svg',
               });
@@ -514,10 +514,10 @@
   }
 
   /* ══════════════════════════════════════════════════════
-     AUTO-REFRESH - re-fetches all jobs from Supabase
+     AUTO-REFRESH - re-fetches all jobs from database
      every 30 seconds to catch PA callbacks
      ══════════════════════════════════════════════════════ */
-  setInterval(fetchJobsFromSupabase, 30_000);
+  setInterval(fetchJobsFromdatabase, 30_000);
 
   /* ── Modal ── */
   function openModal()  { $('uploadModal').classList.add('open'); document.body.style.overflow='hidden'; }
@@ -736,14 +736,14 @@
     dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');const f=e.dataTransfer?.files?.[0];if(f)handleFile(f);});
     dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')$('fileInput')?.click();});
   }
-  $('refreshBtn')?.addEventListener('click',()=>{Promise.all([fetchJobsFromSupabase(),fetchOperationSummary()]);showToast('Dashboard refreshed','info',1800);});
+  $('refreshBtn')?.addEventListener('click',()=>{Promise.all([fetchJobsFromdatabase(),fetchOperationSummary()]);showToast('Dashboard refreshed','info',1800);});
   $('exportRecentBtn')?.addEventListener('click',()=>{
     const jobs=allJobs.slice(0,8).map(j=>({JobId:j.jobId,FileName:j.fileName,SizeMB:fmt.mb(j.fileSize),Pages:j.pageCount||0,Status:j.status,Submitted:fmt.datetime(j.submittedAt),Completed:j.completedAt?fmt.datetime(j.completedAt):'',Cost_USD:j.costTotal??''}));
     exportCSV(jobs,'prudent-recent-jobs.csv');
   });
 
   /* ── Initial load ── */
-  Promise.all([fetchJobsFromSupabase(), fetchOperationSummary()]);
+  Promise.all([fetchJobsFromdatabase(), fetchOperationSummary()]);
   updateQuotaHint();
 
   // Auto-open upload modal if navigated via #upload hash (sidebar "New Redaction")

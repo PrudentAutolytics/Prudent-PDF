@@ -23,11 +23,14 @@ img,svg,video,canvas,iframe{max-width:100%}
   .shell.sidebar-collapsed{grid-template-columns:var(--sidebar-collapsed) minmax(0,1fr)}
   .shell.sidebar-collapsed .sidebar{width:var(--sidebar-collapsed)}
   .shell.sidebar-collapsed .nav-group-label,.shell.sidebar-collapsed .nav-link-label,.shell.sidebar-collapsed .nav-link-badge,.shell.sidebar-collapsed .sidebar-bottom{display:none}
+  .shell.sidebar-collapsed .sidebar-footer{border-top:0;box-shadow:none}
+  .shell.sidebar-collapsed .sidebar-nav-scroll{scrollbar-width:none}
+  .shell.sidebar-collapsed .sidebar-nav-scroll::-webkit-scrollbar{display:none}
   .shell.sidebar-collapsed .nav-link{justify-content:center;padding-inline:12px}
   .shell.sidebar-collapsed .nav-link-icon{width:20px;display:grid;place-items:center}
   .shell.sidebar-collapsed .nav-section{padding-inline:8px}
   .shell.sidebar-collapsed .nav-sep{margin-inline:8px}
-  .sidebar-collapse-btn{display:grid;place-items:center;position:sticky;bottom:12px;margin:12px auto;width:44px;height:44px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);color:var(--ink3);cursor:pointer}
+  .sidebar-collapse-btn{display:grid;place-items:center;margin:8px auto 12px;width:44px;height:44px;min-height:44px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);color:var(--ink3);cursor:pointer;box-shadow:var(--s1)}
 }
 
 @media (max-width: 1100px){
@@ -39,7 +42,9 @@ img,svg,video,canvas,iframe{max-width:100%}
   .topbar-right{gap:6px!important}
   .topbar-mobile-menu{display:grid;place-items:center;width:44px;height:44px;border:0;background:transparent;color:var(--ink);border-radius:10px;cursor:pointer;flex:0 0 auto}
   .mobile-primary-action{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 12px;border-radius:9px;background:var(--blue);color:#fff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
-  .sidebar{position:fixed!important;inset:0 auto 0 0!important;top:0!important;width:min(86vw,340px)!important;height:100dvh!important;z-index:10001!important;transform:translateX(-105%);transition:transform .22s ease;box-shadow:0 20px 50px rgba(2,6,23,.28);padding-top:66px!important;background:var(--surface)!important}
+  .sidebar{position:fixed!important;inset:0 auto 0 0!important;top:0!important;width:min(86vw,340px)!important;height:100dvh!important;z-index:10001!important;transform:translateX(-105%);transition:transform .22s ease;box-shadow:0 20px 50px rgba(2,6,23,.28);padding-top:66px!important;background:var(--surface)!important;overflow:hidden!important}
+  .sidebar-nav-scroll{padding-top:6px!important}
+  .sidebar-footer{padding-bottom:max(0px,env(safe-area-inset-bottom))}
   .sidebar.drawer-open{transform:none}
   .sidebar-close{display:grid;place-items:center;position:absolute;right:12px;top:10px;width:44px;height:44px;border:1px solid var(--border);background:var(--surface2);color:var(--ink);border-radius:10px;cursor:pointer}
   .sidebar-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.56);z-index:10000;opacity:0;pointer-events:none;transition:opacity .2s ease}
@@ -206,4 +211,30 @@ dialog{max-width:calc(100vw - 24px)}
  .recent-operations-table td:nth-child(5)::before{content:'Completed'}
  .recent-operations-table td:last-child{grid-column:auto!important}
  .operations-dashboard-card .card-hd>a{width:100%;justify-content:center}
+}
+
+/* v24 product benchmark shell and typography controls */
+:root{
+  --product-title-size:clamp(1.75rem,2.2vw,2.2rem);
+  --product-body-size:14px;
+  --product-small-size:11.5px;
+  --product-label-tracking:.08em;
+}
+.page-title,.gov-title{font-size:var(--product-title-size)!important;line-height:1.12!important;letter-spacing:-.035em!important}
+.page-subtitle,.gov-sub{font-size:var(--product-body-size)!important;line-height:1.65!important}
+.stat-label,.metric-label,.page-hd-eyebrow,.gov-eyebrow,.nav-group-label{
+  letter-spacing:var(--product-label-tracking)!important;
+}
+.card-title,.gov-card-title{line-height:1.35!important}
+.nav-link{line-height:1.35!important}
+.sidebar{contain:layout paint}
+.sidebar-nav-scroll{scrollbar-width:thin}
+@media(max-height:760px) and (min-width:1101px){
+  .sidebar-nav-scroll{padding-top:8px}
+  .nav-group-label{padding-top:11px}
+  .nav-sep{margin-block:6px}
+  .nav-link{padding-block:8px}
+  .sidebar-bottom{padding-top:8px}
+  .plan-box{padding:12px}
+  .plan-count{font-size:22px}
 }

@@ -4,8 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Redaction Review Workspace · Prudent Redact</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Redaction Review | Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/enterprise-responsive.css"/>
 <style>
@@ -284,7 +284,7 @@
     }));
   }
 
-  /* ── Fetch jobs from Supabase ── */
+  /* ── Fetch jobs from database ── */
   async function fetchJobs() {
     try {
       const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 30 });

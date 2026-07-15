@@ -14,7 +14,7 @@ const Shell = (() => {
       items : [
         { id: 'dashboard', label: 'Dashboard',        href: '/dashboard', icon: 'grid',    desc: 'Overview, stats, and quick upload' },
         { id: 'upload',    label: 'New Redaction',    href: '/dashboard#upload', icon: 'upload',  desc: 'Upload and process a PDF' },
-        { id: 'history',   label: 'Processing History',      href: '/history',   icon: 'clock',   desc: 'All processed jobs - last 30 days', badge: '30d' },
+        { id: 'history',   label: 'Processing History',      href: '/history',   icon: 'clock',   desc: 'Redaction jobs from the last 30 days', badge: '30d' },
         { id: 'viewer',    label: 'Document Viewer',  href: '/viewer',    icon: 'eye',     desc: 'Secure original and redacted PDF preview with integrity details' },
       ],
     },
@@ -35,7 +35,7 @@ const Shell = (() => {
       group : 'ACCOUNT',
       items : [
         { id: 'profile', label: 'My Profile', href: '/profile', icon: 'user', desc: 'Profile photo, name, email, and account settings' },
-        { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans and cost details' },
+        { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans, limits, and cost details' },
         { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: 'Talk to our team' },
         // Administration is shown only when the session was issued with the
         // administrator flag, which is set server-side from ADMIN_EMAILS at
@@ -163,26 +163,29 @@ const Shell = (() => {
       return `<div class="nav-section"><span class="nav-group-label">${group.group}</span>${items}</div><div class="nav-sep" role="separator"></div>`;
     }).join('');
 
-    const upgradeBtn = s.plan !== 'paid'
-      ? `<button class="btn-upgrade" onclick="location.href='/pricing'">${ICONS.bolt} Upgrade to Pro</button>`
-      : `<div class="flex-between mt-8"><span class="pill-paid">● Pro Active</span><span class="text-xs text-subtle">Unlimited</span></div>`;
+    const upgradeBtn = `<button class="btn-upgrade" onclick="location.href='/pricing'">${ICONS.bolt} View plans and limits</button>`;
 
     return `
 <aside class="sidebar" role="navigation" aria-label="Main navigation">
-  ${navHtml}
-  <div class="sidebar-bottom">
-    <div class="plan-box" role="region" aria-label="Usage quota">
-      <div class="plan-tier">${ICONS.bolt} ${planLabel}</div>
-      <div class="plan-count" id="sidebarUsed">${used}<span> / ${limit} files</span></div>
-      <div class="plan-bar-track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${pct}% of quota used">
-        <div class="plan-bar-fill ${fillCls}" id="planBarFill" style="width:${pct}%"></div>
+  <div class="sidebar-nav-scroll" data-sidebar-scroll>
+    ${navHtml}
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-bottom">
+      <div class="plan-box" role="region" aria-label="Usage quota">
+        <div class="plan-tier" id="sidebarPlanLabel">${ICONS.bolt} ${planLabel}</div>
+        <div class="plan-count" id="sidebarUsed">${used}<span> / ${limit} files</span></div>
+        <div class="plan-bar-track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${pct}% of quota used">
+          <div class="plan-bar-fill ${fillCls}" id="planBarFill" style="width:${pct}%"></div>
+        </div>
+        <div class="plan-meta">
+          <span id="sidebarRemain">${remain} remaining</span>
+          <span>${s.plan === 'paid' ? 'Unlimited' : `${daysLeft} days left`}</span>
+        </div>
+        ${upgradeBtn}
       </div>
-      <div class="plan-meta">
-        <span id="sidebarRemain">${remain} remaining</span>
-        <span>${s.plan === 'paid' ? '∞ credits' : `${daysLeft}d left`}</span>
-      </div>
-      ${upgradeBtn}
     </div>
+    <button class="sidebar-collapse-btn" type="button" aria-label="Collapse navigation"><span aria-hidden="true">‹</span></button>
   </div>
 </aside>`;
   }
@@ -216,7 +219,7 @@ const Shell = (() => {
     const input = document.getElementById('globalSearch');
     if (!input) return;
 
-    // Append dropdown to body - avoids topbar overflow clipping
+    // Append dropdown to body to avoid topbar overflow clipping
     const dropdown = document.createElement('div');
     dropdown.id = 'searchDropdown';
     Object.assign(dropdown.style, {
@@ -300,12 +303,12 @@ const Shell = (() => {
           });
       } catch {}
 
-      // Fallback - search all jobs in history
+      // Fallback search across processing history
       if (!results.find(r => r.href?.includes('history'))) {
         results.push({
           href: `/history?q=${encodeURIComponent(q)}`,
           label: `Search all jobs for "${q}"`,
-          sub  : 'View full results in Job History',
+          sub  : 'View full results in Processing History',
           icon : `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
           color: 'var(--surface2)', iconColor: 'var(--ink3)',
         });
@@ -386,7 +389,7 @@ const Shell = (() => {
   }
 
   function signOut() {
-    if (confirm('Sign out of Prudent PDF?')) { Session.clear(); location.replace('/login'); }
+    if (confirm('Sign out of Prudent Redact?')) { Session.clear(); location.replace('/login'); }
   }
 
   function syncProfileIdentity(session = Session.get() || {}) {
@@ -433,16 +436,11 @@ const Shell = (() => {
         Session.set(updated);
         syncProfileIdentity(updated);
         if (priorAdmin !== (updated.isAdmin === true)) {
-          const sidebar = document.querySelector('.sidebar');
-          if (sidebar) {
-            const holder = document.createElement('div');
-            holder.innerHTML = buildSidebar(currentActiveId);
-            sidebar.replaceWith(holder.firstElementChild);
-            wireSidebarDrawer();
-          }
+          location.reload();
+          return;
         }
 
-        // Update greeting if fullName just arrived from Supabase
+        // Update greeting when the profile name is refreshed
         const greetEl = document.getElementById('welcomeTitle');
         if (greetEl && updated.fullName) {
             greetEl.textContent = `${greeting()}, ${updated.fullName} 👋`;
@@ -468,7 +466,7 @@ const Shell = (() => {
 
         if (pct >= 90) {
           document.getElementById('notifDot')?.classList.remove('hidden');
-          showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining - consider upgrading`, 'warn', 6000);
+          showToast(`Only ${remain} credit${remain !== 1 ? 's' : ''} remaining. Review your plan limits.`, 'warn', 6000);
         }
       })
       .catch(() => {});
@@ -568,13 +566,13 @@ const Shell = (() => {
 
   function injectInfoHelp(root=document) {
     const selectors=[
-      '.page-title','.page-subtitle','.section-title','.card-title','.panel-title','.modal-title',
-      '.stat-label','.metric-label','.kpi-label','.contact-info-label','.nav-group-label',
-      'label:not(.switch):not(.checkbox-label)','th','.tab-btn','.viewer-tab','.gov-label',
+      '.page-title','.section-title','.card-title','.panel-title','.modal-title',
+      '.stat-label','.metric-label','.kpi-label','.contact-info-label',
+      'label:not(.switch):not(.checkbox-label)', '.tab-btn','.viewer-tab','.gov-label',
       '.control-title','.risk-title','.admin-kpi-label','.sla-label'
     ];
     root.querySelectorAll(selectors.join(',')).forEach(el=>{
-      if (el.dataset.infoEnhanced==='1' || el.closest('.topbar-search') || el.closest('.info-help-tooltip')) return;
+      if (el.dataset.infoEnhanced==='1' || el.closest('.topbar-search') || el.closest('.topbar') || el.closest('.sidebar') || el.closest('.info-help-tooltip')) return;
       const label=(el.textContent||'').replace(/\s+/g,' ').trim();
       if (!label || label.length>85 || /^[\d\W]+$/.test(label)) return;
       el.dataset.infoEnhanced='1';

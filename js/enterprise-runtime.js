@@ -17,13 +17,19 @@
     const primary=document.createElement('a');primary.className='mobile-primary-action';primary.href='/dashboard#upload';primary.textContent='New';primary.setAttribute('aria-label','New redaction');top.querySelector('.topbar-right')?.prepend(primary);
     const close=document.createElement('button');close.type='button';close.className='sidebar-close';close.setAttribute('aria-label','Close navigation');close.innerHTML=iconClose();side.prepend(close);
     const backdrop=document.createElement('div');backdrop.className='sidebar-backdrop';backdrop.setAttribute('aria-hidden','true');document.body.appendChild(backdrop);
-    const collapse=document.createElement('button');collapse.type='button';collapse.className='sidebar-collapse-btn';collapse.setAttribute('aria-label','Collapse navigation');collapse.innerHTML='<span aria-hidden="true">‹</span>';side.appendChild(collapse);
+    const collapse=side.querySelector('.sidebar-collapse-btn');
+    const navScroll=side.querySelector('[data-sidebar-scroll]');
+    if(navScroll)navScroll.scrollTop=0;
     side.querySelectorAll('.nav-link').forEach(a=>{ const nodes=[...a.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim()); nodes.forEach(n=>{const span=document.createElement('span');span.className='nav-link-label';span.textContent=n.textContent.trim();n.replaceWith(span)}); });
+    requestAnimationFrame(()=>{
+      const active=side.querySelector('.nav-link.active');
+      if(active&&navScroll)active.scrollIntoView({block:'nearest',inline:'nearest'});
+    });
     function open(){lastFocused=document.activeElement;side.classList.add('drawer-open');backdrop.classList.add('open');document.body.classList.add('drawer-lock');menu.setAttribute('aria-expanded','true');close.focus()}
     function shut(){side.classList.remove('drawer-open');backdrop.classList.remove('open');document.body.classList.remove('drawer-lock');menu.setAttribute('aria-expanded','false');lastFocused?.focus?.()}
     menu.addEventListener('click',open);close.addEventListener('click',shut);backdrop.addEventListener('click',shut);side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{if(innerWidth<=1100)shut()}));
-    collapse.addEventListener('click',()=>{shell.classList.toggle('sidebar-collapsed');const c=shell.classList.contains('sidebar-collapsed');sessionStorage.setItem('pr_sidebar_collapsed',c?'1':'0');collapse.innerHTML=`<span aria-hidden="true">${c?'›':'‹'}</span>`;collapse.setAttribute('aria-label',c?'Expand navigation':'Collapse navigation')});
-    if(innerWidth>1100&&sessionStorage.getItem('pr_sidebar_collapsed')==='1'){shell.classList.add('sidebar-collapsed');collapse.innerHTML='<span aria-hidden="true">›</span>'}
+    collapse?.addEventListener('click',()=>{shell.classList.toggle('sidebar-collapsed');const c=shell.classList.contains('sidebar-collapsed');sessionStorage.setItem('pr_sidebar_collapsed',c?'1':'0');collapse.innerHTML=`<span aria-hidden="true">${c?'›':'‹'}</span>`;collapse.setAttribute('aria-label',c?'Expand navigation':'Collapse navigation')});
+    if(innerWidth>1100&&sessionStorage.getItem('pr_sidebar_collapsed')==='1'){shell.classList.add('sidebar-collapsed');if(collapse)collapse.innerHTML='<span aria-hidden="true">›</span>'}
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&side.classList.contains('drawer-open'))shut();if(e.key==='Tab'&&side.classList.contains('drawer-open')){const items=[...side.querySelectorAll(focusable)].filter(x=>x.offsetParent!==null);if(!items.length)return;const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
     addMobileTableClasses();
   }

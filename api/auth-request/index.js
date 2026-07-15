@@ -93,7 +93,7 @@ module.exports = async function (context, req) {
           use_case       = CASE WHEN EXCLUDED.use_case  <> '' THEN EXCLUDED.use_case  ELSE users.use_case  END
     `, [email, otpStored, expiresAt, fullName || null, company || null, useCase || null]);
 
-    await sendEmail(email, 'Your Prudent PDF login code', otpEmailHtml(otp));
+    await sendEmail(email, 'Your Prudent Redact login code', otpEmailHtml(otp));
 
     context.log('auth-request: verification challenge sent');
     context.res = { status: 200, headers: getCorsHeaders(req), body: { message: 'Code sent.' } };

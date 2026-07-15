@@ -53,7 +53,7 @@ check(quota.includes('const isAdmin    = await isAdminUser'), 'quota refresh rec
 check(quota.includes('isAdmin,'), 'quota API returns admin entitlement');
 check(shell.includes("isAdmin          : data.isAdmin === true"), 'shell stores refreshed admin entitlement');
 check(shell.includes('currentActiveId'), 'shell tracks active navigation for entitlement refresh');
-check(shell.includes('buildSidebar(currentActiveId)'), 'sidebar rebuilds when admin entitlement changes');
+check(shell.includes('priorAdmin !== (updated.isAdmin === true)')&&shell.includes('location.reload()'), 'shell reloads once when admin entitlement changes');
 check(adminPage.includes('Remove access'), 'admin user action exposes remove access');
 check(adminPage.includes('Restore access'), 'admin user action exposes restore access');
 check(adminPage.includes('Add User'), 'admin panel retains add user');
