@@ -27,6 +27,8 @@ const APP_CONFIG = Object.freeze({
     CONTACT_SEND   : '/api/contact-send',
     BLOB_SAS       : '/api/blob-sas',
     USAGE_TRACK     : '/api/usage-track',
+    GOVERNANCE      : '/api/governance',
+    PROFILE         : '/api/profile',
     ADMIN_USERS    : '/api/admin',
     ADMIN_UPDATE   : '/api/admin',
     ADMIN_CONTACTS : '/api/admin',

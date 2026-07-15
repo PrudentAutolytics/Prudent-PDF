@@ -189,11 +189,11 @@
   const email   = session?.email || '';
   const $       = id => document.getElementById(id);
 
-  /* ── In-memory job list from Supabase ── */
+  /* In-memory processing history */
   let allJobs    = [];
   let dataLoaded = false;
 
-  /* ── Fetch all jobs from Supabase via jobs-list API ── */
+  /* Fetch processing history from the authenticated jobs API */
   async function fetchJobs() {
     try {
       const days = parseInt($('dateFilter')?.value || '0', 10);
@@ -209,8 +209,13 @@
         });
       }
     } catch (err) {
-      /* error handled silently */
-      showToast('Failed to load jobs. Please refresh.', 'error');
+      dataLoaded = true;
+      allJobs = [];
+      renderTable();
+      const tbody = $('jobsBody');
+      if (tbody) tbody.innerHTML = `<tr><td colspan="7"><div class="tbl-empty" style="padding:44px 24px"><div class="tbl-empty-title">Processing history is temporarily unavailable</div><div class="tbl-empty-sub">${String(err.message || 'The history service could not load your records.').replace(/[<>&]/g,'')}</div><button class="btn btn-primary btn-sm" id="retryHistory" style="margin-top:14px">Retry</button></div></td></tr>`;
+      $('retryHistory')?.addEventListener('click', fetchJobs);
+      showToast(err.message || 'Processing history could not be loaded.', 'error');
     }
   }
 
@@ -497,7 +502,7 @@
   $('dateFilter')?.addEventListener('change',   () => { fetchJobs(); });
   $('sortFilter')?.addEventListener('change',   renderTable);
 
-  $('refreshBtn')?.addEventListener('click', () => { fetchJobs(); showToast('Refreshed from Supabase', 'info', 1800); });
+  $('refreshBtn')?.addEventListener('click', () => { fetchJobs(); showToast('Processing history refreshed', 'info', 1800); });
   $('exportAllBtn')?.addEventListener('click',      () => exportCSV(toCSVRows(allJobs), 'prudent-all-jobs.csv'));
   $('exportFilteredBtn')?.addEventListener('click', () => exportCSV(toCSVRows(applyFilters(allJobs)), 'prudent-filtered-jobs.csv'));
 

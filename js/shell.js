@@ -32,6 +32,7 @@ const Shell = (() => {
     {
       group : 'ACCOUNT',
       items : [
+        { id: 'profile', label: 'My Profile', href: '/profile', icon: 'user', desc: 'Profile photo, name, email, and account settings' },
         { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans and cost details' },
         { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: 'Talk to our team' },
         // Administration is shown only when the session was issued with the
@@ -46,6 +47,7 @@ const Shell = (() => {
   ];
 
   const ICONS = {
+    user     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21c.7-4.4 3.4-7 8-7s7.3 2.6 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
     grid     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>`,
     upload   : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     clock    : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,

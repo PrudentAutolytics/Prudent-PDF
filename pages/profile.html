@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>My Profile</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<style>
+.profile-wrap{max-width:1050px;margin:0 auto}.profile-grid{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px;align-items:start}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--s1);overflow:hidden}.profile-summary{padding:28px 22px;text-align:center}
+.avatar{width:116px;height:116px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--navy-d),var(--blue));color:#fff;display:grid;place-items:center;font:800 34px var(--font-d);overflow:hidden;border:4px solid var(--surface);box-shadow:0 0 0 1px var(--border),var(--s2)}
+.avatar img{width:100%;height:100%;object-fit:cover}.profile-name{font:800 20px var(--font-d);color:var(--ink)}.profile-email{font-size:12px;color:var(--ink3);margin-top:4px;overflow-wrap:anywhere}.profile-plan{display:inline-flex;margin-top:12px;padding:5px 9px;border-radius:999px;background:var(--blue-bg);color:var(--blue);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+.photo-actions{display:grid;gap:7px;margin-top:18px}.profile-form{padding:22px}.section-title{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px}.section-sub{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field.full{grid-column:1/-1}.field label{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:750;color:var(--ink2);margin-bottom:7px}.field input{width:100%;min-height:44px;border:1.5px solid var(--border2);border-radius:8px;background:var(--surface);color:var(--ink);padding:9px 11px;font:13px var(--font)}.field input:focus{outline:none;border-color:var(--blue);box-shadow:var(--s-glow)}.field-help{font-size:10.5px;color:var(--ink3);line-height:1.5;margin-top:5px}.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
+.usage-box{padding:18px 22px;border-top:1px solid var(--border);text-align:left}.usage-row{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:8px}.usage-track{height:8px;border-radius:999px;background:var(--surface3);overflow:hidden}.usage-fill{height:100%;background:var(--blue);border-radius:inherit;width:0}
+@media(max-width:760px){.profile-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.form-actions{position:sticky;bottom:calc(0px + env(safe-area-inset-bottom));background:var(--surface);padding:14px 0 4px}.form-actions .btn{flex:1;justify-content:center}}
+</style>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
+</head>
+<body>
+<div class="shell" id="appShell"><main class="main">
+<div class="profile-wrap">
+<div class="page-hd anim"><div><div class="page-hd-eyebrow">ACCOUNT</div><div class="page-title">My Profile</div><div class="page-subtitle">Manage your personal profile and account identity.</div></div></div>
+<div class="profile-grid anim">
+<aside class="profile-card">
+ <div class="profile-summary">
+  <div class="avatar" id="avatar"><span id="initials">U</span></div>
+  <div class="profile-name" id="summaryName">Loading profile...</div>
+  <div class="profile-email" id="summaryEmail"></div>
+  <div class="profile-plan" id="summaryPlan">Account</div>
+  <div class="photo-actions">
+   <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden/>
+   <button class="btn btn-secondary btn-sm" id="changePhoto" type="button">Change profile picture</button>
+   <button class="btn btn-ghost btn-sm" id="removePhoto" type="button">Remove picture</button>
+  </div>
+ </div>
+ <div class="usage-box">
+  <div class="usage-row"><span>Plan usage</span><strong id="usageText">0 / 0</strong></div>
+  <div class="usage-track"><div class="usage-fill" id="usageFill"></div></div>
+ </div>
+</aside>
+<section class="profile-card profile-form">
+ <div class="section-title">Profile information</div>
+ <div class="section-sub">Your profile is private to your authenticated account. Updating your email refreshes the signed session identity immediately.</div>
+ <form id="profileForm">
+  <div class="form-grid">
+   <div class="field"><label for="fullName">Full name <button class="info-btn mini" type="button" data-help="name" aria-label="About full name">i</button></label><input id="fullName" maxlength="120" autocomplete="name" required/><div class="field-help">Shown in your account workspace.</div></div>
+   <div class="field"><label for="email">Email address <button class="info-btn mini" type="button" data-help="email" aria-label="About email address">i</button></label><input id="email" type="email" maxlength="254" autocomplete="email" required/><div class="field-help">Used as your signed account identity. It must be unique.</div></div>
+   <div class="field full"><label for="company">Company <button class="info-btn mini" type="button" data-help="company" aria-label="About company">i</button></label><input id="company" maxlength="160" autocomplete="organization"/><div class="field-help">Optional organization name associated with your profile.</div></div>
+  </div>
+  <div class="form-actions"><button class="btn btn-secondary" id="resetBtn" type="button">Reset</button><button class="btn btn-primary" id="saveBtn" type="submit">Save profile</button></div>
+ </form>
+</section>
+</div>
+</div>
+</main></div>
+<dialog id="helpDialog" style="max-width:520px;width:calc(100% - 28px);border:0;border-radius:14px;padding:0"><div class="card-hd"><div class="card-title" id="helpTitle">Profile help</div><button class="btn btn-ghost btn-sm" id="helpClose">Close</button></div><div class="card-bd" id="helpBody"></div></dialog>
+<script src="/js/config.js"></script><script src="/js/shell.js"></script><script src="/js/enterprise-runtime.js"></script>
+<script>
+'use strict';
+Shell.init('profile');
+const $=id=>document.getElementById(id); let profile=null; let picture=null;
+const HELP={name:'Your name is displayed only inside your authenticated Prudent Redact account experience.',email:'Changing your email updates the account record and issues a new signed session token immediately. The email must not already belong to another account.',company:'Company is optional and helps identify the organization associated with your workspace.'};
+function initials(n,e){const s=String(n||e||'U').trim().split(/\s+/).filter(Boolean);return (s.length>1?s[0][0]+s[s.length-1][0]:s[0]?.slice(0,2)||'U').toUpperCase()}
+function renderAvatar(){const a=$('avatar');a.textContent='';if(picture){const img=document.createElement('img');img.src=picture;img.alt='Profile picture';a.appendChild(img)}else{const s=document.createElement('span');s.textContent=initials($('fullName').value,$('email').value);a.appendChild(s)}}
+function render(p){profile=p;picture=p.profilePicture||null;$('fullName').value=p.fullName||'';$('email').value=p.email||'';$('company').value=p.company||'';$('summaryName').textContent=p.fullName||'Prudent Redact user';$('summaryEmail').textContent=p.email||'';$('summaryPlan').textContent=p.plan||'trial';const used=Number(p.creditsUsed||0),limit=Number(p.creditsLimit||0);$('usageText').textContent=`${used.toLocaleString()} / ${limit.toLocaleString()}`;$('usageFill').style.width=`${limit?Math.min(100,used/limit*100):0}%`;renderAvatar()}
+async function load(){try{render(await paFetch(APP_CONFIG.FLOWS.PROFILE,{action:'get'}))}catch(e){showToast(e.message||'Profile could not be loaded.','error')}}
+$('changePhoto').onclick=()=>$('photoInput').click();
+$('photoInput').onchange=()=>{const f=$('photoInput').files[0];if(!f)return;if(f.size>500*1024){showToast('Profile picture must be under 500 KB.','error');return}const r=new FileReader();r.onload=()=>{picture=r.result;renderAvatar()};r.readAsDataURL(f)};
+$('removePhoto').onclick=()=>{picture=null;renderAvatar()};
+$('resetBtn').onclick=()=>profile&&render(profile);
+$('profileForm').onsubmit=async e=>{e.preventDefault();const b=$('saveBtn');b.disabled=true;b.textContent='Saving...';try{const p=await paFetch(APP_CONFIG.FLOWS.PROFILE,{action:'update',fullName:$('fullName').value,email:$('email').value,company:$('company').value,profilePicture:picture});Session.patch({email:p.email,fullName:p.fullName,company:p.company,profilePicture:p.profilePicture,token:p.token});render(p);showToast('Profile updated successfully.','success')}catch(err){showToast(err.message||'Profile could not be saved.','error')}finally{b.disabled=false;b.textContent='Save profile'}};
+document.querySelectorAll('[data-help]').forEach(b=>b.onclick=()=>{$('helpTitle').textContent=b.closest('label').firstChild.textContent.trim();$('helpBody').textContent=HELP[b.dataset.help];$('helpDialog').showModal()});$('helpClose').onclick=()=>$('helpDialog').close();
+load();
+</script>
+</body></html>

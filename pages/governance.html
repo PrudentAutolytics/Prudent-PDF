@@ -86,13 +86,13 @@ const mins=(date)=>Math.max(0,Math.round((Date.now()-new Date(date).getTime())/6
 const age=m=>m<60?`${m}m`:m<1440?`${Math.floor(m/60)}h ${m%60}m`:`${Math.floor(m/1440)}d`;
 const pct=(a,b)=>b?Math.round(a/b*100):0;
 function setDot(id,state){const el=$(id); el.className='health-dot'+(state==='warn'?' warn':state==='bad'?' bad':'');}
-async function api(body){const r=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`); return d;}
+async function api(){return paFetch(APP_CONFIG.FLOWS.GOVERNANCE,{action:'snapshot'});}
 async function load(){
   $('refreshBtn').disabled=true; $('refreshBtn').textContent='Refreshing...';
   try{
-    const [d,healthData]=await Promise.all([api({type:'governance',action:'list'}),paFetch('/api/health',{})]); const h={ok:healthData?.status==='ready',data:healthData};
+    const d=await api(); let healthData=null; try{if(Session.get()?.isAdmin===true)healthData=await paFetch('/api/health',{});}catch{} const h={ok:healthData?healthData.status==='ready':true,data:healthData||{checks:{}}};
     snapshot=d; render(d,h); showToast('Governance controls refreshed','success',1800);
-  }catch(e){console.error(e); showToast(e.message==='Forbidden.'?'Governance Command is restricted to administrators.':e.message,'error',6000); if(e.message==='Forbidden.') setTimeout(()=>location.href='/dashboard',1300);}
+  }catch(e){console.error(e); showToast(e.message||'Governance data could not be loaded.','error',6000);}
   finally{$('refreshBtn').disabled=false;$('refreshBtn').textContent='Refresh controls';}
 }
 function render(d,h){
@@ -102,7 +102,7 @@ function render(d,h){
  $('costTotal').textContent=`$${Number(m.total_cost||0).toFixed(2)}`;$('avgMinutes').textContent=`${Number(m.avg_minutes||0).toFixed(1)} min`;$('pagesTotal').textContent=Number(m.total_pages||0).toLocaleString();
  $('generatedAt').textContent=new Date(d.generatedAt).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'});
  const checks=h.data?.checks||{}; const healthOk=h.ok;
- setDot('serviceDot',healthOk?'ok':'bad');$('serviceHealth').textContent=healthOk?'API configuration healthy':'API configuration requires attention';
+ setDot('serviceDot',healthOk?'ok':'bad');$('serviceHealth').textContent=healthOk?'Governance data available':'Governance data requires attention';
  setDot('callbackDot',d.policy?.callbackProtection?'ok':'bad');$('callbackHealth').textContent=d.policy?.callbackProtection?'Callback secret configured':'Callback protection missing';
  setDot('appUrlDot',d.policy?.appUrlConfigured?'ok':'warn');$('appUrlHealth').textContent=d.policy?.appUrlConfigured?'Deployment callback URL configured':'APP_URL not configured';
  renderPolicy(d.policy||{},checks); renderRisk(d.riskQueue||[]); renderVolume(d.dailyVolume||[]); renderTenants(d.userRisk||[]); renderAudit(d.audit||[]);

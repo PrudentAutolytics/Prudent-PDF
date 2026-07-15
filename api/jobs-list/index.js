@@ -18,26 +18,33 @@ module.exports = async function (context, req) {
   const days  = Math.min(365, Math.max(1, parseInt(req.body?.days || '30', 10) || 30));
 
   try {
+    // History deliberately selects the stable core job schema first. Optional
+    // columns are discovered and included only when they exist, so older
+    // production databases do not make the entire history page fail.
+    const cols = await pool.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'jobs'
+    `);
+    const available = new Set(cols.rows.map(r => r.column_name));
+    const optional = [
+      ['result_url', 'resultUrl'], ['blob_url', 'blobUrl'],
+      ['page_count', 'pageCount'], ['cost_total', 'costTotal'],
+      ['file_size_bytes', 'fileSize'], ['completed_at', 'completedAt'],
+      ['error_message', 'errorMessage'], ['extracted_fields', 'extractedFields']
+    ].filter(([column]) => available.has(column))
+     .map(([column, alias]) => `j.${column} AS "${alias}"`);
+    const fields = [
+      'j.id AS "jobId"', 'j.file_name AS "fileName"', 'j.status',
+      'j.submitted_at AS "submittedAt"', ...optional
+    ].join(',\n        ');
     const result = await pool.query(`
-      SELECT
-        j.id                AS "jobId",
-        j.file_name         AS "fileName",
-        j.status,
-        j.result_url        AS "resultUrl",
-        j.blob_url          AS "blobUrl",
-        j.page_count        AS "pageCount",
-        j.cost_total        AS "costTotal",
-        j.file_size_bytes   AS "fileSize",
-        j.submitted_at      AS "submittedAt",
-        j.completed_at      AS "completedAt",
-        j.error_message     AS "errorMessage",
-        j.extracted_fields  AS "extractedFields"
+      SELECT ${fields}
       FROM jobs j
       INNER JOIN users u ON u.id = j.user_id
       WHERE u.email = $1
         AND j.submitted_at > NOW() - INTERVAL '1 day' * $2
       ORDER BY j.submitted_at DESC
-      LIMIT 50
+      LIMIT 250
     `, [email, days || 365]);
 
     context.res = {

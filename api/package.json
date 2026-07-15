@@ -4,7 +4,7 @@
   "description": "Prudent PDF Azure Functions API",
   "scripts": {
     "build": "echo No build required",
-    "test:regression": "node ../tests/regression-check.js && node ../tests/security-unit.js && node ../tests/cors-unit.js && node ../tests/auth-unit.js && node ../tests/media-redaction-unit.js"
+    "test:regression": "node ../tests/regression-check.js && node ../tests/security-unit.js && node ../tests/cors-unit.js && node ../tests/auth-unit.js && node ../tests/media-redaction-unit.js && node ../tests/profile-governance-history-unit.js"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.17.0",
