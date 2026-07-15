@@ -17,6 +17,8 @@
     drawing: null,
     outputUrl: null,
     faceDetector: null,
+    faceDetectorKind: null,
+    faceModelReady: false,
     lastFaceBoxes: [],
     videoFrameBusy: false,
     exportAbort: false,
@@ -28,7 +30,7 @@
   const HELP = {
     processing: ['Local media processing', 'The editor works with media bytes in this browser workspace. A successful export sends only minimal operation metadata to the usage API. The PDF and redaction Power Automate contract is not changed.'],
     effect: ['Redaction effect', 'Black permanently covers the selected pixels. Blur and pixelation transform the selected visual region. For the strongest visual removal, use Black.'],
-    faces: ['Face privacy', 'Prudent Redact automatically finds faces after image selection and when the redaction effect changes when the browser provides face detection. Suggested face regions are padded and should still be reviewed before export. If the browser does not expose face detection, draw boxes manually.'],
+    faces: ['Face privacy', 'Prudent Redact uses a self-hosted local face model to scan images immediately after upload when automatic face privacy is enabled. Detected face boxes are mapped from original media coordinates to the review canvas, padded for safer coverage, and masked with the selected effect. Review coverage before export.'],
     regions: ['Redaction regions', 'Draw rectangles directly over sensitive content. Manual regions are reviewer-controlled. In video mode, manual regions remain fixed for the full video export.'],
     videoScope: ['Video face tracking', 'When enabled, Prudent Redact refreshes detected face regions repeatedly during export and applies the selected Black, Blur, or Pixelate effect. The safety margin expands each detected face box. Manual boxes remain fixed for the entire clip.'],
     output: ['Controlled output', 'Export creates a new redacted file. The source remains unchanged. Successful export counts as one plan usage and sends a minimal usage event to the configured Power Automate trigger.']
@@ -210,22 +212,31 @@
       targetCtx.save(); targetCtx.imageSmoothingEnabled = false; targetCtx.drawImage(t,0,0,tw,th,x,y,w,h); targetCtx.restore();
     }
   }
+  function sourceFrame(source, width, height) {
+    const frame = document.createElement('canvas');
+    frame.width = width; frame.height = height;
+    const frameCtx = frame.getContext('2d');
+    frameCtx.drawImage(source, 0, 0, width, height);
+    return frame;
+  }
   function renderImage() {
     if (!state.image) return;
+    const frame = sourceFrame(state.image, canvas.width, canvas.height);
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(state.image,0,0,canvas.width,canvas.height);
-    state.regions.forEach(r => drawRegionEffect(ctx, canvas, r));
+    ctx.drawImage(frame,0,0);
+    state.regions.forEach(r => drawRegionEffect(ctx, frame, r));
     if (state.drawing) {
-      ctx.save(); ctx.strokeStyle='#3b82f6'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.strokeRect(state.drawing.x,state.drawing.y,state.drawing.w,state.drawing.h); ctx.restore();
+      ctx.save(); ctx.strokeStyle='#2563eb'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.strokeRect(state.drawing.x,state.drawing.y,state.drawing.w,state.drawing.h); ctx.restore();
     }
   }
   function renderVideoFrame() {
     if (!state.sourceFile || state.mode !== 'video' || video.readyState < 2) return;
+    const frame = sourceFrame(video, canvas.width, canvas.height);
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(video,0,0,canvas.width,canvas.height);
-    state.regions.forEach(r => drawRegionEffect(ctx, canvas, r));
+    ctx.drawImage(frame,0,0);
+    state.regions.forEach(r => drawRegionEffect(ctx, frame, r));
     if (state.drawing) {
-      ctx.save(); ctx.strokeStyle='#3b82f6'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.strokeRect(state.drawing.x,state.drawing.y,state.drawing.w,state.drawing.h); ctx.restore();
+      ctx.save(); ctx.strokeStyle='#2563eb'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.strokeRect(state.drawing.x,state.drawing.y,state.drawing.w,state.drawing.h); ctx.restore();
     }
   }
   function render() {
@@ -280,11 +291,19 @@
         render();
         $('sourceMeta').textContent = `${file.name} | ${width} x ${height} | ${formatSize(file.size)}`;
         say('Image ready. Face privacy detection is running when supported.');
-        if ($('autoFaceImage')?.checked && state.faceDetector) {
-          const count = await runFaceDetection({ automatic: true });
-          showToast(count ? `${count} face${count===1?'':'s'} automatically masked with ${state.effect}. Review and export.` : 'Image ready. No faces were automatically found. Draw boxes over any sensitive areas.', count ? 'success' : 'info');
+        if ($('autoFaceImage')?.checked) {
+          if (!state.faceModelReady) {
+            $('faceSupport').textContent='Image ready. Waiting for the local face privacy model...';
+            for (let wait=0; wait<40 && !state.faceModelReady; wait++) await new Promise(resolve=>setTimeout(resolve,100));
+          }
+          if (state.faceModelReady) {
+            const count = await runFaceDetection({ automatic: true });
+            showToast(count ? `${count} face${count===1?'':'s'} automatically masked with ${state.effect}. Review and export.` : 'Automatic face scan completed. Review the image and draw boxes over any remaining sensitive areas.', count ? 'success' : 'info');
+          } else {
+            showToast('The automatic face model is unavailable. Draw boxes over sensitive areas before export.', 'warning');
+          }
         } else {
-          showToast('Image ready. Draw boxes over sensitive areas before export.', 'info');
+          showToast('Image ready. Automatic face privacy is off. Draw boxes over sensitive areas before export.', 'info');
         }
         $('nextQueued').hidden = !state.pendingFiles.length;
       } catch (err) {
@@ -363,58 +382,99 @@
   });
 
   async function setupFaceDetector() {
-    if (!('FaceDetector' in window)) {
-      $('faceSupport').textContent='Automatic face assistance is not available in this browser. Manual region redaction remains available.';
-      $('faceSupport').className='capability-state attention'; $('detectFaces').disabled=true; return;
-    }
+    $('detectFaces').disabled = true;
+    $('faceSupport').textContent='Loading local face privacy model...';
+    $('faceSupport').className='capability-state';
     try {
-      state.faceDetector = new FaceDetector({ fastMode:true, maxDetectedFaces:100 });
-      $('faceSupport').textContent='Automatic face privacy is available. Faces in images are masked automatically when enabled.';
-      $('faceSupport').className='capability-state available';
-      if (state.mode === 'image' && state.sourceFile && state.image && $('autoFaceImage')?.checked) {
-        setTimeout(() => runFaceDetection({ automatic: true }), 0);
+      if (window.faceapi?.nets?.tinyFaceDetector) {
+        await window.faceapi.nets.tinyFaceDetector.loadFromUri('/models/face');
+        state.faceDetector = window.faceapi;
+        state.faceDetectorKind = 'local-model';
+        state.faceModelReady = true;
+        $('faceSupport').textContent='Local automatic face privacy is ready. Images are scanned immediately after upload and detected faces are masked automatically.';
+        $('faceSupport').className='capability-state available';
+        $('detectFaces').disabled=false;
+      } else if ('FaceDetector' in window) {
+        state.faceDetector = new FaceDetector({ fastMode:false, maxDetectedFaces:100 });
+        state.faceDetectorKind = 'native';
+        state.faceModelReady = true;
+        $('faceSupport').textContent='Automatic face privacy is ready. Images are scanned immediately after upload.';
+        $('faceSupport').className='capability-state available';
+        $('detectFaces').disabled=false;
+      } else {
+        throw new Error('NO_FACE_DETECTOR');
       }
-    } catch {
-      $('faceSupport').textContent='Face assistance could not be initialized. Manual region redaction remains available.';
+      if (state.mode === 'image' && state.sourceFile && state.image && $('autoFaceImage')?.checked) {
+        await runFaceDetection({ automatic: true });
+      }
+    } catch (err) {
+      console.warn('Face model initialization failed:', err?.message || err);
+      state.faceDetector=null; state.faceDetectorKind=null; state.faceModelReady=false;
+      $('faceSupport').textContent='Automatic face privacy could not be initialized. Manual region redaction remains available.';
       $('faceSupport').className='capability-state attention'; $('detectFaces').disabled=true;
     }
   }
-  async function detectFaces(source) {
-    if (!state.faceDetector) return [];
-    const faces = await state.faceDetector.detect(source);
-    const sourceW = state.mode==='image' ? (state.image.naturalWidth || state.image.width) : video.videoWidth;
-    const sourceH = state.mode==='image' ? (state.image.naturalHeight || state.image.height) : video.videoHeight;
+  function detectionSource() {
+    if (state.mode === 'image') {
+      const width = state.image.naturalWidth || state.image.width;
+      const height = state.image.naturalHeight || state.image.height;
+      return sourceFrame(state.image, width, height);
+    }
+    return sourceFrame(video, video.videoWidth, video.videoHeight);
+  }
+  async function detectFaces() {
+    if (!state.faceDetector || !state.faceModelReady) return [];
+    const source = detectionSource();
+    const sourceW = source.width, sourceH = source.height;
+    let rawBoxes = [];
+    if (state.faceDetectorKind === 'local-model') {
+      const inputSize = Math.max(sourceW, sourceH) >= 1400 ? 608 : 416;
+      const options = new window.faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold: 0.42 });
+      const detections = await window.faceapi.detectAllFaces(source, options);
+      rawBoxes = detections.map(item => item.box || item.detection?.box).filter(Boolean);
+    } else {
+      const faces = await state.faceDetector.detect(source);
+      rawBoxes = faces.map(item => item.boundingBox).filter(Boolean);
+    }
     const sx=canvas.width/sourceW, sy=canvas.height/sourceH;
-    const padding = Math.max(0.05, Math.min(0.4, Number($('facePadding')?.value || 18) / 100));
-    return faces.map(f => {
-      const baseX=f.boundingBox.x*sx, baseY=f.boundingBox.y*sy, baseW=f.boundingBox.width*sx, baseH=f.boundingBox.height*sy;
+    const padding = Math.max(0.08, Math.min(0.4, Number($('facePadding')?.value || 18) / 100));
+    return rawBoxes.map(box => {
+      const baseX=box.x*sx, baseY=box.y*sy, baseW=box.width*sx, baseH=box.height*sy;
       const px=baseW*padding, py=baseH*padding;
       const x=Math.max(0,baseX-px), y=Math.max(0,baseY-py);
       return { x, y, w:Math.min(canvas.width-x,baseW+px*2), h:Math.min(canvas.height-y,baseH+py*2), kind:'face' };
     });
   }
   async function runFaceDetection({ automatic = false } = {}) {
-    if (!state.sourceFile || !state.faceDetector || state.faceDetectionBusy) return 0;
+    if (!state.sourceFile || !state.faceDetector || !state.faceModelReady || state.faceDetectionBusy) return 0;
     state.faceDetectionBusy = true;
     $('detectFaces').disabled = true;
-    $('detectFaces').textContent = automatic ? 'Finding faces automatically...' : 'Finding faces...';
+    $('detectFaces').textContent = automatic ? 'Scanning faces automatically...' : 'Scanning faces...';
+    if (automatic) $('faceSupport').textContent = 'Scanning the uploaded media locally for faces...';
     try {
-      const source = state.mode === 'image' ? state.image : video;
-      const boxes = await detectFaces(source);
+      const boxes = await detectFaces();
       state.regions = state.regions.filter(region => region.kind !== 'face');
       if (boxes.length) state.regions.push(...boxes);
+      state.lastFaceBoxes = boxes.map(box => ({...box}));
       render(); updateRegionUI();
+      $('faceSupport').textContent = boxes.length
+        ? `${boxes.length} face${boxes.length===1?'':'s'} detected and masked automatically. Review the coverage before export.`
+        : 'Automatic scan completed. No faces were detected. Draw a manual region over anything that still needs masking.';
+      $('faceSupport').className = boxes.length ? 'capability-state available' : 'capability-state attention';
       if (!automatic) {
-        showToast(boxes.length ? `${boxes.length} face${boxes.length === 1 ? '' : 's'} found and masked. Review before export.` : 'No faces were found in this image or frame. Draw a box over anything else that is sensitive.', boxes.length ? 'success' : 'info');
+        showToast(boxes.length ? `${boxes.length} face${boxes.length === 1 ? '' : 's'} found and masked. Review before export.` : 'No faces were found. Draw a box over anything else that is sensitive.', boxes.length ? 'success' : 'info');
       }
       return boxes.length;
-    } catch {
+    } catch (err) {
+      console.warn('Face detection failed:', err?.message || err);
+      $('faceSupport').textContent='Automatic scan could not process this media. Manual region redaction remains available.';
+      $('faceSupport').className='capability-state attention';
       if (!automatic) showToast('Face detection could not process this media. Draw sensitive areas manually.', 'warning');
       return 0;
     } finally {
       state.faceDetectionBusy = false;
-      $('detectFaces').disabled = !state.faceDetector;
-      $('detectFaces').textContent = 'Find faces now';
+      $('detectFaces').disabled = !state.faceDetector || !state.faceModelReady;
+      $('detectFaces').textContent = 'Scan faces again';
     }
   }
 
@@ -459,8 +519,9 @@
     out.width=state.image.naturalWidth || state.image.width;
     out.height=state.image.naturalHeight || state.image.height;
     const oc=out.getContext('2d',{willReadFrequently:true}); oc.drawImage(state.image,0,0);
+    const originalFrame=sourceFrame(state.image,out.width,out.height);
     const sx=out.width/canvas.width, sy=out.height/canvas.height;
-    state.regions.forEach(r=>drawRegionEffect(oc,out,r,sx,sy));
+    state.regions.forEach(r=>drawRegionEffect(oc,originalFrame,r,sx,sy));
     const mime=state.sourceFile.type==='image/png'?'image/png':'image/jpeg';
     const blob=await canvasToBlob(out,mime,mime==='image/jpeg'?0.94:undefined);
     if(!blob || !blob.size)throw new Error('Image export failed.');
@@ -496,11 +557,12 @@
       if(video.readyState>=2){
         exportCtx.clearRect(0,0,exportCanvas.width,exportCanvas.height);
         exportCtx.drawImage(video,0,0,exportCanvas.width,exportCanvas.height);
+        const originalFrame=sourceFrame(video,exportCanvas.width,exportCanvas.height);
         if($('autoFaceVideo').checked&&state.faceDetector&&frameNo%5===0&&!state.videoFrameBusy){
           state.videoFrameBusy=true;try{dynamicFaces=await detectFaces(video)}catch{}finally{state.videoFrameBusy=false}
         }
         const sx=exportCanvas.width/canvas.width, sy=exportCanvas.height/canvas.height;
-        [...state.regions,...dynamicFaces].forEach(r=>drawRegionEffect(exportCtx,exportCanvas,r,sx,sy));
+        [...state.regions,...dynamicFaces].forEach(r=>drawRegionEffect(exportCtx,originalFrame,r,sx,sy));
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(exportCanvas,0,0,canvas.width,canvas.height);
         frameNo++;
