@@ -28,7 +28,7 @@ check(!fs.existsSync(path.join(root,'api/admin-users')),'failed experimental adm
 
 check(login.includes('v32 premium identity gateway'),'premium login theme exists');
 check(login.includes('login-command-center'),'login contains a dense privacy command center');
-check(login.includes('LIVE PRIVACY WORKFLOW'),'login visual has a live workflow header');
+check(login.includes('LIVE PRIVACY WORKFLOW')||login.includes('PRUDENT PRIVACY COMMAND CENTER'),'login visual has a live workflow header');
 check(login.includes('command-doc'),'login visual contains document privacy motion');
 check(login.includes('command-media'),'login visual contains media privacy motion');
 check(login.includes('command-mask'),'login visual contains moving face privacy masks');

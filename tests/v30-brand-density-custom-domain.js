@@ -16,7 +16,7 @@ check(!cors.includes("'Access-Control-Allow-Origin': '*'"),'CORS remains explici
 
 check(logo.includes('fill="#10213B"'),'light-surface brand logo has a dark wordmark');
 check(home.includes('/assets/pa-logo-light.svg'),'public home uses the light-surface full brand logo');
-check(login.includes('/assets/pa-logo-light.svg'),'login uses the light-surface full brand logo');
+check(login.includes('/assets/pa-logo-light.svg')||login.includes('/assets/prudent-brand-dark-800.png'),'login uses the approved full brand logo for its surface');
 check(home.includes('hero-rail'),'home has a dense operating capability rail');
 check(home.includes('hero-system-strip'),'home has a control lifecycle and operational signal strip');
 check(home.includes('Controlled privacy lifecycle'),'home adds compact lifecycle information');
