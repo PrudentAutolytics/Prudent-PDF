@@ -19,7 +19,8 @@ const Shell = (() => {
     {
       group : 'DOCUMENT TOOLS',
       items : [
-        { id: 'tools', label: 'Document Operations', href: '/tools', icon: 'tools', desc: 'Split, merge, organize, validate, and inspect PDF documents' },
+        { id: 'tools', label: 'Document Operations', href: '/tools', icon: 'tools', desc: 'PDF operations, media redaction, validation, and controlled conversion workflows' },
+        { id: 'media-redaction', label: 'Media Redaction', href: '/media-redaction', icon: 'shield', desc: 'Redact faces and sensitive regions in images and video' },
       ],
     },
     {

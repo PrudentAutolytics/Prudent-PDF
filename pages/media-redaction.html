@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Media Redaction Studio</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<link rel="stylesheet" href="/css/media-redaction.css"/>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#173967"/>
+</head>
+<body>
+<div class="shell" id="appShell">
+  <main class="main" id="main-content">
+    <div class="page-hd anim media-page-hd">
+      <div>
+        <div class="eyebrow">MULTIMEDIA PRIVACY WORKSPACE</div>
+        <h1 class="page-title">Media Redaction Studio</h1>
+        <p class="page-subtitle">Review and permanently mask sensitive regions in images and video. Source media remains unchanged. Successful exports count as one plan usage and trigger the configured Power Automate usage event.</p>
+      </div>
+      <a class="btn btn-secondary btn-sm" href="/tools">All workflows</a>
+    </div>
+
+    <section class="media-security-note anim" aria-label="Processing model">
+      <strong>Local media processing</strong>
+      <span>Image and supported video redaction run in this browser workspace. Media bytes are not included in usage events. Face assistance depends on browser support and never replaces reviewer confirmation.</span>
+      <button class="info-btn" id="processingInfo" type="button" aria-label="About local media processing">i</button>
+    </section>
+
+    <div class="media-layout anim">
+      <section class="media-workspace card" aria-labelledby="workspaceTitle">
+        <div class="media-commandbar">
+          <div>
+            <h2 id="workspaceTitle">Redaction canvas</h2>
+            <div id="sourceMeta" class="media-meta">Select an image or video to begin.</div>
+          </div>
+          <div class="media-mode-tabs" role="tablist" aria-label="Media type">
+            <button class="seg on" id="imageMode" type="button" role="tab" aria-selected="true">Image</button>
+            <button class="seg" id="videoMode" type="button" role="tab" aria-selected="false">Video</button>
+          </div>
+        </div>
+
+        <div id="dropZone" class="media-drop">
+          <input id="mediaInput" type="file" accept="image/jpeg,image/png,image/webp" hidden/>
+          <div class="media-drop-icon">+</div>
+          <strong id="dropTitle">Select an image</strong>
+          <span id="dropHelp">JPG, PNG, or WebP. Drag and drop is available on desktop.</span>
+          <button id="selectMedia" class="btn btn-primary" type="button">Select image</button>
+        </div>
+
+        <div id="editorWrap" class="media-editor" hidden>
+          <div class="media-stage-wrap">
+            <canvas id="mediaCanvas" class="media-canvas" aria-label="Media redaction canvas"></canvas>
+            <video id="sourceVideo" playsinline preload="metadata" hidden></video>
+          </div>
+          <div id="videoControls" class="media-video-controls" hidden>
+            <button id="playPause" class="btn btn-secondary btn-sm" type="button">Play</button>
+            <input id="timeline" type="range" min="0" max="1000" value="0" aria-label="Video timeline"/>
+            <span id="timeLabel" class="media-time">00:00 / 00:00</span>
+          </div>
+        </div>
+
+        <div id="statusLive" class="sr-only" aria-live="polite"></div>
+      </section>
+
+      <aside class="media-panel card" aria-label="Redaction controls">
+        <div class="media-panel-section">
+          <div class="media-panel-title">Redaction effect <button class="info-btn mini" type="button" data-help="effect" aria-label="About redaction effects">i</button></div>
+          <div class="effect-grid" role="radiogroup" aria-label="Redaction effect">
+            <button class="effect-option on" data-effect="black" type="button">Black</button>
+            <button class="effect-option" data-effect="blur" type="button">Blur</button>
+            <button class="effect-option" data-effect="pixelate" type="button">Pixelate</button>
+          </div>
+        </div>
+
+        <div class="media-panel-section">
+          <div class="media-panel-title">Detection assistance <button class="info-btn mini" type="button" data-help="faces" aria-label="About face detection assistance">i</button></div>
+          <button id="detectFaces" class="btn btn-secondary btn-full" type="button">Detect faces in current frame</button>
+          <div id="faceSupport" class="capability-state">Checking browser capability...</div>
+        </div>
+
+        <div class="media-panel-section">
+          <div class="media-panel-title">Regions <button class="info-btn mini" type="button" data-help="regions" aria-label="About redaction regions">i</button></div>
+          <div id="regionSummary" class="region-summary">0 redaction regions</div>
+          <div class="media-actions-grid">
+            <button id="undoRegion" class="btn btn-secondary btn-sm" type="button">Undo</button>
+            <button id="clearRegions" class="btn btn-secondary btn-sm" type="button">Clear</button>
+          </div>
+          <p class="media-hint">Draw directly on the media to add a region. Each reviewed region is permanently applied to the exported output.</p>
+        </div>
+
+        <div class="media-panel-section" id="videoOptions" hidden>
+          <div class="media-panel-title">Video scope <button class="info-btn mini" type="button" data-help="videoScope" aria-label="About video region scope">i</button></div>
+          <label class="check-row"><input id="autoFaceVideo" type="checkbox"/> <span>Detect and mask faces while exporting</span></label>
+          <p class="media-hint">Manual regions apply to the whole video. Face assistance samples frames during export when browser support is available.</p>
+        </div>
+
+        <div class="media-panel-section media-export-section">
+          <div class="media-panel-title">Output <button class="info-btn mini" type="button" data-help="output" aria-label="About redacted outputs">i</button></div>
+          <button id="exportMedia" class="btn btn-primary btn-full" type="button" disabled>Export redacted image</button>
+          <div id="exportState" class="media-export-state">Select media and add at least one redaction region.</div>
+          <a id="downloadOutput" class="btn btn-secondary btn-full" href="#" hidden>Download output</a>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card anim media-evidence" id="evidenceCard" hidden>
+      <div class="card-hd"><div class="card-title">Operation evidence</div></div>
+      <div class="card-bd">
+        <div class="evidence-grid">
+          <div><span>Operation</span><strong id="evOperation">-</strong></div>
+          <div><span>Source</span><strong id="evSource">-</strong></div>
+          <div><span>Output</span><strong id="evOutput">-</strong></div>
+          <div><span>Regions</span><strong id="evRegions">-</strong></div>
+          <div><span>Output size</span><strong id="evSize">-</strong></div>
+          <div><span>SHA-256</span><strong id="evHash" class="mono">-</strong></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="mediaHelp" class="media-help" aria-labelledby="mediaHelpTitle">
+  <div class="card-hd"><div id="mediaHelpTitle" class="card-title">Help</div><button id="mediaHelpClose" class="btn btn-ghost btn-sm" type="button">Close</button></div>
+  <div id="mediaHelpBody" class="media-help-body"></div>
+</dialog>
+
+<script src="/js/config.js"></script>
+<script src="/js/shell.js"></script>
+<script src="/js/enterprise-runtime.js"></script>
+<script src="/js/media-redaction.js"></script>
+</body>
+</html>
