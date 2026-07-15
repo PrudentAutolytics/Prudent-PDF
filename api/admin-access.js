@@ -5,7 +5,9 @@ const FALLBACK_ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'kabileshvijayakumar@
   .split(',').map(v=>v.trim().toLowerCase()).filter(Boolean);
 
 async function isAdminUser(userId, email) {
-  const normalized = String(email || '').toLowerCase();
+  // Normalize defensively: trim AND lowercase. A stray leading or trailing
+  // space in a stored or session email must never lock an administrator out.
+  const normalized = String(email || '').trim().toLowerCase();
   try {
     const columns = await pool.query(`
       SELECT column_name FROM information_schema.columns

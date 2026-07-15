@@ -85,6 +85,65 @@ body {
 }
 .left-trust svg { opacity: .6; color: #93C5FD; }
 
+/* ── Animated redaction demo (shows the product working) ── */
+.demo-card {
+  position: relative; z-index: 1;
+  margin: 28px 0 8px; max-width: 440px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 14px; padding: 18px 20px;
+  backdrop-filter: blur(6px);
+}
+.demo-card-hd {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px; font-size: 11px; font-weight: 700;
+  letter-spacing: .09em; text-transform: uppercase; color: #7dd3fc;
+}
+.demo-card-hd .demo-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.18); animation: demoPulse 2s ease-in-out infinite; }
+@keyframes demoPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.demo-line { font: 13px/1.9 var(--mono, monospace); color: rgba(255,255,255,.82); position: relative; white-space: nowrap; overflow: hidden; }
+.demo-redact {
+  position: relative; display: inline-block; color: transparent; border-radius: 3px;
+  background: #0b1220;
+}
+.demo-redact::after {
+  content: ''; position: absolute; inset: 0; border-radius: 3px;
+  background: linear-gradient(90deg, #0f172a, #1e293b);
+  transform: scaleX(0); transform-origin: left; animation: redactSweep .55s ease forwards;
+}
+.demo-redact.d1::after { animation-delay: .6s; }
+.demo-redact.d2::after { animation-delay: 1.15s; }
+.demo-redact.d3::after { animation-delay: 1.7s; }
+.demo-redact.d4::after { animation-delay: 2.25s; }
+@keyframes redactSweep { to { transform: scaleX(1); } }
+.demo-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px;
+  margin-left: 7px; vertical-align: middle;
+  background: rgba(34,197,94,.14); color: #4ade80; border: 1px solid rgba(34,197,94,.3);
+  opacity: 0; animation: tagIn .3s ease forwards;
+}
+.demo-tag.t1 { animation-delay: 1.2s; }
+.demo-tag.t2 { animation-delay: 1.75s; }
+.demo-tag.t3 { animation-delay: 2.3s; }
+.demo-tag.t4 { animation-delay: 2.85s; }
+@keyframes tagIn { from{opacity:0;transform:translateX(-4px)} to{opacity:1;transform:none} }
+.demo-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(148,163,184,.12); display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: rgba(255,255,255,.5); }
+.demo-foot strong { color: #7dd3fc; font-weight: 700; }
+
+/* ── How it works strip ── */
+.hiw { position: relative; z-index: 1; display: flex; gap: 10px; margin-top: 20px; max-width: 460px; }
+.hiw-step { flex: 1; padding: 12px 12px 13px; border: 1px solid rgba(148,163,184,.14); border-radius: 11px; background: rgba(255,255,255,.025); }
+.hiw-num { width: 22px; height: 22px; border-radius: 6px; background: rgba(96,165,250,.14); border: 1px solid rgba(96,165,250,.22); color: #93C5FD; font-size: 11px; font-weight: 800; display: grid; place-items: center; margin-bottom: 8px; }
+.hiw-t { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.hiw-s { font-size: 10.5px; color: rgba(255,255,255,.5); line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-redact::after { animation: none; transform: scaleX(1); }
+  .demo-tag { animation: none; opacity: 1; }
+  .demo-dot { animation: none; }
+}
+
 /* ── Right panel ── */
 .right-panel {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -278,7 +337,7 @@ body{grid-template-columns:minmax(0,1.12fr) minmax(430px,.88fr);background:#0711
 .form-wrap{max-width:410px;background:#fff;border:1px solid #dbe4ef;border-radius:18px;padding:34px;box-shadow:0 24px 70px rgba(15,23,42,.12)}
 .form-eyebrow{color:#25619a}.form-h1{font-size:30px;color:#0f1f36}.form-sub{color:#64748b}.login-input{min-height:48px;border-radius:9px;border-color:#cbd5e1}.btn-main{min-height:48px;background:#25619a;border-radius:9px;box-shadow:0 8px 22px rgba(37,97,154,.24)}.btn-main:hover:not(:disabled){background:#1f5689;box-shadow:0 10px 28px rgba(37,97,154,.3)}
 .sec-badge{background:#f8fafc}.right-footer{color:#94a3b8}
-@media(max-width:900px){body{display:block;overflow:auto;background:#f8fafc}.left-panel{min-height:auto;padding:28px 22px}.left-brand{margin:0}.left-logo{margin-bottom:26px}.left-tagline{font-size:36px}.left-sub{margin-bottom:24px}.left-bottom{display:none}.right-panel{min-height:60dvh;padding:34px 18px}.right-top{display:none}.form-wrap{max-width:520px;padding:28px 22px}.left-features{grid-template-columns:1fr 1fr}}@media(max-width:520px){.left-features{grid-template-columns:1fr}.left-feat:nth-child(n+3){display:none}.left-tagline{font-size:32px}.form-wrap{border-radius:14px}.otp-digit{width:42px;height:52px}}
+@media(max-width:900px){body{display:block;overflow:auto;background:#f8fafc}.left-panel{min-height:auto;padding:28px 22px}.left-brand{margin:0}.left-logo{margin-bottom:26px}.left-tagline{font-size:36px}.left-sub{margin-bottom:20px}.left-bottom{display:none}.right-panel{min-height:60dvh;padding:34px 18px}.right-top{display:none}.form-wrap{max-width:520px;padding:28px 22px}.demo-card{max-width:100%}.hiw{max-width:100%}}@media(max-width:520px){.left-tagline{font-size:32px}.form-wrap{border-radius:14px}.otp-digit{width:42px;height:52px}.hiw{flex-direction:column}.demo-line{font-size:12px}}
 
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
@@ -671,19 +730,25 @@ $('changeEmailBtn').addEventListener('click', () => {
   var brand = d.getElementById('leftBrand');
   if (brand) {
     brand.innerHTML = [
-      '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/pa-logo.svg" alt=""/></a>',
+      '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/pa-logo.svg" alt="Prudent Autolytics"/></a>',
       '<div class="left-tagline">Redact documents<br/>with <span>enterprise AI</span></div>',
-      '<p class="left-sub">Automatically detect and remove PII from PDFs in seconds. Built for legal, HR, finance and compliance teams.</p>',
-      '<div class="left-features" id="lf"></div>'
+      '<p class="left-sub">Automatically detect and permanently remove personal data from PDFs, images, and video. Built for legal, HR, finance, healthcare, and compliance teams.</p>',
+      // Animated demo: shows PII being detected and redacted in real time
+      '<div class="demo-card" aria-hidden="true">',
+      '  <div class="demo-card-hd"><span class="demo-dot"></span>Live redaction preview</div>',
+      '  <div class="demo-line">Applicant: <span class="demo-redact d1">Jane Doe</span><span class="demo-tag t1">Name</span></div>',
+      '  <div class="demo-line">Phone: <span class="demo-redact d2">012 3456 7890</span><span class="demo-tag t2">Phone</span></div>',
+      '  <div class="demo-line">Account: <span class="demo-redact d3">GB82 WEST 1234</span><span class="demo-tag t3">IBAN</span></div>',
+      '  <div class="demo-line">SSN: <span class="demo-redact d4">402 78 1136</span><span class="demo-tag t4">ID</span></div>',
+      '  <div class="demo-foot"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>4 items</strong> detected and permanently masked. No metadata, no recovery.</span></div>',
+      '</div>',
+      // How it works
+      '<div class="hiw" aria-hidden="true">',
+      '  <div class="hiw-step"><div class="hiw-num">1</div><div class="hiw-t">Detect</div><div class="hiw-s">Azure AI finds names, IDs, and more</div></div>',
+      '  <div class="hiw-step"><div class="hiw-num">2</div><div class="hiw-t">Redact</div><div class="hiw-s">Permanent black-box removal</div></div>',
+      '  <div class="hiw-step"><div class="hiw-num">3</div><div class="hiw-t">Verify</div><div class="hiw-s">Compare original vs redacted</div></div>',
+      '</div>'
     ].join('');
-    var feats = [
-      ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z','Azure Document Intelligence - detects names, IDs, addresses and more'],
-      ['','Permanent black-box redaction - no metadata, no recovery'],
-      ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z','Side by side viewer - compare original vs redacted instantly'],
-      ['M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z','Private Azure Blob Storage - auto-deleted after 7 days']
-    ];
-    var lf = d.getElementById('lf');
-    if (lf) feats.forEach(function(f){ lf.innerHTML += '<div class="left-feat"><div class="left-feat-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="'+f[0]+'" stroke="currentColor" stroke-width="1.8"/></svg></div>'+f[1]+'</div>'; });
   }
 
   // Left bottom trust badges

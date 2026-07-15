@@ -1,7 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#2563EB"/>
-  <path d="M8 8h10l6 6v10a2 2 0 01-2 2H8a2 2 0 01-2-2V10a2 2 0 012-2z" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M18 8v6h6" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-  <rect x="10" y="17" width="8" height="2.5" rx="1.25" fill="white" opacity="0.9"/>
-  <rect x="10" y="21" width="5" height="2" rx="1" fill="white" opacity="0.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Prudent Redact">
+  <defs>
+    <linearGradient id="paG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A8CFF"/>
+      <stop offset="48%" stop-color="#4169F6"/>
+      <stop offset="100%" stop-color="#B218F4"/>
+    </linearGradient>
+    <linearGradient id="bgG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F2544"/>
+      <stop offset="100%" stop-color="#0A1830"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bgG)"/>
+  <rect x="6" y="6" width="500" height="500" rx="108" fill="none" stroke="url(#paG)" stroke-width="4" opacity="0.35"/>
+  <g transform="translate(-145.72 -231.88) scale(0.98462)">
+    <path d="M 350 481 L 278 481 L 272 492 L 267 499 L 265 504 L 257 516 L 254 523 L 252 525 L 247 535 L 245 537 L 243 542 L 241 544 L 239 549 L 237 551 L 232 561 L 230 563 L 228 568 L 220 580 L 214 592 L 210 597 L 208 602 L 206 604 L 204 609 L 202 611 L 200 616 L 194 625 L 193 631 L 192 632 L 193 641 L 197 648 L 201 652 L 208 656 L 214 657 L 215 658 L 228 658 L 229 657 L 233 657 L 244 652 L 255 643 L 255 642 L 261 636 L 264 630 L 266 628 L 268 623 L 273 616 L 275 611 L 277 609 L 279 604 L 284 597 L 294 578 L 296 576 L 304 561 L 306 559 L 308 554 L 313 547 L 315 542 L 320 535 L 323 528 L 328 521 L 338 502 L 346 490 L 348 485 L 350 483 Z
+M 367 333 L 363 341 L 352 358 L 349 365 L 344 372 L 342 377 L 337 384 L 335 389 L 330 396 L 324 408 L 316 420 L 310 432 L 305 439 L 300 449 L 365 449 L 368 453 L 374 465 L 376 467 L 387 488 L 392 495 L 394 500 L 396 502 L 398 507 L 400 509 L 402 514 L 404 516 L 406 521 L 408 523 L 410 528 L 412 530 L 414 535 L 416 537 L 419 544 L 421 546 L 423 551 L 425 553 L 427 558 L 429 560 L 432 567 L 434 569 L 438 577 L 436 579 L 434 578 L 433 579 L 390 579 L 387 576 L 385 571 L 383 569 L 377 557 L 369 545 L 367 540 L 365 537 L 364 537 L 356 552 L 354 554 L 351 561 L 349 563 L 347 568 L 345 570 L 343 575 L 341 577 L 339 582 L 334 589 L 327 603 L 322 610 L 320 615 L 318 617 L 316 622 L 314 624 L 305 641 L 303 643 L 300 650 L 298 652 L 299 653 L 301 652 L 303 652 L 304 653 L 551 653 L 552 652 L 550 650 L 547 643 L 542 636 L 540 631 L 538 629 L 536 624 L 534 622 L 531 615 L 526 608 L 516 589 L 511 582 L 500 561 L 498 559 L 493 549 L 488 542 L 486 537 L 484 535 L 482 530 L 480 528 L 470 509 L 465 502 L 455 483 L 450 476 L 448 471 L 446 469 L 444 464 L 439 457 L 429 438 L 427 436 L 418 419 L 413 412 L 410 405 L 406 400 L 404 395 L 402 393 L 397 383 L 392 376 L 390 371 L 388 369 L 386 364 L 384 362 L 379 352 L 374 345 L 368 333 Z" fill="url(#paG)" fill-rule="evenodd" clip-rule="evenodd"/>
+  </g>
 </svg>
