@@ -35,6 +35,9 @@
 .rec-mono { font-family:var(--mono); font-size:11px; color:var(--ink3); }
 .local-note { display:flex; gap:9px; align-items:flex-start; padding:11px 13px; border:1px solid var(--border2); border-radius:var(--r8); background:var(--surface2); font-size:12px; color:var(--ink2); line-height:1.6; margin-bottom:14px; }
 .local-note svg { flex:none; margin-top:1px; color:var(--ink3); }
+
+.catalog-command{display:flex;gap:12px;align-items:center;padding:18px 0 14px;flex-wrap:wrap}.catalog-command .inp{max-width:360px}.tool-state{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}.tool-badge{font-size:9px;padding:2px 5px;border-radius:999px;background:var(--blue-bg);color:var(--blue);font-weight:700}.tool-glyph{font:700 10px var(--mono)}.info-btn{margin-left:auto;width:32px;height:32px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--blue);font-weight:800;cursor:pointer}.info-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}.help-dialog{max-width:560px;width:calc(100% - 32px);border:0;border-radius:14px;padding:0;box-shadow:0 24px 70px rgba(0,0,0,.28)}.help-dialog::backdrop{background:rgba(10,20,35,.5)}.help-body{padding:20px;line-height:1.7;color:var(--ink2)}
+@media(max-width:600px){.catalog-command{align-items:stretch}.catalog-command .inp{max-width:none;width:100%}.segs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}.ops-grid{grid-template-columns:1fr}.ops-tool{padding:16px}.ops-band{padding:16px 0}}
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
@@ -60,9 +63,8 @@
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div>
             <b style="color:var(--ink)">Local processing.</b>
-            Documents opened in these workspaces are processed by the redaction engine running in this browser tab.
-            They are not uploaded to Prudent Redact, not written to Azure Blob Storage, and not sent to any external
-            viewer or conversion service. Redaction remains a separate, server-side controlled process.
+            Documents opened in these workspaces are processed by the document engine running in this browser tab.
+            They are not uploaded to Azure Blob Storage and are not sent to an external document conversion service. After a successful operation, minimal usage metadata is recorded by Prudent Redact and the configured Power Automate trigger is called so plan usage can be counted. PDF bytes and fingerprints are not included in that usage event. Redaction remains a separate, server-side controlled process.
           </div>
         </div>
       </div>
@@ -70,7 +72,7 @@
 
     <div class="card anim">
       <div class="card-bd" style="padding:4px 22px 8px">
-        <div id="bands"></div>
+        <div class="catalog-command"><input id="toolSearch" class="inp" type="search" placeholder="Search document workflows" aria-label="Search document workflows"><div id="catFilters" class="segs" aria-label="Workflow categories"></div></div><div id="bands"></div>
       </div>
     </div>
 
@@ -95,6 +97,7 @@
 
   </main>
 </div>
+<dialog id="toolHelp" class="help-dialog" aria-labelledby="toolHelpTitle"><div class="card-hd"><div class="card-title" id="toolHelpTitle">Workflow help</div><button id="toolHelpClose" class="btn btn-ghost btn-sm" type="button">Close</button></div><div id="toolHelpBody" class="help-body"></div></dialog>
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
@@ -108,32 +111,31 @@
   const $ = id => document.getElementById(id);
   const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  /* ── Tool directory ── */
-  $('bands').innerHTML = TOOL_BANDS.map(band => `
-    <section class="ops-band">
-      <div class="ops-band-hd">
-        <div class="ops-band-name">${esc(band.name)}</div>
-        <div class="ops-band-desc">${esc(band.desc)}</div>
-      </div>
-      <div class="ops-grid">
-        ${band.tools.map(id => {
-          const t = TOOLS[id];
-          return `
-          <article class="ops-tool">
-            <div class="ops-tool-hd">
-              <span class="ops-tool-ico" aria-hidden="true">${t.icon}</span>
-              <h2 class="ops-tool-name">${esc(t.name)}</h2>
-            </div>
-            <p class="ops-tool-what">${esc(t.what)}</p>
-            <div class="ops-tool-when"><b>Use for</b>${esc(t.when.join(', '))}</div>
-            <div class="ops-tool-act">
-              <a class="btn btn-secondary btn-sm" href="/tool?op=${t.id}">Open ${esc(t.name)}</a>
-            </div>
-          </article>`;
-        }).join('')}
-      </div>
-    </section>
-  `).join('');
+  /* Tool directory */
+  let activeCategory = 'All';
+  const search = $('toolSearch');
+  $('catFilters').innerHTML = ['All', ...CATEGORY_ORDER].map((c,i)=>`<button class="seg${i===0?' on':''}" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+  $('catFilters').addEventListener('click', e=>{ const b=e.target.closest('[data-cat]'); if(!b)return; activeCategory=b.dataset.cat; document.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('on',x===b)); renderDirectory(); });
+  search.addEventListener('input', renderDirectory);
+  function renderDirectory(){
+    const q=search.value.trim().toLowerCase();
+    const bands=TOOL_BANDS.map(b=>({...b,tools:b.tools.filter(id=>{const t=TOOLS[id]; return (activeCategory==='All'||t.category===activeCategory)&&(!q||[t.name,t.what,...t.when].join(' ').toLowerCase().includes(q));})})).filter(b=>b.tools.length);
+    $('bands').innerHTML = bands.length ? bands.map(band => `<section class="ops-band"><div class="ops-band-hd"><div class="ops-band-name">${esc(band.name)}</div><div class="ops-band-desc">${esc(band.desc)}</div></div><div class="ops-grid">${band.tools.map(id=>{const t=TOOLS[id]; const href=t.route||`${t.engine==='core'?'/tool':'/advanced-tool'}?op=${encodeURIComponent(t.id)}`; const state=t.engine==='controlled'?'Connector required':t.engine==='route'?'Controlled workflow':'Available now'; return `<article class="ops-tool"><div class="ops-tool-hd"><span class="ops-tool-ico">${t.icon}</span><h2 class="ops-tool-name">${esc(t.name)}</h2>${t.badge?`<span class="tool-badge">${esc(t.badge)}</span>`:''}<button class="info-btn" type="button" data-tool-help="${esc(t.id)}" aria-label="About ${esc(t.name)}" title="About ${esc(t.name)}">i</button></div><div class="tool-state">${state}</div><p class="ops-tool-what">${esc(t.what)}</p><div class="ops-tool-when"><b>Use for</b>${esc(t.when.join(', '))}</div><div class="ops-tool-act"><a class="btn btn-secondary btn-sm" href="${href}">Open ${esc(t.name)}</a></div></article>`;}).join('')}</div></section>`).join('') : '<div style="padding:40px;text-align:center;color:var(--ink3)">No workflows match your search.</div>';
+  }
+  renderDirectory();
+  const helpDialog = $('toolHelp');
+  $('bands').addEventListener('click', e => {
+    const b = e.target.closest('[data-tool-help]');
+    if (!b) return;
+    e.preventDefault();
+    const t = TOOLS[b.dataset.toolHelp];
+    if (!t) return;
+    $('toolHelpTitle').textContent = t.name;
+    $('toolHelpBody').textContent = t.help;
+    helpDialog.showModal();
+  });
+  $('toolHelpClose').onclick = () => helpDialog.close();
+  helpDialog.addEventListener('click', e => { if (e.target === helpDialog) helpDialog.close(); });
 
   /* ── Recent local operation records ── */
   function renderRecords() {

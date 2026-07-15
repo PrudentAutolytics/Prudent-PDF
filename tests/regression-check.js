@@ -33,7 +33,7 @@ if(!process.exitCode) ok('JSON files parse');
 for(const f of files.filter(f=>f.endsWith('.js'))){ if(f.includes(`${path.sep}tests${path.sep}`)) continue; try{cp.execFileSync(process.execPath,['--check',f],{stdio:'pipe'});}catch(e){fail(`JS syntax ${path.relative(root,f)}: ${String(e.stderr||e.message)}`);} }
 if(!process.exitCode) ok('JavaScript syntax checks pass');
 
-const requiredApis=['auth-check','auth-request','auth-verify','blob-sas','contact-send','health','jobs-list','jobs-status','jobs-submit','quota-get','admin'];
+const requiredApis=['auth-check','auth-request','auth-verify','blob-sas','contact-send','health','jobs-list','jobs-status','jobs-submit','quota-get','admin','usage-track'];
 for(const api of requiredApis){ for(const file of ['index.js','function.json']){ if(!fs.existsSync(path.join(root,'api',api,file))) fail(`missing API file api/${api}/${file}`); } }
 if(!process.exitCode) ok('required Azure Function routes present');
 
@@ -99,7 +99,7 @@ for(const f of htmlFiles){
 }
 if(!process.exitCode) ok('no duplicate static HTML ids');
 
-const protectedApis=['admin','blob-sas','health','jobs-list','jobs-submit','quota-get'];
+const protectedApis=['admin','blob-sas','health','jobs-list','jobs-submit','quota-get','usage-track'];
 for(const api of protectedApis){
   const code=fs.readFileSync(path.join(root,'api',api,'index.js'),'utf8');
   if(!code.includes('verifySession')) fail(`protected API lacks session verification: ${api}`);
@@ -114,6 +114,21 @@ for(const marker of ['@media (max-width: 1100px)','@media (max-width: 760px)','@
   if(!responsive.includes(marker)) fail(`responsive P0 marker missing: ${marker}`);
 }
 if(!process.exitCode) ok('responsive mobile, tablet, touch, viewport, and safe-area controls present');
+
+const usageTrack=fs.readFileSync(path.join(root,'api/usage-track/index.js'),'utf8');
+if(!usageTrack.includes(fallback) || !usageTrack.includes('process.env.PA_JOB_SUBMIT_FLOW || PA_FLOW_FALLBACK')) fail('usage tracking is not wired to the locked Power Automate URL');
+if(!usageTrack.includes('credits_used = credits_used + 1') || !usageTrack.includes('usageIncrement: 1')) fail('document operation usage increment is missing');
+if(!usageTrack.includes("eventType: 'DOCUMENT_OPERATION_USAGE'")) fail('Power Automate usage event contract missing');
+if(!process.exitCode) ok('document operations increment usage and trigger the locked Power Automate URL');
+
+const catalog=fs.readFileSync(path.join(root,'js/tools-catalog.js'),'utf8');
+const benchmarkTools=['Merge PDF','Split PDF','Compress PDF','Edit PDF','Annotate PDF','Highlight PDF','Comment PDF','Draw on PDF','Fill PDF','Flatten PDF','PDF to Word','PDF to PowerPoint','PDF to Excel','PDF to JPG','PDF to PNG','PDF to TXT','Word to PDF','PowerPoint to PDF','Excel to PDF','JPG to PDF','PNG to PDF','Sign PDF','Request E-Signatures','Signature Tracking','Watermark','Rotate PDF','HTML to PDF','Unlock PDF','Protect PDF','Organize PDF','PDF to PDF/A','Repair PDF','Page Numbers','Scan to PDF','OCR PDF','Compare PDF','Redact PDF','Crop PDF','PDF Forms','AI Summarizer','Chat with PDF','AI Question Generator','Translate PDF','PDF to Markdown','Extract PDF Images','Accessibility Check','Bates Numbering','Header and Footer'];
+for(const name of benchmarkTools){ if(!catalog.includes(`name:'${name}'`)) fail(`benchmark workflow missing: ${name}`); }
+if(!process.exitCode) ok('benchmark PDF workflow catalog coverage present');
+
+const toolsPage=fs.readFileSync(path.join(root,'pages/tools.html'),'utf8');
+if(!toolsPage.includes('data-tool-help') || !toolsPage.includes('toolHelpBody')) fail('workflow information controls missing');
+if(!process.exitCode) ok('workflow information buttons and accessible help dialog present');
 
 if(process.exitCode) process.exit(process.exitCode);
 console.log('All regression checks passed.');

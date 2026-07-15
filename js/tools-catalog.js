@@ -1,141 +1,71 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   PRUDENT REDACT - tools-catalog.js
-   Single source of truth for the Document Operations toolkit. The home page
-   and the tool workspace both read from here, so a tool cannot appear in the
-   directory without a workspace behind it.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
+/* Prudent Redact v13 workflow catalog. A workflow is listed only with an explicit capability state. */
 'use strict';
-
-const TOOL_ICONS = {
-  split    : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v4M16 3h3a2 2 0 012 2v4M8 21H5a2 2 0 01-2-2v-4M16 21h3a2 2 0 002-2v-4M3 12h18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-  merge    : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M8 6H5a2 2 0 00-2 2v8a2 2 0 002 2h3M16 6h3a2 2 0 012 2v8a2 2 0 01-2 2h-3M12 3v18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  organize : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M14 17.5h7M17.5 14v7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-  extract  : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M12 17v-6M9.5 13.5L12 11l2.5 2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  remove   : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M9 14h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-  rotate   : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3.2-6.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M21 3v5h-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  validate : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.7"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  metadata : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.7"/><path d="M20 20l-3.5-3.5M11 8v3.5M11 14.5v.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-  compare  : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4M15 4h4a1 1 0 011 1v14a1 1 0 01-1 1h-4M12 2v20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
-};
-
+const I = n => `<span class="tool-glyph" aria-hidden="true">${n}</span>`;
 const TOOLS = {
-  split: {
-    id: 'split', name: 'Split PDF', icon: TOOL_ICONS.split,
-    title: 'Split PDF',
-    intro: 'Create controlled PDF outputs using page ranges, fixed page groups, or named document sections.',
-    what: 'Create controlled outputs using page ranges, fixed page groups, or named document sections.',
-    when: ['Large case packs', 'Invoice batches', 'Employee document packages'],
-    inputs: 1,
-  },
-  merge: {
-    id: 'merge', name: 'Merge PDF', icon: TOOL_ICONS.merge,
-    title: 'Merge PDF',
-    intro: 'Combine several source documents into a single ordered output document.',
-    what: 'Combine several source documents into a single ordered output document.',
-    when: ['Case file assembly', 'Evidence bundles', 'Board packs'],
-    inputs: 'many',
-  },
-  organize: {
-    id: 'organize', name: 'Page Organizer', icon: TOOL_ICONS.organize,
-    title: 'Page Organizer',
-    intro: 'Reorder, rotate, and remove pages in a single workspace, then produce one revised document.',
-    what: 'Reorder, rotate, and remove pages in one place, then produce a single revised document.',
-    when: ['Scanned document cleanup', 'Submission preparation', 'Pack correction'],
-    inputs: 1,
-  },
-  extract: {
-    id: 'extract', name: 'Extract Pages', icon: TOOL_ICONS.extract,
-    title: 'Extract Pages',
-    intro: 'Produce a new document containing only the pages you select, in source order or in an order you define.',
-    what: 'Produce a new document containing only the pages you select, in source or custom order.',
-    when: ['Disclosure sets', 'Selected exhibits', 'Single-document extracts'],
-    inputs: 1,
-  },
-  remove: {
-    id: 'remove', name: 'Remove Pages', icon: TOOL_ICONS.remove,
-    title: 'Remove Pages',
-    intro: 'Produce a revised document with selected pages excluded. The source document is never modified.',
-    what: 'Produce a revised document with selected pages excluded, leaving the source unchanged.',
-    when: ['Removing blank pages', 'Excluding out-of-scope content', 'Separator page cleanup'],
-    inputs: 1,
-  },
-  rotate: {
-    id: 'rotate', name: 'Rotate Pages', icon: TOOL_ICONS.rotate,
-    title: 'Rotate Pages',
-    intro: 'Correct page orientation across the whole document, odd or even pages, or a specific page range.',
-    what: 'Correct orientation across all pages, odd or even pages, or a specific page range.',
-    when: ['Scanned document orientation', 'Mixed landscape pages', 'Fax and intake corrections'],
-    inputs: 1,
-  },
-  validate: {
-    id: 'validate', name: 'PDF Validation', icon: TOOL_ICONS.validate,
-    title: 'PDF Validation',
-    intro: 'Check a document before it enters a process: file signature, structure, encryption, page count, and fingerprint.',
-    what: 'Check file signature, structure, encryption, page count, and fingerprint before processing.',
-    when: ['Document handoff validation', 'Intake quality checks', 'Batch pre-flight'],
-    inputs: 'many',
-  },
-  metadata: {
-    id: 'metadata', name: 'Metadata Inspector', icon: TOOL_ICONS.metadata,
-    title: 'Metadata Inspector',
-    intro: 'Inspect the document properties a PDF carries, and produce a metadata-cleaned copy.',
-    what: 'Inspect the document properties a PDF carries, and produce a metadata-cleaned copy.',
-    when: ['Pre-release checks', 'Author and producer removal', 'Document handoff'],
-    inputs: 1,
-  },
-  compare: {
-    id: 'compare', name: 'Document Compare', icon: TOOL_ICONS.compare,
-    title: 'Document Compare',
-    intro: 'Compare a base document against a revised document on structure, size, metadata, and fingerprint.',
-    what: 'Compare a base and a revised document on structure, size, metadata, and fingerprint.',
-    when: ['Output verification', 'Version checks', 'Redaction confirmation'],
-    inputs: 2,
-  },
-};
+ merge:{id:'merge',name:'Merge PDF',category:'Organize PDF',icon:I('M'),what:'Combine PDFs in a controlled order.',when:['Case packs','Evidence bundles'],inputs:'many',engine:'core'},
+ split:{id:'split',name:'Split PDF',category:'Organize PDF',icon:I('S'),what:'Separate page ranges or fixed page groups into independent PDFs.',when:['Invoice batches','Large packs'],inputs:1,engine:'core'},
+ organize:{id:'organize',name:'Organize PDF',category:'Organize PDF',icon:I('O'),what:'Reorder, rotate, and remove pages in one workspace.',when:['Pack correction','Document cleanup'],inputs:1,engine:'core'},
+ extract:{id:'extract',name:'Extract Pages',category:'Organize PDF',icon:I('E'),what:'Create a PDF from selected pages and ranges.',when:['Exhibits','Selected records'],inputs:1,engine:'core'},
+ remove:{id:'remove',name:'Remove Pages',category:'Organize PDF',icon:I('R'),what:'Create a revised PDF without selected pages.',when:['Blank pages','Out-of-scope content'],inputs:1,engine:'core'},
+ rotate:{id:'rotate',name:'Rotate PDF',category:'Organize PDF',icon:I('90'),what:'Rotate all, odd, even, or selected pages.',when:['Scanned orientation','Mixed layouts'],inputs:1,engine:'core'},
+ crop:{id:'crop',name:'Crop PDF',category:'Organize PDF',icon:I('C'),what:'Crop page margins using controlled point measurements.',when:['Margin cleanup','Scan preparation'],inputs:1,engine:'advanced'},
+ compress:{id:'compress',name:'Compress PDF',category:'Optimize PDF',icon:I('C'),what:'Rewrite PDF structure with object streams and remove avoidable metadata.',when:['Handoffs','Storage reduction'],inputs:1,engine:'advanced'},
+ repair:{id:'repair',name:'Repair PDF',category:'Optimize PDF',icon:I('+'),what:'Parse and rebuild recoverable PDF structure into a new document.',when:['Malformed files','Rebuild attempts'],inputs:1,engine:'advanced'},
+ validate:{id:'validate',name:'PDF Validation',category:'Optimize PDF',icon:I('V'),what:'Check signature, structure, encryption, page count, and fingerprint.',when:['Intake quality','Pre-flight'],inputs:'many',engine:'core'},
+ metadata:{id:'metadata',name:'Metadata Inspector',category:'Optimize PDF',icon:I('i'),what:'Inspect metadata and create a metadata-cleaned copy.',when:['Pre-release','Privacy review'],inputs:1,engine:'core'},
+ edit:{id:'edit',name:'Edit PDF',category:'Edit PDF',icon:I('T'),what:'Add controlled text overlays to selected pages.',when:['Labels','Document notes'],inputs:1,engine:'advanced'},
+ watermark:{id:'watermark',name:'Watermark',category:'Edit PDF',icon:I('W'),what:'Stamp text across every page with configurable size and opacity.',when:['Draft marking','Controlled copies'],inputs:1,engine:'advanced'},
+ pageNumbers:{id:'pageNumbers',name:'Page Numbers',category:'Edit PDF',icon:I('#'),what:'Add page numbers with configurable position, size, and starting number.',when:['Case packs','Board papers'],inputs:1,engine:'advanced'},
+ sign:{id:'sign',name:'Sign PDF',category:'Edit PDF',icon:I('S'),what:'Apply a typed signature mark to a selected page and position.',when:['Internal approval marks','Prepared copies'],inputs:1,engine:'advanced'},
+ forms:{id:'forms',name:'PDF Forms',category:'Edit PDF',icon:I('F'),what:'Inspect existing form fields and create a fillable text field.',when:['Intake forms','Interactive documents'],inputs:1,engine:'advanced',badge:'New'},
+ redact:{id:'redact',name:'Redact PDF',category:'PDF Security',icon:I('X'),what:'Submit a PDF to the existing controlled AI redaction workflow.',when:['PII removal','Sensitive documents'],inputs:1,engine:'route',route:'/dashboard'},
+ protect:{id:'protect',name:'Protect PDF',category:'PDF Security',icon:I('P'),what:'Password encryption requires a cryptographic PDF engine not present in the browser bundle.',when:['Encrypted handoff','Access control'],inputs:1,engine:'controlled'},
+ unlock:{id:'unlock',name:'Unlock PDF',category:'PDF Security',icon:I('U'),what:'Inspect password protection and prepare authorized documents for a supported decryption engine.',when:['Authorized recovery','Protected source review'],inputs:1,engine:'controlled'},
+ compare:{id:'compare',name:'Compare PDF',category:'PDF Intelligence',icon:I('D'),what:'Compare page count, size, metadata, and SHA-256 fingerprints.',when:['Version checks','Output verification'],inputs:2,engine:'core'},
+ ocr:{id:'ocr',name:'OCR PDF',category:'PDF Intelligence',icon:I('O'),what:'OCR requires a configured OCR engine to produce searchable text without fabricating results.',when:['Scanned PDFs','Searchable archives'],inputs:1,engine:'controlled'},
+ summarize:{id:'summarize',name:'AI Summarizer',category:'PDF Intelligence',icon:I('AI'),what:'AI summarization requires a configured enterprise AI endpoint and explicit data handling policy.',when:['Long reports','Review briefs'],inputs:1,engine:'controlled',badge:'New'},
+ translate:{id:'translate',name:'Translate PDF',category:'PDF Intelligence',icon:I('L'),what:'Layout-preserving translation requires a configured document translation service.',when:['Global operations','Multilingual packs'],inputs:1,engine:'controlled',badge:'New'},
+ pdfMarkdown:{id:'pdfMarkdown',name:'PDF to Markdown',category:'PDF Intelligence',icon:I('MD'),what:'Structured Markdown extraction requires a text and layout extraction engine.',when:['LLM preparation','Documentation'],inputs:1,engine:'controlled',badge:'New'},
+ pdfWord:{id:'pdfWord',name:'PDF to Word',category:'Convert PDF',icon:I('W'),what:'High-fidelity DOCX conversion requires a document conversion engine.',when:['Editable documents','Content reuse'],inputs:1,engine:'controlled'},
+ pdfPowerPoint:{id:'pdfPowerPoint',name:'PDF to PowerPoint',category:'Convert PDF',icon:I('P'),what:'Editable PPTX conversion requires a slide reconstruction engine.',when:['Presentation reuse','Slide preparation'],inputs:1,engine:'controlled'},
+ pdfExcel:{id:'pdfExcel',name:'PDF to Excel',category:'Convert PDF',icon:I('X'),what:'Table-aware XLSX conversion requires structured table extraction.',when:['Finance data','Tabular extraction'],inputs:1,engine:'controlled'},
+ pdfJpg:{id:'pdfJpg',name:'PDF to JPG',category:'Convert PDF',icon:I('J'),what:'Page rasterization requires the PDF rendering engine to be bundled locally.',when:['Page images','Image workflows'],inputs:1,engine:'controlled'},
+ pdfA:{id:'pdfA',name:'PDF to PDF/A',category:'Convert PDF',icon:I('A'),what:'ISO PDF/A conformance requires profile validation and archival conversion support.',when:['Long-term archive','Records management'],inputs:1,engine:'controlled'},
+ wordPdf:{id:'wordPdf',name:'Word to PDF',category:'Convert to PDF',icon:I('W'),what:'DOC and DOCX rendering requires an Office-compatible layout engine.',when:['Document distribution','Read-only copies'],inputs:1,engine:'controlled'},
+ pptPdf:{id:'pptPdf',name:'PowerPoint to PDF',category:'Convert to PDF',icon:I('P'),what:'PPT and PPTX rendering requires a presentation layout engine.',when:['Slide distribution','Archive copies'],inputs:1,engine:'controlled'},
+ excelPdf:{id:'excelPdf',name:'Excel to PDF',category:'Convert to PDF',icon:I('X'),what:'Spreadsheet pagination requires a workbook rendering engine.',when:['Finance reports','Read-only sheets'],inputs:1,engine:'controlled'},
+ jpgPdf:{id:'jpgPdf',name:'JPG to PDF',category:'Convert to PDF',icon:I('J'),what:'Convert JPG or PNG images into an ordered PDF.',when:['Photo records','Image packs'],inputs:'images',engine:'advanced'},
+ htmlPdf:{id:'htmlPdf',name:'HTML to PDF',category:'Convert to PDF',icon:I('H'),what:'Create a PDF from supplied HTML text. Remote URL fetching is intentionally not proxied.',when:['Controlled HTML','Generated reports'],inputs:'html',engine:'advanced'},
+ scanPdf:{id:'scanPdf',name:'Scan to PDF',category:'Workflows',icon:I('S'),what:'Capture images with a mobile camera or file picker and assemble them into a PDF.',when:['Mobile intake','Field documents'],inputs:'camera',engine:'advanced'},
+ createPdf:{id:'createPdf',name:'Create PDF',category:'Workflows',icon:I('+'),what:'Create a new PDF from controlled text content.',when:['Briefs','Internal notes'],inputs:'html',engine:'advanced'},
+ annotate:{id:'annotate',name:'Annotate PDF',category:'Edit PDF',icon:I('A'),what:'Add comments, highlights, shapes, drawings, and review marks.',when:['Document review','Team feedback'],inputs:1,engine:'controlled'},
+ highlight:{id:'highlight',name:'Highlight PDF',category:'Edit PDF',icon:I('H'),what:'Highlight important text and review areas.',when:['Review','Evidence preparation'],inputs:1,engine:'controlled'},
+ comment:{id:'comment',name:'Comment PDF',category:'Edit PDF',icon:I('C'),what:'Add review comments and sticky-note style annotations.',when:['Legal review','Approval cycles'],inputs:1,engine:'controlled'},
+ draw:{id:'draw',name:'Draw on PDF',category:'Edit PDF',icon:I('D'),what:'Add freehand drawing and markup to document pages.',when:['Markup','Field review'],inputs:1,engine:'controlled'},
+ fill:{id:'fill',name:'Fill PDF',category:'Edit PDF',icon:I('F'),what:'Fill supported interactive PDF form fields.',when:['Applications','Controlled forms'],inputs:1,engine:'controlled'},
+ flatten:{id:'flatten',name:'Flatten PDF',category:'PDF Security',icon:I('FL'),what:'Flatten interactive form fields into the page content to create a less editable output.',when:['Final handoff','Form archival'],inputs:1,engine:'advanced'},
+ sanitize:{id:'sanitize',name:'Sanitize PDF',category:'PDF Security',icon:I('S'),what:'Inspect metadata and rebuild a controlled copy with avoidable metadata removed.',when:['External release','Privacy preparation'],inputs:1,engine:'controlled'},
+ accessibility:{id:'accessibility',name:'Accessibility Check',category:'Optimize PDF',icon:I('AC'),what:'Assess document accessibility indicators and identify remediation needs.',when:['Accessible publishing','Quality review'],inputs:1,engine:'controlled'},
+ pdfTxt:{id:'pdfTxt',name:'PDF to TXT',category:'Convert PDF',icon:I('TXT'),what:'Extract document text into a plain text file.',when:['Text reuse','Search workflows'],inputs:1,engine:'controlled'},
+ txtPdf:{id:'txtPdf',name:'TXT to PDF',category:'Convert to PDF',icon:I('TXT'),what:'Create a PDF from supplied plain text content.',when:['Notes','Generated reports'],inputs:'html',engine:'advanced'},
+ pngPdf:{id:'pngPdf',name:'PNG to PDF',category:'Convert to PDF',icon:I('PNG'),what:'Convert PNG images into an ordered PDF document.',when:['Screenshots','Image packs'],inputs:'images',engine:'advanced'},
+ pdfPng:{id:'pdfPng',name:'PDF to PNG',category:'Convert PDF',icon:I('PNG'),what:'Render PDF pages into PNG images.',when:['Page images','Publishing'],inputs:1,engine:'controlled'},
+ extractImages:{id:'extractImages',name:'Extract PDF Images',category:'Convert PDF',icon:I('IMG'),what:'Extract embedded images from a PDF into separate image files.',when:['Asset recovery','Content reuse'],inputs:1,engine:'controlled'},
+ aiChat:{id:'aiChat',name:'Chat with PDF',category:'PDF Intelligence',icon:I('AI'),what:'Ask grounded questions about a document using an approved enterprise AI endpoint.',when:['Document review','Research'],inputs:1,engine:'controlled',badge:'AI'},
+ questionGenerator:{id:'questionGenerator',name:'AI Question Generator',category:'PDF Intelligence',icon:I('Q'),what:'Generate review questions from document content using an approved enterprise AI endpoint.',when:['Training','Knowledge checks'],inputs:1,engine:'controlled',badge:'AI'},
+ rewrite:{id:'rewrite',name:'AI Rewrite PDF',category:'PDF Intelligence',icon:I('RW'),what:'Prepare document text for controlled AI rewriting and reviewed replacement.',when:['Policy drafting','Content revision'],inputs:1,engine:'controlled',badge:'AI'},
+ extractText:{id:'extractText',name:'Extract Text',category:'PDF Intelligence',icon:I('T'),what:'Extract selectable text from supported PDFs.',when:['Search','Data preparation'],inputs:1,engine:'controlled'},
+ eSignRequest:{id:'eSignRequest',name:'Request E-Signatures',category:'Workflows',icon:I('ES'),what:'Send documents for electronic signature and track signer status through an approved signing service.',when:['Contracts','Approvals'],inputs:1,engine:'controlled'},
+ signatureTrack:{id:'signatureTrack',name:'Signature Tracking',category:'Workflows',icon:I('ST'),what:'Review signature request status, recipients, and completion evidence.',when:['Contract operations','Approval monitoring'],inputs:1,engine:'controlled'},
+ reader:{id:'reader',name:'PDF Reader',category:'Workflows',icon:I('R'),what:'Open and review PDFs in the secure Prudent Redact document viewer.',when:['Document review','Secure preview'],inputs:1,engine:'route',route:'/viewer'},
+ share:{id:'share',name:'Share PDF',category:'Workflows',icon:I('SH'),what:'Prepare controlled document sharing using short-lived access and approved recipients.',when:['External handoff','Controlled review'],inputs:1,engine:'controlled'},
+ batchConvert:{id:'batchConvert',name:'Batch Convert',category:'Workflows',icon:I('B'),what:'Queue multiple compatible documents for a common conversion workflow.',when:['Shared services','High-volume operations'],inputs:'many',engine:'controlled'},
+ template:{id:'template',name:'Create PDF Template',category:'Workflows',icon:I('TP'),what:'Create reusable document structures for repeatable PDF workflows.',when:['Standard packs','Repeatable forms'],inputs:1,engine:'controlled'},
+ headerFooter:{id:'headerFooter',name:'Header and Footer',category:'Edit PDF',icon:I('HF'),what:'Add controlled header and footer content across document pages.',when:['Policy packs','Controlled copies'],inputs:1,engine:'controlled'},
+ bates:{id:'bates',name:'Bates Numbering',category:'Edit PDF',icon:I('B'),what:'Apply sequential evidence identifiers to document pages.',when:['Legal discovery','Evidence bundles'],inputs:1,engine:'controlled'},
 
-const TOOL_BANDS = [
-  {
-    name : 'Prepare',
-    desc : 'Assemble and restructure source material before it enters a controlled process.',
-    tools: ['split', 'merge', 'organize'],
-  },
-  {
-    name : 'Transform',
-    desc : 'Produce a revised document from a source document. The source is never modified.',
-    tools: ['extract', 'remove', 'rotate'],
-  },
-  {
-    name : 'Validate',
-    desc : 'Confirm what a document actually is, what it carries, and how it differs from another.',
-    tools: ['validate', 'metadata', 'compare'],
-  },
-];
-
-/* Presets configure a tool. They never bypass validation and never assume
-   anything about the content of a document. */
-const TOOL_PRESETS = {
-  split: [
-    { id: 'invoice-batch', name: 'Invoice batch split',
-      desc: 'Split a batched scan into fixed page groups, one document per invoice.',
-      apply: { strategy: 'everyN', n: 5 } },
-    { id: 'case-sections', name: 'Legal case sections',
-      desc: 'Split a case pack into named sections using explicit page ranges.',
-      apply: { strategy: 'groups' } },
-  ],
-  extract: [
-    { id: 'employee-pack', name: 'Employee pack extraction',
-      desc: 'Extract a defined range of pages into a single document, in source order.',
-      apply: { order: 'source' } },
-  ],
-  rotate: [
-    { id: 'scan-orientation', name: 'Scanned document orientation',
-      desc: 'Rotate a selected page range 90 degrees clockwise to correct sideways scans.',
-      apply: { scope: 'selection', degrees: 90 } },
-  ],
-  validate: [
-    { id: 'handoff', name: 'Document handoff validation',
-      desc: 'Validate every selected document and export the validation report as JSON.',
-      apply: {} },
-  ],
 };
+Object.values(TOOLS).forEach(t=>{ t.title=t.title||t.name; t.intro=t.intro||t.what; t.help=t.help||`${t.what} Use this workflow for ${t.when.join(' or ')}. The source is preserved. A successful completed operation is metered as one plan usage and records a usage event through the configured Power Automate trigger. Document bytes are not included in the usage event.`; });
+const CATEGORY_ORDER=['Workflows','Organize PDF','Optimize PDF','Convert PDF','Convert to PDF','Edit PDF','PDF Security','PDF Intelligence'];
+const TOOL_BANDS=CATEGORY_ORDER.map(name=>({name,desc:{'Workflows':'Mobile and guided document intake workflows.','Organize PDF':'Assemble, split, reorder, and reshape page structures.','Optimize PDF':'Validate, rebuild, inspect, and reduce document overhead.','Convert PDF':'Convert PDFs into other controlled formats when the required engine is available.','Convert to PDF':'Create PDFs from supported source formats.','Edit PDF':'Add controlled content, numbering, marks, and form elements.','PDF Security':'Redaction and document protection controls.','PDF Intelligence':'Compare, extract, summarize, translate, and understand documents.'}[name],tools:Object.values(TOOLS).filter(t=>t.category===name).map(t=>t.id)}));
+const TOOL_PRESETS={split:[{id:'invoice',name:'Invoice batch split',apply:{strategy:'everyN',n:5}}],rotate:[{id:'scan',name:'Scanned orientation',apply:{scope:'selection',degrees:90}}],validate:[{id:'handoff',name:'Document handoff validation',apply:{}}]};

@@ -712,6 +712,25 @@ const PDFOps = (() => {
       const all = getOperationRecords();
       all.unshift(record);
       if (sessionStorage.getItem('pr_privacy_mode') !== '1') localStorage.setItem(RECORD_KEY, JSON.stringify(all.slice(0, LIMITS.MAX_OP_RECORDS)));
+      // Enterprise usage metering. The document bytes and fingerprints are never sent.
+      // The API increments the plan usage count and triggers the same configured Power Automate URL.
+      try {
+        const primarySource = record.sources[0] || {};
+        const primaryOutput = record.outputs[0] || {};
+        const usage = await paFetch(APP_CONFIG.FLOWS.USAGE_TRACK, {
+          operation: record.operation,
+          sourceName: primarySource.name || '',
+          outputName: primaryOutput.name || '',
+          pageCount: record.pagesAfter ?? primaryOutput.pageCount ?? record.pagesBefore ?? primarySource.pageCount ?? 0,
+          fileSizeMB: +(((primaryOutput.size || primarySource.size || 0) / 1048576).toFixed(3)),
+        }, 35000);
+        if (usage?.creditsUsed != null) Session.patch({ creditsUsed: usage.creditsUsed, creditsLimit: usage.creditsLimit });
+        record.usageEventId = usage?.eventId || null;
+        record.flowTriggered = usage?.flowTriggered === true;
+      } catch (usageError) {
+        record.usageTrackingWarning = usageError?.message || 'Usage tracking unavailable';
+        if (typeof showToast === 'function') showToast('Document completed, but usage metering could not be confirmed. Contact an administrator if this persists.', 'warning');
+      }
       return record;
     } catch {
       return null;  // a full or blocked localStorage must never fail the operation itself

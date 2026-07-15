@@ -48,6 +48,10 @@
       "rewrite": "/pages/tool.html"
     },
     {
+      "route": "/advanced-tool",
+      "rewrite": "/pages/advanced-tool.html"
+    },
+    {
       "route": "/",
       "rewrite": "/index.html"
     }
