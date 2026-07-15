@@ -17,8 +17,9 @@ const splitHeader = value => String(value || '')
   .filter(Boolean);
 
 const LOCKED_DEPLOYMENT_ORIGINS = [
-  // Existing deployment value is intentionally preserved for backward compatibility.
+  // Existing deployments are intentionally preserved for backward compatibility.
   'https://brave-cliff-0ceef0a00.4.azurestaticapps.net',
+  'https://nice-grass-0f3d2db00.7.azurestaticapps.net',
 ];
 
 const CONFIGURED_ORIGINS = [

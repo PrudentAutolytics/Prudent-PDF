@@ -13,10 +13,10 @@ check(shell.includes("const profileName = String(s.fullName || '').trim()"),'top
 check(shell.includes('syncProfileIdentity(updated)'), 'quota profile identity refresh updates visible topbar');
 check(shell.includes('syncProfileIdentity,'),'profile identity sync is exposed to profile page');
 check(profile.includes("Shell.syncProfileIdentity?.(Session.get())"),'profile save immediately synchronizes topbar identity');
-check(home.includes('Document privacy operations in one controlled workspace.'),'enterprise access home is present');
-check(home.includes('PRUDENT REDACT CONTROL PLANE'),'home includes capability control plane');
-check(login.includes('v20 enterprise access theme'),'login has enterprise access theme');
-check(login.includes('background:#07111f'),'login uses controlled dark navy enterprise palette');
+check(home.includes('Privacy operations control plane'),'enterprise access home is present');
+check(home.includes('PRUDENT PRIVACY CONTROL PLANE'),'home includes capability control plane');
+check(login.includes('v29 light motion access experience'),'login has enterprise access theme');
+check(login.includes('background:#f4f8fd'),'login uses the current light enterprise palette');
 for(const [name,src] of [['tools',tools],['shell',shell],['profile',profile],['home',home],['login',login]]) check(!/[\u2013\u2014]/.test(src),`${name} has no en dash or em dash`);
 if(process.exitCode)process.exit(process.exitCode);
 console.log('v20 operations, home, and profile identity tests passed.');

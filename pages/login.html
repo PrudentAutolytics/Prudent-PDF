@@ -339,6 +339,53 @@ body{grid-template-columns:minmax(0,1.12fr) minmax(430px,.88fr);background:#0711
 .sec-badge{background:#f8fafc}.right-footer{color:#94a3b8}
 @media(max-width:900px){body{display:block;overflow:auto;background:#f8fafc}.left-panel{min-height:auto;padding:28px 22px}.left-brand{margin:0}.left-logo{margin-bottom:26px}.left-tagline{font-size:36px}.left-sub{margin-bottom:20px}.left-bottom{display:none}.right-panel{min-height:60dvh;padding:34px 18px}.right-top{display:none}.form-wrap{max-width:520px;padding:28px 22px}.demo-card{max-width:100%}.hiw{max-width:100%}}@media(max-width:520px){.left-tagline{font-size:32px}.form-wrap{border-radius:14px}.otp-digit{width:42px;height:52px}.hiw{flex-direction:column}.demo-line{font-size:12px}}
 
+
+/* v29 light motion access experience */
+body{background:#f4f8fd;grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr)}
+.left-panel{
+  background:
+    radial-gradient(circle at 18% 16%,rgba(74,163,242,.18),transparent 28%),
+    radial-gradient(circle at 82% 72%,rgba(109,93,252,.11),transparent 30%),
+    linear-gradient(160deg,#f8fbff,#eaf4ff);
+  color:#10213b;border-right:1px solid #d9e6f3;padding:48px clamp(36px,5vw,76px)
+}
+.left-grid{background-image:linear-gradient(rgba(91,137,187,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(91,137,187,.09) 1px,transparent 1px);background-size:50px 50px;opacity:.55}
+.left-glow{background:radial-gradient(circle,rgba(74,163,242,.22),transparent 66%);width:720px;height:720px}
+.left-logo-img{height:42px;width:142px;background:#fff;border:1px solid #d7e4f1;padding:5px;box-shadow:0 10px 26px rgba(55,84,124,.08)}
+.left-tagline{color:#10213b;font-size:clamp(40px,4.7vw,68px);line-height:.98;letter-spacing:-.055em;max-width:690px}
+.left-tagline span{background:linear-gradient(120deg,#1f6fd1,#22b8cf,#6d5dfc);background-size:200% 200%;background-clip:text;-webkit-background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:loginGradient 7s ease infinite}
+@keyframes loginGradient{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.left-sub{max-width:620px;color:#657b97;font-size:15px}
+.access-visual{position:relative;max-width:650px;min-height:280px;margin-top:28px;border:1px solid #d4e2f0;border-radius:22px;background:rgba(255,255,255,.76);box-shadow:0 24px 60px rgba(55,84,124,.12);overflow:hidden;backdrop-filter:blur(18px)}
+.access-visual-top{display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #e0eaf4;font-size:9px;font-weight:900;letter-spacing:.1em;color:#6f829d}
+.access-live{color:#0f9f6e}.access-live:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#0f9f6e;margin-right:7px;box-shadow:0 0 0 5px rgba(15,159,110,.10);animation:accessPulse 2s infinite}
+@keyframes accessPulse{50%{box-shadow:0 0 0 10px rgba(15,159,110,0)}}
+.access-canvas{position:absolute;left:14px;top:52px;bottom:14px;width:58%;border-radius:16px;background:linear-gradient(145deg,#e7f2fd,#d7e9f9);overflow:hidden;border:1px solid #d7e4f1}
+.access-person{position:absolute;width:70px;height:100px;border-radius:38px 38px 18px 18px;background:#688faf}
+.access-person:before{content:"";position:absolute;width:40px;height:40px;border-radius:50%;background:#d1ae8c;left:15px;top:-24px}
+.access-person.a{left:12%;bottom:12%}.access-person.b{left:48%;bottom:24%;transform:scale(.9)}.access-person.c{right:6%;bottom:10%;transform:scale(.76)}
+.access-mask{position:absolute;width:46px;height:39px;border-radius:8px;background:rgba(16,33,59,.86);box-shadow:0 0 0 2px rgba(74,163,242,.45);animation:accessMask 5s ease-in-out infinite}
+.access-mask.a{left:16%;top:22%}.access-mask.b{left:53%;top:30%;animation-delay:-1.8s}.access-mask.c{right:12%;top:48%;animation-delay:-3.4s}
+@keyframes accessMask{50%{transform:translate(7px,6px)}}
+.access-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#2b8ee7,transparent);box-shadow:0 0 14px rgba(43,142,231,.65);animation:accessScan 4.4s linear infinite}
+@keyframes accessScan{from{top:4%;opacity:0}10%{opacity:1}90%{opacity:1}to{top:96%;opacity:0}}
+.access-stack{position:absolute;right:14px;top:52px;bottom:14px;width:36%;display:grid;grid-template-rows:repeat(3,1fr);gap:8px}
+.access-mini{padding:12px;border:1px solid #dbe7f2;border-radius:13px;background:#fff;box-shadow:0 8px 20px rgba(55,84,124,.06);animation:accessFloat 5.5s ease-in-out infinite}
+.access-mini:nth-child(2){animation-delay:-1.8s}.access-mini:nth-child(3){animation-delay:-3.6s}
+@keyframes accessFloat{50%{transform:translateY(-4px)}}
+.access-mini small{font-size:7px;font-weight:900;letter-spacing:.08em;color:#6f829d}.access-mini strong{display:block;font-size:11px;color:#10213b;margin:7px 0 3px}.access-mini span{display:block;font-size:8px;color:#7b8da6}
+.left-trust{color:#607791!important}
+.right-panel{background:linear-gradient(160deg,#fbfdff,#f2f7fc);padding:48px clamp(28px,4vw,64px)}
+.form-wrap{max-width:420px;background:rgba(255,255,255,.94);border:1px solid #d7e4f1;border-radius:22px;padding:36px;box-shadow:0 28px 80px rgba(55,84,124,.16);backdrop-filter:blur(18px)}
+.form-eyebrow{color:#1f6fd1}.form-h1{color:#10213b}.form-sub{color:#6f829d}
+.login-input{border-color:#cbd9e7;background:#fff}.login-input:focus{border-color:#1f6fd1;box-shadow:0 0 0 4px rgba(31,111,209,.11)}
+.btn-main{background:linear-gradient(135deg,#1f6fd1,#2c84df);box-shadow:0 12px 26px rgba(31,111,209,.24)}
+.btn-main:hover:not(:disabled){background:linear-gradient(135deg,#195fac,#2577c9);box-shadow:0 16px 34px rgba(31,111,209,.3)}
+.sec-badge{background:#f6f9fd;border-color:#dce7f3}.right-footer{color:#8b9cb1}
+@media(max-width:980px){body{display:block;background:#f4f8fd}.left-panel{min-height:auto;padding:26px 20px 34px}.left-brand{margin:0}.left-logo{margin-bottom:22px}.left-tagline{font-size:clamp(34px,8vw,48px)}.left-sub{margin-bottom:18px}.access-visual{max-width:720px;min-height:245px}.left-bottom{display:none}.right-panel{min-height:60dvh;padding:32px 16px}.right-top{display:none}.form-wrap{max-width:560px;padding:28px 22px}}
+@media(max-width:580px){.access-visual{min-height:220px}.access-canvas{width:64%}.access-stack{width:31%}.access-mini{padding:8px}.access-mini span{display:none}.access-person{transform:scale(.8)!important;transform-origin:bottom}.left-tagline{font-size:36px}.form-wrap{border-radius:16px}.otp-digit{width:42px;height:52px}}
+@media(max-width:420px){.access-visual{min-height:190px}.access-stack{display:none}.access-canvas{right:12px;width:auto}.left-panel{padding-inline:14px}.right-panel{padding-inline:12px}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
@@ -530,7 +577,7 @@ $('emailInput').addEventListener('input', () => {
   S.checked = false; S.isNew = false;
   $('regSlide').classList.remove('open');
   $('stepTitle').textContent = 'Welcome back';
-  $('stepSub').textContent = 'Enter your work email to continue - no password required.';
+  $('stepSub').textContent = 'Enter your work email to continue. No password is required.';
   $('contBtnTxt').textContent = 'Continue';
   clearTimeout(checkDebounce);
   const em = ($('emailInput').value || '').trim();
@@ -703,7 +750,7 @@ $('changeEmailBtn').addEventListener('click', () => {
   $('emailInput').value = '';
   $('regSlide').classList.remove('open');
   $('stepTitle').textContent = 'Welcome back';
-  $('stepSub').textContent = 'Enter your work email to continue - no password required.';
+  $('stepSub').textContent = 'Enter your work email to continue. No password is required.';
   show('stepEmail');
   setTimeout(() => $('emailInput')?.focus(), 60);
 });
@@ -731,43 +778,37 @@ $('changeEmailBtn').addEventListener('click', () => {
   if (brand) {
     brand.innerHTML = [
       '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/pa-logo.svg" alt="Prudent Autolytics"/></a>',
-      '<div class="left-tagline">Redact documents<br/>with <span>enterprise AI</span></div>',
-      '<p class="left-sub">Automatically detect and permanently remove personal data from PDFs, images, and video. Built for legal, HR, finance, healthcare, and compliance teams.</p>',
-      // Animated demo: shows PII being detected and redacted in real time
-      '<div class="demo-card" aria-hidden="true">',
-      '  <div class="demo-card-hd"><span class="demo-dot"></span>Live redaction preview</div>',
-      '  <div class="demo-line">Applicant: <span class="demo-redact d1">Jane Doe</span><span class="demo-tag t1">Name</span></div>',
-      '  <div class="demo-line">Phone: <span class="demo-redact d2">012 3456 7890</span><span class="demo-tag t2">Phone</span></div>',
-      '  <div class="demo-line">Account: <span class="demo-redact d3">GB82 WEST 1234</span><span class="demo-tag t3">IBAN</span></div>',
-      '  <div class="demo-line">SSN: <span class="demo-redact d4">402 78 1136</span><span class="demo-tag t4">ID</span></div>',
-      '  <div class="demo-foot"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>4 items</strong> detected and permanently masked. No metadata, no recovery.</span></div>',
-      '</div>',
-      // How it works
-      '<div class="hiw" aria-hidden="true">',
-      '  <div class="hiw-step"><div class="hiw-num">1</div><div class="hiw-t">Detect</div><div class="hiw-s">Azure AI finds names, IDs, and more</div></div>',
-      '  <div class="hiw-step"><div class="hiw-num">2</div><div class="hiw-t">Redact</div><div class="hiw-s">Permanent black-box removal</div></div>',
-      '  <div class="hiw-step"><div class="hiw-num">3</div><div class="hiw-t">Verify</div><div class="hiw-s">Compare original vs redacted</div></div>',
+      '<div class="left-tagline">Control privacy work.<br/><span>See every workflow move.</span></div>',
+      '<p class="left-sub">Access one workspace for PDF redaction, document operations, image and video privacy, processing history, operation cost and governance.</p>',
+      '<div class="access-visual" aria-hidden="true">',
+      '  <div class="access-visual-top"><span>PRUDENT PRIVACY WORKSPACE</span><span class="access-live">LIVE</span></div>',
+      '  <div class="access-canvas"><div class="access-person a"></div><div class="access-person b"></div><div class="access-person c"></div><div class="access-mask a"></div><div class="access-mask b"></div><div class="access-mask c"></div><div class="access-scan"></div></div>',
+      '  <div class="access-stack">',
+      '    <div class="access-mini"><small>DOCUMENT</small><strong>Redaction jobs</strong><span>Controlled processing</span></div>',
+      '    <div class="access-mini"><small>MEDIA</small><strong>Face privacy</strong><span>Multi pass local scan</span></div>',
+      '    <div class="access-mini"><small>GOVERNANCE</small><strong>Control posture</strong><span>Risk and operations</span></div>',
+      '  </div>',
       '</div>'
     ].join('');
   }
 
   // Left bottom trust badges
   set('leftBottom', [
-    '<div class="left-trust">GDPR Compliant</div>',
-    '<div class="left-trust">TLS Encrypted</div>',
-    '<div class="left-trust">Auto-deleted 7 days</div>'
+    '<div class="left-trust">TLS transport</div>',
+    '<div class="left-trust">Azure hosted APIs</div>',
+    '<div class="left-trust">Passwordless verification</div>'
   ].join(''));
 
   // Right panel
   set('rightTopHint', 'New to Prudent Redact? <a href="/">Learn more</a>');
   set('formEyebrow', 'Prudent Redact');
   set('stepTitle', 'Welcome back');
-  set('stepSub', 'Enter your work email to continue - no password required.');
-  set('newUserBannerTxt', 'New account - 5 free documents included');
+  set('stepSub', 'Enter your work email to continue. No password is required.');
+  set('newUserBannerTxt', 'New account. Trial access is configured after verification.');
   set('rightFooter', '<a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>© 2026 PRUDENT AUTOLYTICS LLP · Bangalore, India');
 
   // Trial perks
-  var pkMap = {'5fr':'Free tier included','aid':'AI detection','sbv':'Document viewer','ncc':'No credit card required'};
+  var pkMap = {'5fr':'Trial capacity','aid':'Controlled redaction','sbv':'Document review','ncc':'Passwordless access'};
   d.querySelectorAll('.pk').forEach(function(e){ e.textContent = pkMap[e.textContent] || e.textContent; });
 })();
 </script>
