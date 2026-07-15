@@ -723,10 +723,21 @@ const PDFOps = (() => {
           outputName: primaryOutput.name || '',
           pageCount: record.pagesAfter ?? primaryOutput.pageCount ?? record.pagesBefore ?? primarySource.pageCount ?? 0,
           fileSizeMB: +(((primaryOutput.size || primarySource.size || 0) / 1048576).toFixed(3)),
+          sourceCount: Math.max(1, record.sources.length),
         }, 35000);
         if (usage?.creditsUsed != null) Session.patch({ creditsUsed: usage.creditsUsed, creditsLimit: usage.creditsLimit });
         record.usageEventId = usage?.eventId || null;
         record.flowTriggered = usage?.flowTriggered === true;
+        record.costAnalysis = usage?.costAnalysis || calcOperationCost(
+          record.operation,
+          record.pagesAfter ?? primaryOutput.pageCount ?? record.pagesBefore ?? primarySource.pageCount ?? 0,
+          (primaryOutput.size || primarySource.size || 0) / 1048576,
+          Math.max(1, record.sources.length)
+        );
+        if (sessionStorage.getItem('pr_privacy_mode') !== '1') {
+          const refreshed = getOperationRecords().filter(item => item.id !== record.id);
+          localStorage.setItem(RECORD_KEY, JSON.stringify([record, ...refreshed].slice(0, LIMITS.MAX_OP_RECORDS)));
+        }
       } catch (usageError) {
         record.usageTrackingWarning = usageError?.message || 'Usage tracking unavailable';
         if (typeof showToast === 'function') showToast('Document completed, but usage metering could not be confirmed. Contact an administrator if this persists.', 'warning');

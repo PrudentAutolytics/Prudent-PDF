@@ -68,7 +68,9 @@ img,svg,video,canvas,iframe{max-width:100%}
   .quick-actions-row{grid-template-columns:1fr!important}
   .stats-grid,.metric-grid,.admin-kpi-grid,.command-strip,.calc-fields,.plans-grid{grid-template-columns:1fr!important}
   .stat-card,.metric-card,.card,.panel{border-radius:14px!important}
-  .card,.panel{padding:16px!important}
+  .card-hd{padding:13px 14px!important;gap:8px!important;flex-wrap:wrap}
+  .card-bd{padding:14px!important}
+  .card-footer{padding:12px 14px!important;flex-wrap:wrap!important;gap:8px!important}
   .btn{min-height:44px}
   .btn-sm{min-height:40px}
   .form-input,input,select,textarea{font-size:16px!important;max-width:100%}
@@ -104,3 +106,94 @@ img,svg,video,canvas,iframe{max-width:100%}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+
+/* v22 enterprise responsive QA corrections */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.main>*{max-width:100%;min-width:0}
+.page-hd>div{min-width:0;max-width:100%}
+.page-subtitle{max-width:min(760px,100%)}
+.card-hd>*{min-width:0}
+.card-title{overflow-wrap:anywhere}
+.inp,.filter-select,.form-input{max-width:100%;min-width:0}
+.segs{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.ops-grid{grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))!important}
+.ops-tool{min-width:0}
+.ops-tool-act .btn{max-width:100%;white-space:normal;text-align:center}
+.flow,.wk,.gov-grid,.contact-grid{min-width:0}
+.source-item,.output{min-width:0;overflow-wrap:anywhere}
+.output>div{min-width:0}
+.output b{overflow-wrap:anywhere}
+dialog{max-width:calc(100vw - 24px)}
+@media(max-width:1100px){
+ .topbar{max-width:100vw;overflow:hidden}
+ .topbar-brand{overflow:hidden}
+ .main{box-sizing:border-box}
+ .page-hd>div:first-child{flex:1 1 300px}
+ .flow,.wk{width:100%}
+}
+@media(max-width:760px){
+ .main{box-sizing:border-box}
+ .page-hd{align-items:stretch!important}
+ .page-hd>div,.page-hd>a,.page-hd>button{max-width:100%}
+ .page-hd>a{width:100%;justify-content:center}
+ .card{overflow:hidden}
+ .card-hd{align-items:flex-start!important}
+ .card-hd .btn{max-width:100%}
+ .filter-row,.toolbar-row,.viewer-toolbar{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .stats-grid{gap:10px!important}
+ .stat-card{min-height:118px!important}
+ .tbl-wrap{border-radius:10px}
+ .ops-band-hd{display:block!important}
+ .ops-band-desc{margin-top:4px!important}
+ .catalog-command{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+ .catalog-command .inp{width:100%!important}
+ .ops-availability-tabs{width:100%;overflow-x:auto}
+ .availability-tab{min-width:max-content}
+ .media-layout,.profile-grid{width:100%}
+ .viewer-toolbar{height:auto!important;min-height:52px;padding:8px!important;flex-wrap:nowrap!important}
+ .viewer-toolbar .btn{flex:0 0 auto}
+ .viewer-toolbar select{min-width:180px}
+ .enterprise-strip{overflow-x:auto;white-space:nowrap}
+ .dossier-actions{grid-template-columns:1fr!important}
+}
+@media(max-width:430px){
+ .mobile-primary-action{max-width:122px;overflow:hidden;text-overflow:ellipsis}
+ .user-chip{padding-inline:6px!important}
+ .page-title{overflow-wrap:anywhere}
+ .btn{white-space:normal;text-align:center;justify-content:center}
+ .card-bd{padding:12px!important}
+ .card-hd{padding:12px!important}
+}
+
+@media(max-width:760px){
+ .mobile-card-table tbody{display:grid!important;gap:10px!important}
+ .mobile-card-table tr{grid-template-columns:1fr 1fr!important;gap:10px 12px!important}
+ .mobile-card-table td{grid-column:auto!important;grid-row:auto!important}
+ .mobile-card-table td:last-child{grid-column:1/-1!important;grid-row:auto!important}
+ .mobile-card-table td::before{display:block;font-size:8.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+ .recent-jobs-table td:nth-child(1)::before{content:'Document'}
+ .recent-jobs-table td:nth-child(2)::before{content:'Status'}
+ .recent-jobs-table td:nth-child(3)::before{content:'Cost'}
+ .recent-jobs-table td:nth-child(4)::before{content:'Action'}
+ .history-jobs-table td:nth-child(1)::before{content:'Document'}
+ .history-jobs-table td:nth-child(2)::before{content:'Status'}
+ .history-jobs-table td:nth-child(3)::before{content:'Pages'}
+ .history-jobs-table td:nth-child(4)::before{content:'Size'}
+ .history-jobs-table td:nth-child(5)::before{content:'Cost'}
+ .history-jobs-table td:nth-child(6)::before{content:'Submitted'}
+ .history-jobs-table td:nth-child(7)::before{content:'Action'}
+ .admin-users-table td:nth-child(1)::before{content:'User'}
+ .admin-users-table td:nth-child(2)::before{content:'Company'}
+ .admin-users-table td:nth-child(3)::before{content:'Plan'}
+ .admin-users-table td:nth-child(4)::before{content:'Credits'}
+ .admin-users-table td:nth-child(5)::before{content:'Status'}
+ .admin-users-table td:nth-child(6)::before{content:'Action'}
+ .api-keys-table td:nth-child(1)::before{content:'Name'}
+ .api-keys-table td:nth-child(2)::before{content:'Key prefix'}
+ .api-keys-table td:nth-child(3)::before{content:'Created'}
+ .api-keys-table td:nth-child(4)::before{content:'Last used'}
+ .api-keys-table td:nth-child(5)::before{content:'Action'}
+}
+
+@media(max-width:760px){.cost-analysis-grid{grid-template-columns:1fr!important}}

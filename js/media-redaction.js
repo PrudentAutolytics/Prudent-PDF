@@ -159,6 +159,12 @@
     const assistedVideo = state.mode === 'video' && $('autoFaceVideo')?.checked && !!state.faceDetector;
     $('exportMedia').disabled = !state.sourceFile || (!state.regions.length && !assistedVideo);
     $('exportState').textContent = !state.sourceFile ? 'Select source media to begin.' : (!state.regions.length && !assistedVideo) ? 'Draw at least one region or enable supported face assistance.' : `Ready to create a new redacted ${state.mode === 'video' ? 'video' : 'image'} using ${state.regions.length} region${state.regions.length === 1 ? '' : 's'}.`;
+    const operation = state.mode === 'video'
+      ? ($('autoFaceVideo')?.checked ? 'VIDEO_FACE_REDACTION' : 'VIDEO_REDACTION')
+      : (state.regions.some(r=>r.kind==='face') ? 'FACE_REDACTION' : 'IMAGE_REDACTION');
+    const estimate = calcOperationCost(operation, 0, (state.sourceFile?.size || 0) / 1048576, 1);
+    if ($('mediaPlatformCost')) $('mediaPlatformCost').textContent = estimate.platformFmt;
+    if ($('mediaProductCost')) $('mediaProductCost').textContent = estimate.productFmt;
   }
   function setMode(mode) {
     if (state.sourceFile) resetSource();
@@ -499,8 +505,12 @@
   $('autoFaceVideo').onchange=updateRegionUI;
 
   async function trackUsage(operation, sourceName, outputName, pageCount, size) {
-    const usage=await paFetch(APP_CONFIG.FLOWS.USAGE_TRACK,{operation,sourceName,outputName,pageCount,fileSizeMB:+(size/1048576).toFixed(3)},35000);
+    const usage=await paFetch(APP_CONFIG.FLOWS.USAGE_TRACK,{operation,sourceName,outputName,pageCount,fileSizeMB:+(size/1048576).toFixed(3),sourceCount:1},35000);
     if(usage?.creditsUsed!=null)Session.patch({creditsUsed:usage.creditsUsed,creditsLimit:usage.creditsLimit});
+    if(usage?.costAnalysis){
+      if($('mediaPlatformCost'))$('mediaPlatformCost').textContent='$'+Number(usage.costAnalysis.platformCost||0).toFixed(4);
+      if($('mediaProductCost'))$('mediaProductCost').textContent='$'+Number(usage.costAnalysis.productPrice||0).toFixed(4);
+    }
     return usage;
   }
   async function showEvidence(operation, outputName, blob, regionCount) {

@@ -96,7 +96,7 @@
           </div>
         </div>
         <div class="tbl-wrap">
-          <table class="tbl"><thead><tr><th>File</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead>
+          <table class="tbl mobile-card-table recent-jobs-table"><thead><tr><th>File</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead>
           <tbody id="recentBody"><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:180px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:110px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:210px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:130px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:150px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:95px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr></tbody>
           </table>
         </div>
@@ -118,15 +118,16 @@
             <a href="/pricing" class="btn btn-sm btn-secondary" style="font-size:11.5px">View breakdown →</a>
           </div>
           <div class="card-body" style="padding:12px 20px 16px">
-            <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px">Average cost per processed document. Azure Document Intelligence pricing: OCR $1.50 + PII $10.00 per 1,000 pages (~$0.043/page).</div>
+            <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px">30-day estimated product cost combines completed redaction jobs with successfully metered document and media operations. Non-redaction operation estimates use the configured platform cost model and are recorded server-side after completion.</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
               <div style="background:var(--amber-pale);border:1px solid var(--amber-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:5px">Avg / file</div><div class="font-display font-bold" id="avgCost" style="font-size:18px;color:var(--amber)">$0.00</div></div>
               <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Total pages</div><div class="font-display font-bold" id="totalPages" style="font-size:18px;color:var(--ink)">0</div></div>
               <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Avg pages/doc</div><div class="font-display font-bold" id="avgPages" style="font-size:18px;color:var(--ink)">0</div></div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Success rate</div><div class="font-display font-bold" id="successRate" style="font-size:18px;color:var(--ink3)">0%</div></div>
-              <div style="background:var(--blue-pale);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:5px">Total cost</div><div class="font-display font-bold" id="sCostInsight" style="font-size:18px;color:var(--blue)">$0.00</div></div>
+            <div class="cost-analysis-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Redaction cost</div><div class="font-display font-bold" id="redactionCostInsight" style="font-size:18px;color:var(--ink)">$0.00</div></div>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Operation cost</div><div class="font-display font-bold" id="operationCostInsight" style="font-size:18px;color:var(--ink)">$0.00</div></div>
+              <div style="background:var(--blue-pale);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:5px">Combined cost</div><div class="font-display font-bold" id="sCostInsight" style="font-size:18px;color:var(--blue)">$0.00</div></div>
             </div>
           </div>
         </div>
@@ -233,10 +234,11 @@
   updateDropzoneConstraints();
 
   /* ══════════════════════════════════════════════════════
-     JOBS - driven entirely from Supabase via jobs-list API
+     JOBS - driven by authenticated jobs-list API
      ══════════════════════════════════════════════════════ */
-  let allJobs = []; // in-memory cache from Supabase
+  let allJobs = []; // in-memory cache from jobs API
   let jobsLoaded = false;
+  let operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
 
   async function fetchJobsFromSupabase() {
     try {
@@ -259,6 +261,16 @@
     }
   }
 
+  async function fetchOperationSummary() {
+    try {
+      const summary = await paFetch(APP_CONFIG.FLOWS.OPERATION_SUMMARY, { days: 30 });
+      operationSummary = summary || operationSummary;
+    } catch {
+      operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
+    }
+    renderStats();
+  }
+
   function getJob(jobId) { return allJobs.find(j => j.jobId === jobId); }
 
   function upsertJob(job) {
@@ -274,9 +286,12 @@
     const limit = s.creditsLimit ?? APP_CONFIG.PLANS?.trial?.filesPerMonth ?? 5;
     const done  = allJobs.filter(j => (j.status || '').toLowerCase() === 'complete');
     const total = allJobs.length;
-    const cost  = done.reduce((sum, j) => sum + (+(j.costTotal || 0)), 0);
+    const redactionCost = done.reduce((sum, j) => sum + (+(j.costTotal || 0)), 0);
+    const operationCost = +(operationSummary.totalProductPrice || 0);
+    const cost = redactionCost + operationCost;
+    const completedWork = done.length + +(operationSummary.totalOperations || 0);
     const pages = done.reduce((sum, j) => sum + (+(j.pageCount || 0)), 0);
-    const avgCst = done.length ? cost / done.length : 0;
+    const avgCst = completedWork ? cost / completedWork : 0;
     const avgPgs = done.length ? pages / done.length : 0;
     const rate   = total ? Math.round(done.length / total * 100) : 0;
 
@@ -286,12 +301,14 @@
     setText('sDone',        String(done.length));
     setText('sDoneNote',    total ? `${rate}% success rate` : 'No jobs yet');
     setText('sCost',        '$' + cost.toFixed(2));
-    setText('sCostNote',    `${done.length} completed job${done.length !== 1 ? 's' : ''}`);
+    setText('sCostNote',    `${done.length} redaction job${done.length !== 1 ? 's' : ''} + ${operationSummary.totalOperations || 0} document operation${Number(operationSummary.totalOperations || 0) !== 1 ? 's' : ''}`);
     setText('sCredits',     String(Math.max(0, limit - used)));
     setText('sCreditsNote', `${used} of ${limit} used · ${s.planLabel || s.plan || 'Trial'}`);
-    setText('avgCost',      done.length ? '$' + avgCst.toFixed(2) : '$0.00');
+    setText('avgCost',      completedWork ? '$' + avgCst.toFixed(2) : '$0.00');
     setText('totalPages',   String(pages));
     setText('avgPages',     done.length ? avgPgs.toFixed(1) : '0');
+    setText('redactionCostInsight', '$' + redactionCost.toFixed(2));
+    setText('operationCostInsight', '$' + operationCost.toFixed(2));
     setText('sCostInsight', '$' + cost.toFixed(2));
     const srEl = $('successRate');
     if (srEl) {
@@ -678,14 +695,14 @@
     dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');const f=e.dataTransfer?.files?.[0];if(f)handleFile(f);});
     dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')$('fileInput')?.click();});
   }
-  $('refreshBtn')?.addEventListener('click',()=>{fetchJobsFromSupabase();showToast('Refreshed','info',1800);});
+  $('refreshBtn')?.addEventListener('click',()=>{Promise.all([fetchJobsFromSupabase(),fetchOperationSummary()]);showToast('Dashboard refreshed','info',1800);});
   $('exportRecentBtn')?.addEventListener('click',()=>{
     const jobs=allJobs.slice(0,8).map(j=>({JobId:j.jobId,FileName:j.fileName,SizeMB:fmt.mb(j.fileSize),Pages:j.pageCount||0,Status:j.status,Submitted:fmt.datetime(j.submittedAt),Completed:j.completedAt?fmt.datetime(j.completedAt):'',Cost_USD:j.costTotal??''}));
     exportCSV(jobs,'prudent-recent-jobs.csv');
   });
 
   /* ── Initial load ── */
-  fetchJobsFromSupabase();  // load from Supabase immediately
+  Promise.all([fetchJobsFromSupabase(), fetchOperationSummary()]);
   updateQuotaHint();
 
   // Auto-open upload modal if navigated via #upload hash (sidebar "New Redaction")

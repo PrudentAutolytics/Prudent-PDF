@@ -108,6 +108,10 @@
           <div class="media-panel-title">Output <button class="info-btn mini" type="button" data-help="output" aria-label="About redacted outputs">i</button></div>
           <button id="exportMedia" class="btn btn-primary btn-full" type="button" disabled>Export redacted image</button>
           <div id="exportState" class="media-export-state">Select media and add at least one redaction region.</div>
+          <div class="workflow-cost media-cost" id="mediaCostEstimate">
+            <div><span>Estimated platform cost</span><strong id="mediaPlatformCost">$0.0000</strong></div>
+            <div><span>Estimated product cost</span><strong id="mediaProductCost">$0.0000</strong></div>
+          </div>
           <a id="downloadOutput" class="btn btn-secondary btn-full" href="#" hidden>Download this output</a>
           <button id="downloadBatch" class="btn btn-secondary btn-full" type="button" disabled>Download batch ZIP (0)</button>
           <button id="nextQueued" class="btn btn-ghost btn-full" type="button" hidden>Open next queued file</button>

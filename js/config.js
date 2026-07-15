@@ -27,6 +27,7 @@ const APP_CONFIG = Object.freeze({
     CONTACT_SEND   : '/api/contact-send',
     BLOB_SAS       : '/api/blob-sas',
     USAGE_TRACK     : '/api/usage-track',
+    OPERATION_SUMMARY: '/api/operation-summary',
     GOVERNANCE      : '/api/governance',
     PROFILE         : '/api/profile',
     ADMIN_USERS    : '/api/admin',
@@ -135,6 +136,57 @@ const APP_CONFIG = Object.freeze({
   },
 });
 
+
+
+/* OPERATION COST MODEL
+   This is separate from calcJobCost(), which remains the redaction cost model.
+   Non-redaction operations are costed as platform operations using the configured
+   Functions and Power Automate rates. Browser compute itself is not represented
+   as an Azure charge. Values are estimates from the configured application model. */
+const OPERATION_COST_MODEL_VERSION = '2026.07-op-v1';
+const OPERATION_COST_FACTORS = Object.freeze({
+  PDF_SPLIT:1.20, PDF_MERGE:1.30, PAGE_EXTRACTION:1.00, PAGE_REMOVAL:1.00,
+  PAGE_ROTATION:0.85, PAGE_ORGANIZATION:1.10, METADATA_CLEAN:0.80, PDF_VALIDATION:0.70,
+  WORKFLOW_COMPRESS:1.15, WORKFLOW_REPAIR:1.35, WORKFLOW_WATERMARK:1.00,
+  WORKFLOW_PAGENUMBERS:0.90, WORKFLOW_CROP:0.90, WORKFLOW_EDIT:1.00,
+  WORKFLOW_SIGN:1.00, WORKFLOW_FORMS:1.10, WORKFLOW_JPGPDF:1.10,
+  WORKFLOW_SCANPDF:1.20, WORKFLOW_HTMLPDF:1.00, WORKFLOW_FLATTEN:1.00,
+  WORKFLOW_CREATEPDF:0.85, IMAGE_REDACTION:1.10, FACE_REDACTION:1.35,
+  VIDEO_REDACTION:2.50, VIDEO_FACE_REDACTION:3.50, LICENCE_PLATE_REDACTION:2.50,
+  SCREEN_BADGE_REDACTION:1.35
+});
+
+function calcOperationCost(operation, pageCount = 0, fileSizeMB = 0, sourceCount = 1) {
+  const c = APP_CONFIG.COSTS;
+  const op = String(operation || '').toUpperCase();
+  const factor = OPERATION_COST_FACTORS[op] || 1;
+  const pages = Math.max(0, Number(pageCount) || 0);
+  const size = Math.max(0, Number(fileSizeMB) || 0);
+  const sources = Math.max(1, Number(sourceCount) || 1);
+  const functions = c.FUNCTIONS_PER_RUN * factor;
+  const paFlow = c.PA_FLOW_PER_RUN;
+  const storageEstimate = size * c.BLOB_PER_MB * 0.05;
+  const workload = (pages * 0.000002 * factor) + ((sources - 1) * c.FUNCTIONS_PER_RUN * 0.25);
+  const platformSubtotal = functions + paFlow + storageEstimate + workload;
+  const platformCost = platformSubtotal * c.OVERHEAD_MULTIPLIER;
+  const productPrice = platformCost * c.PRODUCT_MARGIN;
+  return {
+    modelVersion: OPERATION_COST_MODEL_VERSION,
+    operation: op,
+    factor,
+    breakdown: {
+      functions: +functions.toFixed(6),
+      paFlow: +paFlow.toFixed(6),
+      storageEstimate: +storageEstimate.toFixed(6),
+      workload: +workload.toFixed(6),
+    },
+    platformSubtotal: +platformSubtotal.toFixed(6),
+    platformCost: +platformCost.toFixed(6),
+    productPrice: +productPrice.toFixed(6),
+    platformFmt: '$' + platformCost.toFixed(4),
+    productFmt: '$' + productPrice.toFixed(4),
+  };
+}
 
 /* ── PLAN HELPERS ──────────────────────────────────────────────────────────── */
 

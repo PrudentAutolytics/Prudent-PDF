@@ -80,6 +80,22 @@ module.exports = async function(context, req) {
       .filter((row, index, all) => all.findIndex(item => item.jobId === row.jobId) === index)
       .slice(0, 50);
 
+    let operationMetrics = { totalOperations: 0, operationCost: 0 };
+    try {
+      const usageExists = await pool.query(`SELECT to_regclass('public.operation_usage') AS table_name`);
+      if (usageExists.rows[0]?.table_name) {
+        const usage = await pool.query(`
+          SELECT COUNT(*)::int AS "totalOperations",
+                 COALESCE(SUM(product_price),0)::float8 AS "operationCost"
+          FROM operation_usage
+          WHERE user_id=$1 AND created_at > NOW()-INTERVAL '30 days'
+        `,[auth.userId]);
+        operationMetrics = usage.rows[0] || operationMetrics;
+      }
+    } catch (usageError) {
+      context.log.warn('governance operation cost summary unavailable', { reason: usageError?.code || 'query_error' });
+    }
+
     context.res = {
       status: 200,
       headers: getCorsHeaders(req),
@@ -94,7 +110,10 @@ module.exports = async function(context, req) {
           stuck_jobs: stuck.length,
           sla_breaches: sla.length,
           total_pages: rows.reduce((sum, row) => sum + Number(row.pageCount || 0), 0),
-          total_cost: rows.reduce((sum, row) => sum + Number(row.costTotal || 0), 0),
+          redaction_cost: rows.reduce((sum, row) => sum + Number(row.costTotal || 0), 0),
+          operation_cost: Number(operationMetrics.operationCost || 0),
+          operation_count: Number(operationMetrics.totalOperations || 0),
+          total_cost: rows.reduce((sum, row) => sum + Number(row.costTotal || 0), 0) + Number(operationMetrics.operationCost || 0),
           avg_minutes: durations.length ? durations.reduce((a, b) => a + b, 0) / durations.length : 0,
           p95_minutes: p95,
         },

@@ -58,6 +58,19 @@
 .dossier-actions{padding:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:7px;background:var(--surface2)}
 @media(max-width:1200px){.viewer-content{grid-template-columns:1fr 1fr 280px}}
 
+
+@media(max-width:760px){
+ .main{height:calc(100dvh - var(--mobile-bar-h,58px))!important;overflow:hidden!important}
+ .viewer-content{display:block!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch}
+ .viewer-pane{min-height:68dvh!important;height:68dvh!important;border-right:0!important;border-bottom:1px solid var(--border)!important}
+ .viewer-pane:last-child{height:auto!important;min-height:70dvh!important}
+ .pane-body{min-height:0!important}
+ .pane-body iframe{min-height:0!important;height:100%!important}
+ .fields-panel{min-height:58dvh!important}
+ .viewer-toolbar{flex-shrink:0!important}
+ .enterprise-strip{flex-shrink:0!important}
+}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
