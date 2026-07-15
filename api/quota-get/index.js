@@ -26,10 +26,21 @@ module.exports = async function (context, req) {
   const email = auth.email;
 
   try {
+    // profile_picture is added lazily by the profile API. Discover it so
+    // older databases without the column do not break this query.
+    let hasPicture = false;
+    try {
+      const colCheck = await pool.query(`
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema='public' AND table_name='users' AND column_name='profile_picture' LIMIT 1
+      `);
+      hasPicture = colCheck.rows.length > 0;
+    } catch { hasPicture = false; }
+
     const result = await pool.query(`
       SELECT id, email, plan, credits_used, credits_limit,
              max_file_size_mb, max_pages_per_file, max_pages_per_month,
-             trial_expiry_date, is_active, full_name, company
+             trial_expiry_date, is_active, full_name, company${hasPicture ? ', profile_picture' : ''}
       FROM users WHERE email = $1
     `, [email]);
 
@@ -59,6 +70,7 @@ module.exports = async function (context, req) {
         email            : user.email,
         fullName         : user.full_name  || null,
         company          : user.company    || null,
+        profilePicture   : user.profile_picture || null,
         isActive         : user.is_active,
         isAdmin,
 

@@ -347,6 +347,7 @@ const Shell = (() => {
     const chip = document.getElementById('userChip');
     if (!chip) return;
     const MENU_ITEMS = [
+      { label: 'Profile & Settings', icon: ICONS.settings, fn: () => location.href = '/profile' },
       { label: 'View Pricing', icon: ICONS.star2,  fn: () => location.href = '/pricing' },
       { label: 'Contact Us',   icon: ICONS.mail,   fn: () => location.href = '/contact' },
       { sep: true },
@@ -362,15 +363,34 @@ const Shell = (() => {
       Object.assign(menu.style, {
         position:'fixed', zIndex:'9999', background:'var(--surface)',
         border:'1px solid var(--border2)', borderRadius:'var(--r12)',
-        boxShadow:'var(--s4)', padding:'6px', minWidth:'190px',
+        boxShadow:'var(--s4)', padding:'6px', minWidth:'232px',
         right:'18px', top:'68px', animation:'modalIn .14s ease',
       });
-      menu.innerHTML = MENU_ITEMS.map(item => {
+      // Identity header: avatar image (or initials), name, email, plan.
+      const sess = Session.get() || {};
+      const disp = String(sess.fullName || '').trim() || getDisplayName(sess.email || '');
+      const plan = (sess.planLabel || sess.plan || 'Free trial');
+      const avatarInner = sess.profilePicture
+        ? `<img src="${sess.profilePicture}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>`
+        : getInitials(sess.fullName || sess.email || '');
+      const header = document.createElement('div');
+      header.style.cssText = 'display:flex;align-items:center;gap:11px;padding:11px 11px 12px;margin-bottom:4px;border-bottom:1px solid var(--border)';
+      header.innerHTML = `
+        <div style="width:40px;height:40px;flex:none;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--navy-d,#16294B),var(--blue));color:#fff;display:grid;place-items:center;font:800 15px var(--font-d,inherit)">${avatarInner}</div>
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${disp}</div>
+          <div style="font-size:11px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sess.email || ''}</div>
+          <div style="display:inline-flex;margin-top:4px;padding:2px 7px;border-radius:999px;background:var(--blue-bg,var(--blue-pale));color:var(--blue);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em">${plan}</div>
+        </div>`;
+      menu.appendChild(header);
+      const list = document.createElement('div');
+      list.innerHTML = MENU_ITEMS.map(item => {
         if (item.sep) return `<div style="height:1px;background:var(--border);margin:4px 0"></div>`;
         return `<button role="menuitem" style="width:100%;text-align:left;padding:9px 12px;border-radius:var(--r8);font-size:13px;font-weight:500;font-family:var(--font);display:flex;align-items:center;gap:9px;color:${item.danger?'var(--red)':'var(--ink2)'};cursor:pointer;border:none;background:none;transition:background .12s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">${item.icon} ${item.label}</button>`;
       }).join('');
+      menu.appendChild(list);
       document.body.appendChild(menu);
-      const btns = [...menu.querySelectorAll('button')];
+      const btns = [...list.querySelectorAll('button')];
       MENU_ITEMS.filter(i => !i.sep).forEach((item, idx) => {
         btns[idx]?.addEventListener('click', () => { closeMenu(menu); item.fn(); });
       });
@@ -430,6 +450,7 @@ const Shell = (() => {
           maxPagesPerFile  : data.maxPagesPerFile   ?? s.maxPagesPerFile,
           maxPagesPerMonth : data.maxPagesPerMonth  ?? s.maxPagesPerMonth,
           fullName         : data.fullName          ?? s.fullName,
+          profilePicture   : data.profilePicture     ?? s.profilePicture,
           isAdmin          : data.isAdmin === true,
         };
         const priorAdmin = Session.get()?.isAdmin === true;
