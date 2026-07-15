@@ -18,7 +18,7 @@ check(js.includes("runFaceDetection({ automatic: true })"),'automatic face detec
 check(js.includes("state.regions = state.regions.filter(region => region.kind !== 'face')"),'automatic re-detection replaces stale face suggestions');
 check(js.includes("state.image.naturalWidth || state.image.width"),'ImageBitmap dimensions remain supported');
 check(/frameNo%[23]===0/.test(js),'video face regions are refreshed repeatedly during export');
-check(/Number\(\$\('facePadding'\)\?\.value \|\| (18|22)\) \/ 100/.test(js),'face masks apply configurable safety padding');
+check(/Number\(\$\('facePadding'\)\?\.value \|\| (18|22|28)\) \/ 100/.test(js),'face masks apply configurable safety padding');
 check(js.includes("state.pendingFiles=files.slice(1)"),'additional selected media files are queued');
 check(js.includes('prudent-redact-media-batch-'),'batch ZIP receives a controlled output filename');
 check(js.includes('prudent-redact-evidence-manifest.json'),'batch ZIP includes an evidence manifest');

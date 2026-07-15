@@ -34,7 +34,8 @@ img,svg,video,canvas,iframe{max-width:100%}
 }
 
 @media (max-width: 1100px){
-  .shell{display:block!important;min-height:100dvh}
+  .shell{display:block!important;width:100%!important;height:auto!important;min-height:100dvh!important;overflow:visible!important}
+  .main{height:auto!important;min-height:calc(100dvh - var(--mobile-bar-h))!important;overflow:visible!important;scrollbar-gutter:auto!important;overscroll-behavior:auto!important}
   .topbar{position:sticky!important;top:0;z-index:8000;height:var(--mobile-bar-h)!important;padding:0 14px!important;display:flex!important;gap:10px!important}
   .topbar-brand{flex:1!important;min-width:0}
   .topbar-brand>div{width:104px!important;height:36px!important}
@@ -237,4 +238,47 @@ dialog{max-width:calc(100vw - 24px)}
   .sidebar-bottom{padding-top:8px}
   .plan-box{padding:12px}
   .plan-count{font-size:22px}
+}
+
+/* v25 desktop scroll ownership contract */
+@media (min-width:1101px){
+  html,body{height:100%;overflow:hidden}
+  body{min-height:100dvh}
+  .shell{height:100dvh!important;min-height:100dvh!important;overflow:hidden!important}
+  .topbar{grid-row:1!important}
+  .sidebar{
+    grid-row:2!important;
+    align-self:stretch!important;
+    position:relative!important;
+    top:auto!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    background:var(--surface)!important;
+    overflow:hidden!important;
+  }
+  .sidebar-nav-scroll{
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  .sidebar-footer{
+    flex:0 0 auto!important;
+    margin:0!important;
+  }
+  .main{
+    grid-row:2!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+  }
+  .main-viewer{
+    grid-row:2!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
 }

@@ -21,7 +21,7 @@ check(main.includes('overflow: hidden;')&&main.includes('.sidebar-nav-scroll {')
 check(main.includes('flex: 1 1 auto;')&&main.includes('overflow-y: auto;'),'navigation region owns sidebar scrolling');
 check(main.includes('.sidebar-footer {')&&main.includes('flex: 0 0 auto;'),'sidebar footer cannot be pushed out by navigation height');
 check(main.includes('border-top: 1px solid var(--border);'),'sidebar footer has a visual boundary');
-check(main.includes('height: calc(100dvh - var(--topbar-h));'),'desktop sidebar uses dynamic viewport height');
+check(main.includes('height: 100%;')&&main.includes('grid-template-rows: var(--topbar-h) minmax(0,1fr);'),'desktop sidebar fills the fixed viewport content row');
 check(main.includes('min-height: 0;'),'sidebar flex children can shrink correctly');
 check(main.includes('overscroll-behavior: contain;'),'sidebar navigation scroll is contained');
 check(main.includes('scrollbar-gutter: stable;'),'sidebar scrollbar does not shift navigation text');

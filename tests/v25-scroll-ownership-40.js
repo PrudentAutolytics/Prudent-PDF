@@ -1,0 +1,54 @@
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto');
+const root=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+let count=0;
+function check(ok,msg){count++;if(!ok){console.error(`FAIL ${count}: ${msg}`);process.exitCode=1}else console.log(`PASS ${count}: ${msg}`)}
+const main=read('css/main.css');
+const responsive=read('css/enterprise-responsive.css');
+const shell=read('js/shell.js');
+
+check(main.includes('grid-template-rows: var(--topbar-h) minmax(0,1fr);'),'shell second row is explicitly shrinkable');
+check(main.includes('height: 100dvh;')&&main.includes('overflow: hidden;'),'desktop shell is viewport-bound');
+check(main.includes('grid-template-columns: var(--sidebar-w) minmax(0,1fr);'),'main grid column cannot force viewport overflow');
+check(main.includes('.sidebar {')&&main.includes('align-self: stretch;'),'sidebar stretches through the full shell content row');
+check(main.includes('position: relative;')&&main.includes('top: auto;'),'sidebar no longer relies on sticky document scrolling');
+check(main.includes('height: 100%;')&&main.includes('min-height: 0;'),'sidebar fills and can shrink within the grid row');
+check(main.includes('.sidebar-nav-scroll {'),'sidebar keeps isolated navigation scrolling');
+check(main.includes('overflow-y: auto;'),'navigation and main have explicit vertical overflow ownership');
+check(main.includes('.sidebar-footer {')&&main.includes('flex: 0 0 auto;'),'sidebar footer remains fixed inside the sidebar');
+check(main.includes('.main {')&&main.includes('grid-row: 2;'),'main workspace is fixed to the second grid row');
+check(main.includes('scrollbar-gutter: stable;'),'main scrollbar width does not shift layout');
+check(main.includes('overscroll-behavior: contain;'),'main scrolling is contained on desktop');
+check(main.includes('.main-viewer {')&&main.includes('height: 100%;'),'viewer uses the same shell row height');
+check(responsive.includes('html,body{height:100%;overflow:hidden}'),'desktop document scrolling is disabled');
+check(responsive.includes('body{min-height:100dvh}'),'desktop body still fills the viewport');
+check(responsive.includes('.shell{height:100dvh!important'),'desktop shell height is enforced');
+check(responsive.includes('.sidebar{')&&responsive.includes('align-self:stretch!important'),'desktop sidebar full-height paint is enforced');
+check(responsive.includes('height:100%!important')&&responsive.includes('max-height:none!important'),'desktop column height is not truncated');
+check(responsive.includes('.sidebar-nav-scroll{')&&responsive.includes('overflow-y:auto!important'),'only sidebar navigation can scroll internally');
+check(responsive.includes('.sidebar-footer{')&&responsive.includes('flex:0 0 auto!important'),'sidebar footer cannot scroll away');
+check(responsive.includes('.main{')&&responsive.includes('overflow-y:auto!important'),'center workspace owns desktop content scrolling');
+check(responsive.includes('.main-viewer{')&&responsive.includes('overflow:hidden!important'),'viewer remains a controlled non-document-scroll workspace');
+check(responsive.includes('@media (max-width: 1100px)'),'mobile breakpoint remains present');
+check(responsive.includes('height:auto!important;min-height:100dvh!important;overflow:visible!important'),'mobile shell restores document flow');
+check(responsive.includes('.main{height:auto!important'),'mobile main does not inherit desktop fixed-row height');
+check(responsive.includes('overflow:visible!important;scrollbar-gutter:auto!important'),'mobile main restores normal page scrolling');
+check(responsive.includes('overscroll-behavior:auto!important'),'mobile overscroll is restored');
+check(shell.includes('class="sidebar-nav-scroll" data-sidebar-scroll'),'shared shell keeps the navigation scroll region');
+check(shell.includes('class="sidebar-footer"'),'shared shell keeps the fixed footer');
+check(shell.includes('class="sidebar-collapse-btn"'),'shared collapse control remains fixed in the footer');
+check(shell.includes('View plans and limits'),'plan action remains visible in the fixed sidebar footer');
+check(shell.includes('sidebarRemain'),'remaining credits remain in the fixed footer');
+check(shell.includes('sidebarPlanLabel'),'plan label remains refreshable');
+check(shell.includes('currentActiveId'),'active navigation context is preserved');
+check(read('pages/governance.html').includes('Governance Command Center'),'governance page remains intact');
+check(read('pages/dashboard.html').includes('Recent Redaction Jobs'),'dashboard page remains intact');
+check(read('pages/tools.html').includes('Document Operations'),'document operations remain intact');
+check(!/[\u2013\u2014]/.test(main+responsive+shell),'changed shell sources contain no en dash or em dash');
+check(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'api/jobs-submit/index.js'))).digest('hex')==='5345cc76c6e06ad5bc9d5cb18b50ea0f4c039a7306a2e07d1e72db6a32702803','locked Power Automate jobs-submit file is unchanged');
+check(!responsive.includes('.sidebar{position:sticky!important'),'desktop responsive layer does not reintroduce sticky sidebar scrolling');
+
+if(count!==40){console.error(`FAIL: v25 gate executed ${count} checks instead of 40`);process.exitCode=1}
+if(process.exitCode)process.exit(process.exitCode);
+console.log('V25 SCROLL OWNERSHIP GATE: 40 OF 40 CHECKS PASSED');

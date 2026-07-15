@@ -1,9 +1,10 @@
 
 .media-page-hd{gap:18px}.eyebrow{font-size:10px;font-weight:750;letter-spacing:.12em;color:var(--blue);margin-bottom:6px}
 .media-security-note{display:flex;gap:10px;align-items:flex-start;padding:13px 15px;border:1px solid var(--blue-bd);border-radius:12px;background:var(--blue-bg);font-size:12.5px;line-height:1.6;color:var(--ink2);margin-bottom:16px}
-.media-security-note strong{color:var(--ink);white-space:nowrap}.media-security-note .info-btn{margin-left:auto;flex:none}
+.media-security-note strong{color:var(--ink)}.media-security-note .info-btn{margin-left:auto;flex:none}
 .media-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}.media-workspace,.media-panel{overflow:hidden}
-.media-commandbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,440px);align-items:center;gap:18px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.media-commandbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,400px);align-items:center;gap:18px;padding:16px 18px;border-bottom:1px solid var(--border)}
+@media(max-width:1180px){.media-commandbar{grid-template-columns:1fr;gap:12px}.media-source-choices{width:100%}}
 .media-commandbar>div:first-child{min-width:0}
 .media-commandbar h2{font-size:14px;margin:0;color:var(--ink)}
 .media-meta{font-size:11.5px;color:var(--ink3);margin-top:4px;line-height:1.5;overflow-wrap:anywhere}
@@ -40,3 +41,22 @@
  .workflow-step{justify-content:flex-start;text-align:left;padding-inline:10px}
  .effect-grid{grid-template-columns:1fr}
 }
+
+/* v25 media typography hardening: eliminate every text overflow and overlap path */
+.media-commandbar h2{overflow-wrap:anywhere;word-break:break-word}
+.media-source-choices .seg strong,.media-source-choices .seg span{overflow-wrap:anywhere;white-space:normal}
+.media-drop strong,.media-drop span{overflow-wrap:anywhere;max-width:100%}
+.btn-full{white-space:normal;height:auto;min-height:40px;line-height:1.3}
+.effect-option{overflow-wrap:anywhere}
+.capability-state,.media-hint,.media-export-state,.region-summary{overflow-wrap:anywhere;word-break:break-word}
+.media-range-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--ink2);margin-bottom:6px;flex-wrap:wrap}
+.media-range-row span{font-variant-numeric:tabular-nums;color:var(--ink3)}
+.workflow-cost.media-cost>div{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.workflow-cost.media-cost strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.evidence-grid strong{word-break:break-word}
+.evidence-grid strong.mono{word-break:break-all}
+.media-batch-list{display:flex;flex-direction:column;gap:8px}
+.media-help-body{overflow-wrap:anywhere}
+.media-meta{word-break:break-word}
+/* Guarantee the workflow stepper never collides on any width */
+.workflow-step{overflow:hidden;text-overflow:ellipsis}

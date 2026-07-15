@@ -438,7 +438,7 @@
     const ordered=[...boxes].filter(b=>b&&b.width>4&&b.height>4).sort((a,b)=>(b.score||0)-(a.score||0)||b.width*b.height-a.width*a.height);
     const kept=[];
     for(const box of ordered){
-      if(!kept.some(existing=>boxIoU(box,existing)>0.38))kept.push(box);
+      if(!kept.some(existing=>boxIoU(box,existing)>0.45))kept.push(box);
     }
     return kept;
   }
@@ -453,24 +453,49 @@
   async function aggressiveLocalFaceScan(source){
     const sourceW=source.width,sourceH=source.height;
     const boxes=[];
-    boxes.push(...await localDetectOnCanvas(source,0,0,416,0.24));
-    if(Math.max(sourceW,sourceH)>=800)boxes.push(...await localDetectOnCanvas(source,0,0,608,0.30));
-    const large=Math.max(sourceW,sourceH)>=900;
+    // Pass 1+2: whole-frame at two input sizes and low thresholds so small
+    // and low-contrast faces are still caught.
+    boxes.push(...await localDetectOnCanvas(source,0,0,416,0.20));
+    boxes.push(...await localDetectOnCanvas(source,0,0,512,0.22));
+    if(Math.max(sourceW,sourceH)>=800)boxes.push(...await localDetectOnCanvas(source,0,0,608,0.24));
+    // Pass 3: dense overlapping tile grid. More columns/rows and larger
+    // overlap than before so a face that straddles a tile seam is seen whole
+    // in at least one tile. This is the "every nook and corner" coverage.
+    const large=Math.max(sourceW,sourceH)>=760;
     if(large){
-      const cols=sourceW>=1600?3:2,rows=sourceH>=1600?3:2,overlap=0.22;
+      const cols=sourceW>=1500?4:sourceW>=1000?3:2;
+      const rows=sourceH>=1500?4:sourceH>=1000?3:2;
+      const overlap=0.34;
       const tileW=Math.ceil(sourceW/(cols-(cols-1)*overlap));
       const tileH=Math.ceil(sourceH/(rows-(rows-1)*overlap));
       const stepX=Math.max(1,Math.floor(tileW*(1-overlap))),stepY=Math.max(1,Math.floor(tileH*(1-overlap)));
       for(let y=0;y<sourceH;y+=stepY){
         for(let x=0;x<sourceW;x+=stepX){
           const w=Math.min(tileW,sourceW-x),h=Math.min(tileH,sourceH-y);
-          if(w<160||h<160)continue;
+          if(w<140||h<140)continue;
           const tile=document.createElement('canvas');tile.width=w;tile.height=h;
           tile.getContext('2d').drawImage(source,x,y,w,h,0,0,w,h);
-          boxes.push(...await localDetectOnCanvas(tile,x,y,416,0.22));
+          boxes.push(...await localDetectOnCanvas(tile,x,y,416,0.20));
           if(x+w>=sourceW)break;
         }
         if(y+tileH>=sourceH)break;
+      }
+      // Pass 4: dedicated edge and corner bands. Faces at the extreme edges
+      // of a frame are the most commonly missed, so each side and each corner
+      // gets its own high-resolution scan.
+      const bandT=Math.round(Math.min(sourceH,Math.max(220,sourceH*0.28)));
+      const bandS=Math.round(Math.min(sourceW,Math.max(220,sourceW*0.28)));
+      const bands=[
+        {x:0,y:0,w:sourceW,h:bandT},                         // top
+        {x:0,y:sourceH-bandT,w:sourceW,h:bandT},             // bottom
+        {x:0,y:0,w:bandS,h:sourceH},                         // left
+        {x:sourceW-bandS,y:0,w:bandS,h:sourceH},             // right
+      ];
+      for(const b of bands){
+        if(b.w<140||b.h<140)continue;
+        const tile=document.createElement('canvas');tile.width=b.w;tile.height=b.h;
+        tile.getContext('2d').drawImage(source,b.x,b.y,b.w,b.h,0,0,b.w,b.h);
+        boxes.push(...await localDetectOnCanvas(tile,b.x,b.y,416,0.19));
       }
     }
     return dedupeFaceBoxes(boxes);
@@ -487,7 +512,7 @@
       rawBoxes = faces.map(item => ({...item.boundingBox,score:1})).filter(Boolean);
     }
     const sx=canvas.width/sourceW, sy=canvas.height/sourceH;
-    const padding = Math.max(0.12, Math.min(0.5, Number($('facePadding')?.value || 22) / 100));
+    const padding = Math.max(0.12, Math.min(0.6, Number($('facePadding')?.value || 28) / 100));
     return rawBoxes.map(box => {
       const baseX=box.x*sx, baseY=box.y*sy, baseW=box.width*sx, baseH=box.height*sy;
       const px=baseW*padding, py=baseH*padding;

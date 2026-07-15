@@ -153,9 +153,12 @@ table { border-collapse: collapse; width: 100%; }
 /* ── SHELL ────────────────────────────────────────────────────────────────── */
 .shell {
   display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
-  grid-template-rows: var(--topbar-h) 1fr;
-  min-height: 100vh;
+  grid-template-columns: var(--sidebar-w) minmax(0,1fr);
+  grid-template-rows: var(--topbar-h) minmax(0,1fr);
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 
 /* ── TOPBAR ───────────────────────────────────────────────────────────────── */
@@ -278,12 +281,16 @@ table { border-collapse: collapse; width: 100%; }
 /* ── SIDEBAR ──────────────────────────────────────────────────────────────── */
 .sidebar {
   grid-column: 1; grid-row: 2;
+  align-self: stretch;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
   padding: 0;
-  position: sticky; top: var(--topbar-h);
-  height: calc(100dvh - var(--topbar-h));
+  position: relative;
+  top: auto;
+  width: 100%;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
 }
@@ -436,15 +443,28 @@ table { border-collapse: collapse; width: 100%; }
 /* ── MAIN CONTENT ─────────────────────────────────────────────────────────── */
 .main {
   grid-column: 2;
+  grid-row: 2;
   min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
   padding: 48px 56px;
-  min-height: calc(100vh - var(--topbar-h));
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 .main-viewer {
-  grid-column: 2; padding: 0;
-  display: flex; flex-direction: column;
-  height: calc(100vh - var(--topbar-h)); overflow: hidden;
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* ── PAGE HEADER ──────────────────────────────────────────────────────────── */

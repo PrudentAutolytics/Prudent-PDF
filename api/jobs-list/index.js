@@ -36,14 +36,24 @@ module.exports = async function (context, req) {
       'j.id AS "jobId"', 'j.file_name AS "fileName"', 'j.status',
       'j.submitted_at AS "submittedAt"', ...optional
     ].join(',\n        ');
+    // History is scoped to the signed session. We match the session user_id
+    // AND any other users row that shares the same verified session email.
+    // This recovers job history that was created under an earlier users row
+    // for the same person (for example, if the users record was recreated),
+    // without ever trusting a client-supplied identity: auth.userId and
+    // auth.email both come from the verified session token. Foreign users can
+    // never be matched because the email is not caller-controlled.
     const result = await pool.query(`
       SELECT ${fields}
       FROM jobs j
-      WHERE j.user_id = $1
+      WHERE (
+              j.user_id = $1
+              OR j.user_id IN (SELECT id FROM users WHERE LOWER(email) = LOWER($3))
+            )
         AND j.submitted_at > NOW() - INTERVAL '1 day' * $2
       ORDER BY j.submitted_at DESC
       LIMIT 250
-    `, [auth.userId, days || 365]);
+    `, [auth.userId, days || 365, auth.email]);
 
     context.res = {
       status  : 200,
