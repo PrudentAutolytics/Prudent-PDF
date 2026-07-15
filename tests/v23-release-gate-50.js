@@ -41,7 +41,7 @@ check(mediaJs.includes('sourceH>=1500?4:sourceH>=1000?3:2'), 'tall images receiv
 check(mediaJs.includes('function boxIoU'), 'face overlap calculation exists');
 check(mediaJs.includes('function dedupeFaceBoxes'), 'multi-pass detections are deduplicated');
 check(mediaJs.includes('boxIoU(box,existing)>0.45'), 'face deduplication threshold is explicit');
-check(mediaJs.includes('frameNo%3===0'), 'video face detection refreshes every three rendered frames');
+check(mediaJs.includes('frameNo%2===0'), 'video face detection refreshes at least every two rendered frames');
 check(mediaJs.includes("Scanning full image and edge regions locally for faces"), 'automatic scan status describes coverage');
 check(adminAccess.includes("column_name FROM information_schema.columns"), 'admin entitlement is schema-aware');
 check(adminAccess.includes("names.has('is_admin')"), 'users.is_admin is supported');

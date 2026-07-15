@@ -413,7 +413,7 @@ body{background:#f4f8fd;grid-template-columns:minmax(0,1.08fr) minmax(420px,.92f
 @media(max-width:980px){.access-facts{grid-template-columns:repeat(3,1fr)}.access-assurance{max-width:560px}.form-wrap{max-width:560px}}
 @media(max-width:580px){.access-facts{grid-template-columns:1fr}.access-fact span{display:none}.access-assurance{grid-template-columns:1fr}.assurance-card span{display:none}}
 
-</style>
+.access-route-graphic{width:100%;max-width:430px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;position:relative;padding:10px 8px 2px}.access-route-graphic:before{content:'';position:absolute;left:17%;right:17%;top:31px;height:2px;background:linear-gradient(90deg,#c9dcec,#2e75b6,#6d5dfc)}.route-node{position:relative;z-index:1;text-align:center}.route-icon{width:44px;height:44px;margin:auto;border-radius:14px;background:#fff;border:1px solid #d8e5f1;display:grid;place-items:center;color:#2e75b6;font-weight:900;animation:routePulse 4.5s ease-in-out infinite}.route-node strong{display:block;font-size:9px;color:#10213b;margin-top:7px}.route-node span{display:block;font-size:7.5px;color:#8192a8;margin-top:2px}@keyframes routePulse{50%{transform:translateY(-4px)}}</style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
 </head>
@@ -570,7 +570,7 @@ body{background:#f4f8fd;grid-template-columns:minmax(0,1.08fr) minmax(420px,.92f
 
   </div><!-- /form-wrap -->
 
-  <div class="access-assurance" aria-label="Access assurance">
+  <div class="access-route-graphic" aria-label="Passwordless access route"><div class="route-node"><div class="route-icon">@</div><strong>WORK EMAIL</strong><span>Identity request</span></div><div class="route-node"><div class="route-icon">OTP</div><strong>VERIFY</strong><span>Short lived code</span></div><div class="route-node"><div class="route-icon">✓</div><strong>WORKSPACE</strong><span>Signed session</span></div></div><div class="access-assurance" aria-label="Access assurance">
     <div class="assurance-card"><small>Transport</small><strong>TLS protected access</strong><span>Browser to application transport protection.</span></div>
     <div class="assurance-card"><small>Identity</small><strong>Passwordless verification</strong><span>OTP based session establishment.</span></div>
     <div class="assurance-card"><small>Workspace</small><strong>Authenticated controls</strong><span>Protected APIs validate signed session identity.</span></div>

@@ -71,7 +71,7 @@
  .enterprise-strip{flex-shrink:0!important}
 }
 
-</style>
+.viewer-history-meta{font-size:10px;color:var(--ink3);white-space:nowrap;padding:5px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface2)}@media(max-width:900px){.viewer-history-meta{display:none}}</style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
 </head>
@@ -92,7 +92,7 @@
       <!-- Job selector dropdown -->
       <select class="filter-select" id="jobSelector" style="max-width:260px;font-size:12px">
         <option value="">Loading jobs...</option>
-      </select>
+      </select><span id="viewerHistoryMeta" class="viewer-history-meta">Loading document availability...</span>
       <div class="viewer-divider"></div>
       <button class="btn btn-secondary btn-sm" id="dlOrigBtn" disabled>
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -287,7 +287,7 @@
   /* ── Fetch jobs from database ── */
   async function fetchJobs() {
     try {
-      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 30 });
+      const res = await paFetch(APP_CONFIG.FLOWS.JOB_LIST, { email, days: 365 });
       if (Array.isArray(res)) {
         allJobs = res;
         populateSelector();
@@ -336,20 +336,9 @@
   }
 
   /* ── Populate selector ── */
-  function populateSelector() {
-    const sel = $('jobSelector');
-    if (!sel) return;
-    if (!allJobs.length) {
-      sel.innerHTML = '<option value="">No jobs yet</option>';
-      return;
-    }
-    const opts = allJobs.map(j => {
-      const s    = (j.status||'').toLowerCase();
-      const icon = s==='complete'?'✓':s==='queued'?'⏳':s==='processing'?'⚙':'●';
-      return `<option value="${j.jobId}">${icon} ${fmt.trunc(j.fileName,36)} - ${fmt.date(j.submittedAt)}</option>`;
-    }).join('');
-    sel.innerHTML = '<option value="">- Select a job -</option>' + opts;
-  }
+  function jobAgeDays(job){const stamp=new Date(job.submittedAt||job.submitted_at||0).getTime();return stamp?Math.floor((Date.now()-stamp)/86400000):0}
+  function outputAvailability(job){const complete=['complete','completed'].includes(String(job.status||'').toLowerCase());if(!complete)return{state:'processing',label:'Processing'};if(jobAgeDays(job)>30)return{state:'archived',label:'Archived output'};return{state:'available',label:'Preview available'}}
+  function populateSelector(){const sel=$('jobSelector');if(!sel)return;if(!allJobs.length){sel.innerHTML='<option value="">No jobs yet</option>';return}sel.innerHTML='<option value="">Select a document to review...</option>';allJobs.forEach(job=>{const option=document.createElement('option'),state=outputAvailability(job),stamp=job.submittedAt?fmt.date(job.submittedAt):'Unknown date';option.value=job.jobId;option.textContent=`${job.fileName||'Untitled document'} | ${stamp} | ${state.label}`;option.dataset.availability=state.state;sel.appendChild(option)});const archived=allJobs.filter(j=>outputAvailability(j).state==='archived').length,available=allJobs.filter(j=>outputAvailability(j).state==='available').length,meta=$('viewerHistoryMeta');if(meta)meta.textContent=`${available} preview ready | ${archived} archived | 365 day history`}
 
   /* ── Get read SAS URL ── */
   async function getReadSasUrl(blobUrl, container) {
@@ -365,6 +354,8 @@
 
   /* ── Load job into viewer ── */
   async function loadJob(jobId) {
+    const selectedJob=allJobs.find(j=>String(j.jobId)===String(jobId));if(selectedJob&&outputAvailability(selectedJob).state==='archived'){currentJob=selectedJob;$('origLoading')?.classList.add('hidden');$('redLoading')?.classList.add('hidden');$('origEmpty')?.classList.remove('hidden');$('redEmpty')?.classList.remove('hidden');const om=$('origEmptyMsg');if(om)om.textContent='This historical job is retained for audit context, but its 30 day preview output has expired.';const rm=$('redEmptyMsg');if(rm)rm.textContent='Redacted preview unavailable. Reprocess the source document to create a new controlled output.';showToast('Historical record loaded. Preview output has expired after 30 days.','info');return}
+
     if (!jobId) return;
     const j = allJobs.find(x => x.jobId === jobId);
     if (!j) { showToast('Job not found','warn'); return; }

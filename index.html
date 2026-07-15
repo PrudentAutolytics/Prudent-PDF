@@ -177,7 +177,7 @@ button,a{touch-action:manipulation}
 @media(max-width:1080px){.hero{grid-template-columns:1fr;padding-bottom:44px}.hero-rail{grid-template-columns:repeat(2,1fr)}.hero-system-strip{grid-template-columns:1fr}}
 @media(max-width:760px){.hero{padding-top:88px;padding-bottom:28px}.hero-rail{grid-template-columns:1fr}.hero-system-strip{display:none}.hero-signal{min-height:74px}.section{padding-top:64px;padding-bottom:64px}}
 
-</style>
+.visual-orbit{position:absolute;inset:0;pointer-events:none}.orbit-node{position:absolute;width:54px;height:68px;border:1px solid #cfe0ef;border-radius:12px;background:#ffffffd9;box-shadow:0 16px 34px #37547c1a;animation:orbitFloat 6s ease-in-out infinite}.orbit-node:before{content:'';position:absolute;left:10px;right:10px;top:18px;height:4px;border-radius:4px;background:#d8e6f4;box-shadow:0 11px 0 #e2ecf6,0 22px 0 #d8e6f4}.orbit-node.n1{left:46%;top:14%}.orbit-node.n2{right:2%;top:29%;animation-delay:-3s}.orbit-node.n3{left:50%;bottom:8%;animation-delay:-5s}@keyframes orbitFloat{50%{translate:0 -12px}}.evidence-orbit{position:absolute;width:150px;height:150px;right:18%;bottom:8%;border:1px dashed #1f6fd138;border-radius:50%;animation:orbitSpin 18s linear infinite}.evidence-orbit i{position:absolute;width:28px;height:28px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:900;color:var(--blue)}.evidence-orbit i:nth-child(1){left:61px;top:-14px}.evidence-orbit i:nth-child(2){right:-14px;top:61px}.evidence-orbit i:nth-child(3){left:61px;bottom:-14px}.evidence-orbit i:nth-child(4){left:-14px;top:61px}@keyframes orbitSpin{to{transform:rotate(360deg)}}@media(max-width:1080px){.visual-orbit{display:none}}</style>
 </head>
 <body>
 <nav class="nav">
@@ -195,7 +195,7 @@ button,a{touch-action:manipulation}
 </nav>
 
 <main>
-<section class="hero">
+<section class="hero"><div class="visual-orbit" aria-hidden="true"><span class="orbit-node n1"></span><span class="orbit-node n2"></span><span class="orbit-node n3"></span><span class="evidence-orbit"><i>PII</i><i>SHA</i><i>OPS</i><i>RISK</i></span></div>
   <div class="hero-copy">
     <div class="eyebrow"><span class="eyebrow-dot"></span> Privacy operations control plane</div>
     <h1>Detect, control and <span>prove privacy work.</span></h1>

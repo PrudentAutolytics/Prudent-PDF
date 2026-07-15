@@ -90,15 +90,15 @@
 
 /* ── Cost calculator ── */
 .calc-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r16); padding:28px 32px; margin-bottom:32px; }
-.calc-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+.calc-header { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,360px); align-items:stretch; gap:24px; margin-bottom:0; }
 .calc-title { font-size:17px; font-weight:800; letter-spacing:-.3px; color:var(--ink); margin-bottom:4px; }
 .calc-sub { font-size:13px; color:var(--ink3); line-height:1.6; }
-.calc-result-pill { background:linear-gradient(135deg,var(--blue),var(--violet)); color:#fff; border-radius:var(--r12); padding:16px 20px; text-align:center; min-width:160px; flex-shrink:0; }
+.calc-result-pill { background:linear-gradient(135deg,var(--blue),var(--violet)); color:#fff; border-radius:var(--r12); padding:22px 24px; text-align:center; min-width:0; display:flex; flex-direction:column; justify-content:center; min-height:168px; box-shadow:0 18px 36px rgba(73,73,214,.20); }
 .calc-result-label { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; opacity:.8; margin-bottom:4px; }
 .calc-result-price { font-size:32px; font-weight:900; letter-spacing:-1px; font-family:var(--display); }
 .calc-result-sub { font-size:11px; opacity:.75; margin-top:2px; }
 .calc-fields { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-@media(max-width:720px){ .calc-fields { grid-template-columns:1fr 1fr; } }
+@media(max-width:900px){.calc-header{grid-template-columns:1fr}.calc-result-pill{min-height:132px}.calc-fields{grid-template-columns:1fr 1fr}}@media(max-width:520px){.calc-fields{grid-template-columns:1fr}}
 .calc-breakdown-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
 .calc-item { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r8); padding:10px 12px; text-align:center; }
 .calc-item-label { font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); margin-bottom:4px; }

@@ -24,7 +24,8 @@
     exportAbort: false,
     batch: [],
     pendingFiles: [],
-    faceDetectionBusy: false
+    faceDetectionBusy: false,
+    videoTrackStats: { scans: 0, tracked: 0, lastScanMs: 0 }
   };
 
   const HELP = {
@@ -613,6 +614,9 @@
     addBatchOutput(outputName,blob,operation,hash);
     return outputName;
   }
+  function boxIou(a,b){const ax2=a.x+a.w,ay2=a.y+a.h,bx2=b.x+b.w,by2=b.y+b.h,ix=Math.max(0,Math.min(ax2,bx2)-Math.max(a.x,b.x)),iy=Math.max(0,Math.min(ay2,by2)-Math.max(a.y,b.y)),inter=ix*iy;return inter/Math.max(1,a.w*a.h+b.w*b.h-inter)}
+  function smoothTrackedFaces(previous,next){return next.map(face=>{let best=null,score=0;previous.forEach(old=>{const x=boxIou(old,face);if(x>score){score=x;best=old}});if(!best||score<.12)return face;const a=.62;return{...face,x:best.x*(1-a)+face.x*a,y:best.y*(1-a)+face.y*a,w:best.w*(1-a)+face.w*a,h:best.h*(1-a)+face.h*a,kind:'face'}})}
+  function updateVideoTrackingStatus(faces){state.videoTrackStats.tracked=faces.length;const el=$('videoTrackTelemetry');if(el)el.textContent=`Motion tracking active | ${faces.length} face region${faces.length===1?'':'s'} | ${state.videoTrackStats.scans} scans`}
   async function exportVideo() {
     if (!window.MediaRecorder || !canvas.captureStream) throw new Error('Video export is not supported by this browser.');
     state.exportAbort=false; video.pause(); video.currentTime=0;
@@ -637,8 +641,8 @@
         exportCtx.clearRect(0,0,exportCanvas.width,exportCanvas.height);
         exportCtx.drawImage(video,0,0,exportCanvas.width,exportCanvas.height);
         const originalFrame=sourceFrame(video,exportCanvas.width,exportCanvas.height);
-        if($('autoFaceVideo').checked&&state.faceDetector&&frameNo%3===0&&!state.videoFrameBusy){
-          state.videoFrameBusy=true;try{dynamicFaces=await detectFaces(video)}catch{}finally{state.videoFrameBusy=false}
+        if($('autoFaceVideo').checked&&state.faceDetector&&frameNo%2===0&&!state.videoFrameBusy){
+          state.videoFrameBusy=true;try{const started=performance.now(),detected=await detectFaces(video);dynamicFaces=smoothTrackedFaces(dynamicFaces,detected);state.videoTrackStats.scans++;state.videoTrackStats.lastScanMs=Math.round(performance.now()-started);updateVideoTrackingStatus(dynamicFaces)}catch{}finally{state.videoFrameBusy=false}
         }
         const sx=exportCanvas.width/canvas.width, sy=exportCanvas.height/canvas.height;
         [...state.regions,...dynamicFaces].forEach(r=>drawRegionEffect(exportCtx,originalFrame,r,sx,sy));
