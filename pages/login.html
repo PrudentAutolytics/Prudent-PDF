@@ -386,6 +386,33 @@ body{background:#f4f8fd;grid-template-columns:minmax(0,1.08fr) minmax(420px,.92f
 @media(max-width:580px){.access-visual{min-height:220px}.access-canvas{width:64%}.access-stack{width:31%}.access-mini{padding:8px}.access-mini span{display:none}.access-person{transform:scale(.8)!important;transform-origin:bottom}.left-tagline{font-size:36px}.form-wrap{border-radius:16px}.otp-digit{width:42px;height:52px}}
 @media(max-width:420px){.access-visual{min-height:190px}.access-stack{display:none}.access-canvas{right:12px;width:auto}.left-panel{padding-inline:14px}.right-panel{padding-inline:12px}}
 
+
+/* v30 verified access density */
+.left-panel{padding:36px clamp(28px,4vw,58px);justify-content:flex-start}
+.left-brand{margin-bottom:0;display:flex;flex-direction:column}
+.left-logo{margin-bottom:28px}
+.left-logo-img{width:166px;height:48px;padding:6px 10px;border-radius:10px}
+.left-tagline{font-size:clamp(42px,4.3vw,64px);max-width:720px}
+.left-sub{max-width:650px;margin-bottom:18px}
+.access-visual{max-width:720px;min-height:310px;margin-top:16px}
+.access-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:720px;margin-top:12px}
+.access-fact{padding:12px 13px;border:1px solid #d7e4f1;border-radius:13px;background:rgba(255,255,255,.76);box-shadow:0 8px 22px rgba(55,84,124,.05)}
+.access-fact small{display:block;font-size:7.5px;font-weight:900;letter-spacing:.09em;color:#6f829d;text-transform:uppercase}
+.access-fact strong{display:block;font-size:11px;color:#10213b;margin-top:5px}
+.access-fact span{display:block;font-size:8.5px;color:#7488a2;margin-top:3px;line-height:1.4}
+.left-bottom{margin-top:auto;padding-top:18px}
+.right-panel{padding:34px clamp(24px,3.5vw,54px)}
+.right-inner{max-width:520px;gap:14px;justify-content:center}
+.form-wrap{max-width:430px;padding:32px 34px}
+.access-assurance{width:100%;max-width:430px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.assurance-card{padding:10px 11px;border:1px solid #dbe7f2;border-radius:12px;background:rgba(255,255,255,.86);box-shadow:0 8px 22px rgba(55,84,124,.05)}
+.assurance-card small{display:block;font-size:7px;font-weight:900;letter-spacing:.08em;color:#71859f;text-transform:uppercase}
+.assurance-card strong{display:block;font-size:10px;color:#10213b;margin-top:5px;line-height:1.35}
+.assurance-card span{display:block;font-size:8px;color:#8091a8;margin-top:3px;line-height:1.4}
+.security-row .sec-badge:nth-child(3){font-size:0}.security-row .sec-badge:nth-child(3):after{content:"Session";font-size:inherit}
+@media(max-width:980px){.access-facts{grid-template-columns:repeat(3,1fr)}.access-assurance{max-width:560px}.form-wrap{max-width:560px}}
+@media(max-width:580px){.access-facts{grid-template-columns:1fr}.access-fact span{display:none}.access-assurance{grid-template-columns:1fr}.assurance-card span{display:none}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
@@ -542,6 +569,12 @@ body{background:#f4f8fd;grid-template-columns:minmax(0,1.08fr) minmax(420px,.92f
     </div>
 
   </div><!-- /form-wrap -->
+
+  <div class="access-assurance" aria-label="Access assurance">
+    <div class="assurance-card"><small>Transport</small><strong>TLS protected access</strong><span>Browser to application transport protection.</span></div>
+    <div class="assurance-card"><small>Identity</small><strong>Passwordless verification</strong><span>OTP based session establishment.</span></div>
+    <div class="assurance-card"><small>Workspace</small><strong>Authenticated controls</strong><span>Protected APIs validate signed session identity.</span></div>
+  </div>
   </div><!-- /right-inner -->
 
   <div class="right-footer" id="rightFooter"></div>
@@ -777,7 +810,7 @@ $('changeEmailBtn').addEventListener('click', () => {
   var brand = d.getElementById('leftBrand');
   if (brand) {
     brand.innerHTML = [
-      '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/pa-logo.svg" alt="Prudent Autolytics"/></a>',
+      '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/pa-logo-light.svg" alt="Prudent Autolytics"/></a>',
       '<div class="left-tagline">Control privacy work.<br/><span>See every workflow move.</span></div>',
       '<p class="left-sub">Access one workspace for PDF redaction, document operations, image and video privacy, processing history, operation cost and governance.</p>',
       '<div class="access-visual" aria-hidden="true">',
@@ -788,6 +821,11 @@ $('changeEmailBtn').addEventListener('click', () => {
       '    <div class="access-mini"><small>MEDIA</small><strong>Face privacy</strong><span>Multi pass local scan</span></div>',
       '    <div class="access-mini"><small>GOVERNANCE</small><strong>Control posture</strong><span>Risk and operations</span></div>',
       '  </div>',
+      '</div>',
+      '<div class="access-facts" aria-hidden="true">',
+      '  <div class="access-fact"><small>Identity</small><strong>Passwordless session</strong><span>OTP verification establishes access before workspace entry.</span></div>',
+      '  <div class="access-fact"><small>Processing</small><strong>Document and media controls</strong><span>Redaction, operations and local media privacy remain distinct.</span></div>',
+      '  <div class="access-fact"><small>Oversight</small><strong>History and governance</strong><span>Processing state, metering and control posture remain visible.</span></div>',
       '</div>'
     ].join('');
   }

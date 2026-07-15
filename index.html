@@ -152,11 +152,36 @@ button,a{touch-action:manipulation}
 @media(max-width:760px){.nav{height:64px;padding:0 14px}.nav-links{display:none}.nav-actions .secondary{display:none}.hero{padding:100px 16px 54px;gap:32px}.hero h1{font-size:clamp(39px,12vw,60px)}.hero-copy>p{font-size:15px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-actions .btn{width:100%}.control-plane{min-height:auto;border-radius:20px;padding:10px}.cp-grid{grid-template-columns:1fr;min-height:0}.privacy-frame{min-height:410px}.cp-stack{grid-template-columns:1fr 1fr;grid-template-rows:auto}.live-card:nth-child(3){grid-column:1/-1}.section{padding:72px 16px}.proof-grid,.media-showcase{grid-template-columns:1fr}.flow-board{grid-template-columns:1fr}.showcase-card{min-height:360px}.section-head{gap:20px}.footer-inner{align-items:flex-start;flex-direction:column}}
 @media(max-width:460px){.nav-logo{width:104px}.nav-actions .btn{padding-inline:13px}.cp-stack{grid-template-columns:1fr}.live-card:nth-child(3){grid-column:auto}.privacy-frame{min-height:360px}.hero-pills{display:grid;grid-template-columns:1fr}.proof-ticket{right:4%;width:46%}.doc-page{left:4%;width:52%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+/* v30 expert-density public surface */
+.hero{min-height:auto;padding-top:108px;padding-bottom:34px;grid-template-columns:minmax(0,.92fr) minmax(520px,1.08fr);gap:clamp(32px,5vw,72px)}
+.hero h1{font-size:clamp(46px,5.5vw,74px);margin:20px 0 20px}
+.hero-copy>p{max-width:650px}
+.control-plane{min-height:500px}
+.cp-grid{min-height:430px}
+.hero-rail{position:relative;z-index:2;grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:4px}
+.hero-signal{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;min-height:86px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.86);box-shadow:0 12px 28px rgba(55,84,124,.07);backdrop-filter:blur(16px)}
+.hero-signal-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#edf6ff,#e1efff);color:var(--blue);font-weight:900}
+.hero-signal small{display:block;font-size:8.5px;font-weight:900;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.hero-signal strong{display:block;font-size:14px;margin-top:4px}
+.hero-signal span{display:block;font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+.hero-system-strip{display:grid;grid-template-columns:1.05fr .95fr;gap:12px;margin-top:12px}
+.system-card{padding:15px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 10px 24px rgba(55,84,124,.05)}
+.system-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.system-card-head strong{font-size:11px}.system-card-head span{font-size:8px;font-weight:900;letter-spacing:.08em;color:var(--green)}
+.system-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.system-flow b{padding:7px 5px;border-radius:8px;background:var(--soft);border:1px solid var(--line);font-size:8px;text-align:center;color:var(--ink2)}
+.system-meter-row{display:grid;grid-template-columns:90px 1fr 34px;gap:8px;align-items:center;margin-top:7px;font-size:8px;color:var(--muted)}
+.system-meter{height:6px;border-radius:999px;background:#edf2f8;overflow:hidden}.system-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.section{padding-top:84px;padding-bottom:84px}
+@media(max-width:1080px){.hero{grid-template-columns:1fr;padding-bottom:44px}.hero-rail{grid-template-columns:repeat(2,1fr)}.hero-system-strip{grid-template-columns:1fr}}
+@media(max-width:760px){.hero{padding-top:88px;padding-bottom:28px}.hero-rail{grid-template-columns:1fr}.hero-system-strip{display:none}.hero-signal{min-height:74px}.section{padding-top:64px;padding-bottom:64px}}
+
 </style>
 </head>
 <body>
 <nav class="nav">
-  <a href="/" aria-label="Prudent Redact home"><img class="nav-logo" src="/assets/pa-logo.svg" alt="Prudent Autolytics"/></a>
+  <a href="/" aria-label="Prudent Redact home"><img class="nav-logo" src="/assets/pa-logo-light.svg" alt="Prudent Autolytics"/></a>
   <div class="nav-links">
     <a href="#proof">Privacy proof</a>
     <a href="#workflow">Workflow</a>
@@ -204,7 +229,19 @@ button,a{touch-action:manipulation}
           <article class="live-card"><div class="signal">◎</div><small>GOVERNANCE</small><h3>Operator control</h3><p>Risk queue, processing health and control posture.</p><div class="live-meter"><span></span></div></article>
         </div>
       </div>
+
+      <div class="hero-system-strip">
+        <div class="system-card"><div class="system-card-head"><strong>Controlled privacy lifecycle</strong><span>ACTIVE</span></div><div class="system-flow"><b>ACCESS</b><b>PROCESS</b><b>REVIEW</b><b>METER</b><b>GOVERN</b></div></div>
+        <div class="system-card"><div class="system-card-head"><strong>Operational signals</strong><span>LIVE</span></div><div class="system-meter-row"><span>Coverage</span><div class="system-meter"><i style="width:96%"></i></div><b>96</b></div><div class="system-meter-row"><span>Evidence</span><div class="system-meter"><i style="width:91%"></i></div><b>91</b></div><div class="system-meter-row"><span>Control</span><div class="system-meter"><i style="width:88%"></i></div><b>88</b></div></div>
+      </div>
     </div>
+  </div>
+
+  <div class="hero-rail" aria-label="Prudent Redact operating capabilities">
+    <div class="hero-signal"><div class="hero-signal-icon">01</div><div><small>Privacy intake</small><strong>Redaction and media review</strong><span>Separate processing paths with authenticated history.</span></div></div>
+    <div class="hero-signal"><div class="hero-signal-icon">02</div><div><small>Evidence</small><strong>Hashes and controlled output</strong><span>Output identity and operation records stay visible.</span></div></div>
+    <div class="hero-signal"><div class="hero-signal-icon">03</div><div><small>Economics</small><strong>Metered operation cost</strong><span>Document and media operations retain cost estimates.</span></div></div>
+    <div class="hero-signal"><div class="hero-signal-icon">04</div><div><small>Governance</small><strong>Risk and control posture</strong><span>Processing health and operator exceptions in one view.</span></div></div>
   </div>
 </section>
 
@@ -274,7 +311,7 @@ button,a{touch-action:manipulation}
 </section>
 </main>
 
-<footer class="footer"><div class="footer-inner"><img src="/assets/pa-logo.svg" alt="Prudent Autolytics"/><span>PRUDENT AUTOLYTICS LLP | Enterprise document privacy platform</span><span>Service.Account@prudentautolytics.com</span></div></footer>
+<footer class="footer"><div class="footer-inner"><img src="/assets/pa-logo-light.svg" alt="Prudent Autolytics"/><span>PRUDENT AUTOLYTICS LLP | Enterprise document privacy platform</span><span>Service.Account@prudentautolytics.com</span></div></footer>
 
 <script src="/js/config.js"></script>
 <script>

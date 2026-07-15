@@ -20,6 +20,7 @@ const LOCKED_DEPLOYMENT_ORIGINS = [
   // Existing deployments are intentionally preserved for backward compatibility.
   'https://brave-cliff-0ceef0a00.4.azurestaticapps.net',
   'https://nice-grass-0f3d2db00.7.azurestaticapps.net',
+  'https://redact.prudentautolytics.com',
 ];
 
 const CONFIGURED_ORIGINS = [
