@@ -12,6 +12,17 @@ module.exports = async function(context, req) {
     return;
   }
 
+  // Administration compatibility bridge.
+  // The deployed Static Web App exposes /api/governance, while HAR validation
+  // showed both /api/admin-users and /api/admin returning route-level 404s.
+  // Delegate admin operations through this deployed route and let the existing
+  // admin handler re-run signed-session verification and administrator entitlement.
+  if (req.body?.adminBridge === true) {
+    const adminHandler = require('../admin-service');
+    await adminHandler(context, req);
+    return;
+  }
+
   try {
     const columns = await pool.query(`
       SELECT column_name

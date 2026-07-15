@@ -30,10 +30,10 @@ const APP_CONFIG = Object.freeze({
     OPERATION_SUMMARY: '/api/operation-summary',
     GOVERNANCE      : '/api/governance',
     PROFILE         : '/api/profile',
-    ADMIN_USERS    : '/api/admin-users',
-    ADMIN_UPDATE   : '/api/admin-users',
-    ADMIN_CONTACTS : '/api/admin-users',
-    ADMIN_APIKEYS  : '/api/admin-users',
+    ADMIN_USERS    : '/api/governance',
+    ADMIN_UPDATE   : '/api/governance',
+    ADMIN_CONTACTS : '/api/governance',
+    ADMIN_APIKEYS  : '/api/governance',
   },
 
   /* ── Azure Blob ────────────────────────────────────────────────────────── */

@@ -312,7 +312,17 @@ Content-Type: application/json
 
   /* ── Admin API helper ── */
   async function adminCall(body) {
-    const payload={...body,email};try{return await paFetch(APP_CONFIG.FLOWS.ADMIN_USERS,payload)}catch(err){const message=err.message||'';if(/HTTP error 404/i.test(message)&&APP_CONFIG.FLOWS.ADMIN_USERS!=='/api/admin')return await paFetch('/api/admin',payload);if(/Forbidden|Authentication required|Session|Account inactive/i.test(message)){$('adminContent')?.classList.add('hidden');$('adminGate')?.classList.remove('hidden')}throw err}
+    const payload = { ...body, email, adminBridge: true };
+    try {
+      return await paFetch(APP_CONFIG.FLOWS.ADMIN_USERS, payload);
+    } catch (err) {
+      const message = err.message || '';
+      if (/Forbidden|Authentication required|Session|Account inactive/i.test(message)) {
+        $('adminContent')?.classList.add('hidden');
+        $('adminGate')?.classList.remove('hidden');
+      }
+      throw err;
+    }
   }
 
   /* ── Load everything ── */
@@ -341,7 +351,7 @@ Content-Type: application/json
       } else if (/Authentication required|Session|Account inactive/i.test(msg)) {
         $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Session expired</div><div style="font-size:12px;color:var(--ink3);margin-top:6px">Please sign out and sign back in, then reopen Administration.</div></div></td></tr>';
       } else {
-        $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users - ' + esc(msg) + '</div><div style="font-size:12px;color:var(--ink3);margin-top:6px">The user directory endpoint could not be loaded. Refresh after deployment; the client automatically retries the legacy administration route if the new route is unavailable.</div></div></td></tr>';
+        $('usersBody').innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Could not load users - ' + esc(msg) + '</div><div style="font-size:12px;color:var(--ink3);margin-top:6px">The administration bridge could not load the user directory. Refresh after deployment and verify the deployed Governance API is available.</div></div></td></tr>';
       }
     }
   }
