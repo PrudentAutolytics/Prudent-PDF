@@ -19,15 +19,18 @@
     faceDetector: null,
     lastFaceBoxes: [],
     videoFrameBusy: false,
-    exportAbort: false
+    exportAbort: false,
+    batch: [],
+    pendingFiles: [],
+    faceDetectionBusy: false
   };
 
   const HELP = {
     processing: ['Local media processing', 'The editor works with media bytes in this browser workspace. A successful export sends only minimal operation metadata to the usage API. The PDF and redaction Power Automate contract is not changed.'],
     effect: ['Redaction effect', 'Black permanently covers the selected pixels. Blur and pixelation transform the selected visual region. For the strongest visual removal, use Black.'],
-    faces: ['Face detection assistance', 'Where the browser exposes the Face Detection API, Prudent Redact can suggest face boxes for the current image or video frame. Review every suggested region before export.'],
+    faces: ['Face privacy', 'Prudent Redact automatically finds faces after image selection and when the redaction effect changes when the browser provides face detection. Suggested face regions are padded and should still be reviewed before export. If the browser does not expose face detection, draw boxes manually.'],
     regions: ['Redaction regions', 'Draw rectangles directly over sensitive content. Manual regions are reviewer-controlled. In video mode, manual regions remain fixed for the full video export.'],
-    videoScope: ['Video redaction scope', 'Manual regions are applied to every exported frame. Optional face assistance samples frames during export and updates face masks when supported by the browser.'],
+    videoScope: ['Video face tracking', 'When enabled, Prudent Redact refreshes detected face regions repeatedly during export and applies the selected Black, Blur, or Pixelate effect. The safety margin expands each detected face box. Manual boxes remain fixed for the entire clip.'],
     output: ['Controlled output', 'Export creates a new redacted file. The source remains unchanged. Successful export counts as one plan usage and sends a minimal usage event to the configured Power Automate trigger.']
   };
 
@@ -67,8 +70,90 @@
   function safeName(name) {
     return String(name || 'media').replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9._ -]/g, '_').slice(0, 120);
   }
+
+  function crc32(bytes) {
+    let crc = 0 ^ -1;
+    for (let i = 0; i < bytes.length; i++) {
+      crc ^= bytes[i];
+      for (let j = 0; j < 8; j++) crc = (crc >>> 1) ^ (0xEDB88320 & -(crc & 1));
+    }
+    return (crc ^ -1) >>> 0;
+  }
+  function u16(view, offset, value) { view.setUint16(offset, value, true); }
+  function u32(view, offset, value) { view.setUint32(offset, value >>> 0, true); }
+  async function createZip(entries) {
+    const encoder = new TextEncoder();
+    const localParts = [];
+    const centralParts = [];
+    let offset = 0;
+    for (const entry of entries) {
+      const name = encoder.encode(entry.name);
+      const bytes = new Uint8Array(await entry.blob.arrayBuffer());
+      const crc = crc32(bytes);
+      const local = new Uint8Array(30 + name.length);
+      const lv = new DataView(local.buffer);
+      u32(lv, 0, 0x04034b50); u16(lv, 4, 20); u16(lv, 6, 0); u16(lv, 8, 0);
+      u16(lv, 10, 0); u16(lv, 12, 0); u32(lv, 14, crc); u32(lv, 18, bytes.length);
+      u32(lv, 22, bytes.length); u16(lv, 26, name.length); u16(lv, 28, 0);
+      local.set(name, 30);
+      localParts.push(local, bytes);
+      const central = new Uint8Array(46 + name.length);
+      const cv = new DataView(central.buffer);
+      u32(cv, 0, 0x02014b50); u16(cv, 4, 20); u16(cv, 6, 20); u16(cv, 8, 0); u16(cv, 10, 0);
+      u16(cv, 12, 0); u16(cv, 14, 0); u32(cv, 16, crc); u32(cv, 20, bytes.length);
+      u32(cv, 24, bytes.length); u16(cv, 28, name.length); u16(cv, 30, 0); u16(cv, 32, 0);
+      u16(cv, 34, 0); u16(cv, 36, 0); u32(cv, 38, 0); u32(cv, 42, offset);
+      central.set(name, 46);
+      centralParts.push(central);
+      offset += local.length + bytes.length;
+    }
+    const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+    const end = new Uint8Array(22);
+    const ev = new DataView(end.buffer);
+    u32(ev, 0, 0x06054b50); u16(ev, 4, 0); u16(ev, 6, 0); u16(ev, 8, entries.length);
+    u16(ev, 10, entries.length); u32(ev, 12, centralSize); u32(ev, 16, offset); u16(ev, 20, 0);
+    return new Blob([...localParts, ...centralParts, end], { type: 'application/zip' });
+  }
+  function renderBatch() {
+    const list = $('batchList');
+    if (!state.batch.length) {
+      list.innerHTML = '<div class="media-batch-empty">No exported media yet.</div>';
+    } else {
+      list.innerHTML = '';
+      state.batch.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'media-batch-item';
+        const name = document.createElement('div');
+        name.className = 'media-batch-name';
+        const strong = document.createElement('strong'); strong.textContent = item.name;
+        const meta = document.createElement('span'); meta.textContent = `${item.operation.replaceAll('_',' ')} | ${formatSize(item.blob.size)}`;
+        name.append(strong, meta);
+        const link = document.createElement('a');
+        link.className = 'btn btn-secondary btn-sm'; link.textContent = 'Download';
+        link.href = item.url; link.download = item.name;
+        const remove = document.createElement('button');
+        remove.className = 'media-batch-remove'; remove.type = 'button'; remove.textContent = 'Remove';
+        remove.setAttribute('aria-label', `Remove ${item.name} from batch`);
+        remove.onclick = () => { revoke(item.url); state.batch.splice(index, 1); renderBatch(); };
+        row.append(name, link, remove); list.appendChild(row);
+      });
+    }
+    $('downloadBatch').disabled = !state.batch.length;
+    $('downloadBatch').textContent = `Download batch ZIP (${state.batch.length})`;
+    $('batchState').textContent = state.batch.length
+      ? `${state.batch.length} controlled output${state.batch.length === 1 ? '' : 's'} ready in this browser batch.`
+      : 'Exported files are added to this browser batch. Download them together as a ZIP.';
+  }
+  function addBatchOutput(name, blob, operation, hash) {
+    const existing = state.batch.findIndex(item => item.name === name);
+    if (existing >= 0) { revoke(state.batch[existing].url); state.batch.splice(existing, 1); }
+    state.batch.push({ name, blob, operation, hash, createdAt: new Date().toISOString(), url: URL.createObjectURL(blob) });
+    renderBatch();
+  }
   function updateRegionUI() {
-    $('regionSummary').textContent = `${state.regions.length} redaction region${state.regions.length === 1 ? '' : 's'}`;
+    $('regionSummary').textContent = `${state.regions.length} sensitive area${state.regions.length === 1 ? '' : 's'} selected`;
+    $('stepDetect')?.classList.toggle('done', !!state.regions.length || (state.mode === 'video' && $('autoFaceVideo')?.checked && !!state.faceDetector));
+    $('stepExport')?.classList.toggle('done', !!state.outputUrl);
     const assistedVideo = state.mode === 'video' && $('autoFaceVideo')?.checked && !!state.faceDetector;
     $('exportMedia').disabled = !state.sourceFile || (!state.regions.length && !assistedVideo);
     $('exportState').textContent = !state.sourceFile ? 'Select source media to begin.' : (!state.regions.length && !assistedVideo) ? 'Draw at least one region or enable supported face assistance.' : `Ready to create a new redacted ${state.mode === 'video' ? 'video' : 'image'} using ${state.regions.length} region${state.regions.length === 1 ? '' : 's'}.`;
@@ -194,7 +279,14 @@
         fitCanvas(width, height);
         render();
         $('sourceMeta').textContent = `${file.name} | ${width} x ${height} | ${formatSize(file.size)}`;
-        say('Image ready for redaction. Draw a region over sensitive content.');
+        say('Image ready. Face privacy detection is running when supported.');
+        if ($('autoFaceImage')?.checked && state.faceDetector) {
+          const count = await runFaceDetection({ automatic: true });
+          showToast(count ? `${count} face${count===1?'':'s'} automatically masked with ${state.effect}. Review and export.` : 'Image ready. No faces were automatically found. Draw boxes over any sensitive areas.', count ? 'success' : 'info');
+        } else {
+          showToast('Image ready. Draw boxes over sensitive areas before export.', 'info');
+        }
+        $('nextQueued').hidden = !state.pendingFiles.length;
       } catch (err) {
         console.warn('Image decode failed:', file.type || 'unknown-type', file.name, err?.message || err);
         showToast('This image could not be decoded by the browser. Use JPG, PNG, or WebP and verify the file is not renamed from another format.', 'error');
@@ -277,8 +369,11 @@
     }
     try {
       state.faceDetector = new FaceDetector({ fastMode:true, maxDetectedFaces:100 });
-      $('faceSupport').textContent='Face assistance is available. Review suggested regions before export.';
+      $('faceSupport').textContent='Automatic face privacy is available. Faces in images are masked automatically when enabled.';
       $('faceSupport').className='capability-state available';
+      if (state.mode === 'image' && state.sourceFile && state.image && $('autoFaceImage')?.checked) {
+        setTimeout(() => runFaceDetection({ automatic: true }), 0);
+      }
     } catch {
       $('faceSupport').textContent='Face assistance could not be initialized. Manual region redaction remains available.';
       $('faceSupport').className='capability-state attention'; $('detectFaces').disabled=true;
@@ -287,38 +382,54 @@
   async function detectFaces(source) {
     if (!state.faceDetector) return [];
     const faces = await state.faceDetector.detect(source);
-    const sourceW = state.mode==='image' ? state.image.naturalWidth : video.videoWidth;
-    const sourceH = state.mode==='image' ? state.image.naturalHeight : video.videoHeight;
+    const sourceW = state.mode==='image' ? (state.image.naturalWidth || state.image.width) : video.videoWidth;
+    const sourceH = state.mode==='image' ? (state.image.naturalHeight || state.image.height) : video.videoHeight;
     const sx=canvas.width/sourceW, sy=canvas.height/sourceH;
-    return faces.map(f => ({
-      x:Math.max(0,f.boundingBox.x*sx-8), y:Math.max(0,f.boundingBox.y*sy-8),
-      w:Math.min(canvas.width,f.boundingBox.width*sx+16), h:Math.min(canvas.height,f.boundingBox.height*sy+16),
-      kind:'face'
-    }));
+    const padding = Math.max(0.05, Math.min(0.4, Number($('facePadding')?.value || 18) / 100));
+    return faces.map(f => {
+      const baseX=f.boundingBox.x*sx, baseY=f.boundingBox.y*sy, baseW=f.boundingBox.width*sx, baseH=f.boundingBox.height*sy;
+      const px=baseW*padding, py=baseH*padding;
+      const x=Math.max(0,baseX-px), y=Math.max(0,baseY-py);
+      return { x, y, w:Math.min(canvas.width-x,baseW+px*2), h:Math.min(canvas.height-y,baseH+py*2), kind:'face' };
+    });
   }
-  $('detectFaces').onclick = async () => {
-    if (!state.sourceFile || !state.faceDetector) return;
-    $('detectFaces').disabled=true; $('detectFaces').textContent='Detecting...';
+  async function runFaceDetection({ automatic = false } = {}) {
+    if (!state.sourceFile || !state.faceDetector || state.faceDetectionBusy) return 0;
+    state.faceDetectionBusy = true;
+    $('detectFaces').disabled = true;
+    $('detectFaces').textContent = automatic ? 'Finding faces automatically...' : 'Finding faces...';
     try {
-      const source = state.mode==='image' ? state.image : video;
-      const boxes=await detectFaces(source);
-      if (!boxes.length) showToast('No faces were suggested in the current image or frame. Review manually.', 'info');
-      else { state.regions.push(...boxes); showToast(`${boxes.length} face region${boxes.length===1?'':'s'} suggested. Review the canvas before export.`, 'success'); }
+      const source = state.mode === 'image' ? state.image : video;
+      const boxes = await detectFaces(source);
+      state.regions = state.regions.filter(region => region.kind !== 'face');
+      if (boxes.length) state.regions.push(...boxes);
       render(); updateRegionUI();
-    } catch { showToast('Face assistance could not process this frame. Add regions manually.', 'warning'); }
-    finally { $('detectFaces').disabled=false; $('detectFaces').textContent='Detect faces in current frame'; }
-  };
+      if (!automatic) {
+        showToast(boxes.length ? `${boxes.length} face${boxes.length === 1 ? '' : 's'} found and masked. Review before export.` : 'No faces were found in this image or frame. Draw a box over anything else that is sensitive.', boxes.length ? 'success' : 'info');
+      }
+      return boxes.length;
+    } catch {
+      if (!automatic) showToast('Face detection could not process this media. Draw sensitive areas manually.', 'warning');
+      return 0;
+    } finally {
+      state.faceDetectionBusy = false;
+      $('detectFaces').disabled = !state.faceDetector;
+      $('detectFaces').textContent = 'Find faces now';
+    }
+  }
+
+  $('detectFaces').onclick = () => runFaceDetection({ automatic: false });
 
   $('undoRegion').onclick=()=>{state.regions.pop();render();updateRegionUI()};
   $('clearRegions').onclick=()=>{state.regions=[];render();updateRegionUI()};
-  document.querySelectorAll('[data-effect]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-effect]').forEach(x=>x.classList.toggle('on',x===b));state.effect=b.dataset.effect;render()});
+  document.querySelectorAll('[data-effect]').forEach(b=>b.onclick=async()=>{document.querySelectorAll('[data-effect]').forEach(x=>x.classList.toggle('on',x===b));state.effect=b.dataset.effect;render();if(state.mode==='image'&&state.sourceFile&&$('autoFaceImage')?.checked&&state.faceDetector)await runFaceDetection({automatic:true})});
   $('imageMode').onclick=()=>setMode('image'); $('videoMode').onclick=()=>setMode('video');
   $('selectMedia').onclick=()=>{ input.value=''; input.click(); };
-  input.onchange=()=>{ const file=input.files?.[0]; if(file) loadFile(file); };
+  input.onchange=()=>{ const files=Array.from(input.files||[]); if(!files.length)return; state.pendingFiles=files.slice(1); loadFile(files[0]); };
   const dz=$('dropZone');
   ['dragenter','dragover'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.add('drag')}));
   ['dragleave','drop'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.remove('drag')}));
-  dz.addEventListener('drop',e=>e.dataTransfer.files[0]&&loadFile(e.dataTransfer.files[0]));
+  dz.addEventListener('drop',e=>{const files=Array.from(e.dataTransfer.files||[]);if(!files.length)return;state.pendingFiles=files.slice(1);loadFile(files[0])});
 
   video.addEventListener('timeupdate',()=>{$('timeline').value=video.duration?Math.round(video.currentTime/video.duration*1000):0;$('timeLabel').textContent=`${fmtTime(video.currentTime)} / ${fmtTime(video.duration)}`;renderVideoFrame()});
   video.addEventListener('play',()=>{ $('playPause').textContent='Pause'; const loop=()=>{if(!video.paused&&!video.ended){renderVideoFrame();requestAnimationFrame(loop)}};loop()});
@@ -356,8 +467,10 @@
     const ext=mime==='image/png'?'png':'jpg'; const outputName=`${safeName(state.sourceFile.name)}-redacted.${ext}`;
     revoke(state.outputUrl); state.outputUrl=URL.createObjectURL(blob);
     const dl=$('downloadOutput'); dl.href=state.outputUrl; dl.download=outputName; dl.hidden=false;
-    await showEvidence(state.regions.some(r=>r.kind==='face')?'FACE_REDACTION':'IMAGE_REDACTION',outputName,blob,state.regions.length);
-    await trackUsage(state.regions.some(r=>r.kind==='face')?'FACE_REDACTION':'IMAGE_REDACTION',state.sourceFile.name,outputName,0,blob.size);
+    const operation=state.regions.some(r=>r.kind==='face')?'FACE_REDACTION':'IMAGE_REDACTION';
+    const hash=await showEvidence(operation,outputName,blob,state.regions.length);
+    await trackUsage(operation,state.sourceFile.name,outputName,0,blob.size);
+    addBatchOutput(outputName,blob,operation,hash);
     return outputName;
   }
   async function exportVideo() {
@@ -418,8 +531,9 @@
     revoke(state.outputUrl); state.outputUrl=URL.createObjectURL(blob);
     const dl=$('downloadOutput'); dl.href=state.outputUrl;dl.download=outputName;dl.hidden=false;
     const op=$('autoFaceVideo').checked?'VIDEO_FACE_REDACTION':'VIDEO_REDACTION';
-    await showEvidence(op,outputName,blob,state.regions.length);
+    const hash=await showEvidence(op,outputName,blob,state.regions.length);
     await trackUsage(op,state.sourceFile.name,outputName,0,blob.size);
+    addBatchOutput(outputName,blob,op,hash);
     return outputName;
   }
   $('exportMedia').onclick=async()=>{
@@ -433,6 +547,32 @@
     finally{b.disabled=false;b.textContent=state.mode==='image'?'Export redacted image':'Export redacted video'}
   };
 
+
+  $('facePadding').oninput=()=>{$('facePaddingValue').textContent=`${$('facePadding').value}%`};
+  $('autoFaceImage').onchange=()=>{if($('autoFaceImage').checked&&state.mode==='image'&&state.sourceFile&&state.faceDetector)runFaceDetection({automatic:true})};
+  $('nextQueued').onclick=()=>{const next=state.pendingFiles.shift();if(next)loadFile(next);$('nextQueued').hidden=!state.pendingFiles.length};
+  $('downloadBatch').onclick=async()=>{
+    if(!state.batch.length)return;
+    const b=$('downloadBatch');b.disabled=true;b.textContent='Building secure ZIP...';
+    try{
+      const manifest={
+        product:'Prudent Redact',
+        packageType:'CONTROLLED_MEDIA_OUTPUT_BATCH',
+        createdAt:new Date().toISOString(),
+        outputCount:state.batch.length,
+        outputs:state.batch.map(item=>({name:item.name,operation:item.operation,sizeBytes:item.blob.size,sha256:item.hash,createdAt:item.createdAt}))
+      };
+      const manifestBlob=new Blob([JSON.stringify(manifest,null,2)],{type:'application/json'});
+      const zip=await createZip([...state.batch,{name:'prudent-redact-evidence-manifest.json',blob:manifestBlob}]);
+      const url=URL.createObjectURL(zip);
+      const a=document.createElement('a');a.href=url;a.download=`prudent-redact-media-batch-${new Date().toISOString().slice(0,10)}.zip`;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+      showToast(`${state.batch.length} output${state.batch.length===1?'':'s'} packaged into a ZIP.`, 'success');
+    }catch(err){showToast(err.message||'Batch ZIP could not be created.','error')}
+    finally{b.disabled=false;renderBatch()}
+  };
+  $('clearBatch').onclick=()=>{state.batch.forEach(item=>revoke(item.url));state.batch=[];renderBatch();showToast('Browser output batch cleared.','info')};
+
   const help=$('mediaHelp');
   function openHelp(key){
     const h=HELP[key];if(!h)return;$('mediaHelpTitle').textContent=h[0];$('mediaHelpBody').textContent=h[1];help.showModal();
@@ -444,6 +584,7 @@
   const params=new URLSearchParams(location.search);
   setMode(params.get('mode')==='video'?'video':'image');
   setupFaceDetector();
+  renderBatch();
   if(params.get('assist')==='faces') setTimeout(()=>showToast('Face assistance will be available after supported media is loaded. Review all suggested regions.', 'info'),300);
-  window.addEventListener('pagehide',()=>{state.exportAbort=true;revoke(state.sourceUrl);revoke(state.outputUrl)});
+  window.addEventListener('pagehide',()=>{state.exportAbort=true;revoke(state.sourceUrl);revoke(state.outputUrl);state.batch.forEach(item=>revoke(item.url))});
 })();

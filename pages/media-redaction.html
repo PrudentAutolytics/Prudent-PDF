@@ -37,14 +37,14 @@
             <h2 id="workspaceTitle">Redaction canvas</h2>
             <div id="sourceMeta" class="media-meta">Select an image or video to begin. The workspace detects the media type automatically.</div>
           </div>
-          <div class="media-mode-tabs" role="tablist" aria-label="Media type">
-            <button class="seg on" id="imageMode" type="button" role="tab" aria-selected="true">Image</button>
-            <button class="seg" id="videoMode" type="button" role="tab" aria-selected="false">Video</button>
+          <div class="media-mode-tabs media-source-choices" role="tablist" aria-label="Choose media workflow">
+            <button class="seg on" id="imageMode" type="button" role="tab" aria-selected="true"><strong>Image privacy</strong><span>Photos and screenshots</span></button>
+            <button class="seg" id="videoMode" type="button" role="tab" aria-selected="false"><strong>Video privacy</strong><span>Clips and recordings</span></button>
           </div>
         </div>
 
         <div id="dropZone" class="media-drop">
-          <input id="mediaInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/x-m4v" hidden/>
+          <input id="mediaInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/x-m4v" multiple hidden/>
           <div class="media-drop-icon">+</div>
           <strong id="dropTitle">Select an image</strong>
           <span id="dropHelp">JPG, PNG, or WebP. Drag and drop is available on desktop.</span>
@@ -67,8 +67,11 @@
       </section>
 
       <aside class="media-panel card" aria-label="Redaction controls">
+        <div class="media-workflow-status" id="workflowStatus">
+          <span class="workflow-step done">1. Add media</span><span class="workflow-step" id="stepDetect">2. Detect or draw</span><span class="workflow-step" id="stepExport">3. Export</span>
+        </div>
         <div class="media-panel-section">
-          <div class="media-panel-title">Redaction effect <button class="info-btn mini" type="button" data-help="effect" aria-label="About redaction effects">i</button></div>
+          <div class="media-panel-title">How should sensitive areas look? <button class="info-btn mini" type="button" data-help="effect" aria-label="About redaction effects">i</button></div>
           <div class="effect-grid" role="radiogroup" aria-label="Redaction effect">
             <button class="effect-option on" data-effect="black" type="button">Black</button>
             <button class="effect-option" data-effect="blur" type="button">Blur</button>
@@ -77,13 +80,14 @@
         </div>
 
         <div class="media-panel-section">
-          <div class="media-panel-title">Detection assistance <button class="info-btn mini" type="button" data-help="faces" aria-label="About face detection assistance">i</button></div>
-          <button id="detectFaces" class="btn btn-secondary btn-full" type="button">Detect faces in current frame</button>
-          <div id="faceSupport" class="capability-state">Checking browser capability...</div>
+          <div class="media-panel-title">Face privacy <button class="info-btn mini" type="button" data-help="faces" aria-label="About face detection assistance">i</button></div>
+          <label class="check-row"><input id="autoFaceImage" type="checkbox" checked/> <span><strong>Automatically find faces in images</strong><br/><small>Runs after image selection and when the effect changes.</small></span></label>
+          <button id="detectFaces" class="btn btn-secondary btn-full" type="button">Find faces now</button>
+          <div id="faceSupport" class="capability-state">Checking face detection capability...</div>
         </div>
 
         <div class="media-panel-section">
-          <div class="media-panel-title">Regions <button class="info-btn mini" type="button" data-help="regions" aria-label="About redaction regions">i</button></div>
+          <div class="media-panel-title">Review sensitive areas <button class="info-btn mini" type="button" data-help="regions" aria-label="About redaction regions">i</button></div>
           <div id="regionSummary" class="region-summary">0 redaction regions</div>
           <div class="media-actions-grid">
             <button id="undoRegion" class="btn btn-secondary btn-sm" type="button">Undo</button>
@@ -93,19 +97,30 @@
         </div>
 
         <div class="media-panel-section" id="videoOptions" hidden>
-          <div class="media-panel-title">Video scope <button class="info-btn mini" type="button" data-help="videoScope" aria-label="About video region scope">i</button></div>
-          <label class="check-row"><input id="autoFaceVideo" type="checkbox"/> <span>Detect and mask faces while exporting</span></label>
-          <p class="media-hint">Manual regions apply to the whole video. Face assistance samples frames during export when browser support is available.</p>
+          <div class="media-panel-title">Video face tracking <button class="info-btn mini" type="button" data-help="videoScope" aria-label="About video face tracking">i</button></div>
+          <label class="check-row"><input id="autoFaceVideo" type="checkbox" checked/> <span><strong>Mask faces throughout the video</strong><br/><small>Face regions are refreshed repeatedly while the export runs.</small></span></label>
+          <label class="media-range-row" for="facePadding">Face safety margin <span id="facePaddingValue">18%</span></label>
+          <input id="facePadding" type="range" min="5" max="40" value="18" step="1"/>
+          <p class="media-hint">Manual boxes stay fixed for the whole clip. Automatic face masks are refreshed during export when supported by the browser.</p>
         </div>
 
         <div class="media-panel-section media-export-section">
           <div class="media-panel-title">Output <button class="info-btn mini" type="button" data-help="output" aria-label="About redacted outputs">i</button></div>
           <button id="exportMedia" class="btn btn-primary btn-full" type="button" disabled>Export redacted image</button>
           <div id="exportState" class="media-export-state">Select media and add at least one redaction region.</div>
-          <a id="downloadOutput" class="btn btn-secondary btn-full" href="#" hidden>Download output</a>
+          <a id="downloadOutput" class="btn btn-secondary btn-full" href="#" hidden>Download this output</a>
+          <button id="downloadBatch" class="btn btn-secondary btn-full" type="button" disabled>Download batch ZIP (0)</button>
+          <button id="nextQueued" class="btn btn-ghost btn-full" type="button" hidden>Open next queued file</button>
+          <div id="batchState" class="media-hint">Exported files are added to this browser batch. Download them together as a ZIP.</div>
         </div>
       </aside>
     </div>
+
+
+    <section class="card anim media-batch-card" aria-labelledby="batchTitle">
+      <div class="card-hd"><div><div id="batchTitle" class="card-title">Controlled output batch</div><div class="media-hint">Outputs remain in this browser tab until downloaded or cleared.</div></div><button id="clearBatch" class="btn btn-ghost btn-sm" type="button">Clear batch</button></div>
+      <div class="card-bd"><div id="batchList" class="media-batch-list"><div class="media-batch-empty">No exported media yet.</div></div></div>
+    </section>
 
     <section class="card anim media-evidence" id="evidenceCard" hidden>
       <div class="card-hd"><div class="card-title">Operation evidence</div></div>
