@@ -32,5 +32,14 @@ const config = JSON.parse(read('staticwebapp.config.json'));
 check(config.routes.some(r => r.route === '/media-redaction' && r.rewrite === '/pages/media-redaction.html'), 'media redaction route exists');
 check(config.globalHeaders['Content-Security-Policy'].includes("media-src 'self' blob:"), 'CSP permits same-origin and blob media only');
 
+
+check(config.globalHeaders['Content-Security-Policy'].includes("img-src 'self' data: blob: https:"), 'CSP permits blob-backed uploaded image decoding');
+check(read('pages/media-redaction.html').includes('video/mp4,video/webm'), 'media selector accepts video without requiring a mode switch');
+check(media.includes('function classifyFile(file)'), 'media type is auto-detected from MIME type or extension');
+check(media.includes('createImageBitmap'), 'image decoder uses createImageBitmap with fallback');
+check(media.includes('state.image.naturalWidth || state.image.width'), 'image export supports ImageBitmap dimensions');
+check(media.includes("video.addEventListener('ended',onEnded"), 'video export completes from the media ended event');
+check(media.includes('canvasToBlob'), 'image export has a canvas Blob fallback path');
+
 if (process.exitCode) process.exit(process.exitCode);
 console.log('Media redaction regression tests passed.');

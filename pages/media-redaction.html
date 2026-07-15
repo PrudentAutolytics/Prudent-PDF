@@ -35,7 +35,7 @@
         <div class="media-commandbar">
           <div>
             <h2 id="workspaceTitle">Redaction canvas</h2>
-            <div id="sourceMeta" class="media-meta">Select an image or video to begin.</div>
+            <div id="sourceMeta" class="media-meta">Select an image or video to begin. The workspace detects the media type automatically.</div>
           </div>
           <div class="media-mode-tabs" role="tablist" aria-label="Media type">
             <button class="seg on" id="imageMode" type="button" role="tab" aria-selected="true">Image</button>
@@ -44,7 +44,7 @@
         </div>
 
         <div id="dropZone" class="media-drop">
-          <input id="mediaInput" type="file" accept="image/jpeg,image/png,image/webp" hidden/>
+          <input id="mediaInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/x-m4v" hidden/>
           <div class="media-drop-icon">+</div>
           <strong id="dropTitle">Select an image</strong>
           <span id="dropHelp">JPG, PNG, or WebP. Drag and drop is available on desktop.</span>

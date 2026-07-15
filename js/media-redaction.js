@@ -43,6 +43,19 @@
   function formatSize(bytes) {
     return bytes < 1048576 ? `${(bytes/1024).toFixed(1)} KB` : `${(bytes/1048576).toFixed(2)} MB`;
   }
+  async function canvasToBlob(canvasEl, mime, quality) {
+    const blob = await new Promise(resolve => {
+      try { canvasEl.toBlob(resolve, mime, quality); } catch { resolve(null); }
+    });
+    if (blob && blob.size) return blob;
+    const dataUrl = canvasEl.toDataURL(mime, quality);
+    const comma = dataUrl.indexOf(',');
+    if (comma < 0) throw new Error('Canvas export failed.');
+    const binary = atob(dataUrl.slice(comma + 1));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: mime });
+  }
   async function sha256(blob) {
     const bytes = await blob.arrayBuffer();
     const hash = await crypto.subtle.digest('SHA-256', bytes);
@@ -69,16 +82,20 @@
     $('videoMode').setAttribute('aria-selected', String(mode === 'video'));
     $('videoOptions').hidden = mode !== 'video';
     $('videoControls').hidden = true;
-    input.accept = mode === 'image' ? 'image/jpeg,image/png,image/webp' : 'video/mp4,video/webm,video/quicktime';
-    $('dropTitle').textContent = mode === 'image' ? 'Select an image' : 'Select a video';
-    $('dropHelp').textContent = mode === 'image' ? 'JPG, PNG, or WebP. Drag and drop is available on desktop.' : 'MP4, WebM, or MOV when supported by this browser. Export uses the browser media encoder.';
-    $('selectMedia').textContent = mode === 'image' ? 'Select image' : 'Select video';
+    input.accept = 'image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/x-m4v';
+    $('dropTitle').textContent = mode === 'image' ? 'Select image or video' : 'Select video or image';
+    $('dropHelp').textContent = mode === 'image'
+      ? 'JPG, PNG, WebP, MP4, WebM, or browser-supported MOV. Media type is detected automatically.'
+      : 'MP4, WebM, browser-supported MOV, JPG, PNG, or WebP. Media type is detected automatically.';
+    $('selectMedia').textContent = 'Select media';
     $('exportMedia').textContent = mode === 'image' ? 'Export redacted image' : 'Export redacted video';
     updateRegionUI();
   }
   function resetSource() {
     revoke(state.sourceUrl); revoke(state.outputUrl);
-    state.sourceUrl = null; state.outputUrl = null; state.sourceFile = null; state.image = null;
+    state.sourceUrl = null; state.outputUrl = null; state.sourceFile = null;
+    if (state.image && typeof state.image.close === 'function') { try { state.image.close(); } catch {} }
+    state.image = null;
     state.regions = []; state.lastFaceBoxes = []; state.drawing = null; state.exportAbort = true;
     video.pause(); video.removeAttribute('src'); video.load();
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -129,40 +146,100 @@
   function render() {
     state.mode === 'image' ? renderImage() : renderVideoFrame();
   }
-  async function loadFile(file) {
-    const isImage = file.type.startsWith('image/');
-    const isVideo = file.type.startsWith('video/');
-    if ((state.mode === 'image' && !isImage) || (state.mode === 'video' && !isVideo)) {
-      showToast(`Select a supported ${state.mode} file.`, 'error'); return;
+  function classifyFile(file) {
+    const type = String(file?.type || '').toLowerCase();
+    const name = String(file?.name || '').toLowerCase();
+    if (type.startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(name)) return 'image';
+    if (type.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(name)) return 'video';
+    return null;
+  }
+  async function decodeImage(file, objectUrl) {
+    if ('createImageBitmap' in window) {
+      try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch {}
     }
-    if (file.size > 500 * 1024 * 1024) { showToast('Media files are limited to 500 MB in this browser workspace.', 'error'); return; }
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('IMAGE_DECODE_FAILED'));
+      img.src = objectUrl;
+    });
+  }
+  async function loadFile(file) {
+    const detectedMode = classifyFile(file);
+    if (!detectedMode) {
+      showToast('Select a supported JPG, PNG, WebP, MP4, WebM, MOV, or M4V file.', 'error');
+      input.value = '';
+      return;
+    }
+    if (file.size > 500 * 1024 * 1024) {
+      showToast('Media files are limited to 500 MB in this browser workspace.', 'error');
+      input.value = '';
+      return;
+    }
     resetSource();
-    state.mode = isImage ? 'image' : 'video';
+    state.mode = detectedMode;
     state.sourceFile = file;
     state.sourceUrl = URL.createObjectURL(file);
-    $('dropZone').hidden = true; $('editorWrap').hidden = false;
-    if (state.mode === 'image') {
-      const img = new Image();
-      img.onload = () => {
-        state.image = img; fitCanvas(img.naturalWidth,img.naturalHeight); render();
-        $('sourceMeta').textContent = `${file.name} | ${img.naturalWidth} x ${img.naturalHeight} | ${formatSize(file.size)}`;
-        say('Image ready for redaction. Draw a region over sensitive content.');
-      };
-      img.onerror = () => { showToast('The selected image could not be decoded.', 'error'); resetSource(); };
-      img.src = state.sourceUrl;
-    } else {
-      video.src = state.sourceUrl;
-      video.onloadedmetadata = () => {
-        fitCanvas(video.videoWidth,video.videoHeight); renderVideoFrame();
-        $('videoControls').hidden = false;
-        $('sourceMeta').textContent = `${file.name} | ${video.videoWidth} x ${video.videoHeight} | ${fmtTime(video.duration)} | ${formatSize(file.size)}`;
-        $('timeLabel').textContent = `00:00 / ${fmtTime(video.duration)}`;
-        say('Video ready. Draw a static region or detect faces in the current frame.');
-      };
-      video.onerror = () => { showToast('The selected video could not be decoded by this browser.', 'error'); resetSource(); };
-    }
+    $('dropZone').hidden = true;
+    $('editorWrap').hidden = false;
     setModeVisualOnly();
+
+    if (state.mode === 'image') {
+      try {
+        const img = await decodeImage(file, state.sourceUrl);
+        state.image = img;
+        const width = img.naturalWidth || img.width;
+        const height = img.naturalHeight || img.height;
+        if (!width || !height) throw new Error('IMAGE_DIMENSIONS_INVALID');
+        fitCanvas(width, height);
+        render();
+        $('sourceMeta').textContent = `${file.name} | ${width} x ${height} | ${formatSize(file.size)}`;
+        say('Image ready for redaction. Draw a region over sensitive content.');
+      } catch (err) {
+        console.warn('Image decode failed:', file.type || 'unknown-type', file.name, err?.message || err);
+        showToast('This image could not be decoded by the browser. Use JPG, PNG, or WebP and verify the file is not renamed from another format.', 'error');
+        resetSource();
+      } finally {
+        input.value = '';
+      }
+      return;
+    }
+
+    let settled = false;
+    const failVideo = (message) => {
+      if (settled) return;
+      settled = true;
+      const mediaError = video.error;
+      console.warn('Video decode failed:', file.type || 'unknown-type', file.name, mediaError?.code || '', mediaError?.message || '');
+      showToast(message, 'error');
+      resetSource();
+      input.value = '';
+    };
+    const readyVideo = () => {
+      if (settled) return;
+      if (!video.videoWidth || !video.videoHeight || !Number.isFinite(video.duration)) {
+        failVideo('The selected video does not contain a readable video track.');
+        return;
+      }
+      settled = true;
+      fitCanvas(video.videoWidth, video.videoHeight);
+      renderVideoFrame();
+      $('videoControls').hidden = false;
+      $('sourceMeta').textContent = `${file.name} | ${video.videoWidth} x ${video.videoHeight} | ${fmtTime(video.duration)} | ${formatSize(file.size)}`;
+      $('timeLabel').textContent = `00:00 / ${fmtTime(video.duration)}`;
+      say('Video ready. Draw a static region or detect faces in the current frame.');
+      input.value = '';
+    };
+    video.onloadedmetadata = readyVideo;
+    video.oncanplay = readyVideo;
+    video.onerror = () => failVideo('This video codec is not supported by the current browser. WebM is the most compatible export and input format for this browser workspace.');
+    video.src = state.sourceUrl;
+    try { video.load(); } catch {}
+    setTimeout(() => {
+      if (!settled && video.readyState < 1) failVideo('The browser could not read this video. Try WebM or an H.264 MP4 supported by your browser.');
+    }, 12000);
   }
+
   function setModeVisualOnly() {
     const mode=state.mode;
     $('imageMode').classList.toggle('on', mode === 'image'); $('videoMode').classList.toggle('on', mode === 'video');
@@ -236,7 +313,8 @@
   $('clearRegions').onclick=()=>{state.regions=[];render();updateRegionUI()};
   document.querySelectorAll('[data-effect]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-effect]').forEach(x=>x.classList.toggle('on',x===b));state.effect=b.dataset.effect;render()});
   $('imageMode').onclick=()=>setMode('image'); $('videoMode').onclick=()=>setMode('video');
-  $('selectMedia').onclick=()=>input.click(); input.onchange=()=>input.files[0]&&loadFile(input.files[0]);
+  $('selectMedia').onclick=()=>{ input.value=''; input.click(); };
+  input.onchange=()=>{ const file=input.files?.[0]; if(file) loadFile(file); };
   const dz=$('dropZone');
   ['dragenter','dragover'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.add('drag')}));
   ['dragleave','drop'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.remove('drag')}));
@@ -266,13 +344,15 @@
     return hash;
   }
   async function exportImage() {
-    const out=document.createElement('canvas'); out.width=state.image.naturalWidth; out.height=state.image.naturalHeight;
+    const out=document.createElement('canvas');
+    out.width=state.image.naturalWidth || state.image.width;
+    out.height=state.image.naturalHeight || state.image.height;
     const oc=out.getContext('2d',{willReadFrequently:true}); oc.drawImage(state.image,0,0);
     const sx=out.width/canvas.width, sy=out.height/canvas.height;
     state.regions.forEach(r=>drawRegionEffect(oc,out,r,sx,sy));
     const mime=state.sourceFile.type==='image/png'?'image/png':'image/jpeg';
-    const blob=await new Promise(resolve=>out.toBlob(resolve,mime,mime==='image/jpeg'?0.94:undefined));
-    if(!blob)throw new Error('Image export failed.');
+    const blob=await canvasToBlob(out,mime,mime==='image/jpeg'?0.94:undefined);
+    if(!blob || !blob.size)throw new Error('Image export failed.');
     const ext=mime==='image/png'?'png':'jpg'; const outputName=`${safeName(state.sourceFile.name)}-redacted.${ext}`;
     revoke(state.outputUrl); state.outputUrl=URL.createObjectURL(blob);
     const dl=$('downloadOutput'); dl.href=state.outputUrl; dl.download=outputName; dl.hidden=false;
@@ -297,13 +377,10 @@
     const rec=new MediaRecorder(outputStream,mime?{mimeType:mime}:{});
     const chunks=[]; rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
     const done=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=()=>reject(new Error('Video encoder failed.'))});
-    let frameNo=0; let dynamicFaces=[];
-    rec.start(1000); await video.play();
-    $('exportState').textContent='Exporting redacted video. Keep this tab open until processing completes.';
-    await new Promise((resolve,reject)=>{
-      const draw=async()=>{
-        if(state.exportAbort){video.pause();resolve();return}
-        if(video.ended){resolve();return}
+    let frameNo=0; let dynamicFaces=[]; let renderActive=true;
+    const renderFrame=async()=>{
+      if(!renderActive || state.exportAbort || video.ended)return;
+      if(video.readyState>=2){
         exportCtx.clearRect(0,0,exportCanvas.width,exportCanvas.height);
         exportCtx.drawImage(video,0,0,exportCanvas.width,exportCanvas.height);
         if($('autoFaceVideo').checked&&state.faceDetector&&frameNo%5===0&&!state.videoFrameBusy){
@@ -315,10 +392,27 @@
         ctx.drawImage(exportCanvas,0,0,canvas.width,canvas.height);
         frameNo++;
         $('exportState').textContent=`Exporting video at ${fmtTime(video.currentTime)} of ${fmtTime(video.duration)}. Keep this tab open.`;
-        if('requestVideoFrameCallback' in video)video.requestVideoFrameCallback(()=>draw().catch(reject));else requestAnimationFrame(()=>draw().catch(reject));
-      }; draw().catch(reject);
+      }
+      if(renderActive&&!video.ended&&!state.exportAbort)requestAnimationFrame(()=>renderFrame().catch(()=>{}));
+    };
+    const playbackDone=new Promise((resolve,reject)=>{
+      const maxWait=Math.max(30000,Math.ceil((video.duration||0)*1000)+30000);
+      const timer=setTimeout(()=>{cleanup();reject(new Error('Video export timed out. Try a shorter WebM or MP4 file.'));},maxWait);
+      const onEnded=()=>{cleanup();resolve();};
+      const onError=()=>{cleanup();reject(new Error('Video playback failed during export.'));};
+      const cleanup=()=>{clearTimeout(timer);video.removeEventListener('ended',onEnded);video.removeEventListener('error',onError);};
+      video.addEventListener('ended',onEnded,{once:true});
+      video.addEventListener('error',onError,{once:true});
     });
-    video.pause(); rec.stop(); await done;
+    rec.start(1000);
+    $('exportState').textContent='Exporting redacted video. Keep this tab open until processing completes.';
+    renderFrame().catch(()=>{});
+    await video.play();
+    await playbackDone;
+    renderActive=false;
+    video.pause();
+    if(rec.state!=='inactive')rec.stop();
+    await done;
     const blob=new Blob(chunks,{type:rec.mimeType||'video/webm'}); if(!blob.size)throw new Error('Video export produced no output.');
     const outputName=`${safeName(state.sourceFile.name)}-redacted.webm`;
     revoke(state.outputUrl); state.outputUrl=URL.createObjectURL(blob);
