@@ -6,6 +6,8 @@
 
 const Shell = (() => {
 
+  let currentActiveId = 'dashboard';
+
   const NAV = [
     {
       group : 'WORKSPACE',
@@ -425,9 +427,20 @@ const Shell = (() => {
           maxPagesPerFile  : data.maxPagesPerFile   ?? s.maxPagesPerFile,
           maxPagesPerMonth : data.maxPagesPerMonth  ?? s.maxPagesPerMonth,
           fullName         : data.fullName          ?? s.fullName,
+          isAdmin          : data.isAdmin === true,
         };
+        const priorAdmin = Session.get()?.isAdmin === true;
         Session.set(updated);
         syncProfileIdentity(updated);
+        if (priorAdmin !== (updated.isAdmin === true)) {
+          const sidebar = document.querySelector('.sidebar');
+          if (sidebar) {
+            const holder = document.createElement('div');
+            holder.innerHTML = buildSidebar(currentActiveId);
+            sidebar.replaceWith(holder.firstElementChild);
+            wireSidebarDrawer();
+          }
+        }
 
         // Update greeting if fullName just arrived from Supabase
         const greetEl = document.getElementById('welcomeTitle');
@@ -592,6 +605,7 @@ const Shell = (() => {
 
   return {
     init(activeId) {
+      currentActiveId = activeId || 'dashboard';
       if (!requireAuth()) return;
       applyTheme();
       // Inject favicon

@@ -5,7 +5,7 @@ const { getCorsHeaders, handleCors }    = require('../cors');
 const { generateSessionToken }          = require('../auth');
 const { checkRateLimit }                  = require('../ratelimit');
 const { validEmail, getClientId }         = require('../security');
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'kabileshvijayakumar@prudentautolytics.com').split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+const { isAdminUser } = require('../admin-access');
 
 module.exports = async function (context, req) {
   if (handleCors(context, req)) return;
@@ -79,7 +79,7 @@ module.exports = async function (context, req) {
         fullName        : user.full_name  || null,
         company         : user.company    || null,
         useCase         : user.use_case   || null,
-        isAdmin         : ADMIN_EMAILS.includes(String(user.email).toLowerCase()),
+        isAdmin         : await isAdminUser(user.id, user.email),
       },
     };
 

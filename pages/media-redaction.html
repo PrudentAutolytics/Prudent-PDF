@@ -26,7 +26,7 @@
 
     <section class="media-security-note anim" aria-label="Processing model">
       <strong>Local media processing</strong>
-      <span>Image and supported video redaction run in this browser workspace. Media bytes are not included in usage events. Face assistance depends on browser support and never replaces reviewer confirmation.</span>
+      <span>Image and supported video redaction run in this browser workspace. Media bytes are not included in usage events. Automatic face privacy uses a local multi-pass detector. Review remains required because no face detector can guarantee zero missed or false detections.</span>
       <button class="info-btn" id="processingInfo" type="button" aria-label="About local media processing">i</button>
     </section>
 
@@ -99,8 +99,8 @@
         <div class="media-panel-section" id="videoOptions" hidden>
           <div class="media-panel-title">Video face tracking <button class="info-btn mini" type="button" data-help="videoScope" aria-label="About video face tracking">i</button></div>
           <label class="check-row"><input id="autoFaceVideo" type="checkbox" checked/> <span><strong>Mask faces throughout the video</strong><br/><small>Face regions are refreshed repeatedly while the export runs.</small></span></label>
-          <label class="media-range-row" for="facePadding">Face safety margin <span id="facePaddingValue">18%</span></label>
-          <input id="facePadding" type="range" min="5" max="40" value="18" step="1"/>
+          <label class="media-range-row" for="facePadding">Face safety margin <span id="facePaddingValue">22%</span></label>
+          <input id="facePadding" type="range" min="10" max="50" value="22" step="1"/>
           <p class="media-hint">Manual boxes stay fixed for the whole clip. Automatic face masks are refreshed during export when supported by the browser.</p>
         </div>
 

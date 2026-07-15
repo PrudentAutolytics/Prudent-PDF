@@ -11,7 +11,7 @@ module.exports = async function(context, req) {
   try {
     const exists = await pool.query(`SELECT to_regclass('public.operation_usage') AS table_name`);
     if (!exists.rows[0]?.table_name) {
-      context.res={status:200,headers,body:{available:false,days:30,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[]}};
+      context.res={status:200,headers,body:{available:false,days:30,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[],recentOperations:[]}};
       return;
     }
     const summary = await pool.query(`
@@ -33,9 +33,21 @@ module.exports = async function(context, req) {
       ORDER BY "productPrice" DESC, count DESC
       LIMIT 50
     `,[auth.userId]);
-    context.res={status:200,headers,body:{available:true,days:30,...summary.rows[0],byOperation:byOperation.rows}};
+    const recentOperations = await pool.query(`
+      SELECT id, operation_type AS operation,
+             source_file_name AS "sourceName",
+             output_file_name AS "outputName",
+             page_count AS "pageCount",
+             product_price::float8 AS "productPrice",
+             created_at AS "createdAt"
+      FROM operation_usage
+      WHERE user_id=$1 AND created_at > NOW()-INTERVAL '30 days'
+      ORDER BY created_at DESC
+      LIMIT 12
+    `,[auth.userId]);
+    context.res={status:200,headers,body:{available:true,days:30,...summary.rows[0],byOperation:byOperation.rows,recentOperations:recentOperations.rows}};
   } catch(err) {
     context.log.warn('operation-summary unavailable',{reason:err?.code||'query_error'});
-    context.res={status:200,headers,body:{available:false,days:30,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[]}};
+    context.res={status:200,headers,body:{available:false,days:30,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[],recentOperations:[]}};
   }
 };

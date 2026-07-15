@@ -89,15 +89,15 @@
     <div class="two-col anim d2">
       <div class="card">
         <div class="card-hd">
-          <div class="card-title"><div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>Recent Jobs</div>
+          <div class="card-title"><div class="card-title-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>Recent Redaction Jobs</div>
           <div class="flex gap-8">
             <button class="btn btn-ghost btn-sm" id="refreshBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Refresh</button>
-            <a href="/history" class="btn btn-secondary btn-sm">All jobs →</a>
+            <a href="/history" class="btn btn-secondary btn-sm">Redaction history →</a>
           </div>
         </div>
         <div class="tbl-wrap">
           <table class="tbl mobile-card-table recent-jobs-table"><thead><tr><th>File</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead>
-          <tbody id="recentBody"><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:180px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:110px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:210px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:130px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr><tr><td><span class="skeleton" style="height:12px;width:12px;border-radius:3px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:150px;display:block;margin-bottom:5px"></span><span class="skeleton" style="height:10px;width:95px;display:block"></span></td><td><span class="skeleton" style="height:20px;width:72px;border-radius:10px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:48px;display:block"></span></td><td><span class="skeleton" style="height:13px;width:60px;display:block"></span></td></tr></tbody>
+          <tbody id="recentBody"><tr><td colspan="4"><div class="tbl-empty"><div class="tbl-empty-title">Loading redaction jobs...</div></div></td></tr></tbody>
           </table>
         </div>
         <div class="card-footer"><span class="text-sm text-subtle" id="recentMeta">-</span><div style="flex:1"></div><button class="btn btn-ghost btn-sm" id="exportRecentBtn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Export CSV</button></div>
@@ -133,6 +133,23 @@
         </div>
       </div>
     </div>
+
+    <section class="card anim d3 operations-dashboard-card" aria-labelledby="recentOperationsTitle" style="margin-top:18px">
+      <div class="card-hd">
+        <div>
+          <div class="card-title" id="recentOperationsTitle">Recent Document and Media Operations</div>
+          <div class="text-xs text-subtle" style="margin-top:4px">Split, merge, rotate, scan, media privacy, and other metered workflows are shown separately from Power Automate redaction jobs.</div>
+        </div>
+        <a href="/tools" class="btn btn-secondary btn-sm">Open Document Operations</a>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl mobile-card-table recent-operations-table">
+          <thead><tr><th>Operation</th><th>Source</th><th>Output</th><th>Cost</th><th>Completed</th></tr></thead>
+          <tbody id="recentOperationsBody"><tr><td colspan="5"><div class="tbl-empty"><div class="tbl-empty-title">Loading recent operations...</div></div></td></tr></tbody>
+        </table>
+      </div>
+      <div class="card-footer"><span class="text-sm text-subtle" id="recentOperationsMeta">Separate from redaction processing history</span></div>
+    </section>
 
   </main>
 </div>
@@ -269,6 +286,30 @@
       operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
     }
     renderStats();
+    renderRecentOperations();
+  }
+
+  function operationLabel(value) {
+    return String(value || 'DOCUMENT_OPERATION').replace(/^WORKFLOW_/,'').replaceAll('_',' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  }
+  function renderRecentOperations() {
+    const body = $('recentOperationsBody');
+    const meta = $('recentOperationsMeta');
+    if (!body) return;
+    const rows = Array.isArray(operationSummary.recentOperations) ? operationSummary.recentOperations : [];
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="5"><div class="tbl-empty" style="padding:34px 20px"><div class="tbl-empty-title">No document or media operations yet</div><div class="tbl-empty-sub">Completed Split, Merge, Rotate, Scan to PDF, and media privacy workflows will appear here.</div></div></td></tr>`;
+      if (meta) meta.textContent = '0 metered operations in the last 30 days';
+      return;
+    }
+    body.innerHTML = rows.map(row=>`<tr>
+      <td><strong>${operationLabel(row.operation)}</strong></td>
+      <td>${fmt.trunc(row.sourceName || '-',38)}</td>
+      <td>${fmt.trunc(row.outputName || '-',38)}</td>
+      <td>$${Number(row.productPrice || 0).toFixed(4)}</td>
+      <td>${fmt.datetime(row.createdAt)}</td>
+    </tr>`).join('');
+    if (meta) meta.textContent = `${operationSummary.totalOperations || rows.length} metered operation${Number(operationSummary.totalOperations || rows.length)===1?'':'s'} in the last 30 days`;
   }
 
   function getJob(jobId) { return allJobs.find(j => j.jobId === jobId); }

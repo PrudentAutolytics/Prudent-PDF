@@ -2,6 +2,7 @@
 const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession }              = require('../auth');
 const pool = require('../db');
+const { isAdminUser } = require('../admin-access');
 
 const PLAN_LIMITS = {
   trial        : { label:'Free Trial',    price:0,    filesPerMonth:5,      maxFileSizeMB:10,  maxPagesPerFile:50,    maxPagesPerMonth:50    },
@@ -38,6 +39,7 @@ module.exports = async function (context, req) {
       return;
     }
 
+    const isAdmin    = await isAdminUser(user.id, user.email);
     const plan       = user.plan || 'trial';
     const planDef    = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
 
@@ -58,6 +60,7 @@ module.exports = async function (context, req) {
         fullName         : user.full_name  || null,
         company          : user.company    || null,
         isActive         : user.is_active,
+        isAdmin,
 
         // Plan
         plan,

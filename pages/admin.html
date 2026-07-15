@@ -100,7 +100,7 @@
           Administration
         </div>
         <div class="page-title">Administration</div>
-        <div class="page-subtitle">Manage users, plans, credits, and contact requests. Restricted to Prudent Autolytics only.</div>
+        <div class="page-subtitle">Manage user access, plans, credits, and platform administration. Access is resolved from the administrator entitlement stored on the user record, with the configured admin email list retained only as a compatibility fallback.</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
         <button class="btn btn-ghost btn-sm" id="refreshAdminBtn">
@@ -398,7 +398,7 @@ Content-Type: application/json
         <td>
           <div style="display:flex;gap:5px;flex-wrap:wrap">
             <button class="action-btn ${u.is_active?'danger':'success'}" onclick="toggleActive('${jsArg(u.email)}',${!u.is_active})">
-              ${u.is_active ? 'Disable' : 'Enable'}
+              ${u.is_active ? 'Remove access' : 'Restore access'}
             </button>
           </div>
         </td>
@@ -460,10 +460,10 @@ Content-Type: application/json
 
   /* ── Toggle active ── */
   window.toggleActive = async function(userEmail, active) {
-    if (!confirm((active?'Enable':'Disable') + ' user ' + userEmail + '?')) return;
+    if (!confirm((active?'Restore access for ':'Remove access for ') + userEmail + '?')) return;
     try {
       await adminCall({ action:'setActive', targetEmail:userEmail, active });
-      showToast((active?'Enabled':'Disabled') + ' ' + userEmail, 'success');
+      showToast((active?'Access restored for ':'Access removed for ') + userEmail, 'success');
       await loadUsers();
     } catch(e) { showToast('Failed: ' + e.message, 'error'); }
   };

@@ -3,9 +3,7 @@ const { getCorsHeaders, handleCors } = require('../cors');
 const { verifySession } = require('../auth');
 const pool = require('../db');
 const crypto = require('crypto');
-
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'kabileshvijayakumar@prudentautolytics.com')
-  .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+const { isAdminUser } = require('../admin-access');
 
 const PLAN_LIMITS = {
   trial        : { credits_limit:5,    max_file_size_mb:10,  max_pages_per_file:50,   max_pages_per_month:50    },
@@ -107,7 +105,7 @@ module.exports = async function (context, req) {
   }
 
   const adminEmail = auth.email;
-  if (!ADMIN_EMAILS.includes(adminEmail)) {
+  if (!(await isAdminUser(auth.userId, adminEmail))) {
     context.res = { status: 403, headers: getCorsHeaders(req), body: { error: 'Forbidden.' } };
     return;
   }

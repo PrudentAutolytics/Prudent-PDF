@@ -397,7 +397,7 @@
         state.faceDetector = window.faceapi;
         state.faceDetectorKind = 'local-model';
         state.faceModelReady = true;
-        $('faceSupport').textContent='Local automatic face privacy is ready. Images are scanned immediately after upload and detected faces are masked automatically.';
+        $('faceSupport').textContent='Local automatic face privacy is ready. Images are scanned with full-frame and overlapping edge coverage passes before detected faces are masked.';
         $('faceSupport').className='capability-state available';
         $('detectFaces').disabled=false;
       } else if ('FaceDetector' in window) {
@@ -428,27 +428,71 @@
     }
     return sourceFrame(video, video.videoWidth, video.videoHeight);
   }
+  function boxIoU(a,b){
+    const x1=Math.max(a.x,b.x),y1=Math.max(a.y,b.y),x2=Math.min(a.x+a.width,b.x+b.width),y2=Math.min(a.y+a.height,b.y+b.height);
+    const inter=Math.max(0,x2-x1)*Math.max(0,y2-y1);
+    const union=a.width*a.height+b.width*b.height-inter;
+    return union>0?inter/union:0;
+  }
+  function dedupeFaceBoxes(boxes){
+    const ordered=[...boxes].filter(b=>b&&b.width>4&&b.height>4).sort((a,b)=>(b.score||0)-(a.score||0)||b.width*b.height-a.width*a.height);
+    const kept=[];
+    for(const box of ordered){
+      if(!kept.some(existing=>boxIoU(box,existing)>0.38))kept.push(box);
+    }
+    return kept;
+  }
+  async function localDetectOnCanvas(source, offsetX=0, offsetY=0, inputSize=416, threshold=0.28){
+    const options=new window.faceapi.TinyFaceDetectorOptions({inputSize,scoreThreshold:threshold});
+    const detections=await window.faceapi.detectAllFaces(source,options);
+    return detections.map(item=>{
+      const box=item.box||item.detection?.box;
+      return box?{x:box.x+offsetX,y:box.y+offsetY,width:box.width,height:box.height,score:item.score||item.detection?.score||0}:null;
+    }).filter(Boolean);
+  }
+  async function aggressiveLocalFaceScan(source){
+    const sourceW=source.width,sourceH=source.height;
+    const boxes=[];
+    boxes.push(...await localDetectOnCanvas(source,0,0,416,0.24));
+    if(Math.max(sourceW,sourceH)>=800)boxes.push(...await localDetectOnCanvas(source,0,0,608,0.30));
+    const large=Math.max(sourceW,sourceH)>=900;
+    if(large){
+      const cols=sourceW>=1600?3:2,rows=sourceH>=1600?3:2,overlap=0.22;
+      const tileW=Math.ceil(sourceW/(cols-(cols-1)*overlap));
+      const tileH=Math.ceil(sourceH/(rows-(rows-1)*overlap));
+      const stepX=Math.max(1,Math.floor(tileW*(1-overlap))),stepY=Math.max(1,Math.floor(tileH*(1-overlap)));
+      for(let y=0;y<sourceH;y+=stepY){
+        for(let x=0;x<sourceW;x+=stepX){
+          const w=Math.min(tileW,sourceW-x),h=Math.min(tileH,sourceH-y);
+          if(w<160||h<160)continue;
+          const tile=document.createElement('canvas');tile.width=w;tile.height=h;
+          tile.getContext('2d').drawImage(source,x,y,w,h,0,0,w,h);
+          boxes.push(...await localDetectOnCanvas(tile,x,y,416,0.22));
+          if(x+w>=sourceW)break;
+        }
+        if(y+tileH>=sourceH)break;
+      }
+    }
+    return dedupeFaceBoxes(boxes);
+  }
   async function detectFaces() {
     if (!state.faceDetector || !state.faceModelReady) return [];
     const source = detectionSource();
     const sourceW = source.width, sourceH = source.height;
     let rawBoxes = [];
     if (state.faceDetectorKind === 'local-model') {
-      const inputSize = Math.max(sourceW, sourceH) >= 1400 ? 608 : 416;
-      const options = new window.faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold: 0.42 });
-      const detections = await window.faceapi.detectAllFaces(source, options);
-      rawBoxes = detections.map(item => item.box || item.detection?.box).filter(Boolean);
+      rawBoxes = await aggressiveLocalFaceScan(source);
     } else {
       const faces = await state.faceDetector.detect(source);
-      rawBoxes = faces.map(item => item.boundingBox).filter(Boolean);
+      rawBoxes = faces.map(item => ({...item.boundingBox,score:1})).filter(Boolean);
     }
     const sx=canvas.width/sourceW, sy=canvas.height/sourceH;
-    const padding = Math.max(0.08, Math.min(0.4, Number($('facePadding')?.value || 18) / 100));
+    const padding = Math.max(0.12, Math.min(0.5, Number($('facePadding')?.value || 22) / 100));
     return rawBoxes.map(box => {
       const baseX=box.x*sx, baseY=box.y*sy, baseW=box.width*sx, baseH=box.height*sy;
       const px=baseW*padding, py=baseH*padding;
       const x=Math.max(0,baseX-px), y=Math.max(0,baseY-py);
-      return { x, y, w:Math.min(canvas.width-x,baseW+px*2), h:Math.min(canvas.height-y,baseH+py*2), kind:'face' };
+      return { x, y, w:Math.min(canvas.width-x,baseW+px*2), h:Math.min(canvas.height-y,baseH+py*2), kind:'face', confidence:box.score||null };
     });
   }
   async function runFaceDetection({ automatic = false } = {}) {
@@ -456,7 +500,7 @@
     state.faceDetectionBusy = true;
     $('detectFaces').disabled = true;
     $('detectFaces').textContent = automatic ? 'Scanning faces automatically...' : 'Scanning faces...';
-    if (automatic) $('faceSupport').textContent = 'Scanning the uploaded media locally for faces...';
+    if (automatic) $('faceSupport').textContent = 'Scanning full image and edge regions locally for faces...';
     try {
       const boxes = await detectFaces();
       state.regions = state.regions.filter(region => region.kind !== 'face');
@@ -568,7 +612,7 @@
         exportCtx.clearRect(0,0,exportCanvas.width,exportCanvas.height);
         exportCtx.drawImage(video,0,0,exportCanvas.width,exportCanvas.height);
         const originalFrame=sourceFrame(video,exportCanvas.width,exportCanvas.height);
-        if($('autoFaceVideo').checked&&state.faceDetector&&frameNo%5===0&&!state.videoFrameBusy){
+        if($('autoFaceVideo').checked&&state.faceDetector&&frameNo%3===0&&!state.videoFrameBusy){
           state.videoFrameBusy=true;try{dynamicFaces=await detectFaces(video)}catch{}finally{state.videoFrameBusy=false}
         }
         const sx=exportCanvas.width/canvas.width, sy=exportCanvas.height/canvas.height;

@@ -184,11 +184,11 @@ dialog{max-width:calc(100vw - 24px)}
  .history-jobs-table td:nth-child(6)::before{content:'Submitted'}
  .history-jobs-table td:nth-child(7)::before{content:'Action'}
  .admin-users-table td:nth-child(1)::before{content:'User'}
- .admin-users-table td:nth-child(2)::before{content:'Company'}
- .admin-users-table td:nth-child(3)::before{content:'Plan'}
- .admin-users-table td:nth-child(4)::before{content:'Credits'}
+ .admin-users-table td:nth-child(2)::before{content:'Plan'}
+ .admin-users-table td:nth-child(3)::before{content:'Credits'}
+ .admin-users-table td:nth-child(4)::before{content:'Joined'}
  .admin-users-table td:nth-child(5)::before{content:'Status'}
- .admin-users-table td:nth-child(6)::before{content:'Action'}
+ .admin-users-table td:nth-child(6)::before{content:'Actions'}
  .api-keys-table td:nth-child(1)::before{content:'Name'}
  .api-keys-table td:nth-child(2)::before{content:'Key prefix'}
  .api-keys-table td:nth-child(3)::before{content:'Created'}
@@ -197,3 +197,13 @@ dialog{max-width:calc(100vw - 24px)}
 }
 
 @media(max-width:760px){.cost-analysis-grid{grid-template-columns:1fr!important}}
+
+@media(max-width:760px){
+ .recent-operations-table td:nth-child(1)::before{content:'Operation'}
+ .recent-operations-table td:nth-child(2)::before{content:'Source'}
+ .recent-operations-table td:nth-child(3)::before{content:'Output'}
+ .recent-operations-table td:nth-child(4)::before{content:'Cost'}
+ .recent-operations-table td:nth-child(5)::before{content:'Completed'}
+ .recent-operations-table td:last-child{grid-column:auto!important}
+ .operations-dashboard-card .card-hd>a{width:100%;justify-content:center}
+}
