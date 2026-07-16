@@ -14,7 +14,7 @@ check(login.includes("aria-label=\"New account details\""),'new-user details reg
 check(login.includes("fullName: S.name || ''"),'registration full name is submitted');
 check(login.includes("company: S.company || ''"),'registration company is submitted');
 check(login.includes("useCase: S.useCase || ''"),'registration use case is submitted');
-check(login.includes("$('emailInput').addEventListener('input'"),'changing email resets account discovery');
+check(login.includes("$('emailInput').addEventListener('input'")||login.includes("$('emailInput')?.addEventListener('input'"),'changing email resets account discovery');
 check(login.includes("S.checked = false"),'email changes invalidate stale lookup state');
 check(login.includes("return false;")&&login.includes("return true;"),'email lookup returns explicit success state');
 check(authRequest.includes('fullName')&&authRequest.includes('company')&&authRequest.includes('useCase'),'auth request API accepts registration fields');

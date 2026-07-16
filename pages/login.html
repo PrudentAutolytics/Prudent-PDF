@@ -1048,6 +1048,18 @@ try {
 } catch {}
 
 const $ = id => document.getElementById(id);
+function setText(id, value) {
+  const node = $(id);
+  if (node) node.textContent = value;
+}
+function setAttr(id, name, value) {
+  const node = $(id);
+  if (node) node.setAttribute(name, value);
+}
+function setClass(id, className, enabled) {
+  const node = $(id);
+  if (node) node.classList.toggle(className, enabled);
+}
 let S = { email:'', isNew:false, name:'', company:'', useCase:'', checked:false, otpSent:false };
 let tickTimer = null, checkDebounce = null;
 
@@ -1055,14 +1067,14 @@ function show(s) { ['stepEmail','stepOTP','stepDone'].forEach(id => $(id)?.class
 function eErr(msg) { $('emailErr').classList.remove('hidden'); $('emailErrTxt').textContent = msg; $('emailInput').classList.add('invalid'); $('emailInput').focus(); }
 function eOk()  { $('emailErr').classList.add('hidden'); $('emailInput').classList.remove('invalid'); }
 
-$('emailInput').addEventListener('input', () => {
+$('emailInput')?.addEventListener('input', () => {
   if (S.otpSent) return;
   eOk();
   S.checked = false; S.isNew = false;
-  $('regSlide').classList.remove('open');
-  $('stepTitle').textContent = 'Welcome back';
+  setClass('regSlide', 'open', false);
+  setText('stepTitle', 'Welcome back');
   $('stepSub').textContent = 'Enter your work email to continue. No password is required.';
-  $('contBtnTxt').textContent = 'Continue';
+  setText('contBtnTxt', 'Continue');
   clearTimeout(checkDebounce);
   const em = ($('emailInput').value || '').trim();
   if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return;
@@ -1076,19 +1088,17 @@ async function doCheck(email) {
     S.checked = true;
     if (d.exists) {
       S.isNew = false;
-      $('stepTitle').textContent = 'Welcome back';
-      $('stepSub').textContent = "We'll send a 6-digit code to your inbox. No password is required.";
-      $('contBtnTxt').textContent = 'Send verification code';
-      $('regSlide').classList.remove('open');
-      $('regSlide').setAttribute('aria-hidden','true');
+      setText('stepTitle', 'Welcome back');
+      setText('stepSub', "We'll send a 6-digit code to your inbox. No password is required.");
+      setClass('regSlide', 'open', false);
+      setAttr('regSlide', 'aria-hidden', 'true');
     } else {
       S.isNew = true;
-      $('stepTitle').textContent = 'Create your account';
-      $('stepSub').textContent = 'Add your details, then verify your work email to activate the workspace.';
-      $('contBtnTxt').textContent = 'Create account and send code';
-      $('regSlide').classList.add('open');
-      $('regSlide').setAttribute('aria-hidden','false');
-      $('regSlide').scrollIntoView({ behavior:'smooth', block:'nearest' });
+      setText('stepTitle', 'Create your account');
+      setText('stepSub', 'Add your details, then verify your work email to activate the workspace.');
+      setClass('regSlide', 'open', true);
+      setAttr('regSlide', 'aria-hidden', 'false');
+      $('regSlide')?.scrollIntoView({ behavior:'smooth', block:'nearest' });
       setTimeout(() => $('regName')?.focus(), 260);
     }
     return true;
@@ -1099,20 +1109,20 @@ async function doCheck(email) {
   }
 }
 
-$('continueBtn').addEventListener('click', handleContinue);
-$('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleContinue(); });
-$('emailInput').addEventListener('input', () => {
+$('continueBtn')?.addEventListener('click', handleContinue);
+$('emailInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') handleContinue(); });
+$('emailInput')?.addEventListener('input', () => {
   if (S.otpSent) return;
   S.checked = false;
   S.isNew = false;
   S.name = '';
   S.company = '';
   S.useCase = '';
-  $('regSlide').classList.remove('open');
-  $('regSlide').setAttribute('aria-hidden','true');
-  $('stepTitle').textContent = 'Access your workspace';
-  $('stepSub').textContent = 'Enter your work email. We will send a short lived verification code.';
-  $('contBtnTxt').textContent = 'Continue';
+  setClass('regSlide', 'open', false);
+  setAttr('regSlide', 'aria-hidden', 'true');
+  setText('stepTitle', 'Access your workspace');
+  setText('stepSub', 'Enter your work email. We will send a short lived verification code.');
+  setText('contBtnTxt', 'Continue');
   eOk();
 });
 
@@ -1157,7 +1167,7 @@ async function handleContinue() {
   setLoading('Sending code...');
   try {
     await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email, fullName: S.name || '', company: S.company || '', useCase: S.useCase || '' });
-    $('otpEmailShow').textContent = email;
+    setText('otpEmailShow', email);
     clearDigits();
     show('stepOTP');
     startTimer();
@@ -1169,7 +1179,7 @@ async function handleContinue() {
   }
 }
 
-const ds = [0,1,2,3,4,5].map(i => $('d'+i));
+const ds = [0,1,2,3,4,5].map(i => $('d'+i)).filter(Boolean);
 ds.forEach((inp, i) => {
   inp.addEventListener('input', e => {
     const v = e.target.value.replace(/\D/g, '');
@@ -1177,7 +1187,7 @@ ds.forEach((inp, i) => {
     inp.classList.toggle('filled', !!inp.value);
     $('otpErr').textContent = '';
     if (inp.value && i < 5) ds[i+1].focus();
-    $('verifyBtn').disabled = !ds.every(d => d.value);
+    $('verifyBtn').disabled = !ds.length || !ds.every(d => d.value);
   });
   inp.addEventListener('keydown', e => {
     if (e.key === 'Backspace' && !inp.value && i > 0) { ds[i-1].value = ''; ds[i-1].classList.remove('filled'); ds[i-1].focus(); $('verifyBtn').disabled = true; }
@@ -1188,11 +1198,11 @@ ds.forEach((inp, i) => {
     const p = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
     p.slice(0,6).split('').forEach((ch,j) => { if (ds[j]) { ds[j].value = ch; ds[j].classList.add('filled'); } });
     ds[Math.min(p.length,5)]?.focus();
-    $('verifyBtn').disabled = !ds.every(d => d.value);
+    $('verifyBtn').disabled = !ds.length || !ds.every(d => d.value);
   });
 });
 
-function getCode()    { return ds.map(d => d.value).join(''); }
+function getCode()    { return ds.map(d => d?.value || '').join(''); }
 function clearDigits(){ ds.forEach(d => { d.value = ''; d.classList.remove('filled','bad'); }); $('verifyBtn').disabled = true; }
 function shakeDigits(){ ds.forEach(d => { d.classList.add('bad'); setTimeout(() => d.classList.remove('bad'), 420); }); }
 
@@ -1207,7 +1217,7 @@ function startTimer(ms = 600000) {
   }, 1000);
 }
 
-$('verifyBtn').addEventListener('click', verifyOTP);
+$('verifyBtn')?.addEventListener('click', verifyOTP);
 async function verifyOTP() {
   const code = getCode();
   if (code.length !== 6) return;
@@ -1234,8 +1244,8 @@ async function verifyOTP() {
       });
       const fn = d.fullName || S.name;
       const firstName = fn ? fn.split(' ')[0] : null;
-      $('successTitle').textContent = S.isNew && firstName ? 'Welcome, ' + firstName + '!' : 'Signed in!';
-      $('successSub').textContent   = S.isNew ? 'Your free trial is active. Redirecting...' : 'Redirecting to your dashboard...';
+      setText('successTitle', S.isNew && firstName ? 'Welcome, ' + firstName + '!' : 'Signed in!');
+      setText('successSub', S.isNew ? 'Your free trial is active. Redirecting...' : 'Redirecting to your dashboard...');
       show('stepDone');
       setTimeout(() => location.replace('/dashboard'), 1200);
     } else { throw new Error('Verification failed.'); }
@@ -1247,11 +1257,11 @@ async function verifyOTP() {
       'Verification failed. Please try again.';
     btn.disabled = false;
     btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verify &amp; sign in';
-    $('verifyBtn').disabled = !ds.every(d => d.value);
+    $('verifyBtn').disabled = !ds.length || !ds.every(d => d.value);
   }
 }
 
-$('resendBtn').addEventListener('click', async () => {
+$('resendBtn')?.addEventListener('click', async () => {
   $('otpErr').textContent = ''; clearDigits();
   $('resendBtn').disabled = true; $('resendBtn').textContent = 'Sending...';
   try {
@@ -1262,12 +1272,12 @@ $('resendBtn').addEventListener('click', async () => {
   $('resendBtn').disabled = false; $('resendBtn').textContent = 'Resend code';
 });
 
-$('changeEmailBtn').addEventListener('click', () => {
+$('changeEmailBtn')?.addEventListener('click', () => {
   clearInterval(tickTimer);
   S = { email:'', isNew:false, name:'', company:'', useCase:'', checked:false, otpSent:false };
   $('emailInput').value = '';
-  $('regSlide').classList.remove('open');
-  $('stepTitle').textContent = 'Welcome back';
+  setClass('regSlide', 'open', false);
+  setText('stepTitle', 'Welcome back');
   $('stepSub').textContent = 'Enter your work email to continue. No password is required.';
   show('stepEmail');
   setTimeout(() => $('emailInput')?.focus(), 60);
