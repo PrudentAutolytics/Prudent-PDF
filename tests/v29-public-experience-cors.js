@@ -19,7 +19,7 @@ check(home.includes('Privacy operations control plane'),'home establishes privac
 check(home.includes('control-plane'),'home contains the animated control plane');
 check(home.includes('privacy-frame'),'home contains animated media privacy stage');
 check(home.includes('scan-line'),'home contains moving scan visualization');
-check(home.includes('ribbon-track'),'home contains moving workflow ribbon');
+check(home.includes('id="workflow"'),'home contains the workflow explanation section');
 check(home.includes('Recent Document')===false,'public home does not expose authenticated dashboard data');
 check(home.includes('@media(max-width:760px)'),'home has tablet and mobile responsiveness');
 check(home.includes('@media(max-width:460px)'),'home has narrow phone responsiveness');

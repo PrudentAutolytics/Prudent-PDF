@@ -79,7 +79,38 @@
     }, { passive: true });
   }
 
+  /* -- 4. Workflow autoplay --
+     Cycles the active state through [data-flow-step] cards once the section
+     scrolls into view, pausing on hover or focus. Purely presentational:
+     with reduced motion or no steps it does nothing. */
+  function initFlow() {
+    var steps = Array.prototype.slice.call(document.querySelectorAll('[data-flow-step]'));
+    if (steps.length < 2 || reduced) return;
+    var idx = -1, timer = null, paused = false;
+    var board = steps[0].parentElement;
+    function activate(n) {
+      steps.forEach(function (s, i) { s.classList.toggle('active', i === n); });
+      idx = n;
+    }
+    function tick() { if (!paused) activate((idx + 1) % steps.length); }
+    function start() {
+      if (timer) return;
+      activate(0);
+      timer = setInterval(tick, 3600);
+    }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { start(); io.disconnect(); } });
+      }, { threshold: 0.35 });
+      io.observe(board);
+    } else { start(); }
+    board.addEventListener('pointerenter', function () { paused = true; }, { passive: true });
+    board.addEventListener('pointerleave', function () { paused = false; }, { passive: true });
+    board.addEventListener('focusin', function () { paused = true; });
+    board.addEventListener('focusout', function () { paused = false; });
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { initReveal(); initCountup(); initGlow(); });
-  } else { initReveal(); initCountup(); initGlow(); }
+    document.addEventListener('DOMContentLoaded', function () { initReveal(); initCountup(); initGlow(); initFlow(); });
+  } else { initReveal(); initCountup(); initGlow(); initFlow(); }
 })();
