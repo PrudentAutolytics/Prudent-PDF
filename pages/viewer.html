@@ -72,7 +72,99 @@
  .enterprise-strip{flex-shrink:0!important}
 }
 
-.viewer-history-meta{font-size:10px;color:var(--ink3);white-space:nowrap;padding:5px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface2)}@media(max-width:900px){.viewer-history-meta{display:none}}</style>
+.viewer-history-meta{font-size:10px;color:var(--ink3);white-space:nowrap;padding:5px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface2)}@media(max-width:900px){.viewer-history-meta{display:none}}
+/* v38 premium secure review command bar */
+.main-viewer{background:linear-gradient(180deg,#f7f9fd 0,#f3f6fb 100%)}
+.viewer-toolbar{
+  min-height:88px;padding:13px 18px;display:grid;
+  grid-template-columns:minmax(260px,.9fr) minmax(310px,1.1fr) auto;
+  gap:14px;align-items:center;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(18px);
+  box-shadow:0 8px 28px rgba(42,65,98,.07);z-index:10
+}
+.viewer-identity{display:grid;grid-template-columns:38px minmax(0,1fr);gap:11px;align-items:center;min-width:0}
+.viewer-back{
+  width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--border);
+  border-radius:11px;background:var(--surface2);color:var(--ink2);text-decoration:none
+}
+.viewer-back:hover{border-color:var(--blue-bd);background:var(--blue-pale);color:var(--blue);transform:translateX(-1px)}
+.viewer-file-block{min-width:0}
+.viewer-file-kicker{font-size:8px;letter-spacing:.11em;text-transform:uppercase;font-weight:900;color:var(--blue);margin-bottom:4px}
+.viewer-file-row{display:flex;align-items:center;gap:8px;min-width:0}
+#viewerFileName{font:780 14px var(--font-d)!important;max-width:none!important;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer-file-meta{display:flex;align-items:center;gap:8px;margin-top:4px;min-height:18px;min-width:0}
+#viewerMeta{font-size:9.5px!important;color:var(--ink3)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#viewerStatus{flex-shrink:0}
+.viewer-selection{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:8px;align-items:center;min-width:0}
+.viewer-select-wrap{position:relative;min-width:0}
+.viewer-select-wrap:before{
+  content:"";position:absolute;left:12px;top:50%;translate:0 -50%;width:8px;height:8px;border-radius:50%;
+  background:#1eb980;box-shadow:0 0 0 5px rgba(30,185,128,.08);z-index:2;pointer-events:none
+}
+#jobSelector{
+  width:100%;max-width:none!important;min-height:42px;padding:0 34px 0 30px!important;
+  border-radius:11px!important;background:var(--surface2)!important;border:1px solid var(--border)!important;
+  font-size:11px!important;color:var(--ink2)!important;box-shadow:none!important
+}
+#jobSelector:focus{border-color:var(--blue)!important;box-shadow:0 0 0 4px rgba(65,105,246,.10)!important}
+.viewer-history-meta{font-size:9px!important;padding:7px 9px!important;border-radius:9px!important;background:var(--blue-pale)!important;border-color:var(--blue-bd)!important;color:var(--blue)!important;font-weight:800}
+.viewer-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:nowrap}
+.viewer-action{
+  min-height:42px;padding:0 13px;border-radius:11px;border:1px solid var(--border2);
+  background:var(--surface);color:var(--ink2);display:inline-flex;align-items:center;gap:8px;
+  font-size:10.5px;font-weight:850;white-space:nowrap;box-shadow:0 7px 18px rgba(49,69,100,.06)
+}
+.viewer-action svg{width:14px;height:14px}
+.viewer-action:hover:not(:disabled){transform:translateY(-1px);border-color:var(--blue-bd);background:var(--blue-pale);color:var(--blue);box-shadow:0 12px 25px rgba(49,69,100,.10)}
+.viewer-action.primary{
+  border:0;color:#fff;background:linear-gradient(135deg,#0A8CFF,#4169F6 54%,#6c49ef);
+  box-shadow:0 12px 28px rgba(65,105,246,.25)
+}
+.viewer-action.primary:hover:not(:disabled){color:#fff;background:linear-gradient(135deg,#168ff7,#4f73f7 54%,#7655f2);box-shadow:0 16px 34px rgba(65,105,246,.31)}
+.viewer-action:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+.action-label-short{display:none}
+.enterprise-strip{
+  min-height:40px;padding:8px 18px;gap:10px;border-bottom:1px solid #cfe0f2;
+  background:linear-gradient(90deg,#edf6ff,#f7f9fe 55%,#f3f0ff);
+  color:var(--ink2);font-size:10.5px
+}
+.enterprise-strip strong{font-size:9.5px;letter-spacing:.09em;color:#256cb3}
+.enterprise-strip .review-assurance{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.enterprise-strip .review-assurance:before{content:"";width:7px;height:7px;border-radius:50%;background:#1eb980;box-shadow:0 0 0 4px rgba(30,185,128,.09)}
+.enterprise-strip .shortcut-group{margin-left:auto;display:flex;gap:6px}
+.viewer-pane{border-color:#cfd9e7;background:#fff}
+.pane-hd{min-height:50px;padding:0 14px;background:linear-gradient(180deg,#fff,#f8fafe)}
+.pane-label{font-size:11px;letter-spacing:.08em}
+.pane-label.orig{color:#4b607d}.pane-label.redacted{color:#dc3447}
+.zoom-group{padding:3px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}
+.zoom-btn{width:28px;height:28px;border-radius:7px}.zoom-val{min-width:42px;text-align:center;font-size:9.5px}
+.review-panel{border-left:1px solid #cfd9e7}
+.review-tabs{padding:9px 10px;background:#f8fafe;border-bottom:1px solid var(--border);gap:5px}
+.review-tab{min-height:36px;padding:0 12px;border-radius:9px;font-size:10px;letter-spacing:.05em}
+.review-tab.active{background:#fff;border:1px solid var(--blue-bd);box-shadow:0 7px 18px rgba(49,69,100,.07);color:var(--blue)}
+@media(max-width:1300px){
+  .viewer-toolbar{grid-template-columns:minmax(220px,.8fr) minmax(260px,1fr) auto}
+  .viewer-action{padding-inline:10px}.viewer-action .action-label-full{display:none}.viewer-action .action-label-short{display:inline}
+}
+@media(max-width:1020px){
+  .viewer-toolbar{grid-template-columns:minmax(220px,1fr) minmax(260px,1fr);grid-template-areas:"identity select" "actions actions";min-height:132px}
+  .viewer-identity{grid-area:identity}.viewer-selection{grid-area:select}.viewer-actions{grid-area:actions;justify-content:flex-end}
+}
+@media(max-width:760px){
+  .viewer-toolbar{display:flex;flex-direction:column;align-items:stretch;min-height:auto;padding:10px 12px;gap:10px}
+  .viewer-selection{grid-template-columns:1fr}.viewer-history-meta{display:block!important;width:max-content;max-width:100%}
+  .viewer-actions{display:grid;grid-template-columns:repeat(3,1fr)}
+  .viewer-action{justify-content:center;padding:0 8px}
+  .enterprise-strip{padding:8px 12px}.enterprise-strip>span:not(.review-assurance),.shortcut-group{display:none!important}
+  .viewer-content{grid-template-columns:1fr!important;overflow:auto!important}
+  .review-panel{min-height:520px;border-left:0;border-top:1px solid var(--border)}
+}
+@media(max-width:480px){
+  .viewer-actions{grid-template-columns:1fr 1fr}.viewer-action:last-child{grid-column:1/-1}
+  .viewer-action .action-label-full{display:inline}.viewer-action .action-label-short{display:none}
+}
+
+</style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
 </head>
@@ -80,36 +172,50 @@
 <div class="shell" id="appShell">
   <main class="main main-viewer">
 
-    <div class="viewer-toolbar" role="toolbar">
-      <a href="/history" class="btn btn-ghost btn-sm">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        History
-      </a>
-      <div class="viewer-divider"></div>
-      <div id="viewerFileName" style="font-family:var(--display);font-size:13.5px;font-weight:700;color:var(--ink);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">No document loaded</div>
-      <span class="pill hidden" id="viewerStatus"></span>
-      <span class="font-mono text-xs text-subtle hidden" id="viewerMeta"></span>
-      <div style="flex:1"></div>
-      <!-- Job selector dropdown -->
-      <select class="filter-select" id="jobSelector" style="max-width:260px;font-size:12px">
-        <option value="">Loading jobs...</option>
-      </select><span id="viewerHistoryMeta" class="viewer-history-meta">Loading document availability...</span>
-      <div class="viewer-divider"></div>
-      <button class="btn btn-secondary btn-sm" id="dlOrigBtn" disabled>
-        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Original
-      </button>
-      <button class="btn btn-primary btn-sm" id="dlRedactBtn" disabled>
-        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Redacted PDF
-      </button>
-      <button class="btn btn-secondary btn-sm" id="exportFieldsBtn" disabled>
-        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Review CSV
-      </button>
+    <div class="viewer-toolbar" role="toolbar" aria-label="Secure document review controls">
+      <div class="viewer-identity">
+        <a href="/history" class="viewer-back" aria-label="Return to Processing History" title="Processing History">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="viewer-file-block">
+          <div class="viewer-file-kicker">Secure document review</div>
+          <div class="viewer-file-row">
+            <div id="viewerFileName">No document loaded</div>
+            <span class="pill hidden" id="viewerStatus"></span>
+          </div>
+          <div class="viewer-file-meta"><span class="font-mono hidden" id="viewerMeta"></span></div>
+        </div>
+      </div>
+
+      <div class="viewer-selection">
+        <div class="viewer-select-wrap">
+          <select class="filter-select" id="jobSelector" aria-label="Select a document to review">
+            <option value="">Loading documents...</option>
+          </select>
+        </div>
+        <span id="viewerHistoryMeta" class="viewer-history-meta">Loading availability...</span>
+      </div>
+
+      <div class="viewer-actions" aria-label="Document export actions">
+        <button class="viewer-action" id="dlOrigBtn" disabled title="Open the original PDF in a new tab">
+          <svg fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6" stroke="currentColor" stroke-width="1.7"/><path d="M8 16h8M12 12v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="action-label-full">Open original</span><span class="action-label-short">Original</span>
+        </button>
+        <button class="viewer-action primary" id="dlRedactBtn" disabled title="Open the controlled redacted PDF in a new tab">
+          <svg fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6" stroke="currentColor" stroke-width="1.7"/><rect x="7" y="13" width="10" height="3" rx="1.5" fill="currentColor"/><rect x="8.5" y="18" width="7" height="2" rx="1" fill="currentColor" opacity=".45"/></svg>
+          <span class="action-label-full">Open redacted</span><span class="action-label-short">Redacted</span>
+        </button>
+        <button class="viewer-action" id="exportFieldsBtn" disabled title="Export reviewer decisions and detected entities as CSV">
+          <svg fill="none" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M9 4v16" stroke="currentColor" stroke-width="1.7"/><path d="M13 14h4M15 12v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="action-label-full">Export review CSV</span><span class="action-label-short">Review CSV</span>
+        </button>
+      </div>
     </div>
     <div class="enterprise-strip">
-      <strong>PRUDENT REDACT · SECURE REVIEW</strong><span>Original and redacted outputs remain separate. Review AI-detected entities, verify document integrity, and export a reviewer dossier before release.</span><span style="margin-left:auto" class="kbd">/ search</span><span class="kbd">A accept</span><span class="kbd">R reject</span>
+      <strong>PRUDENT REDACT SECURE REVIEW</strong>
+      <span class="review-assurance">Original and redacted outputs stay separated and integrity checked.</span>
+      <span>Review detected entities before releasing the controlled document.</span>
+      <div class="shortcut-group"><span class="kbd">/ search</span><span class="kbd">A accept</span><span class="kbd">R reject</span></div>
     </div>
 
     <div class="viewer-content">
@@ -119,7 +225,7 @@
         <div class="pane-hd">
           <div class="pane-label orig">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
-            Original
+            Original document
           </div>
           <div class="zoom-group">
             <button class="zoom-btn" id="oZoomOut">−</button>
@@ -150,7 +256,7 @@
         <div class="pane-hd">
           <div class="pane-label redacted">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor"/><rect x="5" y="6" width="14" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="16" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg>
-            Redacted
+            Controlled redacted output
           </div>
           <div class="zoom-group">
             <button class="zoom-btn" id="rZoomOut">−</button>

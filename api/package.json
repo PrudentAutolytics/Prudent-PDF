@@ -4,7 +4,7 @@
   "description": "Prudent Redact Azure Functions API",
   "scripts": {
     "build": "echo No build required",
-    "test:regression": "node ../tests/security-unit.js && node ../tests/cors-unit.js && node ../tests/auth-unit.js && node ../tests/profile-governance-history-unit.js && node ../tests/origin-history-regression.js && node ../tests/media-redaction-unit.js && node ../tests/media-enterprise-v19-unit.js && node ../tests/v21-media-face-auto-unit.js && node ../tests/v25-scroll-ownership-40.js && node ../tests/v34-self-explaining-redaction-ui.js && node ../tests/v35-enterprise-redaction-focus.js && node ../tests/v37-governance-control-center.js"
+    "test:regression": "node ../tests/security-unit.js && node ../tests/cors-unit.js && node ../tests/auth-unit.js && node ../tests/profile-governance-history-unit.js && node ../tests/origin-history-regression.js && node ../tests/media-redaction-unit.js && node ../tests/media-enterprise-v19-unit.js && node ../tests/v21-media-face-auto-unit.js && node ../tests/v25-scroll-ownership-40.js && node ../tests/v34-self-explaining-redaction-ui.js && node ../tests/v35-enterprise-redaction-focus.js && node ../tests/v37-governance-control-center.js && node ../tests/v38-viewer-command-bar.js"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.17.0",
