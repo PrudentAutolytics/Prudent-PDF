@@ -640,6 +640,15 @@ const Shell = (() => {
       wireSearch();
       wireUserChip();
       wireEscape();
+      document.querySelectorAll('a[href="/dashboard#upload"]').forEach(link => {
+        link.addEventListener('click', event => {
+          const onDashboard = location.pathname === '/dashboard' || location.pathname === '/dashboard.html';
+          if (!onDashboard) return;
+          event.preventDefault();
+          history.replaceState(null, '', '/dashboard#upload');
+          window.dispatchEvent(new CustomEvent('prudent:open-redaction'));
+        });
+      });
       requestAnimationFrame(() => { startClock(); startInfoObserver(); setTimeout(refreshQuota, 1200); });
     },
     refreshQuota,

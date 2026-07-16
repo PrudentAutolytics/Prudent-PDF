@@ -809,11 +809,23 @@
   Promise.all([fetchJobsFromdatabase(), fetchOperationSummary()]);
   updateQuotaHint();
 
-  // Auto-open upload modal if navigated via #upload hash (sidebar "New Redaction")
-  if (location.hash === '#upload') {
-    history.replaceState(null, '', location.pathname);
-    setTimeout(openModal, 300);
+  function openUploadFromNavigation() {
+    if (location.hash === '#upload') {
+      history.replaceState(null, '', location.pathname);
+    }
+    setTimeout(() => {
+      openModal();
+      $('dropzone')?.focus();
+    }, 80);
   }
+
+  // Support initial navigation, repeated sidebar clicks while already on Dashboard,
+  // browser hash navigation, and keyboard activation.
+  if (location.hash === '#upload') openUploadFromNavigation();
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#upload') openUploadFromNavigation();
+  });
+  window.addEventListener('prudent:open-redaction', openUploadFromNavigation);
 
 })();
 </script>

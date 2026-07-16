@@ -902,7 +902,7 @@ body{
       </div>
 
       <!-- New user registration slide -->
-      <div class="reg-slide" id="regSlide">
+      <div class="reg-slide" id="regSlide" role="region" aria-label="New account details" aria-hidden="true">
         <div class="new-user-banner">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           <span id="newUserBannerTxt"></span>
@@ -1070,29 +1070,52 @@ $('emailInput').addEventListener('input', () => {
 });
 
 async function doCheck(email) {
-  if (S.otpSent) return;
+  if (S.otpSent) return false;
   try {
     const d = await paFetch(APP_CONFIG.FLOWS.AUTH_CHECK, { email });
     S.checked = true;
     if (d.exists) {
       S.isNew = false;
       $('stepTitle').textContent = 'Welcome back';
-      $('stepSub').textContent = "We'll send a 6-digit code to your inbox - no password needed.";
+      $('stepSub').textContent = "We'll send a 6-digit code to your inbox. No password is required.";
       $('contBtnTxt').textContent = 'Send verification code';
       $('regSlide').classList.remove('open');
+      $('regSlide').setAttribute('aria-hidden','true');
     } else {
       S.isNew = true;
       $('stepTitle').textContent = 'Create your account';
-      $('stepSub').textContent = 'Start your 5-document free trial - no credit card required.';
-      $('contBtnTxt').textContent = 'Create account & send code';
+      $('stepSub').textContent = 'Add your details, then verify your work email to activate the workspace.';
+      $('contBtnTxt').textContent = 'Create account and send code';
       $('regSlide').classList.add('open');
-      setTimeout(() => $('regName')?.focus(), 360);
+      $('regSlide').setAttribute('aria-hidden','false');
+      $('regSlide').scrollIntoView({ behavior:'smooth', block:'nearest' });
+      setTimeout(() => $('regName')?.focus(), 260);
     }
-  } catch(e) { S.checked = false; }
+    return true;
+  } catch(e) {
+    S.checked = false;
+    eErr(e.message || 'We could not check this email right now. Please try again.');
+    return false;
+  }
 }
 
 $('continueBtn').addEventListener('click', handleContinue);
 $('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleContinue(); });
+$('emailInput').addEventListener('input', () => {
+  if (S.otpSent) return;
+  S.checked = false;
+  S.isNew = false;
+  S.name = '';
+  S.company = '';
+  S.useCase = '';
+  $('regSlide').classList.remove('open');
+  $('regSlide').setAttribute('aria-hidden','true');
+  $('stepTitle').textContent = 'Access your workspace';
+  $('stepSub').textContent = 'Enter your work email. We will send a short lived verification code.';
+  $('contBtnTxt').textContent = 'Continue';
+  eOk();
+});
+
 
 async function handleContinue() {
   if (S.otpSent) return;
@@ -1105,7 +1128,16 @@ async function handleContinue() {
   function setLoading(txt) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> ' + txt; }
   function resetBtn()      { btn.disabled = false; btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <span id="contBtnTxt">' + (S.isNew ? 'Create account & send code' : S.checked ? 'Send verification code' : 'Continue') + '</span>'; }
 
-  if (!S.checked) { setLoading('Checking...'); await doCheck(email); resetBtn(); }
+  if (!S.checked) {
+    setLoading('Checking...');
+    const checked = await doCheck(email);
+    resetBtn();
+    if (!checked) return;
+    if (S.isNew) {
+      eOk();
+      return;
+    }
+  }
 
   if (S.isNew) {
     const name = ($('regName')?.value || '').trim();
@@ -1124,7 +1156,7 @@ async function handleContinue() {
   S.otpSent = true;
   setLoading('Sending code...');
   try {
-    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email });
+    await paFetch(APP_CONFIG.FLOWS.AUTH_REQUEST, { email, fullName: S.name || '', company: S.company || '', useCase: S.useCase || '' });
     $('otpEmailShow').textContent = email;
     clearDigits();
     show('stepOTP');
