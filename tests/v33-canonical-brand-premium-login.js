@@ -17,12 +17,12 @@ check(fs.existsSync(path.join(root,'favicon-32.png')),'canonical 32px favicon ex
 check(fs.existsSync(path.join(root,'favicon-16.png')),'canonical 16px favicon exists');
 check(fs.existsSync(path.join(root,'apple-touch-icon.png')),'canonical Apple touch icon exists');
 
-check(login.includes('Private by design.')&&login.includes('Controlled by evidence.'),'premium product proposition is present');
-check(login.includes('PRUDENT PRIVACY COMMAND CENTER'),'premium command center branding is present');
-check(login.includes('LIVE CONTROL'),'premium live control state is present');
-check(login.includes('Control posture'),'premium control posture card is present');
-check(login.includes('Motion privacy coverage'),'premium motion privacy card is present');
-check(login.includes('Evidence follows every outcome'),'premium evidence chain story is present');
+check((login.includes('Private by design.')&&login.includes('Controlled by evidence.'))||(login.includes('Sensitive information in.')&&login.includes('Controlled document out.')),'premium product proposition is present');
+check(login.includes('PRUDENT PRIVACY COMMAND CENTER')||login.includes('DOCUMENT REDACTION PREVIEW'),'premium command center branding is present');
+check(login.includes('LIVE CONTROL')||login.includes('command-live">LIVE'),'premium live control state is present');
+check(login.includes('Control posture')||login.includes('login-proof-list'),'premium control context is present');
+check(login.includes('Motion privacy coverage')||login.includes('Black-box redaction applied'),'premium privacy action is present');
+check(login.includes('Evidence follows every outcome')||login.includes('Output hash'),'premium evidence story is present');
 check(login.includes('premium-brand-stamp'),'canonical brand stamp is present');
 check(login.includes('Privacy operations control plane'),'brand stamp explains the product category');
 check(login.includes('box-shadow:0 38px 110px'),'premium depth treatment exists');

@@ -1,0 +1,41 @@
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto');
+const root=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const check=(ok,m)=>{if(!ok){console.error('FAIL:',m);process.exitCode=1}else console.log('PASS:',m)};
+const home=read('index.html'),login=read('pages/login.html');
+
+check(home.includes('PRUDENT REDACTION WORKFLOW'),'home centers the redaction workflow');
+check(home.includes('Source document'),'home shows the original document');
+check(home.includes('Sensitive information removed'),'home explains what black redaction does');
+check(home.includes('Black-box redaction replaces the original content.'),'home explicitly explains permanent black-box replacement');
+check(home.includes('Verified output')||home.includes('VERIFIED OUTPUT'),'home shows the clean result');
+check(home.includes('No sensitive text exposed'),'home communicates the result without extra explanation');
+check(home.includes('sensitive-value'),'home has animated sensitive values');
+check(home.includes('applyRedaction'),'home animates black redaction across sensitive values');
+check(!home.includes('<div class="person p1">'),'home hero no longer relies on face imagery');
+check(!home.includes('Face privacy coverage'),'home hero no longer leads with face privacy');
+check(home.includes('.hero-rail,.hero-system-strip{display:none!important}'),'home hides secondary dashboard-like clutter');
+check(home.includes('@media(max-width:760px)'),'home redaction visual is responsive');
+check(home.includes('@media(prefers-reduced-motion:reduce)'),'home respects reduced motion');
+
+check(login.includes('Sensitive information in.')&&login.includes('Controlled document out.'),'login states the transformation clearly');
+check(login.includes('DOCUMENT REDACTION PREVIEW'),'login shows a focused redaction preview');
+check(login.includes('Customer verification form'),'login uses a realistic document example');
+check(login.includes('Black-box redaction applied'),'login explains the action visually');
+check(login.includes('Original sensitive text is no longer exposed.'),'login explains the outcome');
+check(login.includes('VERIFIED OUTPUT'),'login shows the output');
+check(login.includes('Redacted document ready'),'login communicates completion');
+check(login.includes('login-sensitive'),'login has animated sensitive values');
+check(login.includes('loginApply'),'login animates black redaction');
+check(!login.includes('<div class="command-person one">'),'login no longer uses face illustrations');
+check(!login.includes('Motion privacy coverage'),'login no longer distracts with secondary media messaging');
+check(login.includes('Upload the document')&&login.includes('Remove sensitive text')&&login.includes('Review the clean output'),'login explains the workflow in three steps');
+check(login.includes('@media(max-width:680px)'),'login visual adapts to mobile');
+check(login.includes('@media(prefers-reduced-motion:reduce)'),'login respects reduced motion');
+check(!/[\u2013\u2014]/.test(home+login),'changed v34 sources contain no en dash or em dash');
+
+const locked=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'api/jobs-submit/index.js'))).digest('hex');
+check(locked==='5345cc76c6e06ad5bc9d5cb18b50ea0f4c039a7306a2e07d1e72db6a32702803','locked Power Automate contract is unchanged');
+if(process.exitCode)process.exit(process.exitCode);
+console.log('V34 self-explaining redaction UI gate passed.');

@@ -14,7 +14,7 @@ check(shell.includes('syncProfileIdentity(updated)'), 'quota profile identity re
 check(shell.includes('syncProfileIdentity,'),'profile identity sync is exposed to profile page');
 check(profile.includes("Shell.syncProfileIdentity?.(Session.get())"),'profile save immediately synchronizes topbar identity');
 check(home.includes('Privacy operations control plane'),'enterprise access home is present');
-check(home.includes('PRUDENT PRIVACY CONTROL PLANE'),'home includes capability control plane');
+check(home.includes('PRUDENT PRIVACY CONTROL PLANE')||home.includes('PRUDENT REDACTION WORKFLOW'),'home includes capability control plane');
 check(login.includes('v29 light motion access experience'),'login has enterprise access theme');
 check(login.includes('background:#f4f8fd'),'login uses the current light enterprise palette');
 for(const [name,src] of [['tools',tools],['shell',shell],['profile',profile],['home',home],['login',login]]) check(!/[\u2013\u2014]/.test(src),`${name} has no en dash or em dash`);

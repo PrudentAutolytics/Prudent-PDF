@@ -826,6 +826,39 @@ body{
   .left-tagline span,.command-doc,.command-redaction:after,.command-mask,.command-scan,.evidence-chip,.gateway-meter i,.route-icon{animation:none!important}
 }
 
+
+/* v34 self-explaining premium login visual */
+.login-command-center{display:block;height:382px;padding:1px}
+.command-main{height:100%;display:block}
+.command-stage{height:calc(100% - 42px);display:grid;grid-template-columns:minmax(0,1.12fr) minmax(210px,.88fr);gap:11px;padding:12px}
+.command-side,.command-media,.command-person,.command-mask,.command-evidence{display:none!important}
+.login-redact-source,.login-redact-output{position:relative;border-radius:17px;overflow:hidden}
+.login-redact-source{padding:17px 17px 66px;background:linear-gradient(180deg,#fff,#f4f7fb);border:1px solid rgba(255,255,255,.10);box-shadow:0 22px 50px rgba(0,0,0,.26)}
+.login-redact-output{padding:15px;background:linear-gradient(155deg,rgba(22,39,70,.96),rgba(15,29,57,.96));border:1px solid rgba(129,164,208,.16)}
+.login-doc-title{font-size:13px;font-weight:800;color:#15223a;margin:7px 0 14px}
+.login-doc-kicker{font-size:7px;font-weight:900;letter-spacing:.11em;color:#73859d}
+.login-data-row{display:grid;grid-template-columns:76px 1fr;gap:9px;align-items:center;margin:9px 0;font-size:8px;color:#73859d}
+.login-data-row b{color:#26364d}
+.login-sensitive{position:relative;display:inline-block;width:max-content;max-width:100%;padding:3px 6px;border-radius:5px;color:#a03841;background:#fff0f1;border:1px solid #f1cdd1;font-weight:800;overflow:hidden}
+.login-sensitive:after{content:"";position:absolute;inset:0;background:#0a111c;transform:scaleX(0);transform-origin:left;animation:loginApply 6.8s ease-in-out infinite}
+.login-sensitive.two:after{animation-delay:.45s}.login-sensitive.three:after{animation-delay:.9s}.login-sensitive.four:after{animation-delay:1.35s}
+@keyframes loginApply{0%,13%{transform:scaleX(0)}28%,72%{transform:scaleX(1)}88%,100%{transform:scaleX(0)}}
+.login-redact-bar{position:absolute;left:15px;right:15px;height:2px;background:linear-gradient(90deg,transparent,#0A8CFF,#4169F6,#B218F4,transparent);box-shadow:0 0 16px rgba(65,105,246,.55);animation:loginRedactBar 6.8s ease-in-out infinite}
+@keyframes loginRedactBar{0%{top:88px;opacity:0}12%{opacity:1}63%{top:238px;opacity:1}78%,100%{opacity:0}}
+.login-action-state{position:absolute;left:14px;right:14px;bottom:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;border-radius:11px;background:#0d1b31;color:#fff}
+.login-action-state strong{font-size:9px}.login-action-state span{font-size:7px;color:#8ea5c3}.login-action-state em{font-style:normal;color:#50d7a4;font-size:8px;font-weight:900}
+.login-output-card{margin-top:12px;padding:13px;border-radius:13px;background:rgba(8,18,35,.62);border:1px solid rgba(134,166,207,.14)}
+.login-output-line{height:5px;border-radius:6px;background:#60789a55;margin:8px 0}.login-output-line.s{width:60%}.login-output-black{height:13px;border-radius:3px;background:#050a11;margin:10px 0}
+.login-output-status{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding:9px;border-radius:10px;background:rgba(80,215,164,.08);border:1px solid rgba(80,215,164,.16)}
+.login-output-status strong{font-size:8px;color:#c9f3e1}.login-output-status span{font-size:7px;color:#50d7a4;font-weight:900}
+.login-proof-list{display:grid;gap:7px;margin-top:10px}
+.login-proof-list div{display:flex;align-items:center;justify-content:space-between;padding:8px 9px;border-radius:9px;background:rgba(255,255,255,.035);border:1px solid rgba(136,166,205,.10);font-size:7px;color:#8399b8}
+.login-proof-list b{color:#dce8f7}.login-proof-list em{font-style:normal;color:#50d7a4;font-weight:900}
+.access-facts{grid-template-columns:repeat(3,1fr)}
+@media(max-width:680px){.command-stage{grid-template-columns:1fr}.login-redact-output{display:none}.login-command-center{height:320px}.access-facts{grid-template-columns:1fr}}
+@media(max-width:480px){.login-command-center{height:286px}.login-data-row{grid-template-columns:64px 1fr}.login-doc-title{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.login-sensitive:after,.login-redact-bar{animation:none!important}.login-sensitive:after{transform:scaleX(1)}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#173967"/>
@@ -1228,27 +1261,34 @@ $('changeEmailBtn').addEventListener('click', () => {
   if (brand) {
     brand.innerHTML = [
       '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/prudent-brand-dark-800.png" alt="Prudent Autolytics"/></a>',
-      '<div class="left-tagline">Private by design.<br/><span>Controlled by evidence.</span></div>',
-      '<p class="left-sub">A secure privacy operations workspace for documents and moving media, built around controlled execution, visible evidence, metering and governance.</p>',
+      '<div class="left-tagline">Sensitive information in.<br/><span>Controlled document out.</span></div>',
+      '<p class="left-sub">Prudent Redact permanently replaces personal and confidential information with black redaction blocks, then records the output and processing evidence.</p>',
       '<div class="login-command-center" aria-hidden="true">',
       '  <div class="command-main">',
-      '    <div class="command-top"><span>PRUDENT PRIVACY COMMAND CENTER</span><span class="command-live">LIVE CONTROL</span></div>',
+      '    <div class="command-top"><span>DOCUMENT REDACTION PREVIEW</span><span class="command-live">LIVE</span></div>',
       '    <div class="command-stage">',
-      '      <div class="command-doc"><div class="command-line m"></div><div class="command-line s"></div><div class="command-redaction"></div><div class="command-line"></div><div class="command-redaction"></div><div class="command-line m"></div></div>',
-      '      <div class="command-media"><div class="command-person one"></div><div class="command-person two"></div><div class="command-person three"></div><div class="command-mask one"></div><div class="command-mask two"></div><div class="command-mask three"></div><div class="command-scan"></div></div>',
-      '      <div class="command-evidence"><div class="evidence-chip"><small>OUTPUT</small><strong>SHA 256</strong><span>VERIFIED</span></div><div class="evidence-chip"><small>METERING</small><strong>Operation cost</strong><span>RECORDED</span></div><div class="evidence-chip"><small>CONTROL</small><strong>History</strong><span>VISIBLE</span></div></div>',
+      '      <section class="login-redact-source">',
+      '        <div class="login-doc-kicker">SOURCE DOCUMENT</div>',
+      '        <div class="login-doc-title">Customer verification form</div>',
+      '        <div class="login-data-row"><b>Name</b><span class="login-sensitive">Maya Kapoor</span></div>',
+      '        <div class="login-data-row"><b>Email</b><span class="login-sensitive two">maya@example.com</span></div>',
+      '        <div class="login-data-row"><b>Account</b><span class="login-sensitive three">7744 1998 2281</span></div>',
+      '        <div class="login-data-row"><b>ID number</b><span class="login-sensitive four">ID-8842-119</span></div>',
+      '        <div class="login-redact-bar"></div>',
+      '        <div class="login-action-state"><div><strong>Black-box redaction applied</strong><br/><span>Original sensitive text is no longer exposed.</span></div><em>DONE</em></div>',
+      '      </section>',
+      '      <aside class="login-redact-output">',
+      '        <div class="login-doc-kicker">VERIFIED OUTPUT</div>',
+      '        <div class="login-output-card"><div class="login-output-line s"></div><div class="login-output-line"></div><div class="login-output-black"></div><div class="login-output-black"></div><div class="login-output-line"></div><div class="login-output-black"></div><div class="login-output-status"><strong>Redacted document ready</strong><span>PASS</span></div></div>',
+      '        <div class="login-proof-list"><div><b>Redaction</b><em>Permanent</em></div><div><b>Output hash</b><em>Recorded</em></div><div><b>History</b><em>Visible</em></div></div>',
+      '      </aside>',
       '    </div>',
-      '  </div>',
-      '  <div class="command-side">',
-      '    <div class="gateway-card"><small>CONTROL POSTURE</small><h3>Control posture</h3><p>Processing, evidence and operator controls remain visible.</p><div class="gateway-score"><strong>96</strong><span>STRONG</span></div><div class="gateway-meter"><i style="width:96%"></i></div></div>',
-      '    <div class="gateway-card"><small>MEDIA MOTION</small><h3>Motion privacy coverage</h3><p>Video regions are rescanned and smoothed while the controlled output is created.</p><div class="gateway-meter"><i style="width:89%"></i></div></div>',
-      '    <div class="gateway-card"><small>EVIDENCE CHAIN</small><h3>Evidence follows every outcome</h3><div class="gateway-events"><div class="gateway-event">Session verified</div><div class="gateway-event">Operation metered</div><div class="gateway-event">Output evidence ready</div></div></div>',
       '  </div>',
       '</div>',
       '<div class="access-facts" aria-hidden="true">',
-      '  <div class="access-fact"><small>Identity</small><strong>Signed passwordless access</strong><span>OTP verification establishes the workspace session.</span></div>',
-      '  <div class="access-fact"><small>Privacy</small><strong>Documents and moving media</strong><span>Redaction controls remain distinct and reviewable.</span></div>',
-      '  <div class="access-fact"><small>Operations</small><strong>Evidence, cost and governance</strong><span>Processing outcomes remain visible after execution.</span></div>',
+      '  <div class="access-fact"><small>1</small><strong>Upload the document</strong><span>Start from the original file.</span></div>',
+      '  <div class="access-fact"><small>2</small><strong>Remove sensitive text</strong><span>Black blocks replace exposed information.</span></div>',
+      '  <div class="access-fact"><small>3</small><strong>Review the clean output</strong><span>Evidence and history remain visible.</span></div>',
       '</div>'
     ].join('');
   }
@@ -1261,10 +1301,10 @@ $('changeEmailBtn').addEventListener('click', () => {
   ].join(''));
 
   // Right panel
-  set('rightTopHint', 'Prudent Autolytics privacy workspace <a href="/">View product</a>');
+  set('rightTopHint', 'Prudent Redact secure access <a href="/">View product</a>');
   set('formEyebrow', 'Secure identity gateway');
   set('stepTitle', 'Access your workspace');
-  set('stepSub', 'Verify your work identity with a short lived code and continue into the controlled privacy workspace.');
+  set('stepSub', 'Enter your work email. We will send a short lived verification code.');
   set('newUserBannerTxt', 'New workspace identity detected. Complete your profile and verify your email to continue.');
   set('rightFooter', '<a href="/pricing">Terms</a> · <a href="/contact">Privacy</a> · <a href="/contact">Support</a><br/>© 2026 PRUDENT AUTOLYTICS LLP · Bangalore, India');
 

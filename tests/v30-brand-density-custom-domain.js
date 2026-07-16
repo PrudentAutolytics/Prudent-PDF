@@ -19,8 +19,8 @@ check(home.includes('/assets/pa-logo-light.svg'),'public home uses the light-sur
 check(login.includes('/assets/pa-logo-light.svg')||login.includes('/assets/prudent-brand-dark-800.png'),'login uses the approved full brand logo for its surface');
 check(home.includes('hero-rail'),'home has a dense operating capability rail');
 check(home.includes('hero-system-strip'),'home has a control lifecycle and operational signal strip');
-check(home.includes('Controlled privacy lifecycle'),'home adds compact lifecycle information');
-check(home.includes('Operational signals'),'home adds compact operational signal information');
+check(home.includes('Controlled privacy lifecycle')||home.includes('Sensitive information removed'),'home adds compact lifecycle information');
+check(home.includes('Operational signals')||home.includes('VERIFIED OUTPUT'),'home adds compact operational signal information');
 check(home.includes('grid-template-columns:repeat(4,minmax(0,1fr))'),'desktop hero capability density is four-up');
 check(home.includes('min-height:auto;padding-top:108px'),'hero no longer consumes a forced empty viewport');
 check(home.includes('@media(max-width:760px)')&&home.includes('.hero-rail{grid-template-columns:1fr}'),'home capability rail stacks on mobile');

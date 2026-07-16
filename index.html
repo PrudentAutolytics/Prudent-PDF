@@ -177,7 +177,40 @@ button,a{touch-action:manipulation}
 @media(max-width:1080px){.hero{grid-template-columns:1fr;padding-bottom:44px}.hero-rail{grid-template-columns:repeat(2,1fr)}.hero-system-strip{grid-template-columns:1fr}}
 @media(max-width:760px){.hero{padding-top:88px;padding-bottom:28px}.hero-rail{grid-template-columns:1fr}.hero-system-strip{display:none}.hero-signal{min-height:74px}.section{padding-top:64px;padding-bottom:64px}}
 
-.visual-orbit{position:absolute;inset:0;pointer-events:none}.orbit-node{position:absolute;width:54px;height:68px;border:1px solid #cfe0ef;border-radius:12px;background:#ffffffd9;box-shadow:0 16px 34px #37547c1a;animation:orbitFloat 6s ease-in-out infinite}.orbit-node:before{content:'';position:absolute;left:10px;right:10px;top:18px;height:4px;border-radius:4px;background:#d8e6f4;box-shadow:0 11px 0 #e2ecf6,0 22px 0 #d8e6f4}.orbit-node.n1{left:46%;top:14%}.orbit-node.n2{right:2%;top:29%;animation-delay:-3s}.orbit-node.n3{left:50%;bottom:8%;animation-delay:-5s}@keyframes orbitFloat{50%{translate:0 -12px}}.evidence-orbit{position:absolute;width:150px;height:150px;right:18%;bottom:8%;border:1px dashed #1f6fd138;border-radius:50%;animation:orbitSpin 18s linear infinite}.evidence-orbit i{position:absolute;width:28px;height:28px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:900;color:var(--blue)}.evidence-orbit i:nth-child(1){left:61px;top:-14px}.evidence-orbit i:nth-child(2){right:-14px;top:61px}.evidence-orbit i:nth-child(3){left:61px;bottom:-14px}.evidence-orbit i:nth-child(4){left:-14px;top:61px}@keyframes orbitSpin{to{transform:rotate(360deg)}}@media(max-width:1080px){.visual-orbit{display:none}}</style>
+.visual-orbit{position:absolute;inset:0;pointer-events:none}.orbit-node{position:absolute;width:54px;height:68px;border:1px solid #cfe0ef;border-radius:12px;background:#ffffffd9;box-shadow:0 16px 34px #37547c1a;animation:orbitFloat 6s ease-in-out infinite}.orbit-node:before{content:'';position:absolute;left:10px;right:10px;top:18px;height:4px;border-radius:4px;background:#d8e6f4;box-shadow:0 11px 0 #e2ecf6,0 22px 0 #d8e6f4}.orbit-node.n1{left:46%;top:14%}.orbit-node.n2{right:2%;top:29%;animation-delay:-3s}.orbit-node.n3{left:50%;bottom:8%;animation-delay:-5s}@keyframes orbitFloat{50%{translate:0 -12px}}.evidence-orbit{position:absolute;width:150px;height:150px;right:18%;bottom:8%;border:1px dashed #1f6fd138;border-radius:50%;animation:orbitSpin 18s linear infinite}.evidence-orbit i{position:absolute;width:28px;height:28px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:900;color:var(--blue)}.evidence-orbit i:nth-child(1){left:61px;top:-14px}.evidence-orbit i:nth-child(2){right:-14px;top:61px}.evidence-orbit i:nth-child(3){left:61px;bottom:-14px}.evidence-orbit i:nth-child(4){left:-14px;top:61px}@keyframes orbitSpin{to{transform:rotate(360deg)}}@media(max-width:1080px){.visual-orbit{display:none}}
+/* v34 self-explaining redaction story */
+.redact-demo{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr);gap:14px;min-height:470px}
+.redact-source,.redact-result{position:relative;border:1px solid var(--line);border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 18px 44px rgba(55,84,124,.10)}
+.redact-source{padding:20px 20px 76px;background:linear-gradient(180deg,#fff,#f8fbff)}
+.redact-result{padding:18px;background:linear-gradient(160deg,#f7fbff,#eef7ff)}
+.doc-kicker{font-size:8px;font-weight:900;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.doc-title{font-size:18px;font-weight:800;color:var(--ink);margin:8px 0 18px}
+.doc-row{display:grid;grid-template-columns:94px 1fr;gap:12px;align-items:center;margin:11px 0;font-size:10px;color:var(--muted)}
+.doc-row strong{color:var(--ink2);font-size:10px}
+.sensitive-value{position:relative;display:inline-block;width:max-content;max-width:100%;padding:4px 7px;border-radius:6px;background:#fff4f4;color:#a12b32;border:1px solid #f2cfd2;font-weight:700;overflow:hidden}
+.sensitive-value:after{content:"";position:absolute;inset:0;background:#101722;transform:scaleX(0);transform-origin:left;animation:applyRedaction 7.2s ease-in-out infinite}
+.sensitive-value.v2:after{animation-delay:.5s}.sensitive-value.v3:after{animation-delay:1s}.sensitive-value.v4:after{animation-delay:1.5s}
+@keyframes applyRedaction{0%,14%{transform:scaleX(0)}28%,70%{transform:scaleX(1)}86%,100%{transform:scaleX(0)}}
+.redaction-cursor{position:absolute;left:18px;right:18px;height:2px;background:linear-gradient(90deg,transparent,#0A8CFF,#4169F6,transparent);box-shadow:0 0 16px rgba(65,105,246,.48);animation:redactionCursor 7.2s ease-in-out infinite}
+@keyframes redactionCursor{0%{top:110px;opacity:0}12%{opacity:1}65%{top:285px;opacity:1}78%,100%{top:285px;opacity:0}}
+.redaction-step{position:absolute;left:18px;right:18px;bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px)}
+.redaction-step strong{font-size:11px;color:var(--ink)}.redaction-step span{font-size:9px;color:var(--muted)}
+.step-state{display:flex;align-items:center;gap:7px;font-size:9px;font-weight:900;color:var(--green)}.step-state:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 5px rgba(15,159,110,.10)}
+.result-preview{position:relative;margin-top:15px;padding:16px;border:1px solid #dce7f3;border-radius:15px;background:#fff;box-shadow:0 12px 28px rgba(55,84,124,.07)}
+.result-line{height:6px;border-radius:8px;background:#dfe8f2;margin:10px 0}.result-line.s{width:58%}.result-black{height:15px;border-radius:3px;background:#101722;margin:12px 0}
+.result-badge{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:16px;padding:10px;border-radius:11px;background:#effaf5;border:1px solid #cbeedd}
+.result-badge strong{font-size:10px;color:#0b7f57}.result-badge span{font-size:8px;color:#4e806d}
+.result-flow{display:grid;gap:8px;margin-top:12px}
+.result-flow div{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.82);font-size:9px;color:var(--muted)}
+.result-flow b{color:var(--ink2)}.result-flow em{font-style:normal;color:var(--green);font-weight:900}
+.redact-demo-label{position:absolute;top:10px;right:12px;font-size:8px;font-weight:900;letter-spacing:.1em;color:var(--green)}
+.hero-rail,.hero-system-strip{display:none!important}
+.control-plane{min-height:auto;padding:15px}
+.cp-grid{display:block;min-height:0}
+@media(max-width:760px){.redact-demo{grid-template-columns:1fr;min-height:0}.redact-source{min-height:390px}.redact-result{min-height:310px}.doc-row{grid-template-columns:82px 1fr}}
+@media(prefers-reduced-motion:reduce){.sensitive-value:after,.redaction-cursor{animation:none!important}.sensitive-value:after{transform:scaleX(1)}}
+
+</style>
 </head>
 <body>
 <nav class="nav">
@@ -198,11 +231,11 @@ button,a{touch-action:manipulation}
 <section class="hero"><div class="visual-orbit" aria-hidden="true"><span class="orbit-node n1"></span><span class="orbit-node n2"></span><span class="orbit-node n3"></span><span class="evidence-orbit"><i>PII</i><i>SHA</i><i>OPS</i><i>RISK</i></span></div>
   <div class="hero-copy">
     <div class="eyebrow"><span class="eyebrow-dot"></span> Privacy operations control plane</div>
-    <h1>Detect, control and <span>prove privacy work.</span></h1>
-    <p>Prudent Redact brings document redaction, image and video privacy, document operations, evidence, cost analysis and governance into one controlled workspace.</p>
+    <h1>Remove sensitive information.<br/><span>Prove what changed.</span></h1>
+    <p>Black-box redaction removes sensitive text from documents and produces a controlled output with visible evidence and processing history.</p>
     <div class="hero-actions">
       <a class="btn primary" href="/login">Enter secure workspace</a>
-      <a class="btn secondary" href="#proof">See the control model</a>
+      <a class="btn secondary" href="#proof">See how redaction works</a>
     </div>
     <div class="hero-pills">
       <div class="hero-pill"><i></i> Azure hosted APIs</div>
@@ -212,36 +245,43 @@ button,a{touch-action:manipulation}
     </div>
   </div>
 
-  <div class="hero-stage" aria-label="Animated privacy operations preview">
+  <div class="hero-stage" aria-label="Animated document redaction preview">
     <div class="control-plane">
-      <div class="cp-top"><span>PRUDENT PRIVACY CONTROL PLANE</span><span class="cp-live">LIVE WORKSPACE</span></div>
+      <div class="cp-top"><span>PRUDENT REDACTION WORKFLOW</span><span class="cp-live">LIVE PREVIEW</span></div>
       <div class="cp-grid">
-        <div class="privacy-frame">
-          <div class="frame-scene"></div>
-          <div class="person p1"></div><div class="person p2"></div><div class="person p3"></div>
-          <div class="mask m1"></div><div class="mask m2"></div><div class="mask m3"></div>
-          <div class="scan-line"></div>
-          <div class="frame-status"><div><strong>Face privacy coverage</strong><br/><span>Local multi pass media review</span></div><div class="score"><b>96</b></div></div>
+        <div class="redact-demo">
+          <section class="redact-source">
+            <div class="doc-kicker">Source document</div>
+            <div class="doc-title">Employee onboarding record</div>
+            <div class="doc-row"><strong>Employee</strong><span class="sensitive-value">Ananya Rao</span></div>
+            <div class="doc-row"><strong>Email</strong><span class="sensitive-value v2">ananya.rao@example.com</span></div>
+            <div class="doc-row"><strong>Account</strong><span class="sensitive-value v3">4821 9364 1128 7742</span></div>
+            <div class="doc-row"><strong>Government ID</strong><span class="sensitive-value v4">XXXX-XXXX-6214</span></div>
+            <div class="redaction-cursor"></div>
+            <div class="redaction-step">
+              <div><strong>Sensitive information removed</strong><br/><span>Black-box redaction replaces the original content.</span></div>
+              <div class="step-state">APPLIED</div>
+            </div>
+          </section>
+          <aside class="redact-result">
+            <div class="redact-demo-label">VERIFIED OUTPUT</div>
+            <div class="doc-kicker">Redacted document</div>
+            <div class="result-preview">
+              <div class="result-line s"></div><div class="result-line"></div>
+              <div class="result-black"></div><div class="result-black"></div>
+              <div class="result-line"></div><div class="result-black"></div>
+              <div class="result-line s"></div>
+              <div class="result-badge"><div><strong>No sensitive text exposed</strong><br/><span>Ready for controlled review</span></div><span>PASS</span></div>
+            </div>
+            <div class="result-flow">
+              <div><b>Redaction</b><em>Permanent</em></div>
+              <div><b>Output evidence</b><em>Recorded</em></div>
+              <div><b>Processing history</b><em>Visible</em></div>
+            </div>
+          </aside>
         </div>
-        <div class="cp-stack">
-          <article class="live-card"><div class="signal">⌁</div><small>DOCUMENT PRIVACY</small><h3>Redaction workflow</h3><p>Submission, processing and controlled review.</p><div class="live-meter"><span></span></div></article>
-          <article class="live-card"><div class="signal">◇</div><small>OUTPUT EVIDENCE</small><h3>Hash and history</h3><p>Output identity, events and operation cost.</p><div class="live-meter"><span></span></div></article>
-          <article class="live-card"><div class="signal">◎</div><small>GOVERNANCE</small><h3>Operator control</h3><p>Risk queue, processing health and control posture.</p><div class="live-meter"><span></span></div></article>
-        </div>
-      </div>
-
-      <div class="hero-system-strip">
-        <div class="system-card"><div class="system-card-head"><strong>Controlled privacy lifecycle</strong><span>ACTIVE</span></div><div class="system-flow"><b>ACCESS</b><b>PROCESS</b><b>REVIEW</b><b>METER</b><b>GOVERN</b></div></div>
-        <div class="system-card"><div class="system-card-head"><strong>Operational signals</strong><span>LIVE</span></div><div class="system-meter-row"><span>Coverage</span><div class="system-meter"><i style="width:96%"></i></div><b>96</b></div><div class="system-meter-row"><span>Evidence</span><div class="system-meter"><i style="width:91%"></i></div><b>91</b></div><div class="system-meter-row"><span>Control</span><div class="system-meter"><i style="width:88%"></i></div><b>88</b></div></div>
       </div>
     </div>
-  </div>
-
-  <div class="hero-rail" aria-label="Prudent Redact operating capabilities">
-    <div class="hero-signal"><div class="hero-signal-icon">01</div><div><small>Privacy intake</small><strong>Redaction and media review</strong><span>Separate processing paths with authenticated history.</span></div></div>
-    <div class="hero-signal"><div class="hero-signal-icon">02</div><div><small>Evidence</small><strong>Hashes and controlled output</strong><span>Output identity and operation records stay visible.</span></div></div>
-    <div class="hero-signal"><div class="hero-signal-icon">03</div><div><small>Economics</small><strong>Metered operation cost</strong><span>Document and media operations retain cost estimates.</span></div></div>
-    <div class="hero-signal"><div class="hero-signal-icon">04</div><div><small>Governance</small><strong>Risk and control posture</strong><span>Processing health and operator exceptions in one view.</span></div></div>
   </div>
 </section>
 

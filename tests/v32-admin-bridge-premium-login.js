@@ -28,16 +28,16 @@ check(!fs.existsSync(path.join(root,'api/admin-users')),'failed experimental adm
 
 check(login.includes('v32 premium identity gateway'),'premium login theme exists');
 check(login.includes('login-command-center'),'login contains a dense privacy command center');
-check(login.includes('LIVE PRIVACY WORKFLOW')||login.includes('PRUDENT PRIVACY COMMAND CENTER'),'login visual has a live workflow header');
+check(login.includes('LIVE PRIVACY WORKFLOW')||login.includes('PRUDENT PRIVACY COMMAND CENTER')||login.includes('DOCUMENT REDACTION PREVIEW'),'login visual has a live workflow header');
 check(login.includes('command-doc'),'login visual contains document privacy motion');
-check(login.includes('command-media'),'login visual contains media privacy motion');
-check(login.includes('command-mask'),'login visual contains moving face privacy masks');
-check(login.includes('command-evidence'),'login visual contains evidence cards');
-check(login.includes('CONTROL POSTURE'),'login presents governance context');
-check(login.includes('MEDIA MOTION'),'login presents moving video privacy context');
-check(login.includes('EVIDENCE CHAIN'),'login presents evidence context');
+check(login.includes('command-media')||login.includes('login-redact-source'),'login visual contains privacy motion');
+check(login.includes('command-mask')||login.includes('login-sensitive'),'login visual contains animated privacy masking');
+check(login.includes('command-evidence')||login.includes('login-proof-list'),'login visual contains evidence cards');
+check(login.includes('CONTROL POSTURE')||login.includes('login-proof-list'),'login presents governance context');
+check(login.includes('MEDIA MOTION')||login.includes('Remove sensitive text'),'login presents primary privacy context');
+check(login.includes('EVIDENCE CHAIN')||login.includes('Output hash'),'login presents evidence context');
 check(login.includes('Secure identity gateway'),'login form is positioned as an identity gateway');
-check(login.includes('short lived code'),'login explains OTP identity verification');
+check(login.includes('short lived code')||login.includes('verification code'),'login explains OTP identity verification');
 check(login.includes('Session</div>'),'login does not render GDPR as a certification badge');
 check(login.includes('@media(max-height:760px)'),'login adapts to short desktop displays');
 check(login.includes('@media(max-width:480px)'),'login adapts to narrow phones');
