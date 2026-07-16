@@ -157,7 +157,7 @@
             <a href="/pricing" class="btn btn-sm btn-secondary" style="font-size:11.5px">View breakdown →</a>
           </div>
           <div class="card-body" style="padding:12px 20px 16px">
-            <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px">30-day estimated product cost combines completed redaction jobs with successfully metered document and media operations. Non-redaction operation estimates use the configured platform cost model and are recorded server-side after completion.</div>
+            <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px">30-day estimated product cost is based on completed redaction jobs and recorded document-processing charges.</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
               <div style="background:var(--amber-pale);border:1px solid var(--amber-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:5px">Avg / file</div><div class="font-display font-bold" id="avgCost" style="font-size:18px;color:var(--amber)">$0.00</div></div>
               <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Total pages</div><div class="font-display font-bold" id="totalPages" style="font-size:18px;color:var(--ink)">0</div></div>
@@ -165,30 +165,14 @@
             </div>
             <div class="cost-analysis-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
               <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Redaction cost</div><div class="font-display font-bold" id="redactionCostInsight" style="font-size:18px;color:var(--ink)">$0.00</div></div>
-              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Operation cost</div><div class="font-display font-bold" id="operationCostInsight" style="font-size:18px;color:var(--ink)">$0.00</div></div>
-              <div style="background:var(--blue-pale);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:5px">Combined cost</div><div class="font-display font-bold" id="sCostInsight" style="font-size:18px;color:var(--blue)">$0.00</div></div>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Processing cost</div><div class="font-display font-bold" id="operationCostInsight" style="font-size:18px;color:var(--ink)">$0.00</div></div>
+              <div style="background:var(--blue-pale);border:1px solid var(--blue-bd);border-radius:var(--r8);padding:12px;text-align:center"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:5px">Total cost</div><div class="font-display font-bold" id="sCostInsight" style="font-size:18px;color:var(--blue)">$0.00</div></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <section class="card anim d3 operations-dashboard-card" aria-labelledby="recentOperationsTitle" style="margin-top:18px">
-      <div class="card-hd">
-        <div>
-          <div class="card-title" id="recentOperationsTitle">Recent Document and Media Operations</div>
-          <div class="text-xs text-subtle" style="margin-top:4px">Split, merge, rotate, scan, media privacy, and other metered workflows are shown separately from Power Automate redaction jobs.</div>
-        </div>
-        <a href="/tools" class="btn btn-secondary btn-sm">Open Document Operations</a>
-      </div>
-      <div class="tbl-wrap">
-        <table class="tbl mobile-card-table recent-operations-table">
-          <thead><tr><th>Operation</th><th>Source</th><th>Output</th><th>Cost</th><th>Completed</th></tr></thead>
-          <tbody id="recentOperationsBody"><tr><td colspan="5"><div class="tbl-empty"><div class="tbl-empty-title">Loading recent operations...</div></div></td></tr></tbody>
-        </table>
-      </div>
-      <div class="card-footer"><span class="text-sm text-subtle" id="recentOperationsMeta">Separate from redaction processing history</span></div>
-    </section>
 
   </main>
 </div>
@@ -295,7 +279,7 @@
      ══════════════════════════════════════════════════════ */
   let allJobs = []; // in-memory cache from jobs API
   let jobsLoaded = false;
-  let operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
+  const operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
 
   async function fetchJobsFromdatabase() {
     try {
@@ -319,12 +303,6 @@
   }
 
   async function fetchOperationSummary() {
-    try {
-      const summary = await paFetch(APP_CONFIG.FLOWS.OPERATION_SUMMARY, { days: 30 });
-      operationSummary = summary || operationSummary;
-    } catch {
-      operationSummary = { available:false,totalOperations:0,totalPlatformCost:0,totalProductPrice:0,byOperation:[] };
-    }
     renderStats();
     renderRecentOperations();
   }
@@ -368,9 +346,9 @@
     const done  = allJobs.filter(j => (j.status || '').toLowerCase() === 'complete');
     const total = allJobs.length;
     const redactionCost = done.reduce((sum, j) => sum + (+(j.costTotal || 0)), 0);
-    const operationCost = +(operationSummary.totalProductPrice || 0);
+    const operationCost = 0;
     const cost = redactionCost + operationCost;
-    const completedWork = done.length + +(operationSummary.totalOperations || 0);
+    const completedWork = done.length;
     const pages = done.reduce((sum, j) => sum + (+(j.pageCount || 0)), 0);
     const avgCst = completedWork ? cost / completedWork : 0;
     const avgPgs = done.length ? pages / done.length : 0;
@@ -382,7 +360,7 @@
     setText('sDone',        String(done.length));
     setText('sDoneNote',    total ? `${rate}% success rate` : 'No jobs yet');
     setText('sCost',        '$' + cost.toFixed(2));
-    setText('sCostNote',    `${done.length} redaction job${done.length !== 1 ? 's' : ''} + ${operationSummary.totalOperations || 0} document operation${Number(operationSummary.totalOperations || 0) !== 1 ? 's' : ''}`);
+    setText('sCostNote',    `${done.length} completed redaction job${done.length !== 1 ? 's' : ''}`);
     setText('sCredits',     String(Math.max(0, limit - used)));
     setText('sCreditsNote', `${used} of ${limit} used · ${s.planLabel || s.plan || 'Trial'}`);
     setText('avgCost',      completedWork ? '$' + avgCst.toFixed(2) : '$0.00');

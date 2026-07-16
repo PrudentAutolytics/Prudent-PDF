@@ -19,10 +19,10 @@ module.exports = async function(context, req) {
     await ensureProfileColumns();
     const action=String(req.body?.action || 'get').toLowerCase();
     if (action === 'get') {
-      const r=await pool.query('SELECT id,email,full_name,company,plan,credits_used,credits_limit,profile_picture,profile_updated_at FROM users WHERE id=$1',[auth.userId]);
+      const r=await pool.query(`SELECT id,email,full_name,company,plan,credits_used,credits_limit,profile_picture,profile_updated_at,COALESCE(role,'user') AS role FROM users WHERE id=$1`,[auth.userId]);
       const u=r.rows[0];
       if(!u){context.res={status:404,headers:getCorsHeaders(req),body:{error:'Profile not found.'}};return;}
-      context.res={status:200,headers:getCorsHeaders(req),body:{email:u.email,fullName:u.full_name||'',company:u.company||'',plan:u.plan||'trial',creditsUsed:u.credits_used||0,creditsLimit:u.credits_limit||0,profilePicture:u.profile_picture||null,profileUpdatedAt:u.profile_updated_at||null}};
+      context.res={status:200,headers:getCorsHeaders(req),body:{email:u.email,fullName:u.full_name||'',company:u.company||'',plan:u.plan||'trial',creditsUsed:u.credits_used||0,creditsLimit:u.credits_limit||0,profilePicture:u.profile_picture||null,profileUpdatedAt:u.profile_updated_at||null,role:String(u.role||'user').toLowerCase()}};
       return;
     }
     if (action !== 'update') { context.res={status:400,headers:getCorsHeaders(req),body:{error:'Unsupported profile action.'}}; return; }
@@ -37,10 +37,10 @@ module.exports = async function(context, req) {
     }
     const duplicate=await pool.query('SELECT id FROM users WHERE lower(email)=lower($1) AND id<>$2 LIMIT 1',[email,auth.userId]);
     if(duplicate.rows.length){context.res={status:409,headers:getCorsHeaders(req),body:{error:'That email address is already in use.'}};return;}
-    const r=await pool.query(`UPDATE users SET full_name=$1,company=$2,email=$3,profile_picture=$4,profile_updated_at=NOW() WHERE id=$5 RETURNING id,email,full_name,company,plan,credits_used,credits_limit,profile_picture,profile_updated_at`,[fullName,company,email,picture,auth.userId]);
+    const r=await pool.query(`UPDATE users SET full_name=$1,company=$2,email=$3,profile_picture=$4,profile_updated_at=NOW() WHERE id=$5 RETURNING id,email,full_name,company,plan,credits_used,credits_limit,profile_picture,profile_updated_at,COALESCE(role,'user') AS role`,[fullName,company,email,picture,auth.userId]);
     const u=r.rows[0];
     const token=generateSessionToken(u.email,u.id);
-    context.res={status:200,headers:getCorsHeaders(req),body:{email:u.email,fullName:u.full_name,company:u.company||'',plan:u.plan||'trial',creditsUsed:u.credits_used||0,creditsLimit:u.credits_limit||0,profilePicture:u.profile_picture||null,profileUpdatedAt:u.profile_updated_at,token}};
+    context.res={status:200,headers:getCorsHeaders(req),body:{email:u.email,fullName:u.full_name,company:u.company||'',plan:u.plan||'trial',creditsUsed:u.credits_used||0,creditsLimit:u.credits_limit||0,profilePicture:u.profile_picture||null,profileUpdatedAt:u.profile_updated_at,role:String(u.role||'user').toLowerCase(),token}};
   } catch(err) {
     context.log('profile ERROR:',err.message);
     context.res={status:500,headers:getCorsHeaders(req),body:{error:'Profile could not be loaded or saved. Please try again.'}};

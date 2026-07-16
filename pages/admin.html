@@ -153,14 +153,14 @@
           <table class="tbl mobile-card-table admin-users-table">
             <thead><tr>
               <th>User</th>
-              <th>Plan</th>
+              <th>Role</th><th>Plan</th>
               <th>Credits</th>
               <th>Joined</th>
               <th>Status</th>
               <th>Actions</th>
             </tr></thead>
             <tbody id="usersBody">
-              <tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">Loading users...</div></div></td></tr>
+              <tr><td colspan="7"><div class="tbl-empty"><div class="tbl-empty-title">Loading users...</div></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -367,7 +367,7 @@ Content-Type: application/json
   function renderUsers(users) {
     const body = $('usersBody');
     if (!users.length) {
-      body.innerHTML = '<tr><td colspan="6"><div class="tbl-empty"><div class="tbl-empty-title">No users found</div></div></td></tr>';
+      body.innerHTML = '<tr><td colspan="7"><div class="tbl-empty"><div class="tbl-empty-title">No users found</div></div></td></tr>';
       return;
     }
     body.innerHTML = users.map(u => {
@@ -382,6 +382,12 @@ Content-Type: application/json
           <div style="font-weight:600;font-size:13px;color:var(--ink)">${esc(u.full_name) || '-'}</div>
           <div style="font-size:11.5px;color:var(--ink3)">${esc(u.email)}</div>
           ${u.company ? `<div style="font-size:11px;color:var(--ink4)">${esc(u.company)}</div>` : ''}
+        </td>
+        <td>
+          <select class="upgrade-select" aria-label="Role for ${esc(u.email)}" style="font-size:11.5px;padding:4px 7px;border:1px solid var(--border2);border-radius:var(--r6);background:var(--surface2);color:var(--ink);font-family:var(--font);cursor:pointer" onchange="updateUserRole('${jsArg(u.email)}',this.value)">
+            <option value="user"${String(u.role||'user').toLowerCase()==='user'?' selected':''}>User</option>
+            <option value="super_admin"${String(u.role||'').toLowerCase()==='super_admin'?' selected':''}>Super Admin</option>
+          </select>
         </td>
         <td>
           ${planPill(plan)}
@@ -418,6 +424,18 @@ Content-Type: application/json
     const q = e.target.value.trim().toLowerCase();
     renderUsers(q ? allUsers.filter(u => u.email.includes(q) || (u.full_name||'').toLowerCase().includes(q) || (u.company||'').toLowerCase().includes(q)) : allUsers);
   });
+
+
+  window.updateUserRole = async function(userEmail, role) {
+    try {
+      await adminCall({ action:'updateRole', targetEmail:userEmail, role });
+      showToast('Role updated for ' + userEmail, 'success');
+      await loadUsers();
+    } catch(e) {
+      showToast('Failed: ' + e.message, 'error');
+      await loadUsers();
+    }
+  };
 
   /* ── Upgrade plan ── */
   window.upgradePlan = async function(userEmail, plan) {
@@ -571,7 +589,7 @@ Content-Type: application/json
       return;
     }
     $('apiKeysList').innerHTML = `<table class="tbl"><thead><tr>
-      <th>User</th><th>Key</th><th>Plan</th><th>Created</th><th>Last used</th><th></th>
+      <th>User</th><th>Key</th><th>Role</th><th>Plan</th><th>Created</th><th>Last used</th><th></th>
     </tr></thead><tbody>` +
     keys.map(k => `<tr>
       <td style="font-size:12.5px">${esc(k.email)}</td>

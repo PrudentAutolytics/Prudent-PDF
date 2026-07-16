@@ -42,9 +42,9 @@ check(shell.includes('View plans and limits'),'plan action remains visible in th
 check(shell.includes('sidebarRemain'),'remaining credits remain in the fixed footer');
 check(shell.includes('sidebarPlanLabel'),'plan label remains refreshable');
 check(shell.includes('currentActiveId'),'active navigation context is preserved');
-check(read('pages/governance.html').includes('Governance Command Center'),'governance page remains intact');
+check(read('pages/governance.html').includes('Enterprise Governance Center'),'governance page remains intact');
 check(read('pages/dashboard.html').includes('Recent Redaction Jobs'),'dashboard page remains intact');
-check(read('pages/tools.html').includes('Document Operations'),'document operations remain intact');
+check(!fs.existsSync(path.join(root,'pages/tools.html')),'removed document operations module stays absent');
 check(!/[\u2013\u2014]/.test(main+responsive+shell),'changed shell sources contain no en dash or em dash');
 check(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'api/jobs-submit/index.js'))).digest('hex')==='5345cc76c6e06ad5bc9d5cb18b50ea0f4c039a7306a2e07d1e72db6a32702803','locked Power Automate jobs-submit file is unchanged');
 check(!responsive.includes('.sidebar{position:sticky!important'),'desktop responsive layer does not reintroduce sticky sidebar scrolling');

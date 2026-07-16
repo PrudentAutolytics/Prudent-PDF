@@ -58,6 +58,7 @@ async function listUsers() {
     aliasOr(cols, 'max_pages_per_file', '50'),
     aliasOr(cols, 'max_pages_per_month', '50'),
     aliasOr(cols, 'is_active', 'true'),
+    aliasOr(cols, 'role', "'user'::text"),
     aliasOr(cols, 'created_at', 'NOW()'),
   ].join(', ');
   const order = cols.has('created_at') ? 'created_at DESC' : 'email ASC';
@@ -222,6 +223,25 @@ module.exports = async function (context, req) {
           active:cols.has('is_active'), fileLimits:cols.has('max_file_size_mb') && cols.has('max_pages_per_file') && cols.has('max_pages_per_month')
         }
       }};
+      return;
+    }
+
+    if (action === 'updateRole') {
+      const targetEmail = String(req.body?.targetEmail || '').trim().toLowerCase();
+      const role = String(req.body?.role || '').trim().toLowerCase();
+      if (!['user', 'super_admin'].includes(role)) {
+        context.res = { status:400, headers:getCorsHeaders(req), body:{ error:'Role must be user or super_admin.' } };
+        return;
+      }
+      if (targetEmail === adminEmail && role !== 'super_admin') {
+        context.res = { status:400, headers:getCorsHeaders(req), body:{ error:'You cannot remove your own super_admin role.' } };
+        return;
+      }
+      const cols = await getColumns('users');
+      if (!cols.has('role')) throw new Error('Run migration-super-admin-role.sql before managing roles.');
+      await pool.query('UPDATE users SET role=$1 WHERE LOWER(email)=LOWER($2)', [role, targetEmail]);
+      await audit(context, adminEmail, 'updateRole', targetEmail, { role });
+      context.res = { status:200, headers:getCorsHeaders(req), body:{ success:true, role } };
       return;
     }
 

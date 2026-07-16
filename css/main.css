@@ -1315,3 +1315,7 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 .info-help-tooltip strong { display:block; color:var(--ink); font-size:12.5px; margin-bottom:4px; }
 .has-info-help { display:inline-flex; align-items:center; max-width:100%; }
 .nav-link .info-help-btn,.btn .info-help-btn { margin-left:auto; }
+
+.nav-item-disabled{width:100%;appearance:none;text-align:left;opacity:.62;cursor:not-allowed;background:transparent;color:var(--ink3)}
+.nav-item-disabled:hover{background:transparent;color:var(--ink3);transform:none}
+.nav-item-disabled .nav-badge{margin-left:auto;white-space:nowrap}

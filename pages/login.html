@@ -1196,6 +1196,8 @@ async function verifyOTP() {
         isNewUser      : S.isNew,
         expiresAt      : Date.now() + 30 * 24 * 3600000,  // 30 days, matches server
         fullName       : d.fullName || S.name || null,
+        role           : String(d.role || 'user').toLowerCase(),
+        isAdmin        : d.isAdmin === true,
       });
       const fn = d.fullName || S.name;
       const firstName = fn ? fn.split(' ')[0] : null;
@@ -1262,7 +1264,7 @@ $('changeEmailBtn').addEventListener('click', () => {
     brand.innerHTML = [
       '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/prudent-brand-dark-800.png" alt="Prudent Autolytics"/></a>',
       '<div class="left-tagline">Sensitive information in.<br/><span>Controlled document out.</span></div>',
-      '<p class="left-sub">Prudent Redact permanently replaces personal and confidential information with black redaction blocks, then records the output and processing evidence.</p>',
+      '<p class="left-sub">Prudent Redact uses Microsoft Azure and Azure AI Document Intelligence to support controlled document analysis, black-box redaction and processing evidence.</p>',
       '<div class="login-command-center" aria-hidden="true">',
       '  <div class="command-main">',
       '    <div class="command-top"><span>DOCUMENT REDACTION PREVIEW</span><span class="command-live">LIVE</span></div>',
@@ -1296,7 +1298,7 @@ $('changeEmailBtn').addEventListener('click', () => {
   // Left bottom trust badges
   set('leftBottom', [
     '<div class="left-trust">TLS transport</div>',
-    '<div class="left-trust">Azure hosted APIs</div>',
+    '<div class="left-trust">Microsoft Azure</div><div class="left-trust">Azure AI Document Intelligence</div>',
     '<div class="left-trust">Passwordless verification</div>'
   ].join(''));
 

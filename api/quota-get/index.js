@@ -40,7 +40,7 @@ module.exports = async function (context, req) {
     const result = await pool.query(`
       SELECT id, email, plan, credits_used, credits_limit,
              max_file_size_mb, max_pages_per_file, max_pages_per_month,
-             trial_expiry_date, is_active, full_name, company${hasPicture ? ', profile_picture' : ''}
+             trial_expiry_date, is_active, full_name, company, COALESCE(role, 'user') AS role${hasPicture ? ', profile_picture' : ''}
       FROM users WHERE email = $1
     `, [email]);
 
@@ -73,6 +73,7 @@ module.exports = async function (context, req) {
         profilePicture   : user.profile_picture || null,
         isActive         : user.is_active,
         isAdmin,
+        role              : String(user.role || 'user').toLowerCase(),
 
         // Plan
         plan,

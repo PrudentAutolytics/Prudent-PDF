@@ -19,10 +19,9 @@ const Shell = (() => {
       ],
     },
     {
-      group : 'DOCUMENT TOOLS',
+      group : 'COMING SOON',
       items : [
-        { id: 'tools', label: 'Document Operations', href: '/tools', icon: 'tools', desc: 'PDF operations, media redaction, validation, and controlled conversion workflows' },
-        { id: 'media-redaction', label: 'Media Redaction', href: '/media-redaction', icon: 'shield', desc: 'Redact faces and sensitive regions in images and video' },
+        { id: 'media-redaction', label: 'Media Redaction', href: '', icon: 'shield', desc: 'Image and video privacy workflows are in controlled preview', badge: 'Coming Soon', disabled: true },
       ],
     },
     {
@@ -38,10 +37,9 @@ const Shell = (() => {
         { id: 'pricing', label: 'Plans & Pricing', href: '/pricing', icon: 'star', desc: 'Compare plans, limits, and cost details' },
         { id: 'contact', label: 'Contact Us',      href: '/contact', icon: 'mail', desc: 'Talk to our team' },
         // Administration is shown only when the session was issued with the
-        // administrator flag, which is set server-side from ADMIN_EMAILS at
-        // OTP verification. The admin API independently enforces access, so
+        // super_admin role returned by the server at OTP verification. The admin API independently enforces access, so
         // this controls visibility, not authorization.
-        ...(Session.get()?.isAdmin === true
+        ...(String(Session.get()?.role || '').toLowerCase() === 'super_admin'
           ? [{ id: 'admin', label: 'Administration', href: '/admin', icon: 'settings', desc: 'Users, tenant access, plans, credits, and API keys' }]
           : []),
       ],
@@ -451,6 +449,7 @@ const Shell = (() => {
           maxPagesPerMonth : data.maxPagesPerMonth  ?? s.maxPagesPerMonth,
           fullName         : data.fullName          ?? s.fullName,
           profilePicture   : data.profilePicture     ?? s.profilePicture,
+          role             : String(data.role || s.role || 'user').toLowerCase(),
           isAdmin          : data.isAdmin === true,
         };
         const priorAdmin = Session.get()?.isAdmin === true;

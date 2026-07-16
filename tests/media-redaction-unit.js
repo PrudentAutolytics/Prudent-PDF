@@ -8,11 +8,7 @@ function check(ok, message) {
   else console.log('PASS:', message);
 }
 
-const catalog = read('js/tools-catalog.js');
-[
-  'Image Redaction','Face Redaction','Video Redaction','Video Face Redaction',
-  'Licence Plate Redaction','Screen and Badge Redaction','Audio Redaction','Bulk Media Redaction'
-].forEach(name => check(catalog.includes(name), `media workflow present: ${name}`));
+check(!fs.existsSync(path.join(root,'js/tools-catalog.js')), 'removed tools catalog is absent');
 
 const media = read('js/media-redaction.js');
 check(media.includes('FaceDetector'), 'browser face assistance is capability gated');
@@ -29,7 +25,7 @@ const usage = read('api/usage-track/index.js');
 ].forEach(op => check(usage.includes(`'${op}'`), `usage API allows ${op}`));
 
 const config = JSON.parse(read('staticwebapp.config.json'));
-check(config.routes.some(r => r.route === '/media-redaction' && r.rewrite === '/pages/media-redaction.html'), 'media redaction route exists');
+check(config.routes.some(r => r.route === '/media-redaction' && r.redirect === '/dashboard?feature=media-coming-soon'), 'media redaction route is disabled as Coming Soon');
 check(config.globalHeaders['Content-Security-Policy'].includes("media-src 'self' blob:"), 'CSP permits same-origin and blob media only');
 
 

@@ -44,20 +44,9 @@
       "rewrite": "/pages/login.html"
     },
     {
-      "route": "/tools",
-      "rewrite": "/pages/tools.html"
-    },
-    {
       "route": "/media-redaction",
-      "rewrite": "/pages/media-redaction.html"
-    },
-    {
-      "route": "/tool",
-      "rewrite": "/pages/tool.html"
-    },
-    {
-      "route": "/advanced-tool",
-      "rewrite": "/pages/advanced-tool.html"
+      "redirect": "/dashboard?feature=media-coming-soon",
+      "statusCode": 302
     },
     {
       "route": "/",

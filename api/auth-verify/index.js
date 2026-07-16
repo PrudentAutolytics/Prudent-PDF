@@ -32,7 +32,7 @@ module.exports = async function (context, req) {
     const result = await pool.query(`
       SELECT id, email, plan, credits_used, credits_limit,
              trial_expiry_date, otp, otp_expires_at, is_active,
-             full_name, company, use_case
+             full_name, company, use_case, COALESCE(role, 'user') AS role
       FROM users WHERE email = $1
     `, [email]);
 
@@ -79,6 +79,7 @@ module.exports = async function (context, req) {
         fullName        : user.full_name  || null,
         company         : user.company    || null,
         useCase         : user.use_case   || null,
+        role            : String(user.role || 'user').toLowerCase(),
         isAdmin         : await isAdminUser(user.id, user.email),
       },
     };

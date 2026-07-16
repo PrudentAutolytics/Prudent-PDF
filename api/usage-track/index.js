@@ -12,10 +12,8 @@ const { calculateOperationCost } = require('../operation-cost');
 const PA_FLOW_FALLBACK = 'https://default8633bc1414464b1ab39b9eab02755c.9a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6f1b9fb734594602b3cdef26e0166ed6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7yVwfmA-5Aog_IJW3XN7Vz3uNnKcBE1NyoYwluTGlpc';
 
 const ALLOWED_OPERATIONS = new Set([
-  'PDF_SPLIT','PDF_MERGE','PAGE_EXTRACTION','PAGE_REMOVAL','PAGE_ROTATION','PAGE_ORGANIZATION','METADATA_CLEAN','PDF_VALIDATION',
-  'WORKFLOW_COMPRESS','WORKFLOW_REPAIR','WORKFLOW_WATERMARK','WORKFLOW_PAGENUMBERS','WORKFLOW_CROP','WORKFLOW_EDIT','WORKFLOW_SIGN','WORKFLOW_FORMS',
-  'WORKFLOW_JPGPDF','WORKFLOW_SCANPDF','WORKFLOW_HTMLPDF','WORKFLOW_FLATTEN','WORKFLOW_CREATEPDF',
-  'IMAGE_REDACTION','FACE_REDACTION','VIDEO_REDACTION','VIDEO_FACE_REDACTION','LICENCE_PLATE_REDACTION','SCREEN_BADGE_REDACTION'
+  'IMAGE_REDACTION','FACE_REDACTION','VIDEO_REDACTION','VIDEO_FACE_REDACTION',
+  'LICENCE_PLATE_REDACTION','SCREEN_BADGE_REDACTION'
 ]);
 
 function bounded(value, max) { return String(value || '').replace(/[\u0000-\u001f\u007f]/g, '').slice(0, max); }
@@ -27,11 +25,11 @@ module.exports = async function (context, req) {
   if (!auth.ok) { context.res = { status: auth.status, headers, body: { error: auth.error } }; return; }
 
   const operation = bounded(req.body?.operation, 64).toUpperCase();
-  if (!ALLOWED_OPERATIONS.has(operation)) { context.res = { status: 400, headers, body: { error: 'Unsupported document operation.' } }; return; }
+  if (!ALLOWED_OPERATIONS.has(operation)) { context.res = { status: 400, headers, body: { error: 'Unsupported media operation.' } }; return; }
 
   const sourceName = bounded(req.body?.sourceName, 255);
   const outputName = bounded(req.body?.outputName, 255);
-  if ((sourceName && !safeFileName(sourceName)) || (outputName && !safeFileName(outputName))) { context.res = { status: 400, headers, body: { error: 'Invalid document name.' } }; return; }
+  if ((sourceName && !safeFileName(sourceName)) || (outputName && !safeFileName(outputName))) { context.res = { status: 400, headers, body: { error: 'Invalid media name.' } }; return; }
 
   const pageCount = Math.max(0, Math.min(1000000, Number(req.body?.pageCount) || 0));
   const fileSizeMB = Math.max(0, Math.min(5000, Number(req.body?.fileSizeMB) || 0));
@@ -39,7 +37,7 @@ module.exports = async function (context, req) {
   const costAnalysis = calculateOperationCost(operation, pageCount, fileSizeMB, sourceCount);
   const eventId = crypto.randomUUID();
   const event = {
-    eventType: 'DOCUMENT_OPERATION_USAGE',
+    eventType: 'MEDIA_REDACTION_USAGE',
     eventId,
     operationType: operation,
     usageIncrement: 1,
@@ -54,7 +52,7 @@ module.exports = async function (context, req) {
     costModelVersion: costAnalysis.modelVersion,
     occurredAt: new Date().toISOString(),
     product: 'Prudent Redact',
-    source: 'document-operations'
+    source: 'media-redaction-preview'
   };
 
   try {
