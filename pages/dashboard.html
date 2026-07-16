@@ -317,7 +317,7 @@
     if (!body) return;
     const rows = Array.isArray(operationSummary.recentOperations) ? operationSummary.recentOperations : [];
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="5"><div class="tbl-empty" style="padding:34px 20px"><div class="tbl-empty-title">No document or media operations yet</div><div class="tbl-empty-sub">Completed Split, Merge, Rotate, Scan to PDF, and media privacy workflows will appear here.</div></div></td></tr>`;
+      body.innerHTML = `<tr><td colspan="5"><div class="tbl-empty" style="padding:34px 20px"><div class="tbl-empty-title">No redaction activity yet</div><div class="tbl-empty-sub">Completed document redaction jobs will appear here.</div></div></td></tr>`;
       if (meta) meta.textContent = '0 metered operations in the last 30 days';
       return;
     }

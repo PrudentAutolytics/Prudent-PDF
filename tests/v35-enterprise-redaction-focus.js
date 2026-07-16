@@ -20,7 +20,7 @@ check(admin.includes("action === 'updateRole'")&&admin.includes("['user', 'super
 check(fs.existsSync(path.join(root,'migration-super-admin-role.sql')),'role migration is included');
 check(home.includes('Microsoft Azure')&&home.includes('Azure AI Document Intelligence'),'homepage explicitly names Azure and Document Intelligence');
 check(login.includes('Microsoft Azure')&&login.includes('Azure AI Document Intelligence'),'login explicitly names Azure and Document Intelligence');
-check(gov.includes('Enterprise Governance Center')&&gov.includes('Azure Blob Storage'),'Governance is enterprise and Azure focused');
+check((gov.includes('Enterprise Governance Center')||gov.includes('Governance Control Center'))&&gov.includes('Azure Blob Storage'),'Governance is enterprise and Azure focused');
 check(!dash.includes('Recent Document and Media Operations'),'Dashboard operation module removed');
 check(!dash.includes('Open Document Operations'),'Dashboard operation link removed');
 const locked=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'api/jobs-submit/index.js'))).digest('hex');

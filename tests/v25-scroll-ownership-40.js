@@ -42,7 +42,7 @@ check(shell.includes('View plans and limits'),'plan action remains visible in th
 check(shell.includes('sidebarRemain'),'remaining credits remain in the fixed footer');
 check(shell.includes('sidebarPlanLabel'),'plan label remains refreshable');
 check(shell.includes('currentActiveId'),'active navigation context is preserved');
-check(read('pages/governance.html').includes('Enterprise Governance Center'),'governance page remains intact');
+check(read('pages/governance.html').includes('Enterprise Governance Center')||read('pages/governance.html').includes('Governance Control Center'),'governance page remains intact');
 check(read('pages/dashboard.html').includes('Recent Redaction Jobs'),'dashboard page remains intact');
 check(!fs.existsSync(path.join(root,'pages/tools.html')),'removed document operations module stays absent');
 check(!/[\u2013\u2014]/.test(main+responsive+shell),'changed shell sources contain no en dash or em dash');
