@@ -12,6 +12,7 @@
 <title>Sign In | Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<link rel="stylesheet" href="/css/premium.css"/>
 <style>
 /* ── Layout ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -866,7 +867,7 @@ body{
 <body>
 
 <!-- LEFT PANEL - content injected by JS to prevent scraping -->
-<div class="left-panel" id="leftPanel">
+<div class="left-panel aurora-host" id="leftPanel">
   <div class="left-grid"></div>
   <div class="left-glow"></div>
   <div class="left-brand" id="leftBrand"></div>
@@ -1265,7 +1266,7 @@ $('changeEmailBtn').addEventListener('click', () => {
       '<a href="/" class="left-logo"><img class="left-logo-img" src="/assets/prudent-brand-dark-800.png" alt="Prudent Autolytics"/></a>',
       '<div class="left-tagline">Sensitive information in.<br/><span>Controlled document out.</span></div>',
       '<p class="left-sub">Prudent Redact uses Microsoft Azure and Azure AI Document Intelligence to support controlled document analysis, black-box redaction and processing evidence.</p>',
-      '<div class="login-command-center" aria-hidden="true">',
+      '<div class="login-command-center scan-host" aria-hidden="true">',
       '  <div class="command-main">',
       '    <div class="command-top"><span>DOCUMENT REDACTION PREVIEW</span><span class="command-live">LIVE</span></div>',
       '    <div class="command-stage">',
@@ -1327,5 +1328,6 @@ Document and media controls
 History and governance
 -->
 
+<script src="/js/premium.js"></script>
 </body>
 </html>

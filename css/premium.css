@@ -1,0 +1,121 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRUDENT REDACT - premium.css (v36)
+   A motion-and-depth layer over the existing design system. Pure CSS plus
+   hooks consumed by js/premium.js. No external assets, no CDN, CSP-safe.
+   Every animation is disabled under prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Ambient aurora for dark public surfaces ─────────────────────────── */
+.aurora-host { position: relative; isolation: isolate; overflow: hidden; }
+.aurora-host::before,
+.aurora-host::after {
+  content: ''; position: absolute; z-index: -1; border-radius: 50%;
+  filter: blur(90px); opacity: .55; pointer-events: none;
+  will-change: transform;
+}
+.aurora-host::before {
+  width: 620px; height: 620px; top: -220px; right: -160px;
+  background: radial-gradient(circle at 30% 30%, rgba(10,140,255,.32), rgba(65,105,246,.16) 55%, transparent 75%);
+  animation: auroraDrift 16s ease-in-out infinite alternate;
+}
+.aurora-host::after {
+  width: 520px; height: 520px; bottom: -240px; left: -140px;
+  background: radial-gradient(circle at 70% 70%, rgba(178,24,244,.22), rgba(65,105,246,.12) 55%, transparent 75%);
+  animation: auroraDrift 20s ease-in-out infinite alternate-reverse;
+}
+@keyframes auroraDrift {
+  from { transform: translate3d(0,0,0) scale(1); }
+  to   { transform: translate3d(-60px,40px,0) scale(1.12); }
+}
+
+/* ── 2. Scan beam: makes redaction demos feel alive ─────────────────────── */
+.scan-host { position: relative; overflow: hidden; }
+.scan-host::after {
+  content: ''; position: absolute; left: 0; right: 0; top: -40%;
+  height: 34%; pointer-events: none;
+  background: linear-gradient(180deg, transparent,
+              rgba(10,140,255,.10) 45%, rgba(125,211,252,.22) 50%,
+              rgba(10,140,255,.10) 55%, transparent);
+  animation: scanSweep 4.5s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes scanSweep { 0% { top: -40%; } 70%, 100% { top: 120%; } }
+
+/* ── 3. Glass elevation and card life ───────────────────────────────────── */
+.card, .stat-card {
+  transition: transform .22s cubic-bezier(.2,.8,.2,1),
+              box-shadow .22s cubic-bezier(.2,.8,.2,1),
+              border-color .22s ease;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(22,35,59,.10), 0 2px 8px rgba(22,35,59,.06);
+  border-color: var(--blue-bd, #C7DCEE);
+}
+.stat-card { position: relative; overflow: hidden; }
+.stat-card::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(420px circle at var(--mx,50%) var(--my,0%),
+              rgba(46,117,182,.08), transparent 45%);
+  transition: opacity .25s ease;
+}
+.stat-card:hover::before { opacity: 1; }
+
+.topbar {
+  -webkit-backdrop-filter: saturate(1.5) blur(14px);
+  backdrop-filter: saturate(1.5) blur(14px);
+}
+
+/* ── 4. Buttons: tactile press and sheen ────────────────────────────────── */
+.btn { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 44%;
+  left: -60%; pointer-events: none; transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+  transition: left .5s ease;
+}
+.btn-primary:hover::after { left: 120%; }
+.btn:active { transform: scale(.975); }
+
+/* ── 5. Scroll reveal (driven by js/premium.js) ─────────────────────────── 
+   Elements are ONLY hidden when the html element carries .premium-ready,
+   which js/premium.js sets. If the script never runs, everything stays
+   visible: motion is an enhancement, never a dependency. */
+html.premium-ready .reveal { opacity: 0; transform: translateY(14px); }
+html.premium-ready .reveal.reveal-in {
+  opacity: 1; transform: none;
+  transition: opacity .55s cubic-bezier(.2,.8,.2,1), transform .55s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ── 6. KPI count-up target styling ─────────────────────────────────────── */
+[data-countup] { font-variant-numeric: tabular-nums; }
+
+/* ── 7. Live pulse dot (status indicators) ──────────────────────────────── */
+.live-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #22c55e; box-shadow: 0 0 0 0 rgba(34,197,94,.45);
+  animation: liveDot 2s ease-out infinite;
+}
+@keyframes liveDot {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.45); }
+  70%  { box-shadow: 0 0 0 9px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+/* ── 8. Table row life ──────────────────────────────────────────────────── */
+.tbl tbody tr { transition: background .15s ease; }
+.tbl tbody tr:hover td { background: var(--navy-pale, #EDF1F7); }
+
+/* ── 9. Gradient text utility for hero accents ──────────────────────────── */
+.grad-text {
+  background: linear-gradient(92deg, #7dd3fc 0%, #93c5fd 45%, #c4b5fd 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+
+/* ── 10. Motion discipline ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-host::before, .aurora-host::after,
+  .scan-host::after, .live-dot, .btn-primary::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .card, .stat-card, .btn { transition: none !important; }
+}

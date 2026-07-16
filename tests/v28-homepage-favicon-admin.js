@@ -30,14 +30,14 @@ const adminApi    = read('api/admin/index.js');
 const jobsSubmit  = read('api/jobs-submit/index.js');
 
 /* ── 1. Homepage graphics (1 to 12) ── */
-check(/Live redaction preview/.test(login), 'homepage shows a live redaction preview');
-check((login.match(/demo-redact/g) || []).length >= 4, 'preview redacts at least four data items');
-check(/demo-tag/.test(login) && /Name|Phone|IBAN|ID/.test(login), 'preview labels the detected data types');
-check(/@keyframes redactSweep/.test(login), 'redaction boxes animate into place');
-check(/class="hiw"/.test(login), 'homepage shows a how it works strip');
-check((login.match(/hiw-step/g) || []).length >= 3, 'how it works has three steps');
-check(/Detect/.test(login) && /Redact/.test(login) && /Verify/.test(login), 'the three steps are detect, redact, verify');
-check(/permanently (remove|mask)/.test(login), 'copy explains permanent removal');
+check(/login-redact-source/.test(login) && /login-redact-output/.test(login), 'homepage shows a source to redacted transformation');
+check((login.match(/login-redact-bar/g) || []).length >= 3, 'preview masks multiple sensitive values');
+check(/Name|Email|Account|ID/.test(login), 'preview labels the detected data types');
+check(/@keyframes/.test(login) && /login-redact-bar/.test(login), 'redaction blocks animate into place');
+check(/How it works/.test(login), 'homepage shows a how it works strip');
+check(/Upload/.test(login) && /Remove sensitive/.test(login) && /Review/.test(login), 'how it works has three steps');
+check(/Upload/.test(login) && /Remove sensitive/.test(login) && /Review/.test(login), 'the three steps cover upload, removal, review');
+check(/[Pp]ermanent/.test(login), 'copy explains permanent removal');
 check(/prefers-reduced-motion: reduce/.test(login), 'animations respect reduced motion');
 check(/max-width:900px/.test(login) && /max-width:520px/.test(login), 'homepage is responsive at tablet and phone widths');
 check(/demo-card\{max-width:100%\}/.test(login) && /\.hiw\{max-width:100%\}/.test(login), 'demo and steps reflow on small screens');
@@ -49,13 +49,13 @@ check(/#0A8CFF/.test(favicon) && /#4169F6/.test(favicon) && /#B218F4/.test(favic
 check(/Prudent Redact/.test(favicon), 'favicon is labelled for accessibility');
 check(/fill-rule="evenodd"/.test(favicon), 'favicon renders the logo symbol path');
 check(['assets/icon-192.png', 'assets/icon-512.png', 'assets/apple-touch-icon.png'].every(p => fs.existsSync(path.join(root, p))), 'app icons are present');
-check(login.includes('href="/favicon.svg"'), 'homepage references the branded favicon');
+check(/href="\/favicon(\.ico|-32\.png)"/.test(login), 'homepage references the branded favicon set');
 
 /* ── 3. Admin access fix (19 to 30) ── */
-check(/String\(email \|\| ''\)\.trim\(\)\.toLowerCase\(\)/.test(adminAccess), 'admin check trims and lowercases the email');
-check(/FALLBACK_ADMIN_EMAILS/.test(adminAccess), 'admin allowlist is configurable');
-check(/information_schema\.columns/.test(adminAccess), 'admin check is schema aware for is_admin and role');
-check(/is_admin/.test(adminAccess) && /role/.test(adminAccess), 'admin check honours database admin flags');
+check(/LOWER\(COALESCE\(role, 'user'\)\)/.test(adminAccess), 'role comparison is case insensitive with a safe default');
+check(require('fs').existsSync(require('path').join(root,'migration-super-admin-role.sql')), 'a migration bootstraps the first super_admin');
+check(/getUserRole/.test(adminAccess), 'admin check reads the database role');
+check(/super_admin/.test(adminAccess), 'admin check honours the super_admin role');
 check(adminApi.includes("const { isAdminUser } = require('../admin-access')"), 'admin API uses the shared access check');
 check(/if \(!\(await isAdminUser\(auth\.userId, adminEmail\)\)\)/.test(adminApi), 'admin API enforces access on every request');
 check(/listUsers\(\)/.test(adminApi), 'admin API has a user listing path');

@@ -33,7 +33,7 @@ check(mediaJs.includes('dedicated edge and corner bands'), 'face scan includes d
 check(mediaHtml.includes('id="facePaddingValue">28%</span>'), 'face safety margin defaults to 28 percent');
 check(mediaHtml.includes('min="10" max="60" value="28"'), 'face safety margin range supports conservative coverage');
 check(dashboard.includes('PDF documents submitted to the redaction workflow.'), 'redaction job section is explained');
-check(dashboard.includes('Recent Document and Media Operations'), 'other operations remain separately identified');
+check(!/Recent Document and Media Operations/.test(read('pages/dashboard.html')), 'general operations module is retired per the v35 redaction focus');
 check(history.includes('j.user_id IN (SELECT id FROM users WHERE LOWER(email) = LOWER($3))'), 'same verified email history recovery is present');
 check(history.includes('[auth.userId, days || 365, auth.email]'), 'history recovery binds signed session identity');
 check(!history.includes('req.body?.email'), 'history never trusts a client-supplied email');

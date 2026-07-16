@@ -8,6 +8,7 @@
 <title>Governance | Prudent Redact</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<link rel="stylesheet" href="/css/premium.css"/>
 <style>
 .gov-page{padding:28px 30px 44px;max-width:1680px;margin:0 auto;width:100%}
 .gov-hero{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:20px;background:linear-gradient(135deg,var(--navy-d),#203b6b 54%,#2e75b6);color:#fff;padding:28px 30px;box-shadow:var(--s3);margin-bottom:20px}
@@ -116,5 +117,6 @@ function evidence(){if(!snapshot)return; const blob=new Blob([JSON.stringify({sc
 $('refreshBtn').addEventListener('click',load);$('exportBtn').addEventListener('click',evidence);$('copyHealthBtn').addEventListener('click',async()=>{if(!snapshot)return;const m=snapshot.metrics||{};const text=`Prudent Redact governance health\nDeployment: ${location.origin}\nGenerated: ${snapshot.generatedAt}\n30-day jobs: ${m.total_jobs||0}\nFailures: ${m.failed_jobs||0}\nStuck: ${m.stuck_jobs||0}\nSLA breaches: ${m.sla_breaches||0}\nP95: ${Number(m.p95_minutes||0).toFixed(1)} min\nCallback protection: ${snapshot.policy?.callbackProtection?'configured':'missing'}\nAPP_URL: ${snapshot.policy?.appUrlConfigured?'configured':'missing'}`;await navigator.clipboard.writeText(text);showToast('Health summary copied','success',1500);});
 load();
 </script>
+<script src="/js/premium.js"></script>
 </body>
 </html>

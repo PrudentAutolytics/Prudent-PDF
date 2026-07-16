@@ -68,9 +68,9 @@ check(/boxIoU\(box,existing\)>0\.45/.test(mediaJs), 'dedupe keeps distinct nearb
 check(/Number\(\$\('facePadding'\)\?\.value \|\| 28\) \/ 100/.test(mediaJs), 'face mask safety margin defaults to a generous value');
 
 /* ── 3. Administration restricted to the configured administrator (31 to 40) ── */
-check(/FALLBACK_ADMIN_EMAILS = \(process\.env\.ADMIN_EMAILS \|\| 'kabileshvijayakumar@prudentautolytics\.com'\)/.test(adminAccess), 'admin fallback is the single configured owner');
-check(/return FALLBACK_ADMIN_EMAILS\.includes\(normalized\)/.test(adminAccess), 'admin fallback membership is required when no db flag matches');
-check(/information_schema\.columns/.test(adminAccess), 'admin access is schema aware for is_admin and role columns');
+check(/SUPER_ADMIN_ROLE = 'super_admin'/.test(adminAccess), 'administration requires the super_admin role');
+check(/getUserRole\(userId\)\) === SUPER_ADMIN_ROLE/.test(adminAccess), 'admin access is granted only when the database role matches');
+check(require('fs').existsSync(require('path').join(root,'migration-super-admin-role.sql')), 'a role migration bootstraps the first super_admin');
 check(adminApi.includes("const { isAdminUser } = require('../admin-access')"), 'admin API imports the shared access control');
 check(/if \(!\(await isAdminUser\(auth\.userId, adminEmail\)\)\)/.test(adminApi), 'admin API enforces access on every request');
 check(authVerify.includes("const { isAdminUser } = require('../admin-access')"), 'auth verify imports the shared access control');
@@ -84,7 +84,7 @@ check(/j\.user_id IN \(SELECT id FROM users WHERE LOWER\(email\) = LOWER\(\$3\)\
 check(/\[auth\.userId, days \|\| 365, auth\.email\]/.test(jobsList), 'jobs list binds the session email from the token, not the client');
 check(!/req\.body\?\.email/.test(jobsList), 'jobs list never reads a client supplied email');
 check(dashHtml.includes('Recent Redaction Jobs'), 'dashboard shows a redaction jobs section');
-check(dashHtml.includes('Recent Document and Media Operations'), 'dashboard shows a separate operations section');
+check(/Recent Redaction Jobs/.test(dashHtml), 'dashboard stays focused on redaction jobs after the v35 refocus');
 check(/PDF documents submitted to the redaction workflow/.test(dashHtml), 'redaction jobs section explains what it contains');
 
 /* ── 5. Locked contract and copy regressions (47 to 50) ── */

@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<link rel="stylesheet" href="/css/premium.css"/>
 <style>
 .profile-wrap{max-width:1050px;margin:0 auto}.profile-grid{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px;align-items:start}
 .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--s1);overflow:hidden}.profile-summary{padding:28px 22px;text-align:center}
@@ -76,4 +77,5 @@ $('profileForm').onsubmit=async e=>{e.preventDefault();const b=$('saveBtn');b.di
 document.querySelectorAll('[data-help]').forEach(b=>b.onclick=()=>{$('helpTitle').textContent=b.closest('label').firstChild.textContent.trim();$('helpBody').textContent=HELP[b.dataset.help];$('helpDialog').showModal()});$('helpClose').onclick=()=>$('helpDialog').close();
 load();
 </script>
+<script src="/js/premium.js"></script>
 </body></html>
