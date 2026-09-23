@@ -4,28 +4,44 @@
       "route": "/api/*",
       "headers": {
         "Cache-Control": "no-store, private",
-        "X-Content-Type-Options": "nosniff"
+        "X-Content-Type-Options": "nosniff",
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
       }
     },
     {
       "route": "/dashboard",
-      "rewrite": "/pages/dashboard.html"
+      "rewrite": "/pages/dashboard.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/history",
-      "rewrite": "/pages/history.html"
+      "rewrite": "/pages/history.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/viewer",
-      "rewrite": "/pages/viewer.html"
+      "rewrite": "/pages/viewer.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/governance",
-      "rewrite": "/pages/governance.html"
+      "rewrite": "/pages/governance.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/profile",
-      "rewrite": "/pages/profile.html"
+      "rewrite": "/pages/profile.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/pricing",
@@ -37,16 +53,25 @@
     },
     {
       "route": "/admin",
-      "rewrite": "/pages/admin.html"
+      "rewrite": "/pages/admin.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/login",
-      "rewrite": "/pages/login.html"
+      "rewrite": "/pages/login.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/media-redaction",
       "redirect": "/dashboard?feature=media-coming-soon",
-      "statusCode": 302
+      "statusCode": 302,
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
     },
     {
       "route": "/",
@@ -64,7 +89,8 @@
       "/*.ico",
       "/*.png",
       "/*.svg",
-      "/robots.txt"
+      "/robots.txt",
+      "/sitemap.xml"
     ]
   },
   "globalHeaders": {
@@ -72,7 +98,6 @@
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "no-referrer",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=()",
-    "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex",
     "Cache-Control": "no-store, no-cache, must-revalidate, private",
     "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
     "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; frame-src 'self' blob:; connect-src 'self' https://*.azure.com https://*.azurewebsites.net https://*.powerplatform.com https://*.powerautomate.com https://*.supabase.co https://*.blob.core.windows.net; font-src 'self' data:; object-src 'none'; media-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
@@ -92,6 +117,7 @@
     ".json": "application/json",
     ".css": "text/css",
     ".js": "application/javascript",
-    ".svg": "image/svg+xml"
+    ".svg": "image/svg+xml",
+    ".xml": "application/xml"
   }
 }

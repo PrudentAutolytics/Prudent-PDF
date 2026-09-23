@@ -6,13 +6,15 @@ Disallow: /dashboard
 Disallow: /history
 Disallow: /viewer
 Disallow: /admin
+Disallow: /governance
+Disallow: /profile
+Disallow: /media-redaction
 Disallow: /api/
 Disallow: /pages/
-Disallow: /js/
-Disallow: /css/
-Disallow: /assets/
 
-# Landing page and pricing are intentionally public
+# Landing page, pricing and contact are intentionally public.
+# /js/, /css/ and /assets/ stay crawlable so Google can render the public pages.
+# /login is crawlable so Google can see its noindex tag.
 Allow: /
 Allow: /pricing
 Allow: /contact
@@ -70,4 +72,4 @@ Disallow: /
 User-agent: ia_archiver
 Disallow: /
 
-
+Sitemap: https://redact.prudentautolytics.com/sitemap.xml
