@@ -20,3 +20,13 @@ const api=read('pages/developers.html');
 check(api.includes("Shell.init('api')"),'API page is protected by the authenticated shell');
 check(api.includes('Coming soon'),'API page is clearly marked as coming soon');
 check(!/[–—]/.test(api+css),'new sources contain no en dash or em dash');
+
+// v43: public pricing and contact for signed-out visitors
+const pricing=read('pages/pricing.html'),contact=read('pages/contact.html'),pub=read('js/public-shell.js');
+check(!pricing.includes("location.replace('/login')"),'pricing no longer forces signed-out visitors to login');
+check(!contact.includes("location.replace('/login')"),'contact no longer forces signed-out visitors to login');
+check(pricing.includes('PublicShell.init') && contact.includes('PublicShell.init'),'pricing and contact use the public header when signed out');
+check(pricing.includes("Shell.init('pricing')") && contact.includes("Shell.init('contact')"),'signed-in users keep the app shell');
+check(/index, follow/.test(pricing) && /index, follow/.test(contact),'pricing and contact are indexable');
+check(read('sitemap.xml').includes('/pricing') && read('sitemap.xml').includes('/contact'),'sitemap lists pricing and contact');
+check(!/[\u2013\u2014]/.test(pub),'public shell has no en dash or em dash');

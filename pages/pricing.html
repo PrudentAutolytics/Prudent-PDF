@@ -157,19 +157,20 @@
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
+<script src="/js/public-shell.js"></script>
 <script src="/js/enterprise-runtime.js"></script>
 <script>
 (function(){
   'use strict';
 
-  if (!Session.valid()) { location.replace('/login'); return; }
-
-  Shell.init('pricing');
+  // Public for signed-out visitors (and search engines); full app shell when signed in.
+  var signedIn = Session.valid();
+  if (signedIn) { Shell.init('pricing'); } else { PublicShell.init('pricing'); }
 
   var main = document.getElementById('pricingMain');
   if (!main) return;
 
-  var s = Session.get() || {};
+  var s = signedIn ? (Session.get() || {}) : {};
 
   /* ── Build full page HTML synchronously ── */
   var PLAN_ORDER = ['trial','starter','professional','business','enterprise'];
@@ -259,7 +260,7 @@
     '<div class="page-hd anim">',
       '<div>',
         '<div class="page-hd-eyebrow">Plans &amp; Pricing</div>',
-        '<div class="page-title">Simple, transparent pricing</div>',
+        '<h1 class="page-title" style="margin:0">Simple, transparent pricing</h1>',
         '<div class="page-subtitle">Powered by Azure Document Intelligence. No hidden fees. Cancel anytime.</div>',
       '</div>',
     '</div>',
@@ -321,7 +322,7 @@
 
   /* Show content */
   main.style.opacity = '1';
-  document.title = 'Pricing';
+  document.title = 'Plans and Pricing | Prudent Redact';
 
   /* Billing toggle */
   document.getElementById('tgMonthly')?.addEventListener('click', function() {

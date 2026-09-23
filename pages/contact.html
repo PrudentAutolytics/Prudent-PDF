@@ -102,7 +102,7 @@
     <div class="page-hd anim">
       <div>
         <div class="page-hd-eyebrow">Contact</div>
-        <div class="page-title">Get in touch</div>
+        <h1 class="page-title" style="margin:0">Get in touch</h1>
         <div class="page-subtitle">Our team responds to every enquiry within 24 hours on business days.</div>
       </div>
     </div>
@@ -225,13 +225,14 @@
 
 <script src="/js/config.js"></script>
 <script src="/js/shell.js"></script>
+<script src="/js/public-shell.js"></script>
 <script src="/js/enterprise-runtime.js"></script>
 <script>
 (function(){
   'use strict';
 
-  if (!Session.valid()) { location.replace('/login'); return; }
-  Shell.init('contact');
+  // Public for signed-out visitors (and search engines); full app shell when signed in.
+  if (Session.valid()) { Shell.init('contact'); } else { PublicShell.init('contact'); }
 
   // Keep enquiry identity fields intentionally blank.
   // The signed-in account can belong to an administrator or service operator,
@@ -287,7 +288,7 @@
     }
   });
 
-  document.title = 'Contact';
+  document.title = 'Contact | Prudent Redact';
 })();
 </script>
 <script src="/js/premium.js"></script>

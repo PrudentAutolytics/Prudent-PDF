@@ -395,3 +395,71 @@ html[data-theme="dark"] .api-hero { background: var(--surface); }
 html[data-theme="dark"] .api-tab[aria-selected="true"],
 html[data-theme="dark"] .api-empty-icon { background: var(--surface2); }
 html[data-theme="dark"] .api-code { background: #0B1222; }
+
+/* ===========================================================================
+   PUBLIC MODE: Pricing and Contact for signed-out visitors
+   =========================================================================== */
+body.public-mode { background: #FFFFFF !important; }
+html:has(body.public-mode),
+body.public-mode { height: auto !important; overflow: auto !important; }
+body.public-mode .shell {
+  display: block !important; height: auto !important; min-height: 0 !important;
+  overflow: visible !important; background: #FFFFFF !important;
+}
+body.public-mode .main {
+  height: auto !important; min-height: 0 !important; overflow: visible !important;
+  max-width: 1200px; margin: 0 auto; padding: 40px 24px 64px !important;
+}
+body.public-mode #pricingShell { min-height: 0 !important; background: #FFFFFF !important; }
+
+.pub-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,.94); backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid #E6EAF2;
+}
+.pub-header-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 68px;
+  display: flex; align-items: center; gap: 28px;
+}
+.pub-logo img { height: 34px; width: auto; display: block; }
+.pub-nav { display: flex; gap: 6px; margin-left: auto; }
+.pub-link {
+  padding: 8px 12px; border-radius: 9px; font-size: 14px; font-weight: 600;
+  color: #34425C; text-decoration: none;
+}
+.pub-link:hover { background: #F7F9FC; color: #0F1A33; text-decoration: none; }
+.pub-link.active { color: #2549C7; background: #EEF3FF; }
+.pub-actions { display: flex; align-items: center; gap: 10px; }
+.pub-signin { font-size: 14px; font-weight: 600; color: #34425C; text-decoration: none; padding: 8px 10px; }
+.pub-signin:hover { color: #0F1A33; text-decoration: none; }
+.pub-cta { white-space: nowrap; }
+
+.pub-footer { border-top: 1px solid #E6EAF2; background: #FFFFFF; }
+.pub-footer-inner {
+  max-width: 1200px; margin: 0 auto; padding: 22px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+  font-size: 12px; color: #5F6E86;
+}
+.pub-footer-inner img { height: 28px; width: auto; display: block; }
+.pub-footer-inner nav { display: flex; gap: 16px; }
+.pub-footer-inner nav a { color: #34425C; font-weight: 600; text-decoration: none; }
+.pub-footer-inner nav a:hover { color: #2549C7; }
+
+@media (max-width: 760px) {
+  .pub-header-inner { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+  .pub-logo img { height: 30px; }
+  .pub-nav { order: 3; width: 100%; margin-left: 0; justify-content: space-between; }
+  .pub-link { padding: 7px 10px; font-size: 13px; }
+  .pub-actions { margin-left: auto; }
+  .pub-signin { display: none; }
+  body.public-mode .main { padding: 24px 16px 48px !important; }
+  .pub-footer-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* Contact form header: white with a soft brand wash */
+html:not([data-theme="dark"]) .contact-form-head {
+  background: linear-gradient(135deg, #F4F8FF 0%, #FFFFFF 55%, #FAF6FF 100%) !important;
+  color: #0F1A33 !important;
+  border-bottom: 1px solid #E6EAF2;
+}
+html:not([data-theme="dark"]) .contact-form-sub { color: #5F6E86 !important; opacity: 1 !important; }
