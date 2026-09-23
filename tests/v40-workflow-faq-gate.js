@@ -34,7 +34,8 @@ check(/if \(steps\.length < 2 \|\| reduced\) return/.test(js), 'autoplay is skip
 check(/prefers-reduced-motion:reduce\)\{\.flow-step/.test(idx.replace(/\s/g, '')), 'workflow css respects reduced motion');
 
 /* -- FAQ -- */
-check((idx.match(/<details class="faq-item"/g) || []).length === 8, 'FAQ has eight questions');
+// v44 adds three search friendly questions (What is Prudent Redact, documents, scanned PDFs).
+check((idx.match(/<details class="faq-item"/g) || []).length === 11, 'FAQ has eleven questions');
 check(/<details class="faq-item" open>/.test(idx), 'the first FAQ answer is open by default');
 check(/summary::-webkit-details-marker\{display:none\}/.test(idx), 'FAQ uses styled native summaries');
 check(/summary:focus-visible/.test(idx), 'FAQ summaries are keyboard focusable');
