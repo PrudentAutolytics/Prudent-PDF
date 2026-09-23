@@ -7,8 +7,8 @@ const login=read('pages/login.html');
 
 check(login.includes('v33 canonical Prudent premium identity gateway'),'v33 premium identity theme exists');
 check(login.includes('#0A8CFF')&&login.includes('#4169F6')&&login.includes('#B218F4'),'canonical Prudent gradient tokens are used');
-check(login.includes('/assets/prudent-brand-dark-800.png'),'canonical dark-surface horizontal logo is used on the premium panel');
-check(login.includes('/assets/prudent-brand-light-800.png'),'canonical light-surface horizontal logo is used on the gateway stamp');
+check(login.includes('/assets/pa-logo-light.svg'),'v42 white login panel uses the light-surface brand logo');
+check((login.match(/\/assets\/pa-logo-light\.svg/g)||[]).length>=2,'v42 gateway stamp uses the light-surface brand logo');
 check(fs.existsSync(path.join(root,'assets/prudent-brand-dark-800.png')),'canonical dark lockup PNG exists');
 check(fs.existsSync(path.join(root,'assets/prudent-brand-light-800.png')),'canonical light lockup PNG exists');
 check(fs.existsSync(path.join(root,'assets/prudent-mark-gradient-256.png')),'canonical gradient mark PNG exists');

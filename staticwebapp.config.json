@@ -59,6 +59,13 @@
       }
     },
     {
+      "route": "/developers",
+      "rewrite": "/pages/developers.html",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex"
+      }
+    },
+    {
       "route": "/login",
       "rewrite": "/pages/login.html",
       "headers": {

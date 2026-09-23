@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>API Access | Prudent Redact</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/enterprise-responsive.css"/>
+<link rel="stylesheet" href="/css/premium.css"/>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#FFFFFF"/>
+<link rel="stylesheet" href="/css/brand-light.css"/>
+</head>
+<body>
+<div class="shell" id="appShell"><main class="main">
+<div class="api-wrap">
+
+ <section class="api-hero anim">
+  <div>
+   <div class="api-eyebrow">Developers <span class="api-soon">Coming soon</span></div>
+   <h1 class="api-title">API Access</h1>
+   <p class="api-sub">Send PDFs to Prudent Redact straight from your own systems, such as Power Automate, Logic Apps, a CRM or a document pipeline. Get the redacted output, SHA 256 evidence and processing history back without opening the workspace.</p>
+  </div>
+  <div class="api-hero-actions">
+   <a class="btn btn-primary" href="/contact?topic=api">Request early access</a>
+   <a class="btn btn-secondary" href="#quickstart">View quickstart</a>
+  </div>
+ </section>
+
+ <div class="api-grid anim">
+  <div class="api-col">
+
+   <section class="api-card" aria-labelledby="keysTitle">
+    <div class="api-card-hd">
+     <div class="api-card-title" id="keysTitle"><span class="api-card-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.6 7.6a5.5 5.5 0 11-7.8 7.8 5.5 5.5 0 017.8-7.8zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Your API keys</div>
+     <button class="btn btn-primary btn-sm" type="button" disabled title="Available when API access launches">+ Create key</button>
+    </div>
+    <div class="api-card-bd">
+     <div class="api-empty">
+      <span class="api-empty-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 118 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+      <strong>No API keys yet</strong>
+      <span class="api-muted">API keys will be available on Business and Enterprise plans. Each key is tied to your account, uses your plan limits and is shown only once when it is created.</span>
+     </div>
+     <div class="api-key-row" aria-hidden="true">
+      <div class="api-key-mask">pr_live_••••••••••••••••••••••••••••</div>
+      <button class="btn btn-secondary btn-sm" type="button" disabled>Revoke</button>
+     </div>
+    </div>
+   </section>
+
+   <section class="api-card" id="quickstart" aria-labelledby="qsTitle">
+    <div class="api-card-hd">
+     <div class="api-card-title" id="qsTitle"><span class="api-card-icon violet"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Quickstart</div>
+     <div class="api-tabs" role="tablist" aria-label="Code language">
+      <button class="api-tab" role="tab" aria-selected="true" data-lang="curl" type="button">cURL</button>
+      <button class="api-tab" role="tab" aria-selected="false" data-lang="ps" type="button">PowerShell</button>
+      <button class="api-tab" role="tab" aria-selected="false" data-lang="py" type="button">Python</button>
+     </div>
+    </div>
+    <div class="api-card-bd">
+     <p class="api-muted" style="margin:0 0 12px">Submit a PDF for redaction. This is a preview of the planned request format and may change before release.</p>
+     <div class="api-code-wrap">
+      <button class="api-copy" type="button" id="copyCode">Copy</button>
+<pre class="api-code" data-code="curl"><span class="c"># Submit a PDF for redaction</span>
+curl -X POST https://redact.prudentautolytics.com/api/jobs-submit \
+  -H <span class="s">"Authorization: Bearer $PRUDENT_API_KEY"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{
+    "fileName": "contract.pdf",
+    "fileBase64": "&lt;base64 encoded PDF&gt;"
+  }'</span></pre>
+<pre class="api-code" data-code="ps" hidden><span class="c"># Submit a PDF for redaction</span>
+<span class="k">$bytes</span> = [IO.File]::ReadAllBytes(<span class="s">"contract.pdf"</span>)
+<span class="k">$body</span>  = @{ fileName = <span class="s">"contract.pdf"</span>; fileBase64 = [Convert]::ToBase64String(<span class="k">$bytes</span>) } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri <span class="s">"https://redact.prudentautolytics.com/api/jobs-submit"</span> `
+  -Headers @{ Authorization = <span class="s">"Bearer $env:PRUDENT_API_KEY"</span> } `
+  -ContentType <span class="s">"application/json"</span> -Body <span class="k">$body</span></pre>
+<pre class="api-code" data-code="py" hidden><span class="c"># Submit a PDF for redaction</span>
+<span class="k">import</span> base64, os, requests
+
+<span class="k">with</span> open(<span class="s">"contract.pdf"</span>, <span class="s">"rb"</span>) <span class="k">as</span> f:
+    pdf = base64.b64encode(f.read()).decode()
+
+r = requests.post(
+    <span class="s">"https://redact.prudentautolytics.com/api/jobs-submit"</span>,
+    headers={<span class="s">"Authorization"</span>: <span class="s">f"Bearer {os.environ['PRUDENT_API_KEY']}"</span>},
+    json={<span class="s">"fileName"</span>: <span class="s">"contract.pdf"</span>, <span class="s">"fileBase64"</span>: pdf},
+)
+print(r.json())</pre>
+     </div>
+    </div>
+   </section>
+
+   <section class="api-card" aria-labelledby="epTitle">
+    <div class="api-card-hd">
+     <div class="api-card-title" id="epTitle"><span class="api-card-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Endpoints</div>
+     <span class="api-planned">Planned</span>
+    </div>
+    <div class="api-card-bd" style="overflow-x:auto">
+     <table class="api-endpoints">
+      <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+      <tbody>
+       <tr><td><span class="api-method post">POST</span><code>/api/jobs-submit</code></td><td>Submit a PDF for redaction and receive a job ID.</td></tr>
+       <tr><td><span class="api-method get">GET</span><code>/api/jobs-status</code></td><td>Check progress, then fetch the redacted output and its SHA 256 hash.</td></tr>
+       <tr><td><span class="api-method get">GET</span><code>/api/jobs-list</code></td><td>List recent jobs with status, pages and cost.</td></tr>
+       <tr><td><span class="api-method get">GET</span><code>/api/quota-get</code></td><td>See plan usage and remaining capacity.</td></tr>
+      </tbody>
+     </table>
+    </div>
+   </section>
+
+  </div>
+  <div class="api-col">
+
+   <section class="api-card" aria-labelledby="usageTitle">
+    <div class="api-card-hd"><div class="api-card-title" id="usageTitle"><span class="api-card-icon green"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>API usage</div></div>
+    <div class="api-card-bd">
+     <div class="api-stats">
+      <div class="api-stat"><small>Calls this month</small><strong>0</strong><span>Across all keys</span></div>
+      <div class="api-stat"><small>Rate limit</small><strong>Plan</strong><span>Set by your plan</span></div>
+     </div>
+     <p class="api-muted" style="margin:12px 0 0">API jobs count toward the same plan usage as jobs you run in the workspace.</p>
+    </div>
+   </section>
+
+   <section class="api-card" aria-labelledby="whTitle">
+    <div class="api-card-hd"><div class="api-card-title" id="whTitle"><span class="api-card-icon violet"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>Webhooks</div><span class="api-planned">Planned</span></div>
+    <div class="api-card-bd">
+     <p class="api-muted" style="margin:0">Get notified when a job finishes instead of polling. Works well with a Power Automate HTTP trigger.</p>
+     <div class="api-events"><code>job.completed</code><code>job.failed</code><code>quota.low</code></div>
+    </div>
+   </section>
+
+   <section class="api-card" aria-labelledby="whatTitle">
+    <div class="api-card-hd"><div class="api-card-title" id="whatTitle">What you will be able to do</div></div>
+    <div class="api-card-bd">
+     <ul class="api-list">
+      <li><span class="api-check"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Automate redaction</b>Redact documents from any system that can make an HTTPS call.</div></li>
+      <li><span class="api-check"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Keep the evidence</b>Every API job keeps its SHA 256 fingerprint and appears in Processing History.</div></li>
+      <li><span class="api-check"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Control access</b>Create and revoke keys yourself. Administrators can see and revoke every key.</div></li>
+      <li><span class="api-check"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Plug into Microsoft tools</b>Ready for Power Automate, Logic Apps and Azure Functions.</div></li>
+     </ul>
+    </div>
+   </section>
+
+  </div>
+ </div>
+</div>
+</main></div>
+<script src="/js/config.js"></script><script src="/js/shell.js"></script><script src="/js/enterprise-runtime.js"></script>
+<script>
+'use strict';
+Shell.init('api');
+(function () {
+  var tabs = document.querySelectorAll('.api-tab');
+  var blocks = document.querySelectorAll('.api-code');
+  var current = 'curl';
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      current = t.dataset.lang;
+      tabs.forEach(function (x) { x.setAttribute('aria-selected', String(x === t)); });
+      blocks.forEach(function (b) { b.hidden = b.dataset.code !== current; });
+    });
+  });
+  var copy = document.getElementById('copyCode');
+  copy.addEventListener('click', function () {
+    var block = document.querySelector('.api-code[data-code="' + current + '"]');
+    var text = block ? block.textContent : '';
+    function done() { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy'; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { if (window.showToast) showToast('Copy failed. Select the text and copy it manually.', 'error'); });
+    }
+  });
+})();
+</script>
+<script src="/js/premium.js"></script>
+</body></html>

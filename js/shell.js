@@ -21,7 +21,13 @@ const Shell = (() => {
     {
       group : 'COMING SOON',
       items : [
-        { id: 'media-redaction', label: 'Media Redaction', href: '', icon: 'shield', desc: 'Image and video privacy workflows are in controlled preview', badge: 'Coming Soon', disabled: true },
+        { id: 'media-redaction', label: 'Media Redaction', href: '', icon: 'shield', desc: 'Image and video privacy workflows are in controlled preview', badge: 'Soon', disabled: true },
+      ],
+    },
+    {
+      group : 'DEVELOPERS',
+      items : [
+        { id: 'api', label: 'API Access', href: '/developers', icon: 'code', desc: 'API keys, quickstart, and endpoints for programmatic redaction', badge: 'Soon' },
       ],
     },
     {
@@ -47,6 +53,7 @@ const Shell = (() => {
   ];
 
   const ICONS = {
+    code     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     user     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21c.7-4.4 3.4-7 8-7s7.3 2.6 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
     grid     : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>`,
     upload   : `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -94,9 +101,10 @@ const Shell = (() => {
     return `
 <nav class="topbar" role="banner" aria-label="Top navigation">
   <a class="topbar-brand" href="/dashboard" aria-label="Prudent Redact home" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0">
-    <div style="width:120px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid rgba(255,255,255,.10);background:#07111f">
-      <img src="/assets/pa-logo.svg" alt="Prudent Autolytics" style="width:100%;height:100%;object-fit:contain;display:block;padding:3px;box-sizing:border-box"/>
-    </div>
+    <span class="topbar-logo">
+      <img class="logo-on-light" src="/assets/pa-logo-light.svg" alt="Prudent Autolytics"/>
+      <img class="logo-on-dark" src="/assets/pa-logo.svg" alt="" aria-hidden="true"/>
+    </span>
   </a>
 
   <div class="topbar-search" role="search">
@@ -147,7 +155,7 @@ const Shell = (() => {
             <span class="nav-badge-soon">Soon</span>
           </a>`;
         }
-        const badge = item.badge ? `<span class="nav-link-badge${isActive ? ' blue' : ''}">${item.badge}</span>` : '';
+        const badge = item.badge ? `<span class="nav-link-badge${isActive ? ' blue' : ''}${item.badge === 'Soon' ? ' soon' : ''}">${item.badge}</span>` : '';
         return `<a class="nav-link${isActive ? ' active' : ''}" href="${item.href}" title="${item.desc}"${isActive ? ' aria-current="page"' : ''}>
           <span class="nav-link-icon" aria-hidden="true">${ICONS[item.icon] || ''}</span>
           ${item.label}${badge}

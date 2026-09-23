@@ -98,6 +98,7 @@ check(responsive.includes('.nav-sep{margin-block:6px}'),'short viewport navigati
 check(responsive.includes('.nav-link{padding-block:8px}'),'short viewport navigation links use compact vertical rhythm');
 check(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'api/jobs-submit/index.js'))).digest('hex')==='5345cc76c6e06ad5bc9d5cb18b50ea0f4c039a7306a2e07d1e72db6a32702803','locked Power Automate jobs-submit file is unchanged');
 
-if(count!==80){console.error(`FAIL: v24 gate executed ${count} checks instead of 80`);process.exitCode=1}
+// v42 adds pages/developers.html, which adds one per page viewport check.
+if(count!==81){console.error(`FAIL: v24 gate executed ${count} checks instead of 81`);process.exitCode=1}
 if(process.exitCode)process.exit(process.exitCode);
 console.log('V24 PRODUCT BENCHMARK GATE: 80 OF 80 CHECKS PASSED');
