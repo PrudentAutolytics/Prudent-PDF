@@ -30,3 +30,12 @@ check(pricing.includes("Shell.init('pricing')") && contact.includes("Shell.init(
 check(/index, follow/.test(pricing) && /index, follow/.test(contact),'pricing and contact are indexable');
 check(read('sitemap.xml').includes('/pricing') && read('sitemap.xml').includes('/contact'),'sitemap lists pricing and contact');
 check(!/[\u2013\u2014]/.test(pub),'public shell has no en dash or em dash');
+
+// v45: before/after compare, pricing sliders and accessibility
+const home45=read('index.html'),price45=read('pages/pricing.html');
+check(home45.includes('id="baRange"') && home45.includes('type="range"'),'homepage has a keyboard accessible before/after compare slider');
+check(home45.includes('aria-valuetext') && home45.includes('data-ba="0"') && home45.includes('data-ba="100"'),'compare slider announces its position and has button alternatives');
+check(home45.includes('class="skip-link"') && home45.includes('<main id="main">'),'homepage has a skip link to the main content');
+check(price45.includes("rangeField('calcDocs'") && price45.includes('aria-live="polite"'),'pricing estimate uses sliders with a live result');
+check(price45.includes('is-recommended'),'pricing highlights the best fit plan');
+check(!/[–—]/.test(home45+price45),'updated pages contain no en dash or em dash');

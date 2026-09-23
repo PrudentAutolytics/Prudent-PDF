@@ -262,13 +262,63 @@ button,a{touch-action:manipulation}
 @media(max-width:760px){.redact-demo{grid-template-columns:1fr;min-height:0}.redact-source{min-height:390px}.redact-result{min-height:310px}.doc-row{grid-template-columns:82px 1fr}}
 @media(prefers-reduced-motion:reduce){.sensitive-value:after,.redaction-cursor{animation:none!important}.sensitive-value:after{transform:scaleX(1)}}
 
+/* v45 accessibility and before/after compare */
+:root{--muted:#586a84}
+.skip-link{position:absolute;left:12px;top:-60px;z-index:200;padding:10px 14px;border-radius:10px;background:#10213b;color:#fff;font-weight:700;text-decoration:none}
+.skip-link:focus{top:12px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #4169f6;outline-offset:3px;border-radius:10px}
+.compare-section{background:#fff}
+.ba-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.9fr);gap:28px;align-items:start}
+.ba-stage{--pos:50%;position:relative;border-radius:22px;border:1px solid var(--line);background:#f7faff;box-shadow:var(--shadow);overflow:hidden;min-height:400px;user-select:none;touch-action:pan-y}
+.ba-layer{position:absolute;inset:0;padding:clamp(16px,3.2vw,34px);display:flex;align-items:center;justify-content:center}
+.ba-redacted{clip-path:inset(0 0 0 var(--pos))}
+.ba-doc{width:100%;max-width:560px;background:#fff;border:1px solid #e3eaf4;border-radius:14px;padding:clamp(16px,2.4vw,26px);box-shadow:0 14px 34px rgba(16,33,59,.08);font-size:13px}
+.ba-doc-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.ba-doc-hd strong{font-size:15px;color:var(--ink)}
+.ba-doc-hd span{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
+.ba-row{display:grid;grid-template-columns:minmax(96px,.75fr) minmax(0,1.6fr);gap:12px;align-items:center;padding:8px 0;border-top:1px solid #eef2f8}
+.ba-row b{font-weight:650;color:var(--ink2)}
+.ba-val{justify-self:start;padding:3px 8px;border-radius:6px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;color:var(--ink)}
+.ba-original .ba-val.pii{background:#fff4d6;color:#7a4300;box-shadow:inset 0 0 0 1px #f3d58a}
+.ba-redacted .ba-val.pii{background:#0b1220;color:transparent;position:relative}
+.ba-redacted .ba-val.pii::after{content:"REDACTED";position:absolute;inset:0;display:grid;place-items:center;color:#9fb0cc;font-size:9px;letter-spacing:.14em}
+.ba-note{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.6}
+.ba-divider{position:absolute;top:0;bottom:0;left:var(--pos);width:3px;margin-left:-1.5px;background:linear-gradient(180deg,#0A8CFF,#4169F6,#8B3FF2);pointer-events:none;z-index:3}
+.ba-grip{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:#fff;border:2px solid #4169F6;box-shadow:0 8px 22px rgba(16,33,59,.22);display:grid;place-items:center;color:#4169F6}
+.ba-tag{position:absolute;top:12px;z-index:4;padding:5px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;pointer-events:none}
+.ba-tag.left{left:12px;background:#fff4d6;color:#7a4300;border:1px solid #f3d58a}
+.ba-tag.right{right:12px;background:#0b1220;color:#fff}
+.ba-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;z-index:5;-webkit-appearance:none;appearance:none}
+.ba-stage:has(.ba-range:focus-visible){outline:3px solid #4169f6;outline-offset:4px}
+.ba-stage:has(.ba-range:focus-visible) .ba-grip{box-shadow:0 0 0 6px rgba(65,105,246,.25),0 8px 22px rgba(16,33,59,.22)}
+.ba-controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ba-btn{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);font:700 13px var(--font);cursor:pointer}
+.ba-btn:hover{border-color:var(--blue2)}
+.ba-btn[aria-pressed="true"]{background:#10213b;color:#fff;border-color:#10213b}
+.ba-hint{margin-top:10px;font-size:12px;color:var(--muted)}
+.ba-panel{border:1px solid var(--line);border-radius:20px;background:#fff;padding:22px;box-shadow:0 12px 32px rgba(55,84,124,.06)}
+.ba-panel h3{font-size:18px;margin:0 0 4px}
+.ba-panel>p{font-size:13px;color:var(--muted);margin:0 0 14px}
+.ba-found{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ba-found li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#f7faff;border:1px solid #e6eef8;font-size:13px;color:var(--ink2)}
+.ba-found li strong{font-size:12px;padding:2px 9px;border-radius:999px;background:#e9f9f2;color:#0a6e4b}
+.ba-steps{list-style:none;margin:18px 0 0;padding:16px 0 0;border-top:1px solid var(--line);display:grid;gap:12px;counter-reset:bastep}
+.ba-steps li{counter-increment:bastep;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:13px;color:var(--ink2)}
+.ba-steps li::before{content:counter(bastep);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#0A8CFF,#4169F6,#8B3FF2);color:#fff;font-weight:800;font-size:12px}
+.ba-steps b{display:block;color:var(--ink);font-size:13.5px}
+@media(max-width:980px){.ba-layout{grid-template-columns:1fr}}
+@media(max-width:560px){.ba-stage{min-height:360px}.ba-layer{padding:14px}.ba-doc{padding:14px;font-size:11.5px}.ba-row{grid-template-columns:minmax(78px,.7fr) minmax(0,1.5fr);gap:8px}.ba-val{padding:3px 6px}.ba-note{display:none}.ba-grip{width:40px;height:40px;margin:-20px 0 0 -20px}.ba-btn{flex:1 1 30%;padding:0 8px}}
+@media(prefers-reduced-motion:reduce){.ba-stage *{transition:none!important}}
+
 </style>
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","@id":"https://redact.prudentautolytics.com/#org","name":"Prudent Autolytics","legalName":"Prudent Autolytics LLP","alternateName":["Prudent Autolytics LLP","Prudent"],"url":"https://redact.prudentautolytics.com/","logo":"https://redact.prudentautolytics.com/assets/prudent-brand-light-800.png","email":"Service.Account@prudentautolytics.com","address":{"@type":"PostalAddress","addressLocality":"Bangalore","addressRegion":"Karnataka","addressCountry":"IN"}},{"@context":"https://schema.org","@type":"WebSite","@id":"https://redact.prudentautolytics.com/#website","name":"Prudent Redact","alternateName":["Redact Prudent","Prudent Autolytics Redact","Redact by Prudent Autolytics","Prudent Redaction"],"url":"https://redact.prudentautolytics.com/","publisher":{"@id":"https://redact.prudentautolytics.com/#org"}},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Prudent Redact","alternateName":["Redact Prudent","Prudent Autolytics Redact","Redact by Prudent Autolytics","Prudent Redactor"],"applicationCategory":"BusinessApplication","operatingSystem":"Web browser","url":"https://redact.prudentautolytics.com/","description":"Prudent Redact by Prudent Autolytics is an AI PDF redaction tool on Microsoft Azure. Find and permanently black-box redact sensitive information, with SHA-256 evidence and full processing history.","publisher":{"@id":"https://redact.prudentautolytics.com/#org"},"offers":{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":"0","highPrice":"1499","offerCount":"5","url":"https://redact.prudentautolytics.com/pricing"},"keywords":"Prudent Redact, Redact Prudent, Prudent Autolytics Redact, Prudent Autolytics, PDF redaction tool, redact PDF online, PDF redaction software, AI redaction, automatic PDF redaction, remove sensitive information from PDF, PII redaction, personal data redaction, black out text in PDF, document redaction, scanned PDF redaction, OCR redaction, Azure AI Document Intelligence redaction, secure document redaction, GDPR data redaction, bank statement redaction, contract redaction, HR document redaction, redaction audit trail","featureList":["AI detection of sensitive information in PDFs","Permanent black-box redaction","OCR for scanned PDFs","SHA-256 output evidence","Side by side review of original and redacted PDF","Processing history and governance","Passwordless sign in"]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is Prudent Redact?","acceptedAnswer":{"@type":"Answer","text":"Prudent Redact, also known as Redact Prudent or Prudent Autolytics Redact, is an online PDF redaction tool built by Prudent Autolytics. It finds and permanently removes sensitive information from PDF documents, such as names, email addresses, phone numbers, bank and account numbers and ID numbers, using AI on Microsoft Azure."}},{"@type":"Question","name":"What documents can I redact?","acceptedAnswer":{"@type":"Answer","text":"Any PDF that contains personal or confidential data: contracts and legal documents, HR and employee records, bank statements, invoices, KYC and customer onboarding forms, insurance and claim forms, and internal reports. It works as a secure alternative to manually blacking out text in a PDF editor."}},{"@type":"Question","name":"Can Prudent Redact handle scanned PDFs?","acceptedAnswer":{"@type":"Answer","text":"Yes. Azure AI Document Intelligence reads text from scanned and image based PDFs with OCR, so sensitive values can be detected and redacted even when the PDF has no selectable text."}},{"@type":"Question","name":"How does the redaction actually work?","acceptedAnswer":{"@type":"Answer","text":"You submit a PDF from the secure workspace. Azure AI Document Intelligence analyzes the document content and identifies sensitive values, and the workflow applies black-box redaction that replaces the original content in the controlled output. The result is reviewed side by side with its processing status."}},{"@type":"Question","name":"Is the redaction permanent, or can the text be recovered?","acceptedAnswer":{"@type":"Answer","text":"Black-box redaction replaces the original content in the output document. The redacted output is produced as a new controlled file, and its state is recorded with output evidence so you can prove what changed."}},{"@type":"Question","name":"Where are my documents processed and stored?","acceptedAnswer":{"@type":"Answer","text":"Processing runs on Microsoft Azure. Documents are held in private Azure Blob Storage and are accessed through short lived, signed links rather than public URLs. Processing history for your account stays visible inside the workspace."}},{"@type":"Question","name":"Do I need a password?","acceptedAnswer":{"@type":"Answer","text":"No. Access is passwordless: you enter your work email and receive a short lived verification code. Successful verification establishes a signed session for the workspace."}},{"@type":"Question","name":"How can I prove what was removed?","acceptedAnswer":{"@type":"Answer","text":"Every completed job records output evidence, including a SHA 256 fingerprint and processing history. The document viewer lets you open the original and the redacted output for controlled review."}},{"@type":"Question","name":"How is usage measured and billed?","acceptedAnswer":{"@type":"Answer","text":"Operations are metered. Successful redaction jobs increment your plan usage and record cost estimates, which are visible on the dashboard and in governance reporting."}},{"@type":"Question","name":"What about images and video?","acceptedAnswer":{"@type":"Answer","text":"A media privacy studio supports image and video review with automatic face assistance, Black, Blur or Pixelate effects, safety margins and manual regions. Availability is shown inside the product, and unavailable tools are never presented as active."}},{"@type":"Question","name":"Who can administer the workspace?","acceptedAnswer":{"@type":"Answer","text":"Administration is restricted by role. Only accounts holding the administrator role can manage users, plans, credits and access, and every administrative action is recorded for audit."}}]}]</script>
 </head>
 <body>
-<nav class="nav">
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Main">
   <a href="/" aria-label="Prudent Redact home"><img class="nav-logo" src="/assets/pa-logo-light.svg" alt="Prudent Autolytics"/></a>
   <div class="nav-links">
+    <a href="#compare">See it work</a>
     <a href="#proof">Privacy proof</a>
     <a href="#workflow">Workflow</a>
     <a href="#media">Media privacy</a>
@@ -281,7 +331,7 @@ button,a{touch-action:manipulation}
   </div>
 </nav>
 
-<main>
+<main id="main">
 <section class="hero aurora-host"><div class="visual-orbit" aria-hidden="true"><span class="orbit-node n1"></span><span class="orbit-node n2"></span><span class="orbit-node n3"></span><span class="evidence-orbit"><i>PII</i><i>SHA</i><i>OPS</i><i>RISK</i></span></div>
   <div class="hero-copy">
     <div class="eyebrow"><span class="eyebrow-dot"></span> Privacy operations control plane</div>
@@ -342,6 +392,51 @@ button,a{touch-action:manipulation}
 
 </div>
 
+
+<section class="section compare-section reveal" id="compare" aria-labelledby="compareTitle">
+  <div class="section-inner">
+    <div class="section-head">
+      <div><div class="section-kicker">See the difference</div><h2 id="compareTitle">Drag to compare the original and the redacted PDF.</h2></div>
+      <p class="section-lead">Prudent Redact finds personal data such as names, emails, phone numbers, account numbers and ID numbers, then replaces them with permanent black boxes. Everything else in the document stays readable.</p>
+    </div>
+    <div class="ba-layout">
+      <div>
+        <div class="ba-stage" id="baStage">
+          <div class="ba-layer ba-original" aria-hidden="true"><div class="ba-doc"><div class="ba-doc-hd"><strong>Loan agreement</strong><span>PAGE 1 OF 4</span></div><div class="ba-row"><b>Borrower name</b><span class="ba-val pii">Ananya Rao</span></div><div class="ba-row"><b>Email</b><span class="ba-val pii">ananya.rao@example.com</span></div><div class="ba-row"><b>Phone</b><span class="ba-val pii">+91 98450 12345</span></div><div class="ba-row"><b>Account number</b><span class="ba-val pii">4821 9364 1128 7742</span></div><div class="ba-row"><b>PAN</b><span class="ba-val pii">ABCPR1234K</span></div><div class="ba-row"><b>Loan amount</b><span class="ba-val">INR 25,00,000</span></div><div class="ba-row"><b>Term</b><span class="ba-val">60 months</span></div><p class="ba-note">Sample document. Loan amount and term are business data, so they stay visible.</p></div></div>
+          <div class="ba-layer ba-redacted" aria-hidden="true"><div class="ba-doc"><div class="ba-doc-hd"><strong>Loan agreement</strong><span>PAGE 1 OF 4</span></div><div class="ba-row"><b>Borrower name</b><span class="ba-val pii">Ananya Rao</span></div><div class="ba-row"><b>Email</b><span class="ba-val pii">ananya.rao@example.com</span></div><div class="ba-row"><b>Phone</b><span class="ba-val pii">+91 98450 12345</span></div><div class="ba-row"><b>Account number</b><span class="ba-val pii">4821 9364 1128 7742</span></div><div class="ba-row"><b>PAN</b><span class="ba-val pii">ABCPR1234K</span></div><div class="ba-row"><b>Loan amount</b><span class="ba-val">INR 25,00,000</span></div><div class="ba-row"><b>Term</b><span class="ba-val">60 months</span></div><p class="ba-note">Sample document. Loan amount and term are business data, so they stay visible.</p></div></div>
+          <div class="ba-divider" aria-hidden="true"><span class="ba-grip"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <span class="ba-tag left" aria-hidden="true">Original</span>
+          <span class="ba-tag right" aria-hidden="true">Redacted</span>
+          <input class="ba-range" id="baRange" type="range" min="0" max="100" step="1" value="50" aria-label="Compare the original and the redacted document. Move right to see more of the original." aria-valuetext="Half original, half redacted"/>
+        </div>
+        <div class="ba-controls" role="group" aria-label="Choose a view">
+          <button class="ba-btn" type="button" data-ba="100" aria-pressed="false">Show original</button>
+          <button class="ba-btn" type="button" data-ba="50" aria-pressed="true">Side by side</button>
+          <button class="ba-btn" type="button" data-ba="0" aria-pressed="false">Show redacted</button>
+        </div>
+        <p class="ba-hint">Drag the handle, use the buttons, or focus the image and press the arrow keys.</p>
+      </div>
+      <aside class="ba-panel" aria-labelledby="baFoundTitle">
+        <h3 id="baFoundTitle">What was found in this sample</h3>
+        <p>5 sensitive values detected and removed.</p>
+        <ul class="ba-found">
+          <li>Name <strong>Removed</strong></li>
+          <li>Email address <strong>Removed</strong></li>
+          <li>Phone number <strong>Removed</strong></li>
+          <li>Bank account number <strong>Removed</strong></li>
+          <li>PAN / ID number <strong>Removed</strong></li>
+        </ul>
+        <ol class="ba-steps" aria-label="How it works">
+          <li><div><b>Upload your PDF</b>Scanned or digital, from the secure workspace.</div></li>
+          <li><div><b>AI finds personal data</b>Azure AI Document Intelligence reads every page.</div></li>
+          <li><div><b>Review side by side</b>Check the original and the redacted copy together.</div></li>
+          <li><div><b>Download with proof</b>Get the redacted PDF plus a SHA 256 fingerprint.</div></li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <section class="section reveal" id="proof">
   <div class="section-inner">
     <div class="section-head">
@@ -359,15 +454,15 @@ button,a{touch-action:manipulation}
 <section class="section flow-section reveal" id="workflow">
   <div class="section-inner">
     <div class="section-head">
-      <div><div class="section-kicker">Controlled workflow</div><h2>From source file to governed output.</h2></div>
+      <div><div class="section-kicker">How it works</div><h2>From source file to governed output.</h2></div>
       <p class="section-lead">Prudent Redact is designed around a repeatable operating flow. The interface makes the next control obvious while keeping redaction, supporting document operations and media privacy distinct.</p>
     </div>
     <div class="flow-board">
-      <article class="flow-step" data-flow-step><b>1</b><h3>Access</h3><p>Passwordless verification establishes the signed session.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
-      <article class="flow-step" data-flow-step><b>2</b><h3>Process</h3><p>Submit redaction work or execute an available local document operation.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
-      <article class="flow-step" data-flow-step><b>3</b><h3>Review</h3><p>Inspect results, media masks and workflow status.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
-      <article class="flow-step" data-flow-step><b>4</b><h3>Meter</h3><p>Successful operations increment usage and record cost estimates.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
-      <article class="flow-step" data-flow-step><b>5</b><h3>Govern</h3><p>Use history, risk and control posture to manage operational exceptions.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
+      <article class="flow-step" data-flow-step><b>1</b><h3>Sign in</h3><p>Enter your work email and a one time code. No password to remember.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
+      <article class="flow-step" data-flow-step><b>2</b><h3>Upload</h3><p>Add a PDF. AI reads every page and marks the sensitive values.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
+      <article class="flow-step" data-flow-step><b>3</b><h3>Review</h3><p>Compare the original and redacted copy side by side before you release it.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
+      <article class="flow-step" data-flow-step><b>4</b><h3>Download</h3><p>Save the redacted PDF with its SHA 256 fingerprint as proof.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
+      <article class="flow-step" data-flow-step><b>5</b><h3>Track</h3><p>Every job, cost and change is kept in your processing history.</p><span class="flow-bar" aria-hidden="true"><i></i></span></article>
     </div>
   </div>
 </section>
@@ -430,6 +525,19 @@ button,a{touch-action:manipulation}
 <script>
 (function(){
   if (Session.valid()) { location.replace('/dashboard'); return; }
+})();
+</script>
+<script>
+(function(){
+  var stage=document.getElementById('baStage'),range=document.getElementById('baRange');
+  if(!stage||!range)return;
+  var btns=[].slice.call(document.querySelectorAll('.ba-btn'));
+  function label(v){return v>=100?'Showing the original document':v<=0?'Showing the redacted document':v+' percent original, '+(100-v)+' percent redacted';}
+  function set(v){v=Math.max(0,Math.min(100,Number(v)));stage.style.setProperty('--pos',v+'%');range.value=v;range.setAttribute('aria-valuetext',label(v));
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(Number(b.dataset.ba)===v));});}
+  range.addEventListener('input',function(){set(range.value);});
+  btns.forEach(function(b){b.addEventListener('click',function(){set(b.dataset.ba);});});
+  set(50);
 })();
 </script>
 <script src="/js/premium.js"></script>

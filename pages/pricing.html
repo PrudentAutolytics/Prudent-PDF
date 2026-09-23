@@ -40,7 +40,7 @@
   display:grid;
   grid-template-columns:repeat(5,1fr);
   gap:14px;
-  margin-bottom:32px;
+  margin-bottom:40px;
 }
 @media(max-width:1100px){ .plans-grid { grid-template-columns:repeat(3,1fr); } }
 @media(max-width:720px) { .plans-grid { grid-template-columns:1fr 1fr; } }
@@ -141,6 +141,27 @@
 .faq-q.open .faq-q-icon { background:var(--blue); border-color:var(--blue); color:#fff; }
 .faq-a { font-size:13.5px; color:var(--ink3); line-height:1.75; padding-bottom:16px; display:none; }
 .faq-a.open { display:block; }
+/* v45 accessible estimate sliders */
+.range-field{display:flex;flex-direction:column;gap:8px}
+.range-top{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:44px;justify-content:flex-end}
+.range-top label{font-size:12.5px;font-weight:700;color:var(--ink2)}
+.range-top output{font:800 15px var(--font);color:var(--ink);font-variant-numeric:tabular-nums}
+.range-field input[type=range]{--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer;margin:0}
+.range-field input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:linear-gradient(90deg,#0A8CFF,#4169F6 60%,#8B3FF2) 0/var(--fill) 100% no-repeat,#E7ECF5}
+.range-field input[type=range]::-moz-range-track{height:8px;border-radius:999px;background:#E7ECF5}
+.range-field input[type=range]::-moz-range-progress{height:8px;border-radius:999px;background:linear-gradient(90deg,#0A8CFF,#4169F6)}
+.range-field input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-8px;border-radius:50%;background:#fff;border:3px solid #4169F6;box-shadow:0 3px 10px rgba(15,26,51,.2)}
+.range-field input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #4169F6}
+.range-field input[type=range]:focus-visible{outline:3px solid #4169F6;outline-offset:4px;border-radius:8px}
+.range-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3)}
+.calc-fields.sliders{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(150px,.8fr);align-items:end;gap:20px}
+@media(max-width:900px){.calc-fields.sliders{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.calc-fields.sliders{grid-template-columns:1fr}}
+.plan-card.is-recommended{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.16)}
+.rec-badge{display:none;position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 12px;border-radius:999px;background:#047857;color:#fff;font-size:10.5px;font-weight:700}
+.plan-card.is-recommended .rec-badge{display:block}
+.toggle-btn:focus-visible,.faq-q:focus-visible,.plan-btn:focus-visible{outline:3px solid #4169F6;outline-offset:3px}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#FFFFFF"/>
@@ -191,7 +212,7 @@
       var btnCls    = isPopular ? 'plan-btn primary' : 'plan-btn ghost';
       var pill      = isPopular ? '<div class="popular-pill">\u2b50 Most Popular</div>' : '';
       var curBadge  = isCurrent ? '<div style="font-size:11px;color:var(--green);font-weight:600;text-align:center;margin-top:6px">\u2713 Your plan</div>' : '';
-      return '<div class="plan-card' + (isPopular?' popular':'') + '" id="pc-'+id+'">' + pill +
+      return '<div class="plan-card' + (isPopular?' popular':'') + '" id="pc-'+id+'">' + pill + '<div class="rec-badge">\u2713 Best fit for you</div>' +
         '<div class="plan-name">' + p.label + '</div>' +
         '<div style="display:flex;align-items:baseline;gap:2px;margin:12px 0 0">' +
           '<span style="font-size:36px;font-weight:900;letter-spacing:-1.5px;font-family:var(--display);color:var(--ink)" id="pp-'+id+'">' + priceStr + '</span>' + perStr +
@@ -244,7 +265,7 @@
     compareRows.map(function(r) {
       return '<tr><td>' + r[0] + '</td>' +
         r.slice(1).map(function(v, i) {
-          return '<td' + (i===2?' class="hi"':'') + '>' + (v?'<span class="ck">\u2713</span>':'<span class="cx">\u2717</span>') + '</td>';
+          return '<td' + (i===2?' class="hi"':'') + '>' + (v?'<span class="ck" aria-label="Included">\u2713</span>':'<span class="cx" aria-label="Not included">\u2717</span>') + '</td>';
         }).join('') + '</tr>';
     }).join('') +
     '</tbody></table></div>';
@@ -255,6 +276,19 @@
     ['Can I cancel anytime?','Yes. No long-term contracts. Cancel or downgrade at any time. Annual plans are non-refundable after the first 14 days.'],
     ['Do you offer enterprise plans?','Yes. For organisations with specific requirements, contact us and we\u2019ll put together a custom proposal within 48 hours.'],
   ];
+
+  function rangeField(id,label,min,max,step,val,lo,hi){
+    return '<div class="range-field"><div class="range-top"><label for="'+id+'">'+label+'</label><output id="'+id+'Out" for="'+id+'" aria-hidden="true"></output></div>'+
+      '<input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"/>'+
+      '<div class="range-scale" aria-hidden="true"><span>'+lo+'</span><span>'+hi+'</span></div></div>';
+  }
+  function syncRange(id,unit){
+    var r=document.getElementById(id),o=document.getElementById(id+'Out'); if(!r) return;
+    var v=Number(r.value),pct=(v-Number(r.min))/(Number(r.max)-Number(r.min))*100;
+    r.style.setProperty('--fill',pct+'%');
+    var txt=(unit==='MB'?v+' MB':v.toLocaleString()+' '+unit);
+    if(o) o.textContent=txt; r.setAttribute('aria-valuetext',txt);
+  }
 
   main.innerHTML = [
     '<div class="page-hd anim">',
@@ -268,8 +302,8 @@
     /* Billing toggle */
     '<div style="display:flex;justify-content:center;margin-bottom:28px">',
       '<div class="toggle-group">',
-        '<button class="toggle-btn active" id="tgMonthly">Monthly</button>',
-        '<button class="toggle-btn" id="tgAnnual">Annual <span class="save-pill">Save 20%</span></button>',
+        '<button class="toggle-btn active" id="tgMonthly" type="button" aria-pressed="true">Monthly</button>',
+        '<button class="toggle-btn" id="tgAnnual" type="button" aria-pressed="false">Annual <span class="save-pill">Save 20%</span></button>',
       '</div>',
     '</div>',
 
@@ -282,11 +316,11 @@
         '<div>',
           '<div class="calc-title">Estimate your cost</div>',
           '<div class="calc-sub">Based on real Azure pricing: OCR ($1.50/1k pages) + PII detection ($10/1k pages) + 3.5\u00d7 margin.</div>',
-          '<div class="calc-fields" style="margin-top:18px">',
-            '<div class="form-group" style="margin:0"><label class="form-label">Documents / month</label><input class="form-input" type="number" id="calcDocs" value="100" min="1"/></div>',
-            '<div class="form-group" style="margin:0"><label class="form-label">Avg pages / doc</label><input class="form-input" type="number" id="calcPages" value="10" min="1"/></div>',
-            '<div class="form-group" style="margin:0"><label class="form-label">Avg file size (MB)</label><input class="form-input" type="number" id="calcSizeMB" value="2" min="0.1" step="0.5"/></div>',
-            '<div class="form-group" style="margin:0"><label class="form-label">Billing period</label><select class="form-select" id="calcPeriod"><option value="monthly">Monthly</option><option value="annual">Annual (\u221220%)</option></select></div>',
+          '<div class="calc-fields sliders" style="margin-top:18px">',
+            rangeField('calcDocs','Documents per month',10,2000,10,100,'10','2,000'),
+            rangeField('calcPages','Average pages per document',1,200,1,10,'1','200'),
+            rangeField('calcSizeMB','Average file size (MB)',0.5,100,0.5,2,'0.5 MB','100 MB'),
+            '<div class="form-group" style="margin:0"><label class="form-label" for="calcPeriod">Billing period</label><select class="form-select" id="calcPeriod"><option value="monthly">Monthly</option><option value="annual">Annual (\u221220%)</option></select></div>',
           '</div>',
           '<div class="calc-breakdown-row">',
             '<div class="calc-item"><div class="calc-item-label">Azure OCR</div><div class="calc-item-val" id="calcOcr">$0.00</div></div>',
@@ -294,7 +328,7 @@
             '<div class="calc-item"><div class="calc-item-label">Infrastructure</div><div class="calc-item-val" id="calcInfra">$0.00</div></div>',
           '</div>',
         '</div>',
-        '<div class="calc-result-pill">',
+        '<div class="calc-result-pill" aria-live="polite" aria-atomic="true">',
           '<div class="calc-result-label">Est. monthly cost</div>',
           '<div class="calc-result-price" id="calcPrice">$0.00</div>',
           '<div class="calc-result-sub" id="calcSub">-</div>',
@@ -313,7 +347,7 @@
     '<div class="faq-wrap anim d4">',
       faqs.map(function(f) {
         return '<div class="faq-item">' +
-          '<button class="faq-q">' + f[0] + '<span class="faq-q-icon">\u203a</span></button>' +
+          '<button class="faq-q" type="button" aria-expanded="false">' + f[0] + '<span class="faq-q-icon">\u203a</span></button>' +
           '<div class="faq-a"><p>' + f[1] + '</p></div>' +
           '</div>';
       }).join(''),
@@ -329,17 +363,20 @@
     isAnnual = false;
     document.getElementById('tgMonthly').classList.add('active');
     document.getElementById('tgAnnual').classList.remove('active');
+    document.getElementById('tgMonthly').setAttribute('aria-pressed','true'); document.getElementById('tgAnnual').setAttribute('aria-pressed','false');
     updatePrices();
   });
   document.getElementById('tgAnnual')?.addEventListener('click', function() {
     isAnnual = true;
     document.getElementById('tgAnnual').classList.add('active');
     document.getElementById('tgMonthly').classList.remove('active');
+    document.getElementById('tgAnnual').setAttribute('aria-pressed','true'); document.getElementById('tgMonthly').setAttribute('aria-pressed','false');
     updatePrices();
   });
 
   /* Calculator */
   function calcEstimate() {
+    syncRange('calcDocs','documents'); syncRange('calcPages','pages'); syncRange('calcSizeMB','MB');
     var docs   = Math.max(1, +(document.getElementById('calcDocs').value)   || 100);
     var pages  = Math.max(1, +(document.getElementById('calcPages').value)  || 10);
     var sizeMB = Math.max(.1,+(document.getElementById('calcSizeMB').value) || 2);
@@ -359,6 +396,7 @@
     if(ge('calcSub'))   ge('calcSub').textContent   = docs.toLocaleString()+' docs \u00d7 '+pages+' pages'+(annual?' \u00b7 Annual':'');
     var planList = PLAN_ORDER.map(function(id){ return {id:id, p:APP_CONFIG.PLANS[id]}; });
     var rec = planList.find(function(x){ return x.p && (x.p.filesPerMonth===999999||x.p.filesPerMonth>=docs); }) || planList[planList.length-1];
+    PLAN_ORDER.forEach(function(id){ var c=ge('pc-'+id); if(c) c.classList.toggle('is-recommended', !!rec && rec.id===id); });
     if (rec && ge('calcRec')) ge('calcRec').innerHTML = rec.p.price===0
       ? '\u2713 Fits <strong>Free Trial</strong>. <a href="/login" style="color:#fff;font-weight:700;text-decoration:underline">Get started \u2192</a>'
       : '\u2713 Recommended: <strong>'+rec.p.label+'</strong> ($'+rec.p.price+'/mo). <a href="'+(rec.id==='business'||rec.id==='enterprise'?'/contact':'/login')+'" style="color:#fff;font-weight:700;text-decoration:underline">Get started \u2192</a>';
@@ -375,8 +413,8 @@
       var a    = q.nextElementSibling;
       var open = a.classList.contains('open');
       document.querySelectorAll('.faq-a').forEach(function(x){x.classList.remove('open');});
-      document.querySelectorAll('.faq-q').forEach(function(x){x.classList.remove('open');});
-      if (!open) { a.classList.add('open'); q.classList.add('open'); }
+      document.querySelectorAll('.faq-q').forEach(function(x){x.classList.remove('open');x.setAttribute('aria-expanded','false');});
+      if (!open) { a.classList.add('open'); q.classList.add('open'); q.setAttribute('aria-expanded','true'); }
     });
   });
 
